@@ -1,0 +1,10 @@
+openssl_conf = openssl_def
+[openssl_def]
+engines = engine_section
+[engine_section]
+hpre2 = hpre2_section
+[hpre2_section]
+engine_id = hpre2
+dynamic_path = /usr/lib64/engines-1.1/hpre2.so
+default_algorithms = ALL
+

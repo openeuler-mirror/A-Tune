@@ -1,0 +1,6 @@
+[LogSection]
+debug_level=none
+
+[QueueSection]
+queue_number=6
+is_soft=yes

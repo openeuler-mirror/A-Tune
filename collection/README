@@ -1,0 +1,42 @@
+Required Tools: perf mpstat vmstat iostat sar
+
+
+Usage: 
+sh collect_raw_data.sh workload sample_time sample_interval out_log
+
+workload: the workload you want to tune
+sample_time: total collection time
+sample_interval: sample interval
+out_log: the output directory
+
+
+supported cpu: kunpeng 920,Hisilicon 1620
+
+
+supported metrics:
+	hardware metrics:
+		perf-cpu:	IPC  MPKI  LLC  ITLB  DTLB	Memory_Bound  Store_Bound
+		perf-memBW:	MEM_Total CPU0  CPU1  CPU0_Die0  CPU0_Die1  CPU1_Die0  CPU1_Die1  MEM_CPU0_Die0_R  MEM_CPU0_Die1_R  MEM_CPU1_Die0_R  MEM_CPU1_Die1_R  MEM_CPU0_Die0_W  MEM_CPU0_Die1_W	MEM_CPU1_Die0_W  MEM_CPU1_Die1_W
+	
+	cpu utilization:
+		mpstat:	 %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+	
+	system:
+		vmstat:	 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+  			 	 r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+  		sar-load:runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked
+  		sar-task:proc/s   cswch/s
+		sysctl:"/proc/sys/kernel/threads-max","/proc/sys/fs/file-nr","/proc/loadavg"
+  	
+	disk:
+  		iostat:		r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s  %rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+  	
+	network:
+  		sar-network: rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+		sar-net_err: rxerr/s   txerr/s    coll/s  rxdrop/s  txdrop/s  txcarr/s  rxfram/s  rxfifo/s  txfifo/s
+  	
+	memory:	
+  		sar-paging: pgpgin/s pgpgout/s   fault/s  majflt/s  pgfree/s pgscank/s pgscand/s pgsteal/s    %vmeff
+  		/proc/meminfo:
+  		"MemTotal","MemFree","MemAvailable","Buffers","Cached","SwapCached","Active","Inactive","Active(anon)","Inactive(anon)","Active(file)","Inactive(file)","Unevictable","Mlocked","SwapTotal","SwapFree","Dirty","Writeback","AnonPages","Mapped","Shmem","Slab","SReclaimable","SUnreclaim","KernelStack","PageTables","NFS_Unstable","Bounce","WritebackTmp","CommitLimit","Committed_AS","VmallocTotal","VmallocUsed","VmallocChunk","Percpu","HardwareCorrupted","AnonHugePages","ShmemHugePages","ShmemPmdMapped","CmaTotal","CmaFree","HugePages_Total","HugePages_Free","HugePages_Rsvd","HugePages_Surp","Hugepagesize","Hugetlb"
+

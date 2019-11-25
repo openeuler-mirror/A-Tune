@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2019 Huawei Technologies Co., Ltd.
+ * A-Tune is licensed under the Mulan PSL v1.
+ * You can use this software according to the terms and conditions of the Mulan PSL v1.
+ * You may obtain a copy of Mulan PSL v1 at:
+ *     http://license.coscl.org.cn/MulanPSL
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+ * PURPOSE.
+ * See the Mulan PSL v1 for more details.
+ * Create: 2019-10-29
+ */
+
+package pyservice
+
+import (
+	"atune/common/config"
+	"atune/common/log"
+	"atune/common/registry"
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"os/signal"
+	"path"
+	"strings"
+	"syscall"
+)
+
+func init() {
+	registry.RegisterDaemonService("pyengine", &PyEngine{})
+}
+
+// PyEngine : the struct store the pyEngine conf
+type PyEngine struct {
+	Cfg *config.Cfg
+}
+
+// Init method init the PyEngine service
+func (p *PyEngine) Init() error {
+	return nil
+}
+
+// Set the config of the monitor
+func (p *PyEngine) Set(cfg *config.Cfg) {
+	p.Cfg = cfg
+}
+
+// Run method start the python service
+func (p *PyEngine) Run() error {
+	cmdSlice := make([]string, 0)
+	cmdSlice = append(cmdSlice, "python3")
+	cmdSlice = append(cmdSlice, path.Join(config.DefaultAnalysisPath, "app.py"))
+	cmdSlice = append(cmdSlice, path.Join(config.DefaultConfPath, "atuned.cnf"))
+
+	cmdStr := strings.Join(cmdSlice, " ")
+	cmd := exec.Command("sh", "-c", cmdStr)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+
+	stdout, err := cmd.StdoutPipe()
+	stderr, err := cmd.StderrPipe()
+
+	go listenToSystemSignals(cmd)
+
+	go logStdout(stdout)
+	go logStderr(stderr)
+	err = cmd.Start()
+	if err != nil {
+		return fmt.Errorf("cmd.Start() analysis service faild: %v", err)
+		os.Exit(-1)
+	}
+
+	err = cmd.Wait()
+
+	if err != nil {
+		log.Errorf("cmd.Run() analysis faild with: %v", err)
+		os.Exit(-1)
+	}
+
+	return nil
+
+}
+
+func logStdout(stdout io.ReadCloser) {
+	scanner := bufio.NewScanner(stdout)
+	for scanner.Scan() {
+		line := scanner.Text()
+		log.Debug(line)
+	}
+}
+
+func logStderr(stderr io.ReadCloser) {
+	scanner := bufio.NewScanner(stderr)
+	for scanner.Scan() {
+		line := scanner.Text()
+		log.Debug(line)
+	}
+}
+
+func listenToSystemSignals(cmd *exec.Cmd) {
+	signalChan := make(chan os.Signal, 1)
+
+	signal.Notify(signalChan, os.Interrupt, os.Kill, syscall.SIGKILL)
+	select {
+	case <-signalChan:
+		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+		os.Exit(-1)
+	}
+}

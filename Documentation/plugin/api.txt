@@ -1,0 +1,2964 @@
+The CPI & MPI api manual
+========================
+
+Help on CPI in module plugin.plugin object:
+
+class CPI(builtins.object)
+ |  The configurator plugin
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self)
+ |      Initialize.
+ |      
+ |      :param: None
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Class methods defined here:
+ |  
+ |  get_configurator(module, submod) from builtins.type
+ |      Get configurator of 'module'.'submod'.
+ |      
+ |      :param module & submod: [('AFFINITY', 'IRQ'), ('AFFINITY', 'TASK'), ('BIOS', 'BIOS'), ('BOOTLOADER', 'GRUB2'), ('KERNEL_CONFIG', 'KERNEL_CONFIG'), ('SCRIPT', 'SCRIPT'), ('SYSCTL', 'SYSCTL'), ('SYSFS', 'SYSFS'), ('SYSTEMCTL', 'SYSTEMCTL'), ('ULIMIT', 'ULIMIT')]
+ |      :returns cpi: Success, the found configurator
+ |      :raises LookupError: Fail, find configurator error
+ |  
+ |  get_configurators(module=None, submod=None) from builtins.type
+ |      Get configurators of 'module'.'submod'.
+ |      
+ |      :param module(optional): {'SCRIPT', 'ULIMIT', 'SYSFS', 'BOOTLOADER', 'AFFINITY', 'KERNEL_CONFIG', 'BIOS', 'SYSTEMCTL', 'SYSCTL'}
+ |      :param submod(optional): {'SCRIPT', 'ULIMIT', 'SYSFS', 'IRQ', 'KERNEL_CONFIG', 'GRUB2', 'TASK', 'BIOS', 'SYSTEMCTL', 'SYSCTL'}
+ |      :returns list: Success, all found configurators or null
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on IrqAffinity in module configurator.affinity.irq object:
+
+class IrqAffinity(configurator.common.Configurator)
+ |  To change the affinity of irqs
+ |  
+ |  Method resolution order:
+ |      IrqAffinity
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on TaskAffinity in module configurator.affinity.task object:
+
+class TaskAffinity(configurator.common.Configurator)
+ |  To change the affinity of tasks
+ |  
+ |  Method resolution order:
+ |      TaskAffinity
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Bios in module configurator.bios.bios object:
+
+class Bios(configurator.common.Configurator)
+ |  To change the bios config
+ |  
+ |  Method resolution order:
+ |      Bios
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Grub2 in module configurator.bootloader.grub2 object:
+
+class Grub2(configurator.common.Configurator)
+ |  To change the grub2 config
+ |  
+ |  Method resolution order:
+ |      Grub2
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on KernelConfig in module configurator.kernel_config.kconfig object:
+
+class KernelConfig(configurator.common.Configurator)
+ |  To change the kernel config
+ |  
+ |  Method resolution order:
+ |      KernelConfig
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Script in module configurator.script.script object:
+
+class Script(configurator.common.Configurator)
+ |  The script extention of CPI
+ |  
+ |  Method resolution order:
+ |      Script
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Sysctl in module configurator.sysctl.sysctl object:
+
+class Sysctl(configurator.common.Configurator)
+ |  To change the /proc/sys/* config
+ |  
+ |  Method resolution order:
+ |      Sysctl
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Sysfs in module configurator.sysfs.sysfs object:
+
+class Sysfs(configurator.common.Configurator)
+ |  To change the /sys/* config
+ |  
+ |  Method resolution order:
+ |      Sysfs
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Systemctl in module configurator.systemctl.systemctl object:
+
+class Systemctl(configurator.common.Configurator)
+ |  To change the system service config
+ |  
+ |  Method resolution order:
+ |      Systemctl
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on Ulimit in module configurator.ulimit.ulimit object:
+
+class Ulimit(configurator.common.Configurator)
+ |  To change the resources limit of user
+ |  
+ |  Method resolution order:
+ |      Ulimit
+ |      configurator.common.Configurator
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from configurator.common.Configurator:
+ |  
+ |  backup(self, config, rollback_info)
+ |      Backup from the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :param rollback_info: The additional info for rollback, mostly a path
+ |      :returns Exceptions: Fail, error in _backup()
+ |      :returns value: Success, config info
+ |      :raises: None
+ |  
+ |  get(self, key)
+ |      Get the given config.
+ |      
+ |      :param key: The config to be getted, string like "key"
+ |      :returns None: Success
+ |      :returns value: Success, config value string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The module of this configurator
+ |      :raises: None
+ |  
+ |  resume(self, config_info)
+ |      Resume from the saved config info.
+ |      
+ |      :param config_info: The config info to be resumed
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _resume()
+ |      :returns Exceptions: Fail, error in _resume()
+ |      :raises: None
+ |  
+ |  set(self, config)
+ |      Set the given config.
+ |      
+ |      :param config: The config to be setted, string like "key = value"
+ |      :returns None: Success
+ |      :returns NeedRebootWarning: Success, but need reboot
+ |      :returns SetConfigError: Fail, fail in _set()
+ |      :returns Exceptions: Fail, error in _set()
+ |      :raises Exceptions: Error, unexpected errors
+ |  
+ |  submod(self)
+ |      Get the the sub module of this configurator.
+ |      
+ |      :param: None
+ |      :returns: The sub module of this configurator
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from configurator.common.Configurator:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MPI in module plugin.plugin object:
+
+class MPI(builtins.object)
+ |  The monitor plugin
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self)
+ |      Initialize.
+ |      
+ |      :param: None
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Class methods defined here:
+ |  
+ |  get_monitor(module, purpose) from builtins.type
+ |      Get monitor of 'module' for 'purpose'.
+ |      
+ |      :param module & purpose: [('MEM', 'NUMA'), ('MEM', 'TOPO'), ('MEM', 'BANDWIDTH'), ('MEM', 'VMSTAT'), ('MEM', 'UTIL'), ('NET', 'INFO'), ('NET', 'STAT'), ('NET', 'ESTAT'), ('NET', 'TOPO'), ('PERF', 'STAT'), ('PERF', 'TOP'), ('CPU', 'INFO'), ('CPU', 'STAT'), ('CPU', 'TOPO'), ('STORAGE', 'STAT'), ('STORAGE', 'TOPO'), ('SYS', 'BIOS'), ('SYS', 'LDAVG'), ('SYS', 'TASKS'), ('SYS', 'FDUTIL')]
+ |      :returns mpi: Success, the found monitor
+ |      :raises LookupError: Fail, find monitor error
+ |  
+ |  get_monitors(module=None, purpose=None) from builtins.type
+ |      Get monitors of 'module' for 'purpose'.
+ |      
+ |      :param module(optional): {'NET', 'STORAGE', 'MEM', 'PERF', 'SYS', 'CPU'}
+ |      :param purpose(optional): {'STAT', 'ESTAT', 'LDAVG', 'TASKS', 'FDUTIL', 'NUMA', 'TOP', 'TOPO', 'UTIL', 'INFO', 'VMSTAT', 'BIOS', 'BANDWIDTH'}
+ |      :returns list: Success, all found monitors or null
+ |      :raises: None
+ |  
+ |  get_monitors_data(monitors) from builtins.type
+ |      Get given monitors report data in one.
+ |      
+ |      :param monitors: ((module, purpose, options), ...)
+ |              options is for report(para)
+ |      :returns list: Success, decoded data strings of all given monitors
+ |      :returns Exceptions: Success, formatted info
+ |      :raises LookupError: Fail, find monitor error
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MemNuma in module monitor.memory.numainfo object:
+
+class MemNuma(monitor.common.Monitor)
+ |  To collect the memory numa info
+ |  
+ |  Method resolution order:
+ |      MemNuma
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MemTopo in module monitor.memory.topo object:
+
+class MemTopo(monitor.common.Monitor)
+ |  To collect the memory topo
+ |  
+ |  Method resolution order:
+ |      MemTopo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, json, table]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MemBandwidth in module monitor.memory.bandwidth object:
+
+class MemBandwidth(monitor.common.Monitor)
+ |  To collect memory bandwidth stat info
+ |  
+ |  Method resolution order:
+ |      MemBandwidth
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=Total/CPU0/CPU1/CPU0_Die0/CPU0_Die1/CPU1_Die0/CPU1_Die1/CPU0_Die0_R/CPU0_Die1_R/CPU1_Die0_R/CPU1_Die1_R/CPU0_Die0_W/CPU0_Die1_W/CPU1_Die0_W/CPU1_Die1_W]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MemVmstat in module monitor.memory.vmstat object:
+
+class MemVmstat(monitor.common.Monitor)
+ |  To collect the vm stat info
+ |  
+ |  Method resolution order:
+ |      MemVmstat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=procs.r/procs.b/memory.swpd/memory.free/memory.buff/memory.cache/swap.si/swap.so/io.bi/io.bo/system.in/system.cs/cpu.us/cpu.sy/cpu.id/cpu.wa/cpu.st]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on MemUtilStat in module monitor.memory.utilstat object:
+
+class MemUtilStat(monitor.common.Monitor)
+ |  To collect the mem util stat info
+ |  
+ |  Method resolution order:
+ |      MemUtilStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=time/kbmemfree/kbavail/kbmemused/memused/kbbuffers/kbcached/kbcommit/commit/kbactive/kbinact/kbdirty]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on NetInfo in module monitor.network.info object:
+
+class NetInfo(monitor.common.Monitor)
+ |  To collect the nic config info
+ |  
+ |  Method resolution order:
+ |      NetInfo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on NetStat in module monitor.network.netstat object:
+
+class NetStat(monitor.common.Monitor)
+ |  To collect the nic stat info
+ |  
+ |  Method resolution order:
+ |      NetStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--nic=x, --fields=time/nic/rxpcks/txpcks/rxkBs/txkBs/rxcmps/txcmps/rxmcsts/ifutil]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on NetEStat in module monitor.network.netestat object:
+
+class NetEStat(monitor.common.Monitor)
+ |  To collect the nic estat info
+ |  
+ |  Method resolution order:
+ |      NetEStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--nic=x, --fields=time/nic/rxerrs/txerrs/colls/rxdrops/txdrops/txcarrs/rxframs/rxfifos/txfifos/errs/util]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on NetTopo in module monitor.network.topo object:
+
+class NetTopo(monitor.common.Monitor)
+ |  To collect the nic topo
+ |  
+ |  Method resolution order:
+ |      NetTopo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, xml, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on PerfStat in module monitor.performance.stat object:
+
+class PerfStat(monitor.common.Monitor)
+ |  To collect the perf stat info
+ |  
+ |  Method resolution order:
+ |      PerfStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=cycles/instructions/branches/branch-misses/cache-misses/cache-references/dTLB-load-misses/dTLB-loads/iTLB-load-misses/iTLB-loads/stalled-cycles-backend/memstall-load/memstall-store/IPC/BRANCH-MISS-RATIO/CACHE-MISS-RATIO/DTLB-LOAD-MISS-RATIO/ITLB-LOAD-MISS-RATIO/MPKI/SBPI/SBPC/MEMORY-BOUND/STORE-BOUND]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on PerfTop in module monitor.performance.top object:
+
+class PerfTop(monitor.common.Monitor)
+ |  To collect the perf top snapshot
+ |  
+ |  Method resolution order:
+ |      PerfTop
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=overhead/command/object/symbol]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on CpuInfo in module monitor.processor.info object:
+
+class CpuInfo(monitor.common.Monitor)
+ |  To collect the CPU info
+ |  
+ |  Method resolution order:
+ |      CpuInfo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, xml, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on CpuStat in module monitor.processor.stat object:
+
+class CpuStat(monitor.common.Monitor)
+ |  To collect the CPU stat info
+ |  
+ |  Method resolution order:
+ |      CpuStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--cpu=n, --fields=time/cpu/usr/nice/sys/iowait/irq/soft/steal/guest/gnice/idle]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on CpuTopo in module monitor.processor.topo object:
+
+class CpuTopo(monitor.common.Monitor)
+ |  To collect the CPU topo
+ |  
+ |  Method resolution order:
+ |      CpuTopo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, xml]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on IoStat in module monitor.storage.iostat object:
+
+class IoStat(monitor.common.Monitor)
+ |  To collect the storage stat info
+ |  
+ |  Method resolution order:
+ |      IoStat
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--device=x, --fields=dev/rs/ws/rMBs/wMBs/rrqms/wrqms/rrqm/wrqm/r_await/w_await/aqu-sz/rareq-sz/wareq-sz/svctm/util]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on StorageTopo in module monitor.storage.topo object:
+
+class StorageTopo(monitor.common.Monitor)
+ |  To collect the storage topo
+ |  
+ |  Method resolution order:
+ |      StorageTopo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, xml, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on SysBiosInfo in module monitor.system.bios object:
+
+class SysBiosInfo(monitor.common.Monitor)
+ |  To collect the system BIOS info
+ |  
+ |  Method resolution order:
+ |      SysBiosInfo
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, xml, json]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [%s]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on SysLdavg in module monitor.system.ldavg object:
+
+class SysLdavg(monitor.common.Monitor)
+ |  To collect the system load average statistics
+ |  
+ |  Method resolution order:
+ |      SysLdavg
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=time/runq-sz/plist-sz/ldavg-1/ldavg-5/ldavg-15/blocked/task-util]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on SysTasks in module monitor.system.tasks object:
+
+class SysTasks(monitor.common.Monitor)
+ |  To collect the task creation and switching statistics
+ |  
+ |  Method resolution order:
+ |      SysTasks
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=time/procs/cswchs]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on SysFdUtil in module monitor.system.filed object:
+
+class SysFdUtil(monitor.common.Monitor)
+ |  To collect the file handles util info
+ |  
+ |  Method resolution order:
+ |      SysFdUtil
+ |      monitor.common.Monitor
+ |      builtins.object
+ |  
+ |  Methods defined here:
+ |  
+ |  __init__(self, user=None)
+ |      Initialize.
+ |      
+ |      :param user(optional): "UT" for unit test, others are ignored
+ |      :returns: None
+ |      :raises: None
+ |  
+ |  decode(self, info, para)
+ |      The inner method to decode collected info.
+ |      
+ |      :param info: The collected info string
+ |      :param para: The option for decode,
+ |              [--fields=fd-util]:
+ |              "--fields=" to select which data
+ |              "--cpu=" to select which cpu
+ |              "--nic=" to select which net interface
+ |              "--device=" to select which device
+ |      :returns info: Success, decoded info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  ----------------------------------------------------------------------
+ |  Methods inherited from monitor.common.Monitor:
+ |  
+ |  format(self, info, fmt)
+ |      The inner method to format collected info.
+ |      
+ |      :param info: The decoded info
+ |      :param fmt: The option for format,
+ |              [raw, data, %s]:
+ |              "raw" for original string
+ |              "xml" for xml string
+ |              "json" for json string
+ |              "data" for list of decoded data string
+ |              "table" for pretty table string
+ |      :returns info: Success, formatted info
+ |      :raises NotImplementedError: Error, not supported
+ |      :raises Exceptions: Fail, with info
+ |  
+ |  get(self, para=None)
+ |      Get the collected info.
+ |      
+ |      :param para(optional): The option for get
+ |      :returns info: Success, collected info string
+ |      :returns Exceptions: Fail, error in _get()
+ |      :raises: None
+ |  
+ |  module(self)
+ |      Get the the module of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The module of this monitor
+ |      :raises: None
+ |  
+ |  output(self, info, path)
+ |      The method to output collected info to file.
+ |      
+ |      :param info: The formatted info
+ |      :param path: The path to output, None for pass through
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :raises: None
+ |  
+ |  purpose(self)
+ |      Get the the purpose of this monitor.
+ |      
+ |      :param: None
+ |      :returns: The purpose of this monitor
+ |      :raises: None
+ |  
+ |  report(self, fmt, path, para=None)
+ |      Report the given config.
+ |      
+ |      :param fmt: The option for format(fmt)
+ |      :param path: The path to output, None for pass through
+ |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :returns None: Success
+ |      :returns info: Success, output info
+ |      :returns Exceptions: Fail, with info
+ |      :raises: None
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors inherited from monitor.common.Monitor:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+

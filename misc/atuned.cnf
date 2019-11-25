@@ -1,0 +1,45 @@
+
+#################################### server ###############################
+# atuned config
+[server]
+# the address the grpc server to bind to, default is 127.0.0.1
+address = 127.0.0.1
+
+# the atuned grpc listening port, default is 60001
+# the port can be set between 0 to 65535 the not be used
+port = 60001
+
+# the rest service listening port, default is 8383
+# the port can be set between 0 to 65535 than not be used
+rest_port = 8383
+
+# when run analysis command, the numbers of collected data.
+# default is 20
+sample_num = 20
+
+#################################### log ###############################
+[log]
+# log path, must be a absolute path
+path = /var/log/atuned
+
+# Either "debug", "info", "warn", "error", "critical", default is "info"
+level = info
+
+#################################### monitor ###############################
+[monitor]
+# With the module and format of the MPI, the format is {module}_{format}
+# The module is Either "mem", "net", "cpu", "STORAGE"
+# The purpose is "topo"
+module = mem_topo, cpu_topo 
+
+#################################### system ###############################
+# you can add arbitrary key-value here, just like key = value
+# you can use the key in the profile
+[system]
+# the disk to be analysis
+disk = sda
+
+# the network to be analysis
+network = enp189s0f0
+
+user = root

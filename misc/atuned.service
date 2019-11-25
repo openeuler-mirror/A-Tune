@@ -1,0 +1,12 @@
+[Unit]
+Description=EulerOS Auto Tuning Daemon
+After=systemd-sysctl.service network.target
+Requires=polkit.service
+
+[Service]
+Type=notify
+PIDFile=/run/atuned/atuned.pid
+ExecStart=/usr/bin/atuned
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package profile;
+
+// The transporter service definition.
+service ProfileMgr {
+	rpc Profile(ProfileInfo) returns (stream AckCheck) {}
+	rpc CheckInitProfile(ProfileInfo) returns (stream AckCheck) {}
+    	rpc Analysis(AnalysisMessage) returns (stream AckCheck) {}
+	rpc Tuning(ProfileInfo) returns (stream AckCheck) {}
+	rpc ListWorkload(ProfileInfo) returns (stream ListMessage) {}
+	rpc UpgradeProfile(ProfileInfo) returns (stream AckCheck) {}
+	rpc InfoProfile(ProfileInfo) returns (stream ProfileInfo) {}
+	rpc CheckActiveProfile(ProfileInfo) returns (stream AckCheck) {}
+	rpc ProfileRollback(ProfileInfo) returns (stream AckCheck) {}
+	rpc Charaterization(ProfileInfo) returns (stream AckCheck) {}
+	rpc Collection(CollectFlag) returns (stream AckCheck) {}
+	rpc Training(TrainMessage) returns (stream AckCheck) {}
+	rpc Define(DefineMessage) returns (Ack) {}
+	rpc Delete(DefineMessage) returns (Ack) {}
+	rpc Update(DefineMessage) returns (Ack) {}
+	rpc Schedule(ScheduleMessage) returns (stream AckCheck) {}
+}
+
+message ListMessage {
+	string WorkloadType = 1;
+    	string ProfileNames = 2;
+    	string Active = 3;
+}
+
+message ProfileInfo {
+	string Name = 1;
+    	bytes Content = 2;
+}
+
+message AnalysisMessage {
+	string Name = 1;
+    	string Model = 2;
+}
+
+message Ack {
+	string Status = 1;
+}
+
+message AckCheck {
+    string Name = 1;
+    string Status = 2;
+    string Description = 3;
+}
+
+message ProfileLog {
+    int64  Id = 1;
+    string ProfileId = 2;
+    string Timestamp = 3;
+}
+
+message CollectFlag {
+    int64 Interval = 1;
+    int64 Duration = 2;
+    string Workload = 3;
+    string OutputPath = 4;
+    string Block = 5;
+    string Network = 6;
+    string Type = 7;
+}
+
+message TrainMessage {
+    string DataPath = 1;
+    string OutputPath = 2;
+}
+
+message DefineMessage {
+    string WorkloadType = 1;
+    string ProfileName  = 2;
+    bytes  Content      = 3;
+}
+
+message ScheduleMessage {
+    string App = 1;
+    string Type = 2;
+    string Strategy = 3;
+}
