@@ -14,9 +14,14 @@
 package http
 
 import (
+	"atune/common/config"
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -32,21 +37,39 @@ func (c *httpClient) Do(req *http.Request) (*http.Response, error) {
 	return response, err
 }
 
-func newhttpClient() *httpClient {
+func newhttpClient() (*httpClient, error) {
 	var client *http.Client
+	if config.TLS {
+		pool := x509.NewCertPool()
+		caCrt, err := ioutil.ReadFile(config.TLSHTTPCACertFile)
+		if err != nil {
+			return nil, err
+		}
+		pool.AppendCertsFromPEM(caCrt)
 
-	client = &http.Client{}
+		clientCrt, err := tls.LoadX509KeyPair(config.TLSHTTPCertFile, config.TLSHTTPKeyFile)
+		if err != nil {
+			return nil, err
+		}
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs:      pool,
+				Certificates: []tls.Certificate{clientCrt}},
+		}
+		client = &http.Client{Transport: tr}
+	} else {
+		client = &http.Client{}
+	}
 
 	return &httpClient{
 		client: client,
-	}
-
+	}, nil
 }
 
 func newRequest(method string, url string, body interface{}) (*http.Request, error) {
 	var reader io.Reader
 
-	switch body.(type) {
+	switch t := body.(type) {
 	case string:
 		reader = strings.NewReader(body.(string))
 	case []byte:
@@ -54,10 +77,10 @@ func newRequest(method string, url string, body interface{}) (*http.Request, err
 	default:
 		bytesData, err := json.Marshal(body)
 		if err != nil {
+			fmt.Printf("Error in Unexpected type %T\n", t)
 			return nil, err
 		}
 		reader = bytes.NewReader(bytesData)
-
 	}
 
 	request, err := http.NewRequest(method, url, reader)
@@ -73,7 +96,10 @@ func newRequest(method string, url string, body interface{}) (*http.Request, err
 
 // Get method call the restfull GET method
 func Get(url string, data interface{}) (*http.Response, error) {
-	restClient := newhttpClient()
+	restClient, err := newhttpClient()
+	if err != nil {
+		return nil, err
+	}
 	req, err := newRequest("GET", url, data)
 	if err != nil {
 		return nil, err
@@ -89,7 +115,10 @@ func Get(url string, data interface{}) (*http.Response, error) {
 
 //Post method call the restfull POST method
 func Post(url string, data interface{}) (*http.Response, error) {
-	restClient := newhttpClient()
+	restClient, err := newhttpClient()
+	if err != nil {
+		return nil, err
+	}
 	req, err := newRequest("POST", url, data)
 	if err != nil {
 		return nil, err
@@ -105,7 +134,10 @@ func Post(url string, data interface{}) (*http.Response, error) {
 
 // Put method call the restfull PUT method
 func Put(url string, data interface{}) (*http.Response, error) {
-	restClient := newhttpClient()
+	restClient, err := newhttpClient()
+	if err != nil {
+		return nil, err
+	}
 	req, err := newRequest("PUT", url, data)
 	if err != nil {
 		return nil, err
@@ -121,7 +153,10 @@ func Put(url string, data interface{}) (*http.Response, error) {
 
 // Delete method call the restfull DELETE method
 func Delete(url string) (*http.Response, error) {
-	restClient := newhttpClient()
+	restClient, err := newhttpClient()
+	if err != nil {
+		return nil, err
+	}
 	req, err := newRequest("DELETE", url, nil)
 	if err != nil {
 		return nil, err

@@ -14,52 +14,60 @@
 """
 Restful api with collector, in order to provide the method of post.
 """
-
-from flask import current_app
-from flask_restful import reqparse, Resource
-from flask_restful import request, marshal_with, marshal_with_field
 import os
-import pandas as pd
-from resources.field import profile_get_field
-from resources.parser import collector_post_parser
-from plugin.plugin import CPI
-from plugin.plugin import MPI
-from utils.npipe import getNpipe
 
-parser = reqparse.RequestParser()
+from flask import current_app, abort
+from flask_restful import reqparse, Resource
+from flask_restful import marshal_with_field
+import pandas as pd
+from analysis.resources.field import PROFILE_GET_FIELD
+from analysis.resources.parser import COLLECTOR_POST_PARSER
+from analysis.plugin.plugin import MPI
+from analysis.utils.npipe import get_npipe
+
+PARSER = reqparse.RequestParser()
 
 
 class Collector(Resource):
-    @marshal_with_field(profile_get_field)
+    """restful api with collector, in order to provide the method of post"""
+    monitors = "monitors"
+
+    @marshal_with_field(PROFILE_GET_FIELD)
     def post(self):
-        args = collector_post_parser.parse_args()
+        """provide the method of post"""
+        args = COLLECTOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
+        n_pipe = get_npipe(args.get("pipe"))
+        if n_pipe is None:
+            abort(404)
+
         monitors = []
         mpis = []
-        for monitor in args.get("monitors"):
+        for monitor in args.get(self.monitors):
             monitors.append([monitor["module"], monitor["purpose"], monitor["field"]])
             mpis.append(MPI.get_monitor(monitor["module"], monitor["purpose"]))
         collect_num = args.get("sample_num")
 
-        nPipe = getNpipe(args.get("pipe"))
         current_app.logger.info(monitors)
 
         data = []
 
-        for i in range(collect_num):
+        for _ in range(collect_num):
             raw_data = MPI.get_monitors_data(monitors, mpis)
             current_app.logger.info(raw_data)
-            
+
             float_data = list()
-            for x in raw_data:
-                float_data.append(float(x))
+            for num in raw_data:
+                float_data.append(float(num))
 
             data.append(float_data)
 
             str_data = [str(round(data, 3)) for data in float_data]
-            nPipe.write(" ".join(str_data) + "\n")
+            n_pipe.write(" ".join(str_data) + "\n")
 
-        path = "/tmp/test.csv"
+        n_pipe.close()
+
+        path = "/run/atuned/test.csv"
         save_file(path, data)
         result = {}
         result["path"] = path
@@ -67,6 +75,9 @@ class Collector(Resource):
 
 
 def save_file(file_name, datas):
-    print(datas)
+    """save file"""
+    path = os.path.dirname(file_name.strip())
+    if not os.path.exists(path):
+        os.makedirs(path, 0o750)
     writer = pd.DataFrame(columns=None, data=datas)
     writer.to_csv(file_name, encoding='utf-8', header=0, index=False)

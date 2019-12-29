@@ -15,67 +15,73 @@
 Restful api for monitor, in order to provide the method of post and get.
 """
 
+import getopt
 from flask import abort
 from flask import current_app
 from flask_restful import reqparse, Resource
-from resources.parser import monitor_get_parser
-from resources.parser import monitor_post_parser
-from plugin.plugin import MPI
-import getopt
+from analysis.resources.parser import MONITOR_GET_PARSER
+from analysis.resources.parser import MONITOR_POST_PARSER
+from analysis.plugin.plugin import MPI
 
-parser = reqparse.RequestParser()
+PARSER = reqparse.RequestParser()
 
 
 class Monitor(Resource):
+    """restful api for monitor, in order to provide the method of post and get"""
+    module = "module"
+    purpose = "purpose"
+
     def get(self):
+        """provide the method of get"""
         result = {}
-        args = monitor_get_parser.parse_args()
+        args = MONITOR_GET_PARSER.parse_args()
         current_app.logger.info(args)
-        module = args.get("module")
-        purpose = args.get("purpose", None)
+        module = args.get(self.module)
+        purpose = args.get(self.purpose, None)
         fmt = args.get("fmt")
         path = args.get("path")
         para = args.get("para")
 
+        path = None if path.strip() == "" else path
+        para = None if para.strip() == "" else para
         monitors = MPI.get_monitors(module, purpose)
         if len(monitors) < 1:
+            result["status"] = "module: {}, purpose:{} is not exist".format(module, purpose)
             return result, 200
 
         monitor = monitors[0]
-
         ret = monitor.report(fmt, path, para)
-        if ret is not None:
-            result["status"] = str(ret)
-        else:
-            result["status"] = "OK"
+        if isinstance(ret, Exception):
+            result["value"] = str(ret)
+            result["status"] = "FAILED"
+            return result, 200
 
+        result["status"] = "OK"
+        result["value"] = ret
         return result, 200
 
     def post(self):
+        """provide the method of post"""
         result = {}
-        args = monitor_post_parser.parse_args()
+        args = MONITOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
 
-        monitors = []
-        module = args.get("module")
-        purpose = args.get("purpose", None)
-        field = args.get("field")
-
-        monitors = MPI.get_monitors(module, purpose)
+        monitors = MPI.get_monitors(args.get(self.module), args.get(self.purpose, None))
 
         if len(monitors) < 1:
             abort(404)
 
         monitor = monitors[0]
-        ret = monitor.report("data", None, field)
-        opts, args = getopt.getopt(field.split(";")[1].split(), None, ['fields=', 'addr-merge='])
+        ret = monitor.report("data", None, args.get("field"))
+        opts, args = getopt.getopt(args.get("field").split(";")[1].split(), None,
+                                   ['fields=', 'addr-merge='])
         opt = []
-        for o, v in opts:
-            if o in ("--fields"):
-                opt.append(v)
+        for option, value in opts:
+            if option in "--fields":
+                opt.append(value)
 
         events = []
-        for index in range(len(ret)):
+        for index, _ in enumerate(ret):
             if isinstance(ret[index], list):
                 event = {}
                 for i in range(len(ret[index])):
@@ -87,4 +93,3 @@ class Monitor(Resource):
         if len(events) > 0:
             result["data"] = events
         return result, 200
-    

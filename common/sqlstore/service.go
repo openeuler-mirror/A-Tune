@@ -130,8 +130,8 @@ func GetContext(name string) (string, error) {
 // InsertProfile method insert self define profile to table profile
 func InsertProfile(value *Profile) error {
 	session := globalEngine.Table("profile")
-	session.Insert(value)
-	return nil
+	_, err := session.Insert(value)
+	return err
 }
 
 // UpdateProfile method update the profile table
@@ -150,7 +150,6 @@ func DeleteProfile(profileType string) error {
 		return err
 	}
 	return nil
-
 }
 
 // ExistProfile method return true if profileType exist otherwise return false
@@ -166,28 +165,45 @@ func ExistProfile(profileType string) (bool, error) {
 
 // ActiveProfile method set the workload type state to active
 func ActiveProfile(name string) error {
+	var has bool
+
 	session := globalEngine.Table("class_profile")
 
 	name = strings.Trim(name, " ")
 
 	profile := new(ClassProfile)
-	session.Where("active=?", true).Get(profile)
+	has, err := session.Where("active=?", true).Get(profile)
+
+	if err != nil {
+		return err
+	}
 
 	if profile.Class == name {
 		return nil
 	}
 
-	session.Exec("update class_profile set active=? where class = ?", !profile.Active, profile.Class)
+	if has {
+		_, err = session.Exec("update class_profile set active=? where class = ?", !profile.Active, profile.Class)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+	}
 
 	newProfile := new(ClassProfile)
-	has, err := session.Where("class=?", name).Get(newProfile)
+	has, err = session.Where("class=?", name).Get(newProfile)
 	if err != nil {
+		log.Error(err)
 		return err
 	} else if !has {
 		return errors.New("Profile does not exist")
 	}
 
-	session.Exec("update class_profile set active=? where class = ?", !newProfile.Active, newProfile.Class)
+	_, err = session.Exec("update class_profile set active=? where class = ?", !newProfile.Active, newProfile.Class)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 
 	return nil
 }
@@ -275,8 +291,8 @@ func GetCollections() ([]*Collection, error) {
 // InsertProfileLog method insert profile history to database
 func InsertProfileLog(value *ProfileLog) error {
 	session := globalEngine.Table("profile_log")
-	session.Insert(value)
-	return nil
+	_, err := session.Insert(value)
+	return err
 }
 
 // GetProfileLogs method return profile histories
@@ -333,6 +349,7 @@ func InActiveProfile() error {
 	return nil
 }
 
+// UpdateSchedule :update strategy in schedule table
 func UpdateSchedule(typename string, strategy string) error {
 	session := globalEngine.Table("schedule")
 
@@ -355,6 +372,7 @@ func UpdateSchedule(typename string, strategy string) error {
 	return nil
 }
 
+// GetSchedule :get items in schedule table
 func GetSchedule() []*Schedule {
 	session := globalEngine.Table("schedule")
 

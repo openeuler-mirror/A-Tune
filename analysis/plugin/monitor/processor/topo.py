@@ -15,15 +15,8 @@
 The sub class of the monitor, used to collect the CPU topo.
 """
 
-import sys
-import logging
 import subprocess
-
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Monitor
 
 
 class CpuTopo(Monitor):
@@ -36,34 +29,33 @@ class CpuTopo(Monitor):
         Monitor.__init__(self, user)
         self.format.__func__.__doc__ = Monitor.format.__doc__ % ("xml")
         with open('/dev/null', 'w') as no_print:
-            if 0 == subprocess.call("which lstopo-no-graphics".split(),
-                                    stdout=no_print, stderr=no_print):
+            if subprocess.call("which lstopo-no-graphics".split(),
+                               stdout=no_print, stderr=no_print) == 0:
                 self.__cmd = "lstopo-no-graphics"
-            elif 0 == subprocess.call("which lstopo".split(), stdout=no_print,
-                                      stderr=no_print):
+            elif subprocess.call("which lstopo".split(), stdout=no_print,
+                                 stderr=no_print) == 0:
                 self.__cmd = "lstopo"
+            else:
+                self.__cmd = None
 
-    def _get(self, para=None):
+    def _get(self, _):
         output = subprocess.check_output("{cmd} {opt}".format(
             cmd=self.__cmd, opt=self._option).split())
         return output.decode()
 
     def format(self, info, fmt):
-        if (fmt == "xml"):
+        """
+        format the result of the operation
+        :param info:  content that needs to be converted
+        :param fmt:  converted format
+        :returns output:  converted result
+        """
+        if fmt == "xml":
             o_xml = subprocess.check_output("{cmd} --of xml {opt}".format(
-                                            cmd=self.__cmd, opt=self._option).split())
+                cmd=self.__cmd, opt=self._option).split())
             return o_xml.decode()
-        elif (fmt == "table"):
+        if fmt == "table":
             o_xml = subprocess.check_output("{cmd} --of ascii {opt}".format(
-                                            cmd=self.__cmd, opt=self._option).split())
+                cmd=self.__cmd, opt=self._option).split())
             return o_xml.decode()
-        else:
-            return Monitor.format(self, info, fmt)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = CpuTopo("UT")
-    ct.report(sys.argv[1], sys.argv[2])
+        return Monitor.format(self, info, fmt)

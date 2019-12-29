@@ -14,18 +14,15 @@
 """
 The sub class of the monitor, used to collect the vm stat info.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 import getopt
 import re
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
+from ..common import Monitor
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class MemVmstat(Monitor):
@@ -39,24 +36,22 @@ class MemVmstat(Monitor):
         self.__cmd = "vmstat"
         self.__interval = 1
         self.decode.__func__.__doc__ = Monitor.decode.__doc__ % (
-            "--fields=procs.r/procs.b/memory.swpd/memory.free/memory.buff/memory.cache/swap.si/swap.so/io.bi/io.bo/system.in/system.cs/cpu.us/cpu.sy/cpu.id/cpu.wa/cpu.st")
+            "--fields=procs.r/procs.b/memory.swpd/memory.free/memory.buff/memory.cache/swap.si/"
+            "swap.so/io.bi/io.bo/system.in/system.cs/cpu.us/cpu.sy/cpu.id/cpu.wa/cpu.st")
 
     def _get(self, para=None):
         if para is not None:
-            opts, args = getopt.getopt(para.split(), None, ['interval='])
+            opts, _ = getopt.getopt(para.split(), None, ['interval='])
             for opt, val in opts:
-                if opt in ('--interval'):
+                if opt in '--interval':
                     if val.isdigit():
                         self.__interval = int(val)
                     else:
                         err = ValueError(
                             "Invalid parameter: {opt}={val}".format(
                                 opt=opt, val=val))
-                        logger.error(
-                            "{}.{}: {}".format(
-                                self.__class__.__name__,
-                                sys._getframe().f_code.co_name,
-                                str(err)))
+                        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                                     inspect.stack()[0][3], str(err))
                         raise err
                     continue
 
@@ -68,6 +63,12 @@ class MemVmstat(Monitor):
         return output.decode()
 
     def decode(self, info, para):
+        """
+        decode the result of the operation
+        :param info:  content that needs to be decoded
+        :param para:  command line argument
+        :returns ret:  operation result
+        """
         if para is None:
             return info
 
@@ -94,47 +95,35 @@ class MemVmstat(Monitor):
         keys = []
         ret = ""
 
-        opts, args = getopt.getopt(para.split(), None, ['fields='])
+        opts, _ = getopt.getopt(para.split(), None, ['fields='])
         for opt, val in opts:
-            if opt in ('--fields'):
+            if opt in '--fields':
                 keys.append(keyword[val])
                 continue
 
         pattern = re.compile(
-            "^\ ?(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)",
+            r"^\ ?(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)"
+            r"\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)"
+            r"\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)",
             re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(info)
-        if len(searchObj) == 0:
+        search_obj = pattern.findall(info)
+        if len(search_obj) == 0:
             err = LookupError("Fail to find data")
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
 
         for i in keys:
             if type(i).__name__ == 'int':
-                ret = ret + " " + searchObj[-1][i]
+                ret = ret + " " + search_obj[-1][i]
             elif i == "util.swap":
-                util = int(searchObj[-1][keyword["swap.si"]]) + \
-                        int(searchObj[-1][keyword["swap.so"]])
+                util = int(search_obj[-1][keyword["swap.si"]]) + \
+                       int(search_obj[-1][keyword["swap.so"]])
                 ret = ret + " " + str(util)
             elif i == "util.cpu":
-                util = int(searchObj[-1][keyword["cpu.us"]]) + \
-                        int(searchObj[-1][keyword["cpu.sy"]]) + \
-                        int(searchObj[-1][keyword["cpu.st"]])
+                util = int(search_obj[-1][keyword["cpu.us"]]) + \
+                       int(search_obj[-1][keyword["cpu.sy"]]) + \
+                       int(search_obj[-1][keyword["cpu.st"]])
                 ret = ret + " " + str(util)
 
         return ret
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = MemVmstat("UT")
-    ct.report(
-        sys.argv[1],
-        sys.argv[2],
-        "--interval=2;--fields=memory.free --fields=cpu.us --fields=cpu.id --fields=util.cpu")

@@ -36,7 +36,7 @@ type RespBody struct {
 
 //Backup method the value specified by the Prfile
 func (p *Profile) Backup() (*RespBody, error) {
-	url := config.GetUrl(config.ProfileURI)
+	url := config.GetURL(config.ProfileURI)
 	res, err := http.Get(url, p)
 	if err != nil {
 		return nil, err
@@ -48,6 +48,10 @@ func (p *Profile) Backup() (*RespBody, error) {
 	}
 
 	respData, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	respIns := new(RespBody)
 	err = json.Unmarshal(respData, respIns)
 	if err != nil {
@@ -58,7 +62,7 @@ func (p *Profile) Backup() (*RespBody, error) {
 
 //Resume method resume the value specified by the Prfile
 func (p *Profile) Resume() (*RespBody, error) {
-	url := config.GetUrl(config.ProfileURI)
+	url := config.GetURL(config.ProfileURI)
 	res, err := http.Put(url, p)
 	if err != nil {
 		return nil, err
@@ -70,6 +74,10 @@ func (p *Profile) Resume() (*RespBody, error) {
 	}
 
 	respData, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	respIns := new(RespBody)
 	err = json.Unmarshal(respData, respIns)
 	if err != nil {

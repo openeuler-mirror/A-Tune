@@ -91,7 +91,10 @@ func profileUpdate(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	reply, err := svc.Update(CTX.Background(), &PB.DefineMessage{WorkloadType: workloadType, ProfileName: profileName, Content: data})
+	reply, err := svc.Update(CTX.Background(), &PB.DefineMessage{
+		WorkloadType: workloadType,
+		ProfileName:  profileName,
+		Content:      data})
 	if err != nil {
 		fmt.Println(err)
 		return nil

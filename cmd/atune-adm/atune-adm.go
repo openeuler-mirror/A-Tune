@@ -25,12 +25,8 @@ import (
 )
 
 const (
-	usageInfo = `atune-adm is a command line client for atuned AI tunning system`
+	usageInfo = `atune-adm is a command line client for atuned AI tuning system`
 )
-
-func checkValid(ctx *cli.Context) error {
-	return nil
-}
 
 func doBeforeJob(ctx *cli.Context) error {
 	return nil
@@ -59,7 +55,7 @@ func main() {
 	 * for limitaion of cli, have to fix module load path
 	 */
 
-	SVC.WalkServices(func(nm string, svc *SVC.ProfileService) error {
+	err := SVC.WalkServices(func(nm string, svc *SVC.ProfileService) error {
 		ins, err := svc.NewInst(nil)
 		if err != nil {
 			return err
@@ -74,6 +70,11 @@ func main() {
 
 		return nil
 	})
+
+	if err != nil {
+		fmt.Printf("services init failed:%v", err)
+	}
+
 	sort.Sort(cli.CommandsByName(app.Commands))
 	app.Before = doBeforeJob
 	if err := app.Run(os.Args); err != nil {

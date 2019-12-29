@@ -51,7 +51,6 @@ func init() {
 }
 
 func newProfileUpgradeCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileUpgradeCommand, nil
 }
 

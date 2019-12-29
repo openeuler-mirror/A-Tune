@@ -19,11 +19,13 @@ import (
 	"errors"
 )
 
+// NumaSchedule :Numa schedule filter
 type NumaSchedule struct {
 	Name string
 }
 
-func (s *NumaSchedule) Filte(strategy string) error {
+// Tune numa bindings according to input strategy
+func (s *NumaSchedule) Tune(strategy string) error {
 	switch strategy {
 	case "performance":
 	case "auto":
@@ -31,7 +33,7 @@ func (s *NumaSchedule) Filte(strategy string) error {
 	case "powersave":
 		return s.powersave()
 	default:
-		return errors.New("Strategy don't exist")
+		return errors.New("strategy don't exist")
 	}
 	return nil
 }

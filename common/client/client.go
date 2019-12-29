@@ -19,12 +19,13 @@ import (
 	"os"
 	"time"
 
+	"context"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 type clientOpts struct {
-	defaultns   string
 	dialOptions []grpc.DialOption
 }
 
@@ -33,16 +34,15 @@ type Opt func(c *clientOpts) error
 
 //Client :The grpc client structer
 type Client struct {
-	conn      *grpc.ClientConn
-	defaultns string
-	services  map[string]interface{}
+	conn     *grpc.ClientConn
+	services map[string]interface{}
 }
 
 // GetService method return the grpc client command plugin service
 func (c *Client) GetService(name string) (interface{}, error) {
 	_, ok := c.services[name]
 	if !ok {
-		return nil, fmt.Errorf("There is no service %s available", name)
+		return nil, fmt.Errorf("there is no service %s available", name)
 	}
 
 	return c.services[name], nil
@@ -51,7 +51,7 @@ func (c *Client) GetService(name string) (interface{}, error) {
 // NewService method call the function to new a grpc client plugin service
 func (c *Client) NewService(name string, fn func(cc *grpc.ClientConn) (interface{}, error)) error {
 	if _, ok := c.services[name]; ok {
-		return fmt.Errorf("Service %s client has existed")
+		return fmt.Errorf("service %s client has existed", name)
 	}
 	svc, err := fn(c.conn)
 	if err != nil {
@@ -70,7 +70,7 @@ func (c *Client) Connection() *grpc.ClientConn {
 
 //Close method close the grpc connection
 func (c *Client) Close() {
-	c.conn.Close()
+	_ = c.conn.Close()
 }
 
 //GetState method return the state of the grpc connection
@@ -122,15 +122,32 @@ func newClient(address string, opts ...Opt) (*Client, error) {
 	}
 	gopts := []grpc.DialOption{
 		grpc.WithBlock(),
-		grpc.WithInsecure(),
-		grpc.WithTimeout(60 * time.Second),
 		grpc.FailOnNonTempDialError(true),
 		grpc.WithBackoffMaxDelay(3 * time.Second),
 	}
+
+	tls := os.Getenv(config.EnvTLS)
+	if tls == "yes" {
+		clicrt := os.Getenv(config.EnvCliCert)
+		// creds, err := credentials.NewClientTLSFromFile(clicrt, "x.test.youtube.com")
+		creds, err := credentials.NewClientTLSFromFile(clicrt, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create TLS credentials %v", err)
+		}
+		gopts = append(gopts, grpc.WithTransportCredentials(creds))
+	} else {
+		gopts = append(gopts, grpc.WithInsecure())
+	}
+
 	if len(copts.dialOptions) > 0 {
 		gopts = copts.dialOptions
 	}
-	conn, err := grpc.Dial(address, gopts...)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, address, gopts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to dial %q : %s", address, err)
 	}

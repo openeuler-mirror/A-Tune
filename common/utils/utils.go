@@ -49,8 +49,10 @@ const (
 	SUCCESS = "SUCCESS"
 	FAILD   = "FAILED"
 	WARNING = "WARNING"
-	REQUEST = "REQUEST"
+	ERROR   = "ERROR"
 	INFO    = "INFO"
+	SUGGEST = "SUGGEST"
+	UNKNOWN = "UNKNOWN"
 )
 
 // CheckArgs method check command args num
@@ -70,7 +72,7 @@ func CheckArgs(context *cli.Context, expected, checkType int) error {
 
 	if err != nil {
 		fmt.Printf("Incorrect Usage.\n\n")
-		cli.ShowCommandHelp(context, cmdName)
+		_ = cli.ShowCommandHelp(context, cmdName)
 		return err
 	}
 	return nil
@@ -103,7 +105,7 @@ func LoadPlugins(path string) error {
 
 	for _, lib := range libs {
 		if _, err := plugin.Open(lib); err != nil {
-			fmt.Printf("load %s failed : err\n", lib, err)
+			fmt.Printf("load %s failed : err:%s\n", lib, err)
 			continue
 		}
 	}
@@ -143,7 +145,7 @@ func Print(ackCheck *PB.AckCheck) {
 		fc = 31
 	} else if ackCheck.Status == WARNING {
 		fc = 33
-	} else if ackCheck.Status == REQUEST {
+	} else if ackCheck.Status == SUGGEST {
 		fc = 36
 	} else if ackCheck.Status == INFO {
 		fc = 37
@@ -158,7 +160,6 @@ func Print(ackCheck *PB.AckCheck) {
 
 // PrintStr method print string to stdout
 func PrintStr(description string) {
-
 	fmt.Printf("%c[1;40;%dm %s %c[0m\n", 0x1B, 32, description, 0x1B)
 }
 
@@ -166,24 +167,21 @@ func PrintStr(description string) {
 func IsHost() bool {
 	cmd := exec.Command("virt-what")
 	_, err := cmd.Output()
-	if err != nil {
-		return false
-	}
 
-	return true
+	return err == nil
 }
 
-// CreateNamedPipe method create a named pip to communicatin
+// CreateNamedPipe method create a named pip to communicate
 func CreateNamedPipe() (string, error) {
 	npipe := strconv.FormatInt(time.Now().Unix(), 10)
-	npipe = path.Join("/tmp", npipe)
+	npipe = path.Join("/run", npipe)
 
 	exist, err := PathExist(npipe)
 	if err != nil {
 		return "", err
 	}
 	if exist {
-		os.Remove(npipe)
+		_ = os.Remove(npipe)
 	}
 
 	err = syscall.Mkfifo(npipe, 0666)
@@ -201,7 +199,7 @@ func CopyFile(dstName string, srcName string) error {
 	}
 	defer src.Close()
 
-	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0644)
+	dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0640)
 	if err != nil {
 		return err
 	}
@@ -211,7 +209,6 @@ func CopyFile(dstName string, srcName string) error {
 		return err
 	}
 	return nil
-
 }
 
 // RemoveDuplicateElement method remove duplicate elem from slice
@@ -243,7 +240,6 @@ func WaitForPyservice() error {
 			return fmt.Errorf("waiting for pyservice timeout")
 		}
 	}
-	return nil
 }
 
 // InterfaceByName method check the interface state, up or down

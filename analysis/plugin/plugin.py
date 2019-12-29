@@ -14,16 +14,14 @@
 """
 The plugin for monitor and configurator.
 """
-
-import sys
+import inspect
 import logging
-import os
 import threading
-import monitor
-import configurator
 import time
+from analysis.plugin import monitor
+from analysis.plugin import configurator
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class ThreadedCall(threading.Thread):
@@ -33,11 +31,13 @@ class ThreadedCall(threading.Thread):
         super(ThreadedCall, self).__init__()
         self.func = func
         self.args = args
+        self.result = None
 
     def run(self):
         self.result = self.func(*self.args)
 
     def get_result(self):
+        """start a new thread"""
         threading.Thread.join(self)
         try:
             return self.result
@@ -59,17 +59,17 @@ class MPI:
         all_mpis = []
         all_modules = []
         all_purposes = []
-        for m in monitor.common.Monitor.__subclasses__():
-            all_mpis.append((m._module, m._purpose))
-            all_modules.append(m._module)
-            all_purposes.append(m._purpose)
+        for sub_class in monitor.common.Monitor.__subclasses__():
+            all_mpis.append((sub_class.module(sub_class), sub_class.purpose(sub_class)))
+            all_modules.append(sub_class.module(sub_class))
+            all_purposes.append(sub_class.purpose(sub_class))
         self.get_monitors.__func__.__doc__ = self.get_monitors.__func__.__doc__ % (
             set(all_modules), set(all_purposes))
         self.get_monitor.__func__.__doc__ = self.get_monitor.__func__.__doc__ % (
             all_mpis)
 
     @classmethod
-    def get_monitors(self, module=None, purpose=None):
+    def get_monitors(cls, module=None, purpose=None):
         """
         Get monitors of 'module' for 'purpose'.
 
@@ -79,17 +79,17 @@ class MPI:
         :raises: None
         """
         mpis = []
-        for m in monitor.common.Monitor.__subclasses__():
-            if (module is not None) and (m._module != module):
+        for sub_class in monitor.common.Monitor.__subclasses__():
+            if (module is not None) and (sub_class.module(sub_class) != module):
                 continue
-            if (purpose is not None) and (m._purpose != purpose):
+            if (purpose is not None) and (sub_class.purpose(sub_class) != purpose):
                 continue
-            me = m()
-            mpis.append(me)
+            m_class = sub_class()
+            mpis.append(m_class)
         return mpis
 
     @classmethod
-    def get_monitor(self, module, purpose):
+    def get_monitor(cls, module, purpose):
         """
         Get monitor of 'module' for 'purpose'.
 
@@ -101,14 +101,12 @@ class MPI:
         if len(mpis) != 1:
             err = LookupError("Find {} {}-{} monitors".format(
                 len(mpis), module, purpose))
-            logger.error("MPI.{}: {}".format(
-                sys._getframe().f_code.co_name, str(err)))
+            LOGGER.error("MPI.%s: %s", inspect.stack()[0][3], str(err))
             raise err
-        else:
-            return mpis[0]
+        return mpis[0]
 
     @classmethod
-    def get_monitor_pooled(self, module, purpose, pool):
+    def get_monitor_pooled(cls, module, purpose, pool):
         """
         Get monitor of 'module' for 'purpose' in pool.
 
@@ -118,24 +116,22 @@ class MPI:
         :raises LookupError: Fail, find monitor error
         """
         mpis = []
-        for m in pool:
-            if (module is not None) and (m._module != module):
+        for sub_class in pool:
+            if (module is not None) and (sub_class.module() != module):
                 continue
-            if (purpose is not None) and (m._purpose != purpose):
+            if (purpose is not None) and (sub_class.purpose() != purpose):
                 continue
-            mpis.append(m)
+            mpis.append(sub_class)
 
         if len(mpis) != 1:
             err = LookupError("Find {} {}-{} monitors in pool".format(
                 len(mpis), module, purpose))
-            logger.error("MPI.{}: {}".format(
-                sys._getframe().f_code.co_name, str(err)))
+            LOGGER.error("MPI.%s: %s", inspect.stack()[0][3], str(err))
             raise err
-        else:
-            return mpis[0]
+        return mpis[0]
 
     @classmethod
-    def get_monitors_data(self, monitors, pool=None):
+    def get_monitors_data(cls, monitors, pool=None):
         """
         Get given monitors report data in one.
 
@@ -147,22 +143,22 @@ class MPI:
         :raises LookupError: Fail, find monitor error
         """
         mts = []
-        for m in monitors:
+        for m_mpi in monitors:
             if pool is None:
-                mon = MPI.get_monitor(m[0], m[1])
+                mon = MPI.get_monitor(m_mpi[0], m_mpi[1])
             else:
-                mon = MPI.get_monitor_pooled(m[0], m[1], pool)
-            mt = ThreadedCall(mon.report, ("data", None, m[2]))
-            mts.append(mt)
-            mt.start()
+                mon = MPI.get_monitor_pooled(m_mpi[0], m_mpi[1], pool)
+            m_thread = ThreadedCall(mon.report, ("data", None, m_mpi[2]))
+            mts.append(m_thread)
+            m_thread.start()
 
         rets = []
-        for mt in mts:
+        for m_thread in mts:
             start = time.time()
-            ret = mt.get_result()
+            ret = m_thread.get_result()
             end = time.time()
-            logger.debug("MPI.{}: Cost {} s to call {}, ret={}".format(
-                sys._getframe().f_code.co_name, end-start, mt.func, str(ret)))
+            LOGGER.debug("MPI.%s: Cost %s s to call %s, ret=%s", inspect.stack()[0][3],
+                         end - start, m_thread.func, str(ret))
             if isinstance(ret, Exception):
                 return ret
             rets += ret
@@ -183,17 +179,17 @@ class CPI:
         all_cpis = []
         all_modules = []
         all_submods = []
-        for m in configurator.common.Configurator.__subclasses__():
-            all_cpis.append((m._module, m._submod))
-            all_modules.append(m._module)
-            all_submods.append(m._submod)
+        for sub_class in configurator.common.Configurator.__subclasses__():
+            all_cpis.append((sub_class.module(sub_class), sub_class.submod(sub_class)))
+            all_modules.append(sub_class.module(sub_class))
+            all_submods.append(sub_class.submod(sub_class))
         self.get_configurators.__func__.__doc__ = self.get_configurators.__func__.__doc__ % (
             set(all_modules), set(all_submods))
         self.get_configurator.__func__.__doc__ = self.get_configurator.__func__.__doc__ % (
             all_cpis)
 
     @classmethod
-    def get_configurators(self, module=None, submod=None):
+    def get_configurators(cls, module=None, submod=None):
         """
         Get configurators of 'module'.'submod'.
 
@@ -203,17 +199,17 @@ class CPI:
         :raises: None
         """
         cpis = []
-        for c in configurator.common.Configurator.__subclasses__():
-            if (module is not None) and (c._module != module):
+        for sub_class in configurator.common.Configurator.__subclasses__():
+            if (module is not None) and (sub_class.module(sub_class) != module):
                 continue
-            if (submod is not None) and (c._submod != submod):
+            if (submod is not None) and (sub_class.submod(sub_class) != submod):
                 continue
-            ce = c()
-            cpis.append(ce)
+            c_cpi = sub_class()
+            cpis.append(c_cpi)
         return cpis
 
     @classmethod
-    def get_configurator(self, module, submod):
+    def get_configurator(cls, module, submod):
         """
         Get configurator of 'module'.'submod'.
 
@@ -225,42 +221,6 @@ class CPI:
         if len(cpis) != 1:
             err = LookupError("Find {} {}-{} configurators".format(
                 len(cpis), module, submod))
-            logger.error("CPI.{}: {}".format(
-                sys._getframe().f_code.co_name, str(err)))
+            LOGGER.error("CPI.%s: %s", inspect.stack()[0][3], str(err))
             raise err
-        else:
-            return cpis[0]
-
-
-# if __name__ == "__main__":
-#	if len(sys.argv) == 4:
-#		ret = MPI.get_monitors(sys.argv[1], sys.argv[2])
-#		print(ret[0].get(sys.argv[3]))
-#	elif len(sys.argv) == 3:
-#		ret = MPI.get_monitors(sys.argv[1], sys.argv[2])
-#		print(ret[0].get())
-#	else:
-#		print('usage: ' + sys.argv[0] + ' module purpose')
-
-# if __name__ == "__main__":
-#	if len(sys.argv) == 3:
-#		ret = CPI.get_configurators(sys.argv[1])
-#		print(ret[0].set(sys.argv[2]))
-#	else:
-#		print('usage: ' + sys.argv[0] + ' module key=val')
-
-if __name__ == "__main__":
-    monitors = (
-        ("CPU",
-         "STAT",
-         "--interval=1;--cpu=1 --fields=usr --fields=sys --fields=iowait --fields=irq --fields=guest"),
-        ("STORAGE",
-         "STAT",
-         "--interval=3;--device=sda --fields=rMBs --fields=wMBs"),
-        ("NET",
-         "STAT",
-         "--interval=2;--nic=lo --fields=wKBs --fields=rKBs"),
-        ("PERF",
-         "STAT",
-         "--interval=5;--fields=cycles --fields=instructions --fields=cache-misses"))
-    print(MPI.get_monitors_data(monitors))
+        return cpis[0]

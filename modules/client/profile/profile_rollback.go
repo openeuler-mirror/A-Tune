@@ -49,7 +49,6 @@ func init() {
 }
 
 func newProfileRollbackCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileRollbackCommand, nil
 }
 
@@ -74,6 +73,9 @@ func profileRollback(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, err := svc.ProfileRollback(CTX.Background(), &PB.ProfileInfo{})
+	if err != nil {
+		return err
+	}
 
 	for {
 		reply, err := stream.Recv()

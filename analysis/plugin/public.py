@@ -18,19 +18,15 @@ Custom exception and warning.
 
 class SetConfigError(Exception):
     """For setting config errors"""
-    pass
 
 
 class GetConfigError(Exception):
     """For getting config errors"""
-    pass
 
 
 class NeedRebootWarning(Warning):
     """For needing reboot after config"""
-    pass
 
 
 class NeedConfigWarning(Warning):
     """For needing user handle after config"""
-    pass

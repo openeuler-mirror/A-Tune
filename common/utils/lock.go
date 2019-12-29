@@ -28,24 +28,15 @@ type MutexLock struct {
 
 // TryLock method if get the lock success, otherwise return false
 func (m *MutexLock) TryLock() bool {
-	if !atomic.CompareAndSwapInt32(&m.state, 0, 1) {
-		return false
-	}
-	return true
+	return atomic.CompareAndSwapInt32(&m.state, 0, 1)
 }
 
 // Unlock method unlock lock flag
 func (m *MutexLock) Unlock() {
 	atomic.CompareAndSwapInt32(&m.state, 1, 0)
-
 }
 
 // IsLocked method return wether the lock is already locked
 func (m *MutexLock) IsLocked() bool {
-	if atomic.LoadInt32(&m.state) == locked {
-		return true
-	}
-
-	return false
-
+	return atomic.LoadInt32(&m.state) == locked
 }

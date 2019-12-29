@@ -15,15 +15,9 @@
 The sub class of the monitor, used to collect the memory numa info.
 """
 
-import sys
-import logging
 import subprocess
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Monitor
 
 
 class MemNuma(Monitor):
@@ -36,15 +30,7 @@ class MemNuma(Monitor):
         Monitor.__init__(self, user)
         self.__cmd = "numactl"
 
-    def _get(self, para=None):
+    def _get(self, _):
         output = subprocess.check_output("{cmd} {opt}".format(
             cmd=self.__cmd, opt=self._option).split())
         return output.decode()
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = MemNuma("UT")
-    ct.report(sys.argv[1], sys.argv[2])

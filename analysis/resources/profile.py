@@ -18,20 +18,22 @@ Restful api for profile, in order to provide the method of get and put.
 from flask import abort
 from flask import current_app
 from flask_restful import Resource
-from resources.parser import profile_get_parser, profile_put_parser
-from plugin.plugin import CPI
+from analysis.resources.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
+from analysis.plugin.plugin import CPI
 
 
 class Profile(Resource):
-    '''
-    resume the profile
-    '''
+    """provide the method of get and put for profile"""
+    section = "section"
 
     def put(self):
+        """
+        resume the profile
+        """
         result = {}
-        args = profile_put_parser.parse_args()
+        args = PROFILE_PUT_PARSER.parse_args()
         current_app.logger.info(args)
-        section = args.get("section").upper()
+        section = args.get(self.section).upper()
         modules = section.split(".")
         submodule = None
         if len(modules) > 1:
@@ -51,39 +53,37 @@ class Profile(Resource):
 
         return result, 200
 
-    '''
-    backup the profile
-    '''
-
     def get(self):
+        """
+        backup the profile
+        """
         result = {}
-        args = profile_get_parser.parse_args()
+        args = PROFILE_GET_PARSER.parse_args()
         current_app.logger.info(args)
-        section = args.get("section").upper()
+        section = args.get(self.section).upper()
         config = args.get("config")
-        backupDir = args.get("path")
+        backup_dir = args.get("path")
 
         modules = section.split(".")
-        submodule = None
-        if len(modules) > 1:
-            submodule = modules[1]
+        submodule = modules[1] if len(modules) > 1 else None
         configurators = CPI.get_configurators(modules[0], submodule)
 
         if len(configurators) < 1:
-            abort(404)
+            result["status"] = "FAILED"
+            result["value"] = "module: {}, submodule: {} is not exist".format(modules[0], submodule)
+            return result, 200
 
         configurator = configurators[0]
-        realValue = configurator.backup(config, backupDir)
-        if isinstance(realValue, Exception):
+        real_value = configurator.backup(config, backup_dir)
+        if isinstance(real_value, Exception):
             result["status"] = "FAILED"
-            result["value"] = "exception"
+            result["value"] = str(real_value)
         else:
-            if not realValue:
+            if not real_value:
                 result["status"] = "FAILED"
                 result["value"] = "UNKNOWN"
             else:
                 result["status"] = "SUCCESS"
-                result["value"] = realValue
+                result["value"] = real_value
 
         return result, 200
-

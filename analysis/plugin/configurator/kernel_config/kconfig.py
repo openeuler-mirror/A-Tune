@@ -14,17 +14,17 @@
 """
 The sub class of the Configurator, used to change the kernel config.
 """
-
-import sys
+import gzip
+import inspect
+import os
 import logging
 import subprocess
 import re
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
+from analysis.plugin.public import NeedConfigWarning
+from ..common import Configurator
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class KernelConfig(Configurator):
@@ -45,43 +45,30 @@ class KernelConfig(Configurator):
     def _set(self, key, value):
         if self.get(key) == value:
             return 0
-        else:
-            raise NeedConfigWarning(
-                "Please change the kernel configuration {key} to {val}.".format(
-                    key=key, val=value))
+        raise NeedConfigWarning(
+            "Please change the kernel configuration {key} to {val}.".format(
+                key=key, val=value))
 
     def _get(self, key):
         file_type = os.path.splitext(self.__cfg_file)[-1]
         if file_type == ".gz":
-            with gzip.open(self.__cfg_file, 'rt') as f:
-                cfgs = f.read()
+            with gzip.open(self.__cfg_file, 'rt') as file:
+                cfgs = file.read()
         else:
-            with open(self.__cfg_file, 'r') as f:
-                cfgs = f.read()
+            with open(self.__cfg_file, 'r') as file:
+                cfgs = file.read()
 
         pattern = re.compile("^" + key + "=(.+)", re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(cfgs)
-        if len(searchObj) > 1:
-            err = LookupError("find more than one " + key)
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+        search_obj = pattern.findall(cfgs)
+        if len(search_obj) != 1:
+            err = LookupError("not find one " + key)
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
-        return searchObj[0]
+        return search_obj[0]
 
-    def _backup(self, key, rollback_info):
+    def _backup(self, _, __):
         return ""
 
-    def _resume(self, key, value):
+    def _resume(self, _, __):
         return None
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = KernelConfig("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

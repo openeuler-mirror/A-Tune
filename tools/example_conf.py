@@ -16,29 +16,29 @@ Tool to generate an example of profile configuration.
 """
 
 import sys
-sys.path.insert(0, "./../analysis/")
-from plugin.plugin import CPI
 
+sys.path.insert(0, "./../analysis/")
+from analysis.plugin.plugin import CPI
 
 print("#")
 print("# example of atuned profile configuration")
 print("#\n")
 
-global_sections = (("main", "list it's parent profile"),
-					("tip", "the recommended optimization, which should be performed manunaly"),
-					("check", "check the environment"))
+GLOBAL_SECTIONS = (("main", "list it's parent profile"),
+                   ("tip", "the recommended optimization, which should be performed manunaly"),
+                   ("check", "check the environment"))
 
-for i in global_sections:
-	print("[{}]".format(i[0]))
-	print("# {}".format(i[1]))
-	print("\n")
+for i in GLOBAL_SECTIONS:
+    print("[{}]".format(i[0]))
+    print("# {}".format(i[1]))
+    print("\n")
 
-cpi = CPI()
-cpis = cpi.get_configurators()
-for i in cpis:
-	if i.module() == i.submod():
-		print("[{}]".format(i.module().lower()))
-	else:
-		print("[{}.{}]".format(i.module().lower(), i.submod().lower()))
-	print("# {}".format(i.__doc__.lower()))
-	print("\n")
+CPI_INSTANCE = CPI()
+CPIS = CPI_INSTANCE.get_configurators()
+for i in CPIS:
+    if i.module() == i.submod():
+        print("[{}]".format(i.module().lower()))
+    else:
+        print("[{}.{}]".format(i.module().lower(), i.submod().lower()))
+    print("# {}".format(i.__doc__.lower()))
+    print("\n")

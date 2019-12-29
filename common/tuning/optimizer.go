@@ -18,98 +18,54 @@ import (
 	"atune/common/config"
 	"atune/common/http"
 	"atune/common/log"
+	"atune/common/models"
 	"atune/common/project"
-	"encoding/json"
+	"atune/common/utils"
 	"fmt"
-	"io/ioutil"
+	"math"
+	"strconv"
 )
-
-type optimizerBody struct {
-	MaxEval int    `json:"max_eval"`
-	Knobs   []knob `json:"knobs"`
-}
-
-type knob struct {
-	Dtype string  `json:"dtype"`
-	Name  string  `json:"name"`
-	Type  string  `json:"type"`
-	Range []int64 `json:"range"`
-	Items []int64 `json:"items"`
-	Step  int64   `json:"step"`
-	Ref   string  `json:"ref"`
-}
-
-type respPostBody struct {
-	TaskID string `json:task_id`
-}
-
-type optimizerPutBody struct {
-	Iterations int    `json:"iterations"`
-	Value      string `json:"value"`
-}
-
-type respPutBody struct {
-	Param string `json:"param"`
-}
-
-func (o *optimizerBody) Post() (*respPostBody, error) {
-	url := config.GetUrl(config.OptimizerURI)
-	res, err := http.Post(url, o)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	respBody, err := ioutil.ReadAll(res.Body)
-	respPostIns := new(respPostBody)
-
-	err = json.Unmarshal(respBody, respPostIns)
-	if err != nil {
-		return nil, err
-	}
-
-	return respPostIns, nil
-}
-
-func (o *optimizerPutBody) Put(url string) (*respPutBody, error) {
-	res, err := http.Put(url, o)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-
-	respBody, err := ioutil.ReadAll(res.Body)
-	respPutIns := new(respPutBody)
-
-	err = json.Unmarshal(respBody, respPutIns)
-	if err != nil {
-		return nil, err
-	}
-
-	return respPutIns, nil
-
-}
 
 // Optimizer : the type implement the bayes serch service
 type Optimizer struct {
-	Prj *project.YamlPrj
+	Prj *project.YamlPrjSvr
+	utils.MutexLock
 }
 
-/*
-DynamicTuned method using bayes algorithm to search the best performance parameters
-*/
-func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
-	//dynamic profle setting
-	iterations := o.Prj.Iterations
-	optimizerBody := new(optimizerBody)
-	optimizerBody.MaxEval = iterations
+//BenchMark : the benchmark data
+type BenchMark struct {
+	Content []byte
+}
 
-	optimizerBody.Knobs = make([]knob, 0)
+var optimizerPutURL string
+var optimization *Optimizer
+var maxEval string
+var respPutIns *models.RespPutBody
+var iter int
+var maxIter int
+var optimizer = Optimizer{}
+
+// InitTuned method for init tuning
+func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
+	//dynamic profle setting
+	if !optimizer.TryLock() {
+		return fmt.Errorf("dynamic optimizer search has been in running")
+	}
+	maxIter = askIter
+	if maxIter > o.Prj.Maxiterations {
+		maxIter = o.Prj.Maxiterations
+		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
+		ch <- &PB.AckCheck{Name: fmt.Sprintf("server project %s max iterations %d\n",
+			o.Prj.Project, o.Prj.Maxiterations)}
+	}
+
+	optimizerBody := new(models.OptimizerPostBody)
+	optimizerBody.MaxEval = maxIter
+
+	optimizerBody.Knobs = make([]models.Knob, 0)
 
 	for _, item := range o.Prj.Object {
-		knob := new(knob)
+		knob := new(models.Knob)
 		knob.Dtype = item.Info.Dtype
 		knob.Name = item.Name
 		knob.Type = item.Info.Type
@@ -117,6 +73,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 		knob.Range = item.Info.Scope
 		knob.Items = item.Info.Items
 		knob.Step = item.Info.Step
+		knob.Options = item.Info.Options
 		optimizerBody.Knobs = append(optimizerBody.Knobs, *knob)
 	}
 
@@ -124,64 +81,105 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 	if err != nil {
 		return err
 	}
+	if respPostIns.Status != "OK" {
+		log.Errorf(respPostIns.Status)
+		return fmt.Errorf("create task failed: %s", respPostIns.Status)
+	}
 
 	log.Infof("create task id is %s", respPostIns.TaskID)
-	url := config.GetUrl(config.OptimizerURI)
-	optimizerPutURL := fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
+	url := config.GetURL(config.OptimizerURI)
+	optimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
 
 	log.Infof("optimizer put url is: %s", optimizerPutURL)
 
+	optimization = o
+	maxEval = ""
+	iter = 0
+
+	benchmark := BenchMark{Content: nil}
+	if err := benchmark.DynamicTuned(ch); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
+DynamicTuned method using bayes algorithm to search the best performance parameters
+*/
+func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	var eval string
-	for i := 0; i <= iterations+1; i++ {
-		optPutBody := new(optimizerPutBody)
-		optPutBody.Iterations = i
-		optPutBody.Value = eval
-
-		respPutIns, err := optPutBody.Put(optimizerPutURL)
-		if err != nil {
-			log.Errorf("get setting parameter error: %v", err)
-			return err
-		}
-		if i == iterations {
-			ch <- &PB.AckCheck{Name: fmt.Sprintf("Optimized result is: %s", respPutIns.Param)}
-			break
-		}
-
-		log.Infof("setting params is: %s", respPutIns.Param)
-		if err := o.Prj.RunSet(respPutIns.Param); err != nil {
-			log.Error(err)
-			return err
-		}
-
-		log.Info("set the parameter success")
-		if err := o.Prj.RestartProject(); err != nil {
-			log.Error(err)
-			return err
-		}
-		log.Info("restart project success")
-
-		benchmarkByte, err := o.Prj.BenchMark()
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-
-		eval, err = o.Prj.Evaluation(benchmarkByte)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
+	var err error
+	if bench.Content != nil {
+		eval = string(bench.Content)
 
 		log.Info(eval)
+		ch <- &PB.AckCheck{Name: fmt.Sprintf("The %dth optimization result is: %s\n"+
+			" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)}
+
+		floatEval, err := strconv.ParseFloat(eval, 64)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		if maxEval == "" {
+			maxEval = eval
+		}
+
+		floatMaxEval, err := strconv.ParseFloat(maxEval, 64)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		if math.Abs(floatEval) > math.Abs(floatMaxEval) {
+			maxEval = eval
+		}
 	}
 
-	resp, err := http.Delete(optimizerPutURL)
+	optPutBody := new(models.OptimizerPutBody)
+	optPutBody.Iterations = iter
+	optPutBody.Value = eval
+	respPutIns, err = optPutBody.Put(optimizerPutURL)
+	if err != nil {
+		log.Errorf("get setting parameter error: %v", err)
+		return err
+	}
+
+	log.Infof("setting params is: %s", respPutIns.Param)
+	if err := optimization.Prj.RunSet(respPutIns.Param); err != nil {
+		log.Error(err)
+		return err
+	}
+
+	log.Info("set the parameter success")
+	if err := optimization.Prj.RestartProject(); err != nil {
+		log.Error(err)
+		return err
+	}
+	log.Info("restart project success")
+
+	if iter == maxIter {
+		ch <- &PB.AckCheck{Name: fmt.Sprintf("\n The final optimization result is: %s\n"+
+			" The final evaluation value is: %s", respPutIns.Param, maxEval), Status: utils.SUCCESS}
+		if err = deleteTask(optimizerPutURL); err != nil {
+			log.Error(err)
+		}
+		optimizer.Unlock()
+		return nil
+	}
+
+	iter++
+	return nil
+}
+
+func deleteTask(url string) error {
+	resp, err := http.Delete(url)
 	if err != nil {
 		log.Info("delete task faild:", err)
+		return err
 	}
 	defer resp.Body.Close()
-
-	resBytes, err := ioutil.ReadAll(resp.Body)
-	log.Debug(string(resBytes))
 	return nil
 }

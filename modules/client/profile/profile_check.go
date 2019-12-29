@@ -49,7 +49,6 @@ func init() {
 }
 
 func newProfileCheckCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileCheckCommand, nil
 }
 
@@ -70,6 +69,27 @@ func profileCheck(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, err := svc.CheckInitProfile(CTX.Background(), &PB.ProfileInfo{Name: appname})
+	if err != nil {
+		return err
+	}
+
+	for {
+		reply, err := stream.Recv()
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+		utils.Print(reply)
+	}
+	fmt.Println("\nActive profile check:")
+	stream, err = svc.CheckActiveProfile(CTX.Background(), &PB.ProfileInfo{})
+	if err != nil {
+		return err
+	}
 
 	for {
 		reply, err := stream.Recv()

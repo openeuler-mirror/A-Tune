@@ -32,27 +32,16 @@ type logger struct {
 var rootLogger = logrus.New()
 var baseLogger = logger{entry: logrus.NewEntry(rootLogger)}
 
-var logLevels = map[string]logrus.Level{
-	"panic": logrus.PanicLevel,
-	"fatal": logrus.FatalLevel,
-	"error": logrus.ErrorLevel,
-	"warn":  logrus.WarnLevel,
-	"info":  logrus.InfoLevel,
-	"debug": logrus.DebugLevel,
-	"trace": logrus.TraceLevel,
-}
-
 // InitLogger method init the base logger
-func InitLogger(modes []string, logPath string, cfg *ini.File) error {
+func InitLogger(modes []string, cfg *ini.File) error {
 	sec, err := cfg.GetSection("log")
 	if err != nil {
 		return err
 	}
 	formatter := getLogFormat("text")
 
-	baseLogger.SetLevel(sec.Key("level").MustString("info"))
+	_ = baseLogger.SetLevel(sec.Key("level").MustString("info"))
 	for _, mode := range modes {
-
 		switch mode {
 		case "console":
 			baseLogger.entry.Logger.Out = os.Stdout
@@ -63,7 +52,6 @@ func InitLogger(modes []string, logPath string, cfg *ini.File) error {
 				baseLogger.Errorf("syslog hook init faild:%v", err)
 			}
 			baseLogger.entry.Logger.AddHook(syslogHook)
-
 		}
 	}
 
@@ -71,7 +59,6 @@ func InitLogger(modes []string, logPath string, cfg *ini.File) error {
 }
 
 func (log logger) withFileField() *logrus.Entry {
-	filename, line := "???", 0
 	_, filename, line, ok := runtime.Caller(2)
 	if ok {
 		filename = filepath.Base(filename)
@@ -155,7 +142,6 @@ func (log logger) SetLevel(level string) error {
 
 // GetLogger method return the root logger of the logger service
 func GetLogger() *logrus.Logger {
-
 	return rootLogger
 }
 
@@ -167,7 +153,6 @@ func getLogFormat(format string) logrus.Formatter {
 		return &logrus.JSONFormatter{}
 	default:
 		return &logrus.TextFormatter{}
-
 	}
 }
 

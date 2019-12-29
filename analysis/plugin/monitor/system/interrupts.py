@@ -16,9 +16,8 @@ The sub class of the monitor, used to collect the system device interrupts.
 """
 import getopt
 import re
-import sys
 import subprocess
-from monitor.common import *
+from ..common import Monitor
 
 
 class SysInterrupts(Monitor):
@@ -33,7 +32,7 @@ class SysInterrupts(Monitor):
         self.decode.__func__.__doc__ = Monitor.decode.__doc__ % "--nic=x"
         self.__cmd = "awk"
 
-    def _get(self, para=None):
+    def _get(self, _):
         output = subprocess.check_output("{cmd} {opt} {path}".format(
             cmd=self.__cmd, opt=self._option, path=self._path).split())
         return output.decode()
@@ -63,11 +62,3 @@ class SysInterrupts(Monitor):
         pattern = re.compile(r"^(\d*):{}$".format(nic.strip()), re.MULTILINE)
         interrupts = pattern.findall(info)
         return " ".join(interrupts).strip()
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = SysInterrupts("UT")
-    ct.report(sys.argv[1], sys.argv[2])

@@ -20,11 +20,12 @@ class Utils:
     """Utils class"""
 
     @staticmethod
-    def get_keypos(str, key):
+    def get_keypos(str_content, key):
+        """get key position"""
         keys = [" " + key + "=", " " + key + " ", " " + key + "\n"]
         ret = []
         for k in keys:
-            pos = str.rfind(k)
+            pos = str_content.rfind(k)
             if pos != -1:
                 pos += 1
             ret.append(pos)
@@ -32,8 +33,9 @@ class Utils:
 
     @staticmethod
     def get_value(key):
-        with open("/proc/cmdline", 'r') as f:
-            active_cmd = f.read()
+        """get value according to key"""
+        with open("/proc/cmdline", 'r') as file:
+            active_cmd = file.read()
         keypos = Utils.get_keypos(active_cmd, key)
         active = None
         if keypos != -1:

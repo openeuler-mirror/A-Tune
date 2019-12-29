@@ -14,18 +14,14 @@
 """
 The sub class of the monitor, used to collect the system load average statistics.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 import getopt
 import re
+from ..common import Monitor
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class SysLdavg(Monitor):
@@ -43,20 +39,17 @@ class SysLdavg(Monitor):
 
     def _get(self, para=None):
         if para is not None:
-            opts, args = getopt.getopt(para.split(), None, ['interval='])
+            opts, _ = getopt.getopt(para.split(), None, ['interval='])
             for opt, val in opts:
-                if opt in ('--interval'):
+                if opt in '--interval':
                     if val.isdigit():
                         self.__interval = int(val)
                     else:
                         err = ValueError(
                             "Invalid parameter: {opt}={val}".format(
                                 opt=opt, val=val))
-                        logger.error(
-                            "{}.{}: {}".format(
-                                self.__class__.__name__,
-                                sys._getframe().f_code.co_name,
-                                str(err)))
+                        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                                     inspect.stack()[0][3], str(err))
                         raise err
                     continue
 
@@ -68,6 +61,12 @@ class SysLdavg(Monitor):
         return output.decode()
 
     def decode(self, info, para):
+        """
+        decode the result of the operation
+        :param info:  content that needs to be decoded
+        :param para:  command line argument
+        :returns ret:  operation result
+        """
         if para is None:
             return info
 
@@ -83,43 +82,30 @@ class SysLdavg(Monitor):
         keys = []
         ret = ""
 
-        opts, args = getopt.getopt(para.split(), None, ['fields='])
+        opts, _ = getopt.getopt(para.split(), None, ['fields='])
         for opt, val in opts:
-            if opt in ('--fields'):
+            if opt in '--fields':
                 keys.append(keyword[val])
                 continue
 
         pattern = re.compile(
-            "^(\d.*?)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*)",
+            r"^(\d.*?)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)"
+            r"\ {1,}(\d*)",
             re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(info)
-        if len(searchObj) == 0:
+        search_obj = pattern.findall(info)
+        if len(search_obj) == 0:
             err = LookupError("Fail to find data")
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
 
         for i in keys:
             if type(i).__name__ == 'int':
-                ret = ret + " " + searchObj[-1][i]
+                ret = ret + " " + search_obj[-1][i]
             elif i == "task-util":
-                with open("/proc/sys/kernel/threads-max", 'r') as f:
-                    threads_max = f.read()
-                util = int(searchObj[-1][keyword["plist-sz"]]) / \
-                        int(threads_max) * 100
+                with open("/proc/sys/kernel/threads-max", 'r') as file:
+                    threads_max = file.read()
+                util = int(search_obj[-1][keyword["plist-sz"]]) / \
+                    int(threads_max) * 100
                 ret = ret + " " + str(util)
         return ret
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = SysLdavg("UT")
-    ct.report(
-        sys.argv[1],
-        sys.argv[2],
-        "--interval=2;--fields=plist-sz --fields=ldavg-5 --fields=task-util")

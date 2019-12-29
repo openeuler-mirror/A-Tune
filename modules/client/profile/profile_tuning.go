@@ -16,11 +16,13 @@ package profile
 import (
 	PB "atune/api/profile"
 	"atune/common/client"
+	"atune/common/project"
 	SVC "atune/common/service"
 	"atune/common/utils"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"strings"
 
 	"github.com/urfave/cli"
@@ -45,7 +47,7 @@ var profileTunningCommand = cli.Command{
 
 func init() {
 	svc := SVC.ProfileService{
-		Name:    "opt.profile.tunning",
+		Name:    "opt.profile.tuning",
 		Desc:    "opt profile system",
 		NewInst: newProfileTuningCmd,
 	}
@@ -56,7 +58,6 @@ func init() {
 }
 
 func newProfileTuningCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileTunningCommand, nil
 }
 
@@ -83,19 +84,50 @@ func profileTunning(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	var yamlStruct interface{}
-	if err := yaml.Unmarshal(data, &yamlStruct); err != nil {
+	prj := project.YamlPrjCli{}
+	if err := yaml.Unmarshal(data, &prj); err != nil {
 		return err
 	}
 
-	c, err := client.NewClientFromContext(ctx)
+	_, err = runTuningRPC(ctx, &PB.ProfileInfo{Name: prj.Project, Content: []byte(strconv.Itoa(prj.Iterations))})
 	if err != nil {
 		return err
 	}
-	defer c.Close()
 
+	iter := 0
+	for iter < prj.Iterations {
+		benchmarkByte, err := prj.BenchMark()
+		if err != nil {
+			return err
+		}
+
+		var status string
+		status, err = runTuningRPC(ctx, &PB.ProfileInfo{Content: []byte(benchmarkByte)})
+		if err != nil {
+			return err
+		}
+
+		if status == utils.SUCCESS {
+			break
+		}
+
+		iter++
+	}
+	return nil
+}
+
+func runTuningRPC(ctx *cli.Context, info *PB.ProfileInfo) (string, error) {
+	c, err := client.NewClientFromContext(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	defer c.Close()
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Tuning(CTX.Background(), &PB.ProfileInfo{Name: string(data)})
+	stream, err := svc.Tuning(CTX.Background(), info)
+	if err != nil {
+		return "", err
+	}
 
 	for {
 		reply, err := stream.Recv()
@@ -105,10 +137,15 @@ func profileTunning(ctx *cli.Context) error {
 		}
 
 		if err != nil {
-			return err
+			return "", err
 		}
+
 		utils.Print(reply)
+
+		if reply.Status == utils.SUCCESS {
+			return reply.Status, nil
+		}
 	}
 
-	return nil
+	return "", nil
 }

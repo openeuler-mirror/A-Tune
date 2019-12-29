@@ -18,7 +18,6 @@ import (
 	"atune/common/utils"
 	"fmt"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/go-ini/ini"
@@ -28,8 +27,10 @@ import (
 const (
 	Version = "0.0.1"
 
-	EnvAddr = "ATUNED_ADDR"
-	EnvPort = "ATUNED_PORT"
+	EnvAddr    = "ATUNED_ADDR"
+	EnvPort    = "ATUNED_PORT"
+	EnvTLS     = "ATUNE_TLS"
+	EnvCliCert = "ATUNE_CLICERT"
 
 	DefaultTgtPort = "60001"
 	DefaultTgtAddr = "127.0.0.1"
@@ -40,10 +41,11 @@ const (
 	DefaultPath             = "/usr/lib/atuned/"
 	DefaultModDaemonSvrPath = DefaultPath + "modules"
 	DefaultConfPath         = "/etc/atuned/"
+	DefaultTuningPath       = DefaultConfPath + "tuning/"
 	DefaultScriptPath       = "/usr/libexec/atuned/scripts"
 	DefaultCollectorPath    = "/usr/libexec/atuned/collector"
 	DefaultAnalysisPath     = "/usr/libexec/atuned/analysis"
-	DefaultTempPath         = "/tmp/atuned"
+	DefaultTempPath         = "/run/atuned"
 	DefaultCheckerPath      = "/usr/share/atuned/checker/"
 	DefaultBackupPath       = "/usr/share/atuned/backup/"
 )
@@ -59,8 +61,8 @@ const (
 // python service url
 const (
 	Protocol   string = "http"
-	LocalHost  string = "127.0.0.1"
-	ApiVersion string = "v1"
+	LocalHost  string = "localhost"
+	APIVersion string = "v1"
 
 	ConfiguratorURI   string = "setting"
 	MonitorURI        string = "monitor"
@@ -85,9 +87,15 @@ const (
 
 // the grpc server config
 var (
-	Address  string
-	Port     string
-	RestPort string
+	Address           string
+	Port              string
+	RestPort          string
+	TLS               bool
+	TLSServerCertFile string
+	TLSServerKeyFile  string
+	TLSHTTPCertFile   string
+	TLSHTTPKeyFile    string
+	TLSHTTPCACertFile string
 )
 
 // Cfg type, the type that load the conf file
@@ -104,12 +112,12 @@ func (c *Cfg) Load() error {
 		return err
 	}
 	if !exist {
-		return fmt.Errorf("Could not find default config file")
+		return fmt.Errorf("could not find default config file")
 	}
 
 	cfg, err := ini.Load(defaultConfigFile)
 	if err != nil {
-		return fmt.Errorf("Faild to parse %s, %v", defaultConfigFile, err)
+		return fmt.Errorf("faild to parse %s, %v", defaultConfigFile, err)
 	}
 
 	c.Raw = cfg
@@ -118,17 +126,15 @@ func (c *Cfg) Load() error {
 	Address = section.Key("address").MustString("127.0.0.1")
 	Port = section.Key("port").MustString("60001")
 	RestPort = section.Key("rest_port").MustString("8383")
+	TLS = section.Key("tls").MustBool(false)
 
-	/*
-	interval, err := section.Key("interval").Int()
-	if err != nil {
-		return fmt.Errorf("interval value must be a interger between 1800 and 7200")
+	if TLS {
+		TLSServerCertFile = section.Key("tlsservercertfile").MustString("")
+		TLSServerKeyFile = section.Key("tlsserverkeyfile").MustString("")
+		TLSHTTPCertFile = section.Key("tlshttpcertfile").MustString("")
+		TLSHTTPKeyFile = section.Key("tlshttpkeyfile").MustString("")
+		TLSHTTPCACertFile = section.Key("tlshttpcacertfile").MustString("")
 	}
-
-	if interval < 1800 || interval > 7200 {
-		return fmt.Errorf("interval value must be a interger between 1800 and 7200")
-	}
-	*/
 
 	if err := initLogging(cfg); err != nil {
 		return err
@@ -146,17 +152,17 @@ func NewCfg() *Cfg {
 
 func initLogging(cfg *ini.File) error {
 	modes := strings.Split(Modes, ",")
-	logPath := cfg.Section("log").Key("path").String()
-	if !filepath.IsAbs(logPath) {
-		return fmt.Errorf("log path must be absolute path")
-	}
-	log.InitLogger(modes, logPath, cfg)
+	err := log.InitLogger(modes, cfg)
 
-	return nil
+	return err
 }
 
-// GetUrl return the url
-func GetUrl(uri string) string {
-	url := fmt.Sprintf("%s://%s:%s/%s/%s", Protocol, LocalHost, RestPort, ApiVersion, uri)
+// GetURL return the url
+func GetURL(uri string) string {
+	protocol := Protocol
+	if TLS {
+		protocol = "https"
+	}
+	url := fmt.Sprintf("%s://%s:%s/%s/%s", protocol, LocalHost, RestPort, APIVersion, uri)
 	return url
 }

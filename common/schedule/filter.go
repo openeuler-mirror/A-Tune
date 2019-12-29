@@ -17,18 +17,20 @@ import (
 	"atune/common/schedule/filters"
 )
 
-type ScheduleFilter interface {
-	Filte(strategy string) error
+// Filter :schedule filters interface
+type Filter interface {
+	Tune(strategy string) error
 }
 
-func Factory(name string) ScheduleFilter {
+// Factory function for schedule filters
+func Factory(name string) Filter {
 	switch name {
 	case "irq":
 		return &filters.IrqSchedule{Name: "irq"}
 	case "numa":
 		return &filters.NumaSchedule{Name: "numa"}
 	case "cpu":
-		return &filters.CpuSchedule{Name: "cpu"}
+		return &filters.CPUSchedule{Name: "cpu"}
 	default:
 		return nil
 	}

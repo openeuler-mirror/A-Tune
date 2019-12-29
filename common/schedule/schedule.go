@@ -18,6 +18,7 @@ import (
 	"atune/common/config"
 	"atune/common/http"
 	"atune/common/log"
+	"atune/common/registry"
 	"atune/common/sqlstore"
 	"atune/common/utils"
 	"encoding/json"
@@ -37,19 +38,22 @@ func sendChanToAdm(ch chan *PB.AckCheck, item string, status string, description
 	ch <- &PB.AckCheck{Name: item, Status: status, Description: description}
 }
 
+// ConfigPutBody :body send to CPI service
 type ConfigPutBody struct {
 	Section string `json:"section"`
 	Key     string `json:"key"`
 	Value   string `json:"value"`
 }
 
-type respPut struct {
-	Status string `json:status`
-	Value  string `json:value`
+// RespPut ; response of call CPI service
+type RespPut struct {
+	Status string `json:"status"`
+	Value  string `json:"value"`
 }
 
-func (c *ConfigPutBody) Put() (*respPut, error) {
-	url := config.GetUrl(config.ConfiguratorURI)
+// Put schedule config
+func (c *ConfigPutBody) Put() (*RespPut, error) {
+	url := config.GetURL(config.ConfiguratorURI)
 	res, err := http.Put(url, c)
 	if err != nil {
 		return nil, err
@@ -59,18 +63,22 @@ func (c *ConfigPutBody) Put() (*respPut, error) {
 		return nil, fmt.Errorf("connect to configurator service faild")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
-	respPutIns := new(respPut)
+	if err != nil {
+		return nil, err
+	}
+
+	respPutIns := new(RespPut)
 	err = json.Unmarshal(resBody, respPutIns)
 	if err != nil {
 		return nil, err
 	}
 
 	return respPutIns, nil
-
 }
 
-func (c *ConfigPutBody) Get() (*respPut, error) {
-	url := config.GetUrl(config.ConfiguratorURI)
+// Get schedule config
+func (c *ConfigPutBody) Get() (*RespPut, error) {
+	url := config.GetURL(config.ConfiguratorURI)
 	res, err := http.Get(url, c)
 	if err != nil {
 		return nil, err
@@ -80,60 +88,67 @@ func (c *ConfigPutBody) Get() (*respPut, error) {
 		return nil, fmt.Errorf("connect to configurator service faild")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
-	respPutIns := new(respPut)
+	if err != nil {
+		return nil, err
+	}
+
+	respPutIns := new(RespPut)
 	err = json.Unmarshal(resBody, respPutIns)
 	if err != nil {
 		return nil, err
 	}
 
 	return respPutIns, nil
-
 }
 
+// Scheduler class
 type Scheduler struct {
 	schedule []*sqlstore.Schedule
-	name     string
-
-	typename string
-	strategy string
 	IsExit   bool
 }
 
 var instance *Scheduler = nil
 
+// Init schedule table
 func (s *Scheduler) Init() error {
 	s.schedule = sqlstore.GetSchedule()
 
 	return nil
 }
 
+// Schedule :update database and do schedule
 func (s *Scheduler) Schedule(typename string, strategy string, save bool) error {
 	if save {
-		sqlstore.UpdateSchedule(typename, strategy)
+		_ = sqlstore.UpdateSchedule(typename, strategy)
 
 		s.schedule = sqlstore.GetSchedule()
 		for _, item := range s.schedule {
-			s.DoSchedule(item.Type, item.Strategy)
+			_ = s.DoSchedule(item.Type, item.Strategy)
 		}
 	} else {
-		s.DoSchedule(typename, strategy)
+		_ = s.DoSchedule(typename, strategy)
 	}
 
 	return nil
 }
 
+// DoSchedule : get schedule filter and tune
 func (s *Scheduler) DoSchedule(typename string, strategy string) error {
 	filter := Factory(typename)
 	if filter == nil {
 		return errors.New("type don't exist")
 	}
 
-	return filter.Filte(strategy)
+	return filter.Tune(strategy)
 }
 
+// Active schedule strategy
 func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[string]*ini.File) error {
 	for _, item := range itemKeys {
 		value := items[item]
+		if value == nil {
+			continue
+		}
 		for _, section := range value.Sections() {
 			if section.Name() == "main" {
 				continue
@@ -143,18 +158,50 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 			}
 			if section.Name() == "tip" {
 				for _, key := range section.Keys() {
-					description := fmt.Sprintf("%s", key.Name())
-					if key.Value() == "error" {
-						sendChanToAdm(ch, item, utils.REQUEST, description)
-					} else {
-						sendChanToAdm(ch, item, utils.WARNING, description)
-					}
+					description := key.Name()
+					sendChanToAdm(ch, key.Value(), utils.SUGGEST, description)
 				}
 				continue
 			}
 			if section.Name() == "schedule" {
 				for _, key := range section.Keys() {
-					s.Schedule(key.Name(), key.Value(), false)
+					_ = s.Schedule(key.Name(), key.Value(), false)
+				}
+				continue
+			}
+
+			if section.Name() == "check" {
+				if !section.HasKey("check_environment") {
+					continue
+				}
+				if section.Key("check_environment").Value() != "on" {
+					continue
+				}
+
+				services := registry.GetCheckerServices()
+				for _, service := range services {
+					log.Infof("initializing checker service: %s", service.Name)
+					if err := service.Instance.Init(); err != nil {
+						return fmt.Errorf("service init faild: %v", err)
+					}
+				}
+
+				// running checker service
+				for _, srv := range services {
+					service := srv
+					checkerService, ok := service.Instance.(registry.CheckService)
+					if !ok {
+						continue
+					}
+
+					if !registry.IsCheckDisabled(service.Instance) {
+						continue
+					}
+					err := checkerService.Check(ch)
+					if err != nil {
+						log.Errorf("service %s running faild, reason: %v", service.Name, err)
+						continue
+					}
 				}
 				continue
 			}
@@ -179,7 +226,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 				if respPutIns.Status == "OK" {
 					message = append(message, scriptKey)
 				} else {
-					if statusStr != "ERROR" {
+					if statusStr != utils.ERROR {
 						statusStr = respPutIns.Status
 					}
 					message = append(message, respPutIns.Value)
@@ -190,8 +237,8 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 			status := strings.ToUpper(statusStr)
 			if status == "OK" {
 				sendChanToAdm(ch, item, utils.SUCCESS, strings.Join(message, ","))
-			} else if status == "WARNING" {
-				sendChanToAdm(ch, item, utils.REQUEST, strings.Join(message, ","))
+			} else if status == utils.WARNING {
+				sendChanToAdm(ch, item, utils.SUGGEST, strings.Join(message, ","))
 			} else {
 				sendChanToAdm(ch, item, utils.FAILD, strings.Join(message, ","))
 			}
@@ -201,10 +248,11 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 	return nil
 }
 
+// GetScheduler : get schedule instance
 func GetScheduler() *Scheduler {
 	if instance == nil {
 		instance = new(Scheduler)
-		instance.Init()
+		_ = instance.Init()
 	}
 
 	return instance

@@ -20,15 +20,15 @@ import pandas as pd
 import numpy as np
 
 
-def readFromCsv(path):
+def read_from_csv(path):
+    """read data from csv"""
     if not os.path.exists(path):
         return None
     if not path.endswith('.csv'):
         return None
 
-    f = open(path, 'r')
-    data = pd.read_csv(f)
-    data = np.array(data).tolist()
+    with open(path, 'r') as file:
+        data = pd.read_csv(file)
+        data = np.array(data).tolist()
 
     return data
-

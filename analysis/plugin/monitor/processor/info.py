@@ -15,15 +15,8 @@
 The sub class of the monitor, used to collect the CPU info.
 """
 
-import sys
-import logging
 import subprocess
-
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Monitor
 
 
 class CpuInfo(Monitor):
@@ -37,33 +30,30 @@ class CpuInfo(Monitor):
         self.__cmd = "lshw"
         self.format.__func__.__doc__ = Monitor.format.__doc__ % ("xml, json")
 
-    def _get(self, para=None):
+    def _get(self, _):
         with open('/dev/null', 'w') as no_print:
             output = subprocess.check_output("{cmd} {opt}".format(
                 cmd=self.__cmd, opt=self._option).split(),
-                stderr=no_print)
+                                             stderr=no_print)
         return output.decode()
 
     def format(self, info, fmt):
-        if (fmt == "xml"):
+        """
+        format the result of the operation
+        :param info:  content that needs to be converted
+        :param fmt:  converted format
+        :returns output:  converted result
+        """
+        if fmt == "xml":
             o_xml = subprocess.check_output(
                 "{cmd} -xml {opt}".format(
                     cmd=self.__cmd,
                     opt=self._option).split(),
                 stderr=subprocess.DEVNULL)
             return o_xml.decode()
-        elif (fmt == "json"):
+        if fmt == "json":
             o_json = subprocess.check_output("{cmd} -json {opt}".format(
                 cmd=self.__cmd, opt=self._option).split(),
-                stderr=subprocess.DEVNULL)
+                                             stderr=subprocess.DEVNULL)
             return o_json.decode()
-        else:
-            return Monitor.format(self, info, fmt)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = CpuInfo("UT")
-    ct.report(sys.argv[1], sys.argv[2])
+        return Monitor.format(self, info, fmt)

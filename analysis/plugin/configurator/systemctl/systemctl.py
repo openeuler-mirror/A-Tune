@@ -15,15 +15,8 @@
 The sub class of the Configurator, used to change the system service config.
 """
 import os
-import sys
-import logging
 import subprocess
-
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Configurator
 
 
 class Systemctl(Configurator):
@@ -37,44 +30,35 @@ class Systemctl(Configurator):
         Configurator.__init__(self, user)
         self.__cmd = "systemctl"
 
-    def _get(self, service):
+    def _get(self, key):
         with open('/dev/null', 'w') as no_print:
-            output = subprocess.check_output(
-                "{cmd} {opt} {service}; exit 0".format(
-                    cmd=self.__cmd,
-                    opt=self._option,
-                    service=service),
+            output = subprocess.Popen(
+                [self.__cmd, self._option, key],
+                stdout=subprocess.PIPE,
                 stderr=no_print,
-                shell=True)
-        return output.decode().replace('\n', ' ').strip()
+                shell=False)
+            out = output.communicate()
+        return bytes.decode(out[0]).replace('\n', ' ').strip()
 
-    def _set(self, service, oper):
-        if not os.path.exists(self._path + service + ".service"):
+    def _set(self, key, value):
+        if not os.path.exists(self._path + key + ".service"):
             return 0
-        status = self._get(service)
-        if status == "active" and oper == "start" or status == "inactive" and oper == "stop":
+        status = self._get(key)
+        if status == "active" and value == "start" or status == "inactive" and value == "stop":
             return 0
         with open('/dev/null', 'w') as no_print:
             return subprocess.call("{cmd} {oper} {service}".format(
-                cmd=self.__cmd, service=service, oper=oper).split(),
-                stdout=no_print, stderr=no_print)
+                cmd=self.__cmd, service=key, oper=value).split(),
+                                   stdout=no_print, stderr=no_print)
 
-    def _check(self, config1, config2):
+    @staticmethod
+    def check(_, __):
         return True
 
-    def _backup(self, key, rollback_info):
+    def _backup(self, key, _):
         val = self._get(key)
-        if val == "active" or val == "activating":
+        if val in ("active", "activating"):
             val = "start"
         else:
             val = "stop"
         return "{} = {}".format(key, val)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' service=oper')
-        sys.exit(-1)
-    ct = Systemctl("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

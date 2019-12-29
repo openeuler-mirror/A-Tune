@@ -19,14 +19,18 @@ from flask import abort
 from flask import current_app
 from flask_restful import Resource
 from flask_restful import marshal_with_field
-from resources.parser import property_put_parser
-from resources.parser import configurator_get_parser
-from resources.field import configurator_put_field
-from plugin.plugin import CPI
+from analysis.resources.parser import PROPERTY_PUT_PARSER
+from analysis.resources.parser import CONFIGURATOR_GET_PARSER
+from analysis.resources.parser import CONFIGURATOR_POST_PARSER
+from analysis.resources.field import CONFIGURATOR_PUT_FIELD
+from analysis.plugin.plugin import CPI
 
 
 class Configurator(Resource):
-    @marshal_with_field(configurator_put_field)
+    """restful api for configurator, in order to provide the method of put and get"""
+    section = "section"
+
+    @marshal_with_field(CONFIGURATOR_PUT_FIELD)
     def put(self):
         """
         calling cpi set method to set the value of the given key
@@ -37,9 +41,9 @@ class Configurator(Resource):
         :returns value: the message return by the cpi set method
         """
         result = {}
-        args = property_put_parser.parse_args()
+        args = PROPERTY_PUT_PARSER.parse_args()
         current_app.logger.info(args)
-        section = args.get("section").upper()
+        section = args.get(self.section).upper()
         modules = section.split(".")
         submodule = None
         if len(modules) > 1:
@@ -65,7 +69,7 @@ class Configurator(Resource):
 
         return result, 200
 
-    def get(self):
+    def post(self):
         """
         calling the cpi check method to check the value of the given key
         :param section:  The section of the cpi
@@ -75,9 +79,9 @@ class Configurator(Resource):
         :returns value: the system real value
         """
         result = {}
-        args = configurator_get_parser.parse_args()
+        args = CONFIGURATOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
-        section = args.get("section").upper()
+        section = args.get(self.section).upper()
         key = args.get("key")
         value = args.get("value", "")
 
@@ -91,15 +95,51 @@ class Configurator(Resource):
             abort(404)
 
         configurator = configurators[0]
-        realValue = configurator.get(key)
-        result["value"] = realValue
-        if realValue:
-            if configurator._check(value, realValue):
+        real_value = configurator.get(key)
+        if isinstance(real_value, Exception):
+            result["status"] = str(real_value)
+            return result, 200
+
+        result["value"] = real_value
+        if real_value:
+            if configurator.check(value, real_value):
                 result["status"] = "OK"
             else:
-                result["status"] = realValue
+                result["status"] = real_value
         else:
             result["status"] = "UNKNOWN"
 
         return result, 200
 
+    def get(self):
+        """
+        calling the cpi check method to check the value of the given key
+        :param section:  The section of the cpi
+        :param key: the key to be get
+        :returns status: the status compare the expect value with the real value
+        :returns value: the system real value
+        """
+        result = {}
+        args = CONFIGURATOR_GET_PARSER.parse_args()
+        current_app.logger.info(args)
+        section = args.get(self.section).upper()
+        key = args.get("key")
+
+        modules = section.split(".")
+        submodule = modules[1] if len(modules) > 1 else modules[0]
+
+        configurators = CPI.get_configurators(modules[0], submodule)
+        if len(configurators) < 1:
+            abort(404)
+
+        configurator = configurators[0]
+        real_value = configurator.get(key)
+        if isinstance(real_value, Exception):
+            result["value"] = str(real_value)
+            result["status"] = "FAILED"
+            return result, 200
+
+        result["value"] = real_value
+        result["status"] = "OK"
+
+        return result, 200

@@ -34,16 +34,21 @@ type Sqlstore struct {
 
 // Init method init the global db engine
 func (s *Sqlstore) Init() error {
+	var engine *xorm.Engine
 
-	os.MkdirAll(config.DatabasePath, os.ModePerm)
+	err := os.MkdirAll(config.DatabasePath, 0750)
+	if err != nil {
+		return fmt.Errorf("faild to mkdir: %s(%v)", config.DatabasePath, err)
+	}
+
 	dbName := path.Join(config.DatabasePath, config.DatabaseName)
 	connStr := "file:" + dbName + "?cache=shared&mode=rwc"
 
 	log.Infof("Connecting to DB: %s", dbName)
 
-	engine, err := xorm.NewEngine(config.DatabaseType, connStr)
+	engine, err = xorm.NewEngine(config.DatabaseType, connStr)
 	if err != nil {
-		return fmt.Errorf("Faild to connect to database: %v", err)
+		return fmt.Errorf("faild to connect to database: %v", err)
 	}
 
 	s.engine = engine
@@ -55,7 +60,7 @@ func (s *Sqlstore) Init() error {
 // Reload method, reload the db file for hot update
 func Reload(path string) error {
 	if globalEngine != nil {
-		globalEngine.Close()
+		_ = globalEngine.Close()
 	}
 
 	connStr := "file:" + path + "?cache=shared&mode=rwc"
@@ -63,7 +68,7 @@ func Reload(path string) error {
 	log.Infof("Reload DB: %s", path)
 	engine, err := xorm.NewEngine("sqlite3", connStr)
 	if err != nil {
-		return fmt.Errorf("Faild to connect to database: %v", err)
+		return fmt.Errorf("faild to connect to database: %v", err)
 	}
 
 	globalEngine = engine

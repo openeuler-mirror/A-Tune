@@ -28,7 +28,7 @@ type ELF struct {
 Check method check the elf file format
 */
 func (elf *ELF) Check(ch chan *PB.AckCheck) error {
-	log.Debug("Check %s", elf.FileName)
+	log.Debugf("Check %s", elf.FileName)
 
 	sendChanToAdm(ch, elf.FileName, utils.SUCCESS, "FIXME: NOT Implement")
 

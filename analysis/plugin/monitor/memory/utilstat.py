@@ -14,18 +14,15 @@
 """
 The sub class of the monitor, used to collect the mem util stat info.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 import getopt
 import re
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
+from ..common import Monitor
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class MemUtilStat(Monitor):
@@ -39,24 +36,22 @@ class MemUtilStat(Monitor):
         self.__cmd = "sar"
         self.__interval = 1
         self.decode.__func__.__doc__ = Monitor.decode.__doc__ % (
-            "--fields=time/kbmemfree/kbavail/kbmemused/memused/kbbuffers/kbcached/kbcommit/commit/kbactive/kbinact/kbdirty")
+            "--fields=time/kbmemfree/kbavail/kbmemused/memused/kbbuffers/"
+            "kbcached/kbcommit/commit/kbactive/kbinact/kbdirty")
 
     def _get(self, para=None):
         if para is not None:
-            opts, args = getopt.getopt(para.split(), None, ['interval='])
+            opts, _ = getopt.getopt(para.split(), None, ['interval='])
             for opt, val in opts:
-                if opt in ('--interval'):
+                if opt in '--interval':
                     if val.isdigit():
                         self.__interval = int(val)
                     else:
                         err = ValueError(
                             "Invalid parameter: {opt}={val}".format(
                                 opt=opt, val=val))
-                        logger.error(
-                            "{}.{}: {}".format(
-                                self.__class__.__name__,
-                                sys._getframe().f_code.co_name,
-                                str(err)))
+                        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                                     inspect.stack()[0][3], str(err))
                         raise err
                     continue
 
@@ -68,6 +63,12 @@ class MemUtilStat(Monitor):
         return output.decode()
 
     def decode(self, info, para):
+        """
+        decode the result of the operation
+        :param info:  content that needs to be decoded
+        :param para:  command line argument
+        :returns ret:  operation result
+        """
         if para is None:
             return info
 
@@ -87,36 +88,23 @@ class MemUtilStat(Monitor):
         keys = []
         ret = ""
 
-        opts, args = getopt.getopt(para.split(), None, ['fields='])
+        opts, _ = getopt.getopt(para.split(), None, ['fields='])
         for opt, val in opts:
-            if opt in ('--fields'):
+            if opt in '--fields':
                 keys.append(keyword[val])
                 continue
 
         pattern = re.compile(
-            "^(\d.*?)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*)\ {1,}(\d*)\ {2,}(\d*)",
+            r"^(\d.*?)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*)\ {1,}(\d*)"
+            r"\ {1,}(\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*)\ {1,}(\d*)\ {2,}(\d*)",
             re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(info)
-        if len(searchObj) == 0:
+        search_obj = pattern.findall(info)
+        if len(search_obj) == 0:
             err = LookupError("Fail to find data")
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
 
         for i in keys:
-            ret = ret + " " + searchObj[-1][i]
+            ret = ret + " " + search_obj[-1][i]
         return ret
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = MemUtilStat("UT")
-    ct.report(
-        sys.argv[1],
-        sys.argv[2],
-        "--interval=2;--fields=kbmemfree --fields=memused --fields=kbdirty")

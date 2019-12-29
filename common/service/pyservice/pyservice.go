@@ -18,7 +18,6 @@ import (
 	"atune/common/log"
 	"atune/common/registry"
 	"bufio"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -58,16 +57,16 @@ func (p *PyEngine) Run() error {
 	cmd := exec.Command("sh", "-c", cmdStr)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
-	stdout, err := cmd.StdoutPipe()
-	stderr, err := cmd.StderrPipe()
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
 	go listenToSystemSignals(cmd)
-
 	go logStdout(stdout)
 	go logStderr(stderr)
-	err = cmd.Start()
+
+	err := cmd.Start()
 	if err != nil {
-		return fmt.Errorf("cmd.Start() analysis service faild: %v", err)
+		log.Errorf("cmd.Start() analysis service faild: %v", err)
 		os.Exit(-1)
 	}
 
@@ -79,7 +78,6 @@ func (p *PyEngine) Run() error {
 	}
 
 	return nil
-
 }
 
 func logStdout(stdout io.ReadCloser) {
@@ -101,10 +99,8 @@ func logStderr(stderr io.ReadCloser) {
 func listenToSystemSignals(cmd *exec.Cmd) {
 	signalChan := make(chan os.Signal, 1)
 
-	signal.Notify(signalChan, os.Interrupt, os.Kill, syscall.SIGKILL)
-	select {
-	case <-signalChan:
-		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-		os.Exit(-1)
-	}
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+	<-signalChan
+	_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	os.Exit(-1)
 }
