@@ -20,8 +20,6 @@ import (
 	"atune/common/utils"
 	"fmt"
 	"io"
-	"path/filepath"
-	"strings"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
@@ -64,27 +62,7 @@ func init() {
 }
 
 func newProfileAnalysisCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileAnalysisCommand, nil
-}
-
-func checkAnalysis(ctx *cli.Context) error {
-	modelFlag := ctx.String("model")
-	if modelFlag == "" {
-		return nil
-	}
-	exist, err := utils.PathExist(modelFlag)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		return fmt.Errorf("model is not exist")
-	}
-
-	if !strings.HasSuffix(modelFlag, ".m") {
-		return fmt.Errorf("model must be ends with .m")
-	}
-	return nil
 }
 
 func profileAnalysis(ctx *cli.Context) error {
@@ -103,14 +81,8 @@ func profileAnalysis(ctx *cli.Context) error {
 	defer c.Close()
 
 	modelFile := ctx.String("model")
-	if modelFile != "" {
-		modelFile, err = filepath.Abs(modelFile)
-		if err != nil {
-			return err
-		}
-	}
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile})
+	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile})
 
 	for {
 		reply, err := stream.Recv()

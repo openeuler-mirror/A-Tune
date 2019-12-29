@@ -28,7 +28,7 @@ type Training struct {
 
 // Post method call training service
 func (t *Training) Post() (bool, error) {
-	url := config.GetUrl(config.TrainingURI)
+	url := config.GetURL(config.TrainingURI)
 	response, err := http.Post(url, t)
 	if err != nil {
 		return false, err

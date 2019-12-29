@@ -22,6 +22,7 @@ import (
 	"atune/common/models"
 	"atune/common/profile"
 	"atune/common/project"
+	"atune/common/registry"
 	"atune/common/schedule"
 	SVC "atune/common/service"
 	"atune/common/sqlstore"
@@ -35,6 +36,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -45,7 +47,6 @@ import (
 	"github.com/go-ini/ini"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
-	yaml "gopkg.in/yaml.v2"
 )
 
 // Monitor : the body send to monitor service
@@ -101,7 +102,6 @@ func init() {
 	}
 
 	log.Info("load profile service successfully\n")
-
 }
 
 // NewProfileServer method new a instance of the grpc server
@@ -113,12 +113,12 @@ func NewProfileServer(ctx *cli.Context, opts ...interface{}) (interface{}, error
 		return nil, err
 	}
 	if !exist {
-		return nil, fmt.Errorf("Could not find default config file")
+		return nil, fmt.Errorf("could not find default config file")
 	}
 
 	cfg, err := ini.Load(defaultConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("Faild to parse %s, %v", defaultConfigFile, err)
+		return nil, fmt.Errorf("faild to parse %s, %v", defaultConfigFile, err)
 	}
 
 	return &ProfileServer{
@@ -139,7 +139,7 @@ func (s *ProfileServer) Healthy(opts ...interface{}) error {
 
 // Post method send POST to start analysis the workload type
 func (p *ClassifyPostBody) Post() (*RespClassify, error) {
-	url := config.GetUrl(config.ClassificationURI)
+	url := config.GetURL(config.ClassificationURI)
 	response, err := http.Post(url, p)
 	if err != nil {
 		return nil, err
@@ -150,6 +150,10 @@ func (p *ClassifyPostBody) Post() (*RespClassify, error) {
 		return nil, fmt.Errorf("online learning faild")
 	}
 	resBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	resPostIns := new(RespClassify)
 	err = json.Unmarshal(resBody, resPostIns)
 	if err != nil {
@@ -161,7 +165,7 @@ func (p *ClassifyPostBody) Post() (*RespClassify, error) {
 
 // Post method send POST to start collection data
 func (c *CollectorPost) Post() (*RespCollectorPost, error) {
-	url := config.GetUrl(config.CollectorURI)
+	url := config.GetURL(config.CollectorURI)
 	response, err := http.Post(url, c)
 	if err != nil {
 		return nil, err
@@ -172,6 +176,10 @@ func (c *CollectorPost) Post() (*RespCollectorPost, error) {
 		return nil, fmt.Errorf("collect data faild")
 	}
 	resBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	resPostIns := new(RespCollectorPost)
 	err = json.Unmarshal(resBody, resPostIns)
 	if err != nil {
@@ -188,23 +196,22 @@ func (s *ProfileServer) Profile(profileInfo *PB.ProfileInfo, stream PB.ProfileMg
 
 	if !ok {
 		fmt.Println("Failure Load ", profileInfo.GetName())
-		return fmt.Errorf("Load profile %s Faild", profileInfo.GetName())
+		return fmt.Errorf("load profile %s Faild", profileInfo.GetName())
 	}
 	ch := make(chan *PB.AckCheck)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer close(ch)
 	defer cancel()
 
-	go func(ctx context.Context) error {
+	go func(ctx context.Context) {
 		for {
 			select {
 			case value := <-ch:
-				stream.Send(value)
+				_ = stream.Send(value)
 			case <-ctx.Done():
-				return nil
+				return
 			}
 		}
-		return nil
 	}(ctx)
 
 	if err := profile.RollbackActive(ch); err != nil {
@@ -224,7 +231,9 @@ func (s *ProfileServer) ListWorkload(profileInfo *PB.ProfileInfo, stream PB.Prof
 	}
 
 	for _, classProfile := range workloads.Result {
-		stream.Send(&PB.ListMessage{WorkloadType: classProfile.Class, ProfileNames: classProfile.ProfileType, Active: strconv.FormatBool(classProfile.Active)})
+		_ = stream.Send(&PB.ListMessage{WorkloadType: classProfile.Class,
+			ProfileNames: classProfile.ProfileType,
+			Active:       strconv.FormatBool(classProfile.Active)})
 	}
 
 	return nil
@@ -232,57 +241,53 @@ func (s *ProfileServer) ListWorkload(profileInfo *PB.ProfileInfo, stream PB.Prof
 
 // CheckInitProfile method check the system init information
 // like BIOS version, memory balanced...
-func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_CheckInitProfileServer) error {
+func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
+	stream PB.ProfileMgr_CheckInitProfileServer) error {
 	elf := profileInfo.GetName()
 
-	rd, err := ioutil.ReadDir(config.DefaultCheckerPath)
-	if err != nil {
-		return err
-	}
-
-	ch := make(chan *PB.AckCheck, 0)
+	ch := make(chan *PB.AckCheck)
 	defer close(ch)
-	go func() error {
-		for {
-			select {
-			case value, ok := <-ch:
-				if ok {
-					stream.Send(value)
-					continue
-				}
-				break
-			}
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
 		}
-		return nil
 	}()
 
 	elf = strings.Trim(elf, "")
 	if elf != "" {
 		if exist, _ := utils.PathExist(elf); exist {
 			program := checker.ELF{FileName: elf}
-			program.Check(ch)
+			_ = program.Check(ch)
 		}
 	}
 
-	for _, dir := range rd {
-		if dir.IsDir() {
-			continue
-		}
+	services := registry.GetCheckerServices()
 
-		if !strings.HasSuffix(dir.Name(), ".xml") {
-			continue
-		}
-
-		filename := strings.TrimSuffix(dir.Name(), ".xml")
-		switch filename {
-		case "mem_topo":
-			memTopo := checker.MemTopo{Path: path.Join(config.DefaultCheckerPath, dir.Name())}
-			memTopo.Check(ch)
+	for _, service := range services {
+		log.Infof("initializing checker service: %s", service.Name)
+		if err := service.Instance.Init(); err != nil {
+			return fmt.Errorf("service init faild: %v", err)
 		}
 	}
 
-	time.Sleep(time.Duration(2) * time.Second)
-	stream.Send(&PB.AckCheck{Name: "check system finished"})
+	// running checker service
+	for _, srv := range services {
+		service := srv
+		checkerService, ok := service.Instance.(registry.CheckService)
+		if !ok {
+			continue
+		}
+
+		if registry.IsCheckDisabled(service.Instance) {
+			continue
+		}
+		err := checkerService.Check(ch)
+		if err != nil {
+			log.Errorf("service %s running faild, reason: %v", service.Name, err)
+			continue
+		}
+	}
+
 	return nil
 }
 
@@ -293,7 +298,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 	defer s.Unlock()
 
-	stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
+	_ = stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
 
 	npipe, err := utils.CreateNamedPipe()
 	if err != nil {
@@ -310,9 +315,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 		for scanner.Scan() {
 			line := scanner.Text()
-			stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
 		}
-
 	}()
 
 	//1. get the dimension structure of the system data to be collected
@@ -328,6 +332,9 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
 		if len(matches) > 0 {
 			for _, match := range matches {
+				if len(match) < 2 {
+					continue
+				}
 				if !s.Raw.Section("system").Haskey(match[1]) {
 					return fmt.Errorf("%s is not exist in the system section", match[1])
 				}
@@ -348,7 +355,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	respCollectPost, err := collectorBody.Post()
 	if err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error()})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
 
@@ -363,12 +370,12 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	respPostIns, err := body.Post()
 
 	if err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error()})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
 
 	workloadType := respPostIns.WorkloadType
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
 
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
@@ -399,43 +406,37 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 	apps := classApps.Result[0].Apps
 	log.Infof("workload %s support app: %s", workloadType, apps)
-	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s", workloadType, apps, respPostIns.ResourceLimit)
+	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
+		workloadType, apps, respPostIns.ResourceLimit)
 
-	stream.Send(&PB.AckCheck{Name: "\n 3. Build the best resource model..."})
+	_ = stream.Send(&PB.AckCheck{Name: "\n 3. Build the best resource model..."})
 
 	//5. get the profile type depend on the workload type
 	profileType := classProfile.Result[0].ProfileType
 	profileNames := strings.Split(profileType, ",")
 	if len(profileNames) == 0 {
 		log.Errorf("No profile or invaild profiles were specified.")
-		return fmt.Errorf("No profile or invaild profiles were specified")
+		return fmt.Errorf("no profile or invaild profiles were specified")
 	}
 
 	//6. get the profile info depend on the profile type
 	log.Infof("the resource model of the profile type is %s", profileType)
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 4. Match profile: %s", profileType)})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 4. Match profile: %s", profileType)})
 	pro, _ := profile.Load(profileNames)
 	pro.SetWorkloadType(workloadType)
 
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 5. bengin to set static profile")})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 5. bengin to set static profile")})
 	log.Infof("bengin to set static profile")
 
 	//static profile setting
-	ch := make(chan *PB.AckCheck, 0)
-	go func() error {
-		for {
-			select {
-			case value, ok := <-ch:
-				if ok {
-					stream.Send(value)
-					continue
-				}
-				break
-			}
+	ch := make(chan *PB.AckCheck)
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
 		}
-		return nil
 	}()
-	pro.RollbackActive(ch)
+
+	_ = pro.RollbackActive(ch)
 
 	rules := &sqlstore.GetRuleTuned{Class: workloadType}
 	if err := sqlstore.GetRuleTuneds(rules); err != nil {
@@ -443,18 +444,18 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 
 	if len(rules.Result) < 1 {
-		stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
+		_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
 		log.Info("no rules to tuned")
 		return nil
 	}
 
-	log.Info("begin to dynamic tunning depending on rules")
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 6. bengin to set dynamic profile")})
+	log.Info("begin to dynamic tuning depending on rules")
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 6. bengin to set dynamic profile")})
 	if err := tuning.RuleTuned(workloadType); err != nil {
 		return err
 	}
 
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
 	return nil
 }
 
@@ -462,34 +463,65 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_TuningServer) error {
 	//dynamic profle setting
 	data := profileInfo.GetName()
-	fmt.Println(data)
+	content := profileInfo.GetContent()
 
-	var byteData []byte = []byte(data)
-	project := project.YamlPrj{}
-	if err := yaml.Unmarshal(byteData, &project); err != nil {
+	ch := make(chan *PB.AckCheck)
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
+		}
+	}()
+
+	// data == "" means in tuning process
+	if data == "" {
+		benchmark := tuning.BenchMark{Content: content}
+		err := benchmark.DynamicTuned(ch)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	prjfound := false
+	var prjs []*project.YamlPrjSvr
+	err := filepath.Walk(config.DefaultTuningPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			prj, ret := project.LoadProject(path)
+			if ret != nil {
+				log.Errorf("load %s faild(%s)", path, ret)
+				return ret
+			}
+			log.Infof("project:%s load %s success", prj.Project, path)
+			prjs = append(prjs, prj)
+		}
+		return nil
+	})
+
+	if err != nil {
 		return err
 	}
 
-	log.Info("begin to dynamic optimizer search")
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("bengin to dynamic optimizer search")})
-
-	ch := make(chan *PB.AckCheck, 0)
-	go func() error {
-		for {
-			select {
-			case value, ok := <-ch:
-				if ok {
-					stream.Send(value)
-					continue
-				}
-				break
-			}
+	var prj *project.YamlPrjSvr
+	for _, prj = range prjs {
+		if data == prj.Project {
+			log.Infof("found Project:%v", prj.Project)
+			prjfound = true
+			break
 		}
-		return nil
-	}()
+	}
 
-	optimizer := tuning.Optimizer{Prj: &project}
-	err := optimizer.DynamicTuned(ch)
+	if !prjfound {
+		log.Errorf("project:%s not found", data)
+		return fmt.Errorf("project:%s not found", data)
+	}
+
+	log.Info("begin to dynamic optimizer search")
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")})
+
+	optimizer := tuning.Optimizer{Prj: prj}
+	iter, _ := strconv.Atoi(string(content))
+	log.Infof("client ask iterations:%d", iter)
+	err = optimizer.InitTuned(ch, iter)
 	if err != nil {
 		return err
 	}
@@ -510,27 +542,29 @@ func (s *ProfileServer) UpgradeProfile(profileInfo *PB.ProfileInfo, stream PB.Pr
 		return err
 	}
 	if !exist {
-		os.MkdirAll(config.DefaultTempPath, os.ModePerm)
+		if err = os.MkdirAll(config.DefaultTempPath, 0750); err != nil {
+			return err
+		}
 	}
 	timeUnix := strconv.FormatInt(time.Now().Unix(), 10) + ".db"
 	tempFile := path.Join(config.DefaultTempPath, timeUnix)
 
 	if err := utils.CopyFile(tempFile, currenDbPath); err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
 		return nil
 	}
 
 	if err := utils.CopyFile(currenDbPath, newDbPath); err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
 		return nil
 	}
 
 	if err := sqlstore.Reload(currenDbPath); err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
 		return nil
 	}
 
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("upgrade success"), Status: utils.SUCCESS})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("upgrade success"), Status: utils.SUCCESS})
 	return nil
 }
 
@@ -557,7 +591,7 @@ func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.Profi
 		name = strings.Trim(name, " ")
 		context, _ := sqlstore.GetContext(name)
 		context = "\n*** " + name + ":\n" + context
-		stream.Send(&PB.ProfileInfo{Name: context})
+		_ = stream.Send(&PB.ProfileInfo{Name: context})
 	}
 
 	return nil
@@ -566,7 +600,8 @@ func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.Profi
 /*
 CheckActiveProfile method check current active profile is effective
 */
-func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_CheckActiveProfileServer) error {
+func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo,
+	stream PB.ProfileMgr_CheckActiveProfileServer) error {
 	log.Debug("Begin to check active profiles\n")
 	profiles := &sqlstore.GetClass{Active: true}
 	err := sqlstore.GetClasses(profiles)
@@ -574,7 +609,7 @@ func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo, stream P
 		return err
 	}
 	if len(profiles.Result) != 1 {
-		return fmt.Errorf("No active profile or more than 1 active profile")
+		return fmt.Errorf("no active profile or more than 1 active profile")
 	}
 
 	workloadType := profiles.Result[0].Class
@@ -582,24 +617,15 @@ func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo, stream P
 
 	if !ok {
 		log.WithField("profile", workloadType).Errorf("Load profile %s Faild", workloadType)
-		return fmt.Errorf("Load workload type %s Faild", workloadType)
+		return fmt.Errorf("load workload type %s Faild", workloadType)
 	}
 
-	ch := make(chan *PB.AckCheck, 0)
+	ch := make(chan *PB.AckCheck)
 	defer close(ch)
-	go func() error {
-		for {
-			select {
-			case value, ok := <-ch:
-				if ok {
-					stream.Send(value)
-					continue
-				}
-				break
-			}
-			return nil
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
 		}
-		return nil
 	}()
 
 	if err := profile.Check(ch); err != nil {
@@ -611,14 +637,13 @@ func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo, stream P
 
 // ProfileRollback method rollback the profile to init state
 func (s *ProfileServer) ProfileRollback(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_ProfileRollbackServer) error {
-
 	profileLogs, err := sqlstore.GetProfileLogs()
 	if err != nil {
 		return err
 	}
 
 	if len(profileLogs) < 1 {
-		stream.Send(&PB.AckCheck{Name: "no profile need to rollback"})
+		_ = stream.Send(&PB.AckCheck{Name: "no profile need to rollback"})
 		return nil
 	}
 
@@ -627,27 +652,18 @@ func (s *ProfileServer) ProfileRollback(profileInfo *PB.ProfileInfo, stream PB.P
 	})
 
 	//static profile setting
-	ch := make(chan *PB.AckCheck, 0)
-	go func() error {
-		for {
-			select {
-			case value, ok := <-ch:
-				if ok {
-					stream.Send(value)
-					continue
-				}
-				break
-			}
-			return nil
+	ch := make(chan *PB.AckCheck)
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
 		}
-		return nil
 	}()
 
 	for _, pro := range profileLogs {
-		log.Infof("begin to restore profile id: %s", pro.ID)
+		log.Infof("begin to restore profile id: %d", pro.ID)
 		profileInfo := profile.HistoryProfile{}
-		profileInfo.Load(pro.Context)
-		profileInfo.Resume(ch)
+		_ = profileInfo.Load(pro.Context)
+		_ = profileInfo.Resume(ch)
 
 		// delete profile log after restored
 		if err := sqlstore.DelProfileLogByID(pro.ID); err != nil {
@@ -713,20 +729,17 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	script = append(script, message.GetType())
 
 	newScript := strings.Join(script, " ")
-	cmd := exec.Command("sudo", "sh", "-c", newScript)
+	cmd := exec.Command("sh", "-c", newScript)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
-	stdout, err := cmd.StdoutPipe()
-	stderr, err := cmd.StderrPipe()
+	stdout, _ := cmd.StdoutPipe()
+	stderr, _ := cmd.StderrPipe()
 
 	ctx := stream.Context()
 	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-				return
-			}
+		for range ctx.Done() {
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+			return
 		}
 	}()
 
@@ -734,7 +747,7 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		scanner := bufio.NewScanner(stdout)
 		for scanner.Scan() {
 			line := scanner.Text()
-			stream.Send(&PB.AckCheck{Name: line})
+			_ = stream.Send(&PB.AckCheck{Name: line})
 		}
 	}()
 
@@ -742,7 +755,7 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
 			line := scanner.Text()
-			stream.Send(&PB.AckCheck{Name: line})
+			_ = stream.Send(&PB.AckCheck{Name: line})
 		}
 	}()
 
@@ -779,17 +792,17 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 		return err
 	}
 	if success {
-		stream.Send(&PB.AckCheck{Name: "training the self collect data success"})
+		_ = stream.Send(&PB.AckCheck{Name: "training the self collect data success"})
 		return nil
 	}
 
-	stream.Send(&PB.AckCheck{Name: "training the self collect data faild"})
+	_ = stream.Send(&PB.AckCheck{Name: "training the self collect data faild"})
 	return nil
 }
 
 // Charaterization method will be deprecate in the future
 func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_CharaterizationServer) error {
-	stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
+	_ = stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
 
 	npipe, err := utils.CreateNamedPipe()
 	if err != nil {
@@ -806,9 +819,8 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 
 		for scanner.Scan() {
 			line := scanner.Text()
-			stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
 		}
-
 	}()
 
 	//1. get the dimension structure of the system data to be collected
@@ -824,6 +836,9 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
 		if len(matches) > 0 {
 			for _, match := range matches {
+				if len(match) < 2 {
+					continue
+				}
 				if !s.Raw.Section("system").Haskey(match[1]) {
 					return fmt.Errorf("%s is not exist in the system section", match[1])
 				}
@@ -836,14 +851,15 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 		monitors = append(monitors, monitor)
 	}
 
+	sampleNum := s.Raw.Section("server").Key("sample_num").MustInt(20)
 	collectorBody := new(CollectorPost)
-	collectorBody.SampleNum = 5
+	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
 	collectorBody.Pipe = npipe
 
 	respCollectPost, err := collectorBody.Post()
 	if err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error()})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
 
@@ -855,14 +871,13 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 	respPostIns, err := body.Post()
 
 	if err != nil {
-		stream.Send(&PB.AckCheck{Name: err.Error()})
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
 
 	workloadType := respPostIns.WorkloadType
-	stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
 	return nil
-
 }
 
 // Define method user define workload type and profile
@@ -888,14 +903,21 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 		return &PB.Ack{Status: fmt.Sprintf("%s is already exist", profileName)}, nil
 	}
 
-	if err := sqlstore.InsertClassApps(&sqlstore.ClassApps{Class: workloadType, Deletable: true}); err != nil {
+	if err := sqlstore.InsertClassApps(&sqlstore.ClassApps{
+		Class:     workloadType,
+		Deletable: true}); err != nil {
 		return &PB.Ack{}, err
 	}
-	if err := sqlstore.InsertClassProfile(&sqlstore.ClassProfile{Class: workloadType, ProfileType: profileName, Active: false}); err != nil {
+	if err := sqlstore.InsertClassProfile(&sqlstore.ClassProfile{
+		Class:       workloadType,
+		ProfileType: profileName,
+		Active:      false}); err != nil {
 		return &PB.Ack{}, err
 	}
 
-	if err := sqlstore.InsertProfile(&sqlstore.Profile{ProfileType: profileName, ProfileInformation: content}); err != nil {
+	if err := sqlstore.InsertProfile(&sqlstore.Profile{
+		ProfileType:        profileName,
+		ProfileInformation: content}); err != nil {
 		return &PB.Ack{}, err
 	}
 
@@ -918,7 +940,7 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 	}
 
 	classApp := classApps.Result[0]
-	if classApp.Deletable != true {
+	if !classApp.Deletable {
 		return &PB.Ack{Status: "only self defined workload type can be deleted"}, nil
 	}
 
@@ -941,7 +963,7 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 	profileNames := strings.Split(profileType, ",")
 	if len(profileNames) == 0 {
 		log.Errorf("No profile or invaild profiles were specified.")
-		return &PB.Ack{}, fmt.Errorf("No profile or invaild profiles were specified")
+		return &PB.Ack{}, fmt.Errorf("no profile or invaild profiles were specified")
 	}
 
 	// delete profile depend the profiletype
@@ -999,25 +1021,27 @@ func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (
 		}
 	}
 	if !exist {
-		return &PB.Ack{}, fmt.Errorf("profile name %s is exist corresponding to workload type %s", profileName, workloadType)
+		return &PB.Ack{}, fmt.Errorf("profile name %s is exist corresponding to workload type %s",
+			profileName, workloadType)
 	}
 
-	if err := sqlstore.UpdateProfile(&sqlstore.Profile{ProfileType: profileName, ProfileInformation: content}); err != nil {
+	if err := sqlstore.UpdateProfile(&sqlstore.Profile{
+		ProfileType:        profileName,
+		ProfileInformation: content}); err != nil {
 		return &PB.Ack{}, err
 	}
 	return &PB.Ack{Status: "OK"}, nil
 }
 
-/*
- * schedule cpu/irq/numa ...
- */
-func (s *ProfileServer) Schedule(message *PB.ScheduleMessage, stream PB.ProfileMgr_ScheduleServer) error {
+// Schedule cpu/irq/numa ...
+func (s *ProfileServer) Schedule(message *PB.ScheduleMessage,
+	stream PB.ProfileMgr_ScheduleServer) error {
 	_ = message.GetApp()
 	Type := message.GetType()
 	Strategy := message.GetStrategy()
 
 	scheduler := schedule.GetScheduler()
-	scheduler.Schedule(Type, Strategy, true)
+	_ = scheduler.Schedule(Type, Strategy, true)
 
 	return nil
 }

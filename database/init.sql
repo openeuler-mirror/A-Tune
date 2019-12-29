@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS class_profile(
 );
 
 
-
 drop table if exists profile;
 CREATE TABLE IF NOT EXISTS profile(
   profile_type TEXT PRIMARY KEY NOT NULL,
@@ -35,6 +34,7 @@ CREATE TABLE IF NOT EXISTS tuned(
   FOREIGN KEY(class) REFERENCES class_profile(class)
 );
 
+
 drop table if exists collection;
 CREATE TABLE IF NOT EXISTS collection(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -44,12 +44,14 @@ CREATE TABLE IF NOT EXISTS collection(
   metrics TEXT NOT NULL
 );
 
+
 drop table if exists tuned_item;
 CREATE TABLE IF NOT EXISTS tuned_item(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   property TEXT NOT NULL,
   item TEXT NOT NULL
 );
+
 
 drop table if exists rule_tuned;
 CREATE TABLE IF NOT EXISTS rule_tuned(
@@ -63,6 +65,7 @@ CREATE TABLE IF NOT EXISTS rule_tuned(
   field TEXT NOT NULL
 );
 
+
 drop table if exists profile_log;
 CREATE TABLE IF NOT EXISTS profile_log(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -71,6 +74,7 @@ CREATE TABLE IF NOT EXISTS profile_log(
   backup_path TEXT NOT NULL,
   timestamp DATETIME NOT NULL
 );
+
 
 drop table if exists schedule;
 CREATE TABLE IF NOT EXISTS schedule(
@@ -82,36 +86,24 @@ CREATE TABLE IF NOT EXISTS schedule(
 
 -- class_apps:
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default", "", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("webserver", "nginx,httpd", "cpu, network", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_streaming_data", "", "network", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("webserver", "nginx,httpd", "cpu", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_database", "mongoDB,mysql,postgresql,mariadb", "cpu, memory, network, io", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("remote_storage", "ceph", "network, io", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_data_storage", "hadoop.micro.sort,hadoop.micro.terasort,hadoop.micro.wordcount,hadoop.micro.dfsioe.read,hadoop.micro.dfsioe.write,hadoop.sql.aggregation,hadoop.sql.join,hadoop.sql.scan,spark.micro.sort,spark.micro.wordcount,spark.sql.aggregation,spark.sql.join,spark.sql.scan", "io", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_data_computing", "hadoop.websearch.pagerank,hadoop.ml.bayes,hadoop.ml.kmeans,spark.micro.terasort,spark.websearch.pagerank,spark.ml.bayes,spark.ml.kmeans,spark.ml.als,spark.ml.rf,spark.ml.linear,spark.ml.svm,hadoop.ssd.sql.aggregation,hadoop.ssd.sql.join,hadoop.ssd.sql.scan", "cpu, io", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_data", "hadoop, spark", "cpu, io", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("in-memory_computing", "specjbb2015", "cpu, memory", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("in-memory_database", "redis", "cpu, network", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("high-performance_computing", "", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("single_computer_intensive_jobs", "speccpu2006", "cpu, memory", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("highly_interactive_task", "", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("communication", "dubbo", "cpu, network", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("real-time_task", "", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("idle", "idle", "", 0);
 
 -- class_profile:
 INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default", 1);
 INSERT INTO class_profile(class, profile_type, active) VALUES("webserver", "ssl_webserver", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("big_streaming_data", "network-throughput", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("big_database", "database", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("big_data_computing", "big_data", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("big_data_storage", "big_data", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("remote_storage", "remote_storage", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("big_data", "big_data", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_computing", "in-memory_computing", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_database", "in-memory_database", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("high-performance_computing", "hpc", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("highly_interactive_task", "network-latency", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("single_computer_intensive_jobs", "compute-intensive", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("communication", "rpc_communication", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("real-time_task", "real-time", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("idle", "default", 0);
 
 
@@ -119,7 +111,7 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("idle", "default",
 -- profile:
 INSERT INTO profile (profile_type, profile_information) VALUES("default", "
 #
-# atuned configuration for others, which could not be classified
+# A-Tune configuration for others, which could not be classified
 #
 [main]
 #TODO CONFIG
@@ -144,7 +136,7 @@ INSERT INTO profile (profile_type, profile_information) VALUES("default", "
 #irqbalance=stop
 
 [tip]
-bind network interrupts to its affinity numa node = warning
+#bind network interrupts to its affinity numa node = affinity
 
 [script]
 #TODO CONFIG
@@ -165,7 +157,7 @@ check_environment=on
 
 INSERT INTO profile (profile_type, profile_information) VALUES("compute-intensive", "
 #
-# compute-intensive tuned configuration
+# compute-intensive A-Tune configuration
 #
 [main]
 #TODO CONFIG
@@ -181,7 +173,7 @@ Stream Write Mode=Allocate share LLC
 [bootloader.grub2]
 default_hugepagesz=2M
 hugepagesz=2M
-hugepages=230000
+hugepages=150000
 
 [sysfs]
 kernel/mm/transparent_hugepage/defrag=never
@@ -189,14 +181,14 @@ kernel/mm/transparent_hugepage/enabled=never
 
 [sysctl]
 kernel.randomize_va_space=0
-#vm.nr_hugepages=230000
+#vm.nr_hugepages=150000
 
 [tip]
-bind task to corresponding cpu core = error
-use optimized compile = warning
+bind task to corresponding cpu core = affinity
+use optimized compile = compile
 
 [script]
-prefetch = off 
+prefetch = on 
 
 [ulimit]
 #TODO CONFIG
@@ -214,7 +206,7 @@ prefetch = off
 
 INSERT INTO profile (profile_type, profile_information) VALUES("io-intensive", "
 #
-# io-intensive tuned configuration
+# io-intensive A-Tune configuration
 #
 [main]
 #TODO CONFIG
@@ -229,7 +221,6 @@ INSERT INTO profile (profile_type, profile_information) VALUES("io-intensive", "
 #TODO CONFIG
 
 [sysfs]
-# how to find the correct disk
 block/{disk}/queue/read_ahead_kb=4096
 
 [sysctl]
@@ -242,7 +233,7 @@ vm.dirty_expire_centisecs=30000
 #TODO CONFIG
 
 [tip]
-mount your filesystem using noatime and nobarrier option = warning
+mount your filesystem using noatime and nobarrier option = filesystem
 
 [ulimit]
 #TODO CONFIG
@@ -258,203 +249,10 @@ mount your filesystem using noatime and nobarrier option = warning
 
 ");
 
-INSERT INTO profile (profile_type, profile_information) VALUES("remote_storage", "
-#
-# storage-intensive tuned configuration
-#
-[main]
-include=io-intensive
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[tip]
-use xfs as filesystem and mount-option using  noatime and nobarrier = warning
-bind network interrupts to its affinity numa node = error
-
-[bootloader.grub2]
-iommu.passthrough=1
-
-[sysfs]
-block/{disk}/queue/read_ahead_kb=8192
-block/{disk}/queue/scheduler=deadline
-block/{disk}/queue/nr_requests=512
-
-[systemctl]
-sysmonitor=stop
-irqbalance=stop
-
-[sysctl]
-vm.swappiness=0
-kernel.pid_max = 4194303
-fs.file-max=200195456
-
-# Controls IP packet forwarding
-net.ipv4.ip_forward = 0
-
-# Controls source route verification
-net.ipv4.conf.default.rp_filter = 1
-
-# Do not accept source routing
-net.ipv4.conf.default.accept_source_route = 0
-
-# Controls the System Request debugging functionality of the kernel
-kernel.sysrq = 0
-
-# Controls whether core dumps will append the PID to the core filename.
-# Useful for debugging multi-threaded applications.
-kernel.core_uses_pid = 1
-
-# disable TIME_WAIT.. wait ..
-#net.ipv4.tcp_tw_recycle = 1
-net.ipv4.tcp_tw_reuse = 1
-
-# Controls the use of TCP syncookies
-net.ipv4.tcp_syncookies = 0
-
-# double amount of allowed conntrack
-#net.netfilter.nf_conntrack_max = 2621440
-#net.netfilter.nf_conntrack_tcp_timeout_established = 1800
-
-# Disable netfilter on bridges.
-#net.bridge.bridge-nf-call-ip6tables = 0
-#net.bridge.bridge-nf-call-iptables = 0
-#net.bridge.bridge-nf-call-arptables = 0
-
-# Controls the maximum size of a message, in bytes
-kernel.msgmnb = 65536
-
-# Controls the default maxmimum size of a mesage queue
-kernel.msgmax = 65536
-
-# Controls the maximum shared segment size, in bytes
-kernel.shmmax = 68719476736
-
-# Controls the maximum number of shared memory segments, in pages
-kernel.shmall = 4294967296
-
-[script]
-ifconfig = {network} mtu 9000
-ethtool = -G {network} rx 4096 tx 4096
-#ethtool =  -K {network} lro on
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("network-latency", "
-#
-# network-latency tuned configuration
-# Optimize for deterministic performance at the cost of increased power consumption, focused on low latency network performance
-#
-[main]
-include=latency-performance
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-skew_tick=1
-
-[sysfs]
-kernel/mm/transparent_hugepage/defrag=never
-kernel/mm/transparent_hugepage/enabled=never
-
-[sysctl]
-net.core.busy_read=50
-net.core.busy_poll=50
-net.ipv4.tcp_fastopen=3
-kernel.numa_balancing=0
-
-[tip]
-#TODO CONFIG
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("network-throughput", "
-#
-# network-throughput tuned configuration
-# Optimize for streaming network throughput, generally only necessary on older CPUs or 40G+ networks
-#
-[main]
-include=throughput-performance
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-# Increase kernel buffer size maximums.  Currently this seems only necessary at 40Gb speeds.
-#
-# The buffer tuning values below do not account for any potential hugepage allocation.
-# Ensure that you do not oversubscribe system memory.
-net.ipv4.tcp_rmem=4096 87380 16777216
-net.ipv4.tcp_wmem=4096 16384 16777216
-net.ipv4.udp_mem=3145728 4194304 16777216
-
-[tip]
-#TODO CONFIG
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
 
 INSERT INTO profile (profile_type, profile_information) VALUES("rpc_communication", "
 #
-# rpc_communication tuned configuration
-# Optimize for dubbo
+# rpc_communication A-Tune configuration
 #
 [main]
 include=throughput-performance
@@ -492,9 +290,9 @@ ethtool =  -X {network} equal 32 hkey 6d:5a:56:da:25:5b:0e:c2:41:67:25:3d:43:a3:
 swapoff = -a
 
 [tip]
-relogin into the system to enable limits setting = error
-bind your master process to the numa node that has the network card = error
-bind network interrupts to its affinity numa node = error
+relogin into the system to enable limits setting = OS
+bind your master process to the numa node that has the network card = affinity
+bind network interrupts to its affinity numa node = affinity
 
 [ulimit]
 {user}.hard.stack = unlimited
@@ -513,73 +311,13 @@ bind network interrupts to its affinity numa node = error
 
 ");
 
-INSERT INTO profile (profile_type, profile_information) VALUES("latency-performance", "
-#
-# latency-performance tuned configuration
-# Optimize for deterministic performance at the cost of increased power consumption
-#
-[main]
-#TODO CONFIG
-
-#[cpu]
-#force_latency=1
-#governor=performance
-#energy_perf_bias=performance
-#min_perf_pct=100
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-kernel.sched_min_granularity_ns=10000000
-
-vm.dirty_ratio=10
-vm.dirty_background_ratio=3
-vm.swappiness=10
-
-kernel.sched_migration_cost_ns=5000000
-
-[tip]
-#TODO CONFIG
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
 
 INSERT INTO profile (profile_type, profile_information) VALUES("throughput-performance", "
 #
-# throughput-performance tuned configuration
-# Broadly applicable tuning that provides excellent performance across a variety of common server workloads
+# throughput-performance A-Tune configuration
 #
 [main]
 #TODO CONFIG
-
-#[cpu]
-#governor=performance
-#energy_perf_bias=performance
-#min_perf_pct=100
 
 [kernel_config]
 #TODO CONFIG
@@ -621,56 +359,10 @@ vm.swappiness=10
 
 ");
 
-INSERT INTO profile (profile_type, profile_information) VALUES("real-time", "
-#
-# real-time tuned configuration
-# Optimize for realtime workloads
-#
-[main]
-include = network-latency
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-kernel.hung_task_timeout_secs = 600
-kernel.nmi_watchdog = 0
-kernel.sched_rt_runtime_us = -1
-vm.stat_interval = 10
-kernel.timer_migration = 0
-
-[tip]
-using isolated cores to run your real-time task = warning
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
 
 INSERT INTO profile (profile_type, profile_information) VALUES("ssl_webserver", "
 #
-# webserver tuned configuration
+# webserver A-Tune configuration
 #
 [main]
 #TODO CONFIG
@@ -722,9 +414,9 @@ selinux=0
 iommu.passthrough=1
 
 [tip]
-bind your master process to the CPU near the network = error
-bind your network interrupt to the CPU that has this network = error
-relogin into the system to enable limits setting = error
+bind your master process to the CPU near the network = affinity
+bind your network interrupt to the CPU that has this network = affinity
+relogin into the system to enable limits setting = OS
 
 [script]
 openssl_hpre = 0
@@ -747,7 +439,7 @@ prefetch = off
 
 INSERT INTO profile (profile_type, profile_information) VALUES("database", "
 #
-# database tuned configuration
+# database A-Tune configuration
 #
 [main]
 #TODO CONFIG
@@ -759,9 +451,9 @@ INSERT INTO profile (profile_type, profile_information) VALUES("database", "
 #TODO CONFIG
 
 [tip]
-use xfs as filesystem and mount-option using noatime and nobarrier = warning
-bind network interrupts to its affinity numa node = error
-relogin into the system to enable limits setting = error
+use xfs as filesystem and mount-option using noatime and nobarrier = filesystem
+bind network interrupts to its affinity numa node = affinity
+relogin into the system to enable limits setting = OS
 
 [bootloader.grub2]
 iommu.passthrough=1
@@ -820,7 +512,7 @@ prefetch = off
 
 INSERT INTO profile (profile_type, profile_information) VALUES("big_data", "
 #
-# big data computing tuned configuration
+# big_data A-Tune configuration
 #
 [main]
 include=io-intensive
@@ -843,8 +535,8 @@ sysmonitor=stop
 irqbalance=stop
 
 [tip]
-bind network interrupts to its affinity numa node  = error
-relogin into the system to enable limits setting = error
+bind network interrupts to its affinity numa node  = affinity
+relogin into the system to enable limits setting = OS
 
 [sysctl]
 fs.file-max=1000000
@@ -870,7 +562,7 @@ fs.nr_open=2000000
 
 INSERT INTO profile (profile_type, profile_information) VALUES("in-memory_computing", "
 #
-# in-memory computing tuned configuration
+# in-memory_computing A-Tune configuration
 #
 [main]
 include=throughput-performance
@@ -897,7 +589,7 @@ hugepages=102400
 prefetch = off 
 
 [tip]
-use numactl to bind your task = warning
+use numactl to bind your task = affinity
 
 [ulimit]
 #TODO CONFIG
@@ -915,7 +607,7 @@ use numactl to bind your task = warning
 
 INSERT INTO profile (profile_type, profile_information) VALUES("in-memory_database", "
 #
-# in-memory database tuned configuration, refer to sap hana, redis and memcached
+# in-memory_database A-Tune configuration
 #
 [main]
 include=throughput-performance
@@ -957,8 +649,8 @@ sysmonitor=stop
 irqbalance=stop
 
 [tip]
-leverage numactl to make CPU to access its local memory = error
-bind network interrupts to its affinity numa node = error
+leverage numactl to make CPU to access its local memory = affinity
+bind network interrupts to its affinity numa node = affinity
 
 [script]
 prefetch = off
@@ -984,54 +676,7 @@ ethtool =  -K {network} tso on
 
 ");
 
-INSERT INTO profile (profile_type, profile_information) VALUES("hpc", "
-#
-# hpc tuned configuration, Optimize for HPC compute workloads
-#
-[main]
-include=latency-performance
 
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-block/{disk}/queue/read_ahead_kb=4096
-kernel/mm/transparent_hugepage/enabled=always
-
-[sysctl]
-#vm.hugepages_treat_as_movable=0
-vm.min_free_kbytes=135168
-vm.zone_reclaim_mode=1
-kernel.numa_balancing=0
-net.core.busy_read=50
-net.core.busy_poll=50
-net.ipv4.tcp_fastopen=3
-
-[tip]
-#TODO CONFIG
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
 
 -- Performance Point
 INSERT INTO tuned_item(property, item) VALUES("check_environment", "Check");
@@ -1179,13 +824,11 @@ INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.task", "SYS",
 INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.ldavg", "SYS", "LDAVG", "--interval=5;--fields=runq-sz --fields=plist-sz --fields=ldavg-1 --fields=ldavg-5 --fields=ldavg-15 --fields=task-util");
 INSERT INTO collection(name, module, purpose, metrics) VALUES("file.util", "SYS", "FDUTIL", "--interval=5;--fields=fd-util");
 
--- dynamic_tuned table
--- INSERT INTO rule_tuned(name, class, expression, action, opposite_action, monitor, field) VALUES("prefetch", "single_computer_intensive_jobs", "usr>80", "prefetch=off", "prefetch=on","CPU.STAT", ";--fields=usr");
+-- Dynamic_tuned table
 INSERT INTO rule_tuned(name, class, expression, action, opposite_action, monitor, field) VALUES("hpre", "webserver", "object in ('libssl', 'libcrypto')", "openssl_hpre=1", "openssl_hpre=0","PERF.TOP", ";--fields=overhead --fields=object --fields=symbol --addr-merge=0x3f");
 
 -- AI search table
-INSERT INTO tuned (class, name, type, value, range) VALUES("single_computer_intensive_jobs", "prefetech", "ENUM", "off", "on,off" );
--- INSERT INTO tuned (class, name, type, value, range, step) VALUES("single_computer_intensive_jobs", "vm.nr_hugepages", "INT", 230000, "220000,240000", 10000 );
+-- INSERT INTO tuned (class, name, type, value, range) VALUES("single_computer_intensive_jobs", "prefetech", "ENUM", "off", "on,off" );
 
 -- Schedule table
 INSERT INTO schedule (type, strategy) VALUES("all", "auto");

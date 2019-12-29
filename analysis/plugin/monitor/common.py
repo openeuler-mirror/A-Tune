@@ -15,12 +15,10 @@
 The base class of the monitor, used to report the given config, get the collected info,
 decode the collected info, format the collected info and output collected info to file.
 """
-
-import sys
+import inspect
 import logging
-from public import *
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Monitor():
@@ -74,7 +72,8 @@ class Monitor():
         """
         return iter(self._option.split(";"))
 
-    def _getpara(self, paras):
+    @staticmethod
+    def _getpara(paras):
         """
         Get all the configs from one string.
 
@@ -119,13 +118,9 @@ class Monitor():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
 
     def _get(self, para):
         """
@@ -141,11 +136,8 @@ class Monitor():
         :raises Exceptions: Fail, with info
         """
         err = NotImplementedError("_get method is not implemented")
-        logger.error(
-            "{}.{}: {}".format(
-                self.__class__.__name__,
-                sys._getframe().f_code.co_name,
-                str(err)))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
         raise err
 
     def get(self, para=None):
@@ -162,13 +154,9 @@ class Monitor():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
         return ret
 
     def decode(self, info, para):
@@ -188,14 +176,10 @@ class Monitor():
         """
         if para is None:
             return info
-        else:
-            err = NotImplementedError("Not supported decode: {}".format(para))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
-            raise err
+        err = NotImplementedError("Not supported decode: {}".format(para))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
+        raise err
 
     def format(self, info, fmt):
         """
@@ -213,20 +197,17 @@ class Monitor():
         :raises NotImplementedError: Error, not supported
         :raises Exceptions: Fail, with info
         """
-        if (fmt == "raw"):
+        if fmt == "raw":
             return info
-        elif (fmt == "data"):
+        if fmt == "data":
             return info.split()
-        else:
-            err = NotImplementedError("Not supported format: {}".format(fmt))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
-            raise err
+        err = NotImplementedError("Not supported format: {}".format(fmt))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
+        raise err
 
-    def output(self, info, path):
+    @staticmethod
+    def output(info, path):
         """
         The method to output collected info to file.
 
@@ -239,18 +220,15 @@ class Monitor():
         if path is None:
             return info
 
-        f = open(path, mode='w', buffering=-1, encoding=None,
-                 errors=None, newline=None)
-        f.write(info)
-        f.close()
+        with open(path, mode='w', buffering=-1, encoding=None, errors=None, newline=None) as file:
+            file.write(info)
         return None
 
 
 def walk_class_type(father, class_type, desc, datas):
-    if "class" in father and \
-            father["class"] == class_type:
-        if "description" in father and \
-                (desc is None or father["description"] == desc):
+    """get key field"""
+    if "class" in father and father["class"] == class_type:
+        if "description" in father and (desc is None or father["description"] == desc):
             datas.append(father)
             return
     if "children" in father:
@@ -258,9 +236,10 @@ def walk_class_type(father, class_type, desc, datas):
             walk_class_type(i, class_type, desc, datas)
 
 
-def get_class_type(all, class_type, desc=None):
+def get_class_type(json_content, class_type, desc=None):
+    """convert json formatted content to dict"""
     datas = []
-    walk_class_type(all, class_type, desc, datas)
+    walk_class_type(json_content, class_type, desc, datas)
     dict_datas = {}
     dict_datas[class_type + "s"] = datas
     return dict_datas

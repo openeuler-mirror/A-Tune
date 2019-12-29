@@ -43,7 +43,8 @@ Load profile_names slice, and it's include profiles, the profiles slice returned
 The profile inherit from it's include profile, make sure the include profile behind the main profile,
 and not override by the include profile.
 */
-func loadProfile(profileNames []string, profiles []Profile, processedProfiles []string, included bool) ([]Profile, []string) {
+func loadProfile(profileNames []string, profiles []Profile,
+	processedProfiles []string, included bool) ([]Profile, []string) {
 	for _, name := range profileNames {
 		name = strings.Trim(name, " ")
 
@@ -66,7 +67,6 @@ func loadProfile(profileNames []string, profiles []Profile, processedProfiles []
 			}
 		}
 		profile.included = included
-
 	}
 
 	return profiles, processedProfiles
@@ -107,10 +107,10 @@ func merge(profiles []Profile) Profile {
 				if final.options == nil {
 					final.options, _ = final.config.NewSection("main")
 				}
-				final.options.NewKey(key.Name(), key.Value())
+				_, _ = final.options.NewKey(key.Name(), key.Value())
 
 				section, _ := final.config.GetSection("main")
-				section.NewKey(key.Name(), key.Value())
+				_, _ = section.NewKey(key.Name(), key.Value())
 			}
 		}
 
@@ -122,7 +122,7 @@ func merge(profiles []Profile) Profile {
 
 				section, _ := final.config.NewSection(unit.Name())
 				for _, key := range unit.Keys() {
-					section.NewKey(key.Name(), key.Value())
+					_, _ = section.NewKey(key.Name(), key.Value())
 				}
 			} else {
 				section, _ := final.config.GetSection(unit.Name())
@@ -131,8 +131,8 @@ func merge(profiles []Profile) Profile {
 						/*FIXME: Ignore the same key*/
 						continue
 					} else {
-						final.units[index].NewKey(key.Name(), key.Value())
-						section.NewKey(key.Name(), key.Value())
+						_, _ = final.units[index].NewKey(key.Name(), key.Value())
+						_, _ = section.NewKey(key.Name(), key.Value())
 					}
 				}
 			}
@@ -144,10 +144,10 @@ func merge(profiles []Profile) Profile {
 				if final.inputs == nil {
 					final.inputs, _ = final.config.NewSection("inputs")
 				}
-				final.inputs.NewKey(key.Name(), key.Value())
+				_, _ = final.inputs.NewKey(key.Name(), key.Value())
 
 				section, _ := final.config.GetSection("inputs")
-				section.NewKey(key.Name(), key.Value())
+				_, _ = section.NewKey(key.Name(), key.Value())
 			}
 		}
 		//
@@ -191,7 +191,7 @@ func Load(profileNames []string) (Profile, bool) {
 
 	profiles := make([]Profile, 0)
 	processedProfiles := make([]string, 0)
-	profiles, processedProfiles = loadProfile(profileNames, profiles, processedProfiles, false)
+	profiles, _ = loadProfile(profileNames, profiles, processedProfiles, false)
 
 	if len(profiles) == 0 {
 		return Profile{}, false
@@ -218,16 +218,8 @@ func loadConfigData(name string) (*ini.File, error) {
 		return nil, err
 	}
 
-	// Filter {i:PROFILE_DIR}
 	//dir_name := path.Dir(filename)
 	dirName := CONF.DefaultScriptPath
-	regex := regexp.MustCompile("\\${i:PROFILE_DIR}")
-	for _, section := range config.Sections() {
-		for _, key := range section.Keys() {
-			config.Section(section.Name()).Key(key.Name()).SetValue(regex.ReplaceAllString(key.Value(), dirName))
-		}
-	}
-
 	// Filter script=
 	for _, section := range config.Sections() {
 		if section.Name() == "script" {

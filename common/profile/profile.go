@@ -19,6 +19,7 @@ import (
 	"atune/common/http"
 	"atune/common/log"
 	"atune/common/models"
+	"atune/common/registry"
 	"atune/common/schedule"
 	"atune/common/sqlstore"
 	"atune/common/utils"
@@ -50,8 +51,7 @@ type Profile struct {
 
 	inputs *ini.Section
 
-	items  map[string]*ini.File
-	backup bool
+	items map[string]*ini.File
 }
 
 // ConfigPutBody :body send to CPI service
@@ -63,13 +63,13 @@ type ConfigPutBody struct {
 
 // RespPut ; response of call CPI service
 type RespPut struct {
-	Status string `json:status`
-	Value  string `json:value`
+	Status string `json:"status"`
+	Value  string `json:"value"`
 }
 
 // Put method set the key to value, both specified by ConfigPutBody
 func (c *ConfigPutBody) Put() (*RespPut, error) {
-	url := config.GetUrl(config.ConfiguratorURI)
+	url := config.GetURL(config.ConfiguratorURI)
 	res, err := http.Put(url, c)
 	if err != nil {
 		return nil, err
@@ -79,6 +79,10 @@ func (c *ConfigPutBody) Put() (*RespPut, error) {
 		return nil, fmt.Errorf("connect to configurator service faild")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	respPutIns := new(RespPut)
 	err = json.Unmarshal(resBody, respPutIns)
 	if err != nil {
@@ -86,13 +90,12 @@ func (c *ConfigPutBody) Put() (*RespPut, error) {
 	}
 
 	return respPutIns, nil
-
 }
 
-// Get method get the current value of the spefied key by ConfigPutBody
-func (c *ConfigPutBody) Get() (*RespPut, error) {
-	url := config.GetUrl(config.ConfiguratorURI)
-	res, err := http.Get(url, c)
+// Post method get the current value of the spefied key by ConfigPutBody
+func (c *ConfigPutBody) Post() (*RespPut, error) {
+	url := config.GetURL(config.ConfiguratorURI)
+	res, err := http.Post(url, c)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +104,10 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 		return nil, fmt.Errorf("connect to configurator service faild")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	respPutIns := new(RespPut)
 	err = json.Unmarshal(resBody, respPutIns)
 	if err != nil {
@@ -108,7 +115,6 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 	}
 
 	return respPutIns, nil
-
 }
 
 // Backup method backup the workload type of the Profile
@@ -120,17 +126,23 @@ func (p *Profile) Backup() error {
 
 	timeUnix := time.Now().Format("2006_01_02_15_04_05")
 	backedPath := path.Join(config.DefaultBackupPath, p.name+"_"+timeUnix)
-	os.MkdirAll(backedPath, os.ModePerm)
+	err := os.MkdirAll(backedPath, 0750)
+	if err != nil {
+		log.Error(err.Error())
+		return nil
+	}
 
 	buf := bytes.NewBuffer(nil)
 
 	for _, unit := range p.units {
 		// Ignore the sections ["main", "DEFAULT", "bios"]
-		if name := unit.Name(); (name == "main") || (name == "DEFAULT") || (name == "bios" || name == "tip") {
+		if name := unit.Name(); (name == "main") ||
+			(name == "DEFAULT") ||
+			(name == "bios" || name == "tip" || name == "check") {
 			continue
 		}
 
-		buf.WriteString("[" + unit.Name() + "]" + "\n")
+		_, _ = buf.WriteString("[" + unit.Name() + "]" + "\n")
 
 		for _, key := range unit.Keys() {
 			keyName := key.Name()
@@ -142,18 +154,27 @@ func (p *Profile) Backup() error {
 			if err != nil {
 				return err
 			}
-			config := keyName + "=" + keyValue
+			if unit.Name() == "script" {
+				keyName = path.Join(config.DefaultScriptPath, keyName)
+			}
+
+			cfg := keyName + "=" + keyValue
 			body := &models.Profile{
 				Section: unit.Name(),
-				Config:  config,
+				Config:  cfg,
 				Path:    backedPath,
 			}
 
-			respPutIns, _ := body.Backup()
-			if respPutIns == nil || (respPutIns.Status == "FAILED") {
+			respIns, err := body.Backup()
+			if err != nil {
+				log.Errorf(err.Error())
 				continue
 			}
-			buf.WriteString(keyName + "=" + respPutIns.Value + "\n")
+			if respIns.Status == utils.FAILD {
+				log.Errorf("backup failed: %s", respIns.Value)
+				continue
+			}
+			_, _ = buf.WriteString(keyName + "=" + respIns.Value + "\n")
 		}
 	}
 
@@ -221,22 +242,25 @@ func (p *Profile) active(ch chan *PB.AckCheck) error {
 					return err
 				}
 				if section.Name() == "script" {
-					scriptKey = path.Join(config.DefaultScriptPath, strings.Trim(key.Name(), " "))
+					scriptKey = path.Join(config.DefaultScriptPath, strings.Trim(scriptKey, " "))
 				}
 
 				if section.HasKey(scriptKey) {
 					key.SetValue(value)
 					continue
 				}
-				section.NewKey(scriptKey, value)
+				_, _ = section.NewKey(scriptKey, value)
 				section.DeleteKey(key.Name())
 			}
 		}
 	}
 
 	scheduler := schedule.GetScheduler()
-	scheduler.Active(ch, itemKeys, p.items)
-	p.Save()
+	_ = scheduler.Active(ch, itemKeys, p.items)
+	err := p.Save()
+	if err != nil {
+		log.Errorf(err.Error())
+	}
 
 	return nil
 }
@@ -251,7 +275,7 @@ func (p *Profile) SetWorkloadType(name string) {
 	p.name = name
 }
 
-//ItemSort method allocate property to diffrent item
+//ItemSort method allocate property to different item
 func (p *Profile) ItemSort() error {
 	if p.config == nil {
 		return nil
@@ -270,11 +294,7 @@ func (p *Profile) ItemSort() error {
 				continue
 			}
 			if section.Name() == "tip" {
-				if key.Value() == "warning" {
-					itemName = "SUGGEST"
-				} else {
-					itemName = "REQUEST"
-				}
+				itemName = key.Value()
 			} else {
 				itemQuery, err := sqlstore.GetPropertyItem(key.Name())
 				if err != nil {
@@ -289,10 +309,10 @@ func (p *Profile) ItemSort() error {
 				p.items[itemName] = ini.Empty()
 			}
 			if itemSection := p.items[itemName].Section(section.Name()); itemSection == nil {
-				p.items[itemName].NewSection(section.Name())
+				_, _ = p.items[itemName].NewSection(section.Name())
 			}
 			itemSection, _ := p.items[itemName].GetSection(section.Name())
-			itemSection.NewKey(key.Name(), key.Value())
+			_, _ = itemSection.NewKey(key.Name(), key.Value())
 		}
 	}
 	return nil
@@ -315,7 +335,43 @@ func (p *Profile) Check(ch chan *PB.AckCheck) error {
 			continue
 		}
 
-		var statusStr = "OK"
+		if section.Name() == "check" {
+			if !section.HasKey("check_environment") {
+				continue
+			}
+			if section.Key("check_environment").Value() != "on" {
+				continue
+			}
+
+			services := registry.GetCheckerServices()
+			for _, service := range services {
+				log.Infof("initializing checker service in profile check: %s", service.Name)
+				if err := service.Instance.Init(); err != nil {
+					return fmt.Errorf("service init faild: %v", err)
+				}
+			}
+
+			// running checker service
+			for _, srv := range services {
+				service := srv
+				checkerService, ok := service.Instance.(registry.CheckService)
+				if !ok {
+					continue
+				}
+
+				if !registry.IsCheckDisabled(service.Instance) {
+					continue
+				}
+				err := checkerService.Check(ch)
+				if err != nil {
+					log.Errorf("service %s running faild, reason: %v", service.Name, err)
+					continue
+				}
+			}
+			continue
+		}
+
+		var statusStr string
 		for _, key := range section.Keys() {
 			scriptKey := key.Name()
 			scriptKey, err := p.replaceParameter(scriptKey)
@@ -338,7 +394,7 @@ func (p *Profile) Check(ch chan *PB.AckCheck) error {
 				Value:   value,
 			}
 
-			respPutIns, err := body.Get()
+			respPutIns, err := body.Post()
 			if err != nil {
 				sendChanToAdm(ch, key.Name(), utils.FAILD, err.Error())
 				continue
@@ -350,7 +406,7 @@ func (p *Profile) Check(ch chan *PB.AckCheck) error {
 			if statusStr == "OK" {
 				description := fmt.Sprintf("value: %s", value)
 				sendChanToAdm(ch, key.Name(), utils.SUCCESS, description)
-			} else if statusStr == "UNKNOWN" {
+			} else if statusStr == utils.UNKNOWN {
 				description := fmt.Sprintf("expext value: %s, real value: %s", value, statusStr)
 				sendChanToAdm(ch, key.Name(), utils.WARNING, description)
 			} else {
@@ -390,7 +446,7 @@ func (p *Profile) ActiveTuned(ch chan *PB.AckCheck, params string) error {
 			continue
 		}
 
-		var statusStr = "OK"
+		var statusStr string
 		for _, key := range section.Keys() {
 			scriptKey := key.Name()
 			if section.Name() == "script" {
@@ -419,9 +475,9 @@ func (p *Profile) ActiveTuned(ch chan *PB.AckCheck, params string) error {
 			if statusStr == "OK" {
 				description := fmt.Sprintf("value: %s", key.Value())
 				sendChanToAdm(ch, key.Name(), utils.SUCCESS, description)
-			} else if statusStr == "UNKNOWN" {
+			} else if statusStr == utils.WARNING {
 				description := fmt.Sprintf("expext value: %s, real value: %s", key.Value(), statusStr)
-				sendChanToAdm(ch, key.Name(), utils.WARNING, description)
+				sendChanToAdm(ch, key.Name(), utils.SUGGEST, description)
 			} else {
 				description := fmt.Sprintf("expext value: %s, real value: %s", key.Value(), statusStr)
 				sendChanToAdm(ch, key.Name(), utils.FAILD, description)
@@ -448,6 +504,9 @@ func (p *Profile) replaceParameter(str string) (string, error) {
 			return str, fmt.Errorf("input section is not exist")
 		}
 		for _, match := range matches {
+			if len(match) < 2 {
+				continue
+			}
 			if !p.inputs.Haskey(match[1]) {
 				return str, fmt.Errorf("%s is not exist int the inputs section", match[1])
 			}

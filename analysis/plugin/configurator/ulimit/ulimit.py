@@ -14,19 +14,16 @@
 """
 The sub class of the Configurator, used to change the resources limit of user.
 """
-
-import sys
+import inspect
 import logging
 import os
 import re
 import random
 import shutil
+from analysis.plugin.public import GetConfigError
+from ..common import Configurator, file_modify
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Ulimit(Configurator):
@@ -39,60 +36,50 @@ class Ulimit(Configurator):
         self.__cfg_file = "/etc/security/limits.conf"
 
     def _set(self, key, value):
-        f = open(
-            self.__cfg_file,
-            mode='r+',
-            buffering=-1,
-            encoding=None,
-            errors=None,
-            newline=None,
-            closefd=True)
-        info = f.read()
-        keyword = key.split(".")
-        pattern = re.compile(
-            "^\s*?(?!#)" +
-            keyword[0] +
-            "\s+?" +
-            keyword[1] +
-            "\s+?" +
-            keyword[2] +
-            "\s+(\w+)\s*?",
-            re.ASCII | re.MULTILINE)
-        searchObj = pattern.search(info)
-        if searchObj is not None:
-            offset = searchObj.span(1)
-            file_modify(f, offset[0], offset[1] - 1, value)
-        else:
-            file_modify(f, len(info), -1, "\n{domain}\t{type}\t{item}\t{value}".format(
-                domain=keyword[0], type=keyword[1], item=keyword[2], value=value))
-        f.close()
+        with open(self.__cfg_file, mode='r+', buffering=-1, encoding=None, errors=None,
+                  newline=None, closefd=True) as file:
+            info = file.read()
+            keyword = key.split(".")
+            pattern = re.compile(
+                r"^\s*?(?!#)" +
+                keyword[0] +
+                r"\s+?" +
+                keyword[1] +
+                r"\s+?" +
+                keyword[2] +
+                r"\s+(\w+)\s*?",
+                re.ASCII | re.MULTILINE)
+            search_obj = pattern.search(info)
+            if search_obj is not None:
+                offset = search_obj.span(1)
+                file_modify(file, offset[0], offset[1] - 1, value)
+            else:
+                file_modify(file, len(info), -1, "\n{domain}\t{type}\t{item}\t{value}".format(
+                    domain=keyword[0], type=keyword[1], item=keyword[2], value=value))
         return 0
 
     def _get(self, key):
-        with open(self.__cfg_file, 'r') as f:
-            info = f.read()
+        with open(self.__cfg_file, 'r') as file:
+            info = file.read()
         keyword = key.split(".")
         pattern = re.compile(
-            "^\s*?(?!#)" +
+            r"^\s*?(?!#)" +
             keyword[0] +
-            "\s+?" +
+            r"\s+?" +
             keyword[1] +
-            "\s+?" +
+            r"\s+?" +
             keyword[2] +
-            "\s+(\w+)\s*?",
+            r"\s+(\w+)\s*?",
             re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(info)
-        if len(searchObj) == 0:
+        search_obj = pattern.findall(info)
+        if len(search_obj) == 0:
             err = GetConfigError("Fail to find {} config".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
-        return searchObj[-1]
+        return search_obj[-1]
 
-    def _backup(self, key, rollback_info):
+    def _backup(self, _, rollback_info):
         name = os.path.basename(self.__cfg_file)
         bak_file = "{path}/{file}{ver}".format(path=rollback_info, file=name,
                                                ver=random.random())
@@ -102,20 +89,7 @@ class Ulimit(Configurator):
     def _resume(self, key, value):
         if key != "CPI_ROLLBACK_INFO":
             err = ValueError("unsupported resume type: {}".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
         shutil.copy(value, self.__cfg_file)
-        return None
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = Ulimit("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

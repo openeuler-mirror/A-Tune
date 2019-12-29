@@ -50,7 +50,6 @@ func init() {
 }
 
 func newProfileInfoCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileInfoCommand, nil
 }
 
@@ -91,7 +90,6 @@ func profileInfo(ctx *cli.Context) error {
 		}
 
 		fmt.Print(reply.Name)
-
 	}
 
 	return nil

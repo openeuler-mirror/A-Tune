@@ -29,8 +29,6 @@ import (
 
 // HistoryProfile :load profile history type
 type HistoryProfile struct {
-	name string
-
 	config *ini.File
 }
 
@@ -63,7 +61,6 @@ func (p *HistoryProfile) Resume(ch chan *PB.AckCheck) error {
 				sendChanToAdm(ch, key.Name(), utils.FAILD, description)
 			}
 		}
-
 	}
 
 	return nil
@@ -96,10 +93,14 @@ func Rollback() error {
 	})
 
 	for _, pro := range profileLogs {
-		log.Infof("begin to restore profile id: %s", pro.ID)
+		log.Infof("begin to restore profile id: %d", pro.ID)
 		profileInfo := HistoryProfile{}
-		profileInfo.Load(pro.Context)
-		profileInfo.Resume(nil)
+		if err := profileInfo.Load(pro.Context); err != nil {
+			log.Error(err.Error())
+		}
+		if err := profileInfo.Resume(nil); err != nil {
+			log.Error(err.Error())
+		}
 
 		// delete profile log after restored
 		if err := sqlstore.DelProfileLogByID(pro.ID); err != nil {

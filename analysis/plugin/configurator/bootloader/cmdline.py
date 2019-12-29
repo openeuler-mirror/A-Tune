@@ -14,9 +14,8 @@
 """
 The sub class of the Configurator, used to collect the cmdline info.
 """
-import sys
-from configurator.common import *
-from bootutils import Utils
+from ..common import Configurator
+from .bootutils import Utils
 
 
 class Cmdline(Configurator):
@@ -29,12 +28,3 @@ class Cmdline(Configurator):
 
     def _get(self, key):
         return Utils.get_value(key)
-
-
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key[=value]')
-        sys.exit(-1)
-    ct = Cmdline("UT1")
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

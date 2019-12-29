@@ -19,11 +19,13 @@ import (
 	"errors"
 )
 
+// IrqSchedule : irq schedule filter
 type IrqSchedule struct {
 	Name string
 }
 
-func (s *IrqSchedule) Filte(strategy string) error {
+// Tune irq bindings according to input strategy
+func (s *IrqSchedule) Tune(strategy string) error {
 	switch strategy {
 	case "performance":
 	case "auto":
@@ -31,7 +33,7 @@ func (s *IrqSchedule) Filte(strategy string) error {
 	case "powersave":
 		return s.powersave()
 	default:
-		return errors.New("Strategy don't exist")
+		return errors.New("strategy don't exist")
 	}
 	return nil
 }

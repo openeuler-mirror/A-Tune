@@ -15,16 +15,10 @@
 The sub class of the Configurator, used to change the /proc/sys/* config.
 """
 
-import sys
-import logging
 import subprocess
 import re
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Configurator
 
 
 class Sysctl(Configurator):
@@ -39,26 +33,17 @@ class Sysctl(Configurator):
     def _get(self, key):
         with open('/dev/null', 'w') as no_print:
             output = subprocess.check_output("{cmd} -n {key}".format(
-                cmd=self.__cmd, key=key).split(),
-                stderr=no_print)
+                cmd=self.__cmd, key=key).split(), stderr=no_print)
         return output.decode()
 
     def _set(self, key, value):
         with open('/dev/null', 'w') as no_print:
-            return subprocess.call('{cmd} -w {key}="{val}"'.format(
-                cmd=self.__cmd, key=key, val=value), shell=True,
-                stdout=no_print, stderr=no_print)
+            return subprocess.call(
+                [self.__cmd, "-w", "{key}={value}".format(key=key, value=value)],
+                shell=False, stdout=no_print, stderr=no_print)
 
-    def _check(self, config1, config2):
-        config1 = re.sub("\s{1,}", " ", config1)
-        config2 = re.sub("\s{1,}", " ", config2)
+    @staticmethod
+    def check(config1, config2):
+        config1 = re.sub(r"\s{1,}", " ", config1)
+        config2 = re.sub(r"\s{1,}", " ", config2)
         return config1 == config2
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = Sysctl("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

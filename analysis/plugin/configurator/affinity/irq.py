@@ -14,16 +14,14 @@
 """
 The sub class of the Configurator, used to change the affinity of irqs.
 """
-
-import sys
+import inspect
+import subprocess
 import logging
 import os
+from analysis.plugin.public import SetConfigError
+from ..common import Configurator
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class IrqAffinity(Configurator):
@@ -37,81 +35,64 @@ class IrqAffinity(Configurator):
         self._set.__func__.__doc__ = Configurator._set.__doc__ % (
             'irq or irq_name', 'cpumask in hex, no "0x" prefix, "," is permitted')
 
-    def __get_irq_id(self, key):
+    @staticmethod
+    def __get_irq_id(key):
         if key.isdecimal():
-            id = key
+            irq_id = key
             name = None
         else:
-            id = None
+            irq_id = None
             name = key
 
-        if id is None:
-            irqs = sorted(os.listdir("/sys/kernel/irq/"), key=lambda x: int(x))
+        if irq_id is None:
+            irqs = sorted(os.listdir("/sys/kernel/irq/"), key=int)
             for irq in irqs:
-                with open("/sys/kernel/irq/{}/actions".format(irq), 'r') as f:
-                    action = f.read().replace("\n", "")
+                with open("/sys/kernel/irq/{}/actions".format(irq), 'r') as file:
+                    action = file.read().replace("\n", "")
                 if action == name:
-                    id = irq
+                    irq_id = irq
                     break
-        return id
+        return irq_id
 
     def _get(self, key):
-        id = self.__get_irq_id(key)
-        if id is None:
+        irq_id = self.__get_irq_id(key)
+        if irq_id is None:
             err = LookupError("Fail to find irq {}".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
-
-        f = open("{opt}/{id}/smp_affinity".format(opt=self._option,
-                                                  id=id),
-                 mode='r',
-                 buffering=-1,
-                 encoding=None,
-                 errors=None,
-                 newline=None,
-                 closefd=True)
-        ret = f.read().replace(",", "")
-        f.close()
+        with open("{opt}/{id}/smp_affinity".format(opt=self._option, id=irq_id),
+                  mode='r',
+                  buffering=-1,
+                  encoding=None,
+                  errors=None,
+                  newline=None,
+                  closefd=True) as file:
+            ret = file.read().replace(",", "")
         return ret
 
     def _set(self, key, value):
-        id = self.__get_irq_id(key)
-        if id is None:
+        irq_id = self.__get_irq_id(key)
+        if irq_id is None:
             err = LookupError("Fail to find irq {}".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
-            raise err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
 
         mask = value.replace(",", "")
-        f = open("{opt}/{id}/smp_affinity".format(opt=self._option,
-                                                  id=id),
-                 mode='w',
-                 buffering=-1,
-                 encoding=None,
-                 errors=None,
-                 newline=None,
-                 closefd=True)
-        f.write(mask)
-        f.close()
-        return 0
+        with open("{opt}/{id}/smp_affinity".format(opt=self._option, id=irq_id), "w") as file:
+            ret = subprocess.call(["echo", mask],
+                                  shell=False,
+                                  stdout=file,
+                                  stderr=subprocess.DEVNULL)
+        if ret != 0:
+            err = SetConfigError("Fail to set irq {} affinity".format(key))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            raise err
+        return ret
 
-    def _check(self, config1, config2):
+    @staticmethod
+    def check(config1, config2):
         config1 = config1.replace(",", "")
         config2 = config2.replace(",", "")
         return int(config1, base=16) == int(config2, base=16)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = IrqAffinity("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

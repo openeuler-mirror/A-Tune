@@ -17,32 +17,27 @@ Fields used by restful api.
 
 from flask_restful import fields
 
-profile_field = {
+PROFILE_FIELD = {
     'profile': fields.String,
 }
 
-profile_get_field = fields.Nested(profile_field)
+PROFILE_GET_FIELD = fields.Nested(PROFILE_FIELD)
 
-
-param_field = {
+PARAM_FIELD = {
     'status': fields.String,
     'value': fields.String,
 }
 
-configurator_put_field = fields.Nested(param_field)
+CONFIGURATOR_PUT_FIELD = fields.Nested(PARAM_FIELD)
 
-optimizer_field = {
-    'status': fields.String 
+OPTIMIZER_FIELD = {
+    'status': fields.String
 }
 
-optimizer_post_field = {
-    'task_id': fields.String
-}
-
-classification_field = {
+CLASSIFICATION_FIELD = {
     'resource_limit': fields.String,
     'workload_type': fields.String,
     'percentage': fields.Float,
 }
 
-classification_post_field = fields.Nested(classification_field)
+CLASSIFICATION_POST_FIELD = fields.Nested(CLASSIFICATION_FIELD)

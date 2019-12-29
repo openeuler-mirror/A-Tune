@@ -74,13 +74,13 @@ func newTrainCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
 func checkTrainCtx(ctx *cli.Context) error {
 	dataPath := ctx.String("data_path")
 	if dataPath == "" {
-		cli.ShowCommandHelp(ctx, "train")
+		_ = cli.ShowCommandHelp(ctx, "train")
 		return fmt.Errorf("error: data_path must be specified")
 	}
 
 	outputPath := ctx.String("output_file")
 	if outputPath == "" {
-		cli.ShowCommandHelp(ctx, "train")
+		_ = cli.ShowCommandHelp(ctx, "train")
 		return fmt.Errorf("error: output_file must be specified")
 	}
 
@@ -108,7 +108,10 @@ func train(ctx *cli.Context) error {
 		return err
 	}
 	if !exist {
-		os.MkdirAll(dir, 0660)
+		err = os.MkdirAll(dir, 0660)
+		if err != nil {
+			return err
+		}
 	}
 
 	c, err := client.NewClientFromContext(ctx)
@@ -119,6 +122,9 @@ func train(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, err := svc.Training(CTX.Background(), &PB.TrainMessage{DataPath: dataPath, OutputPath: outputPath})
+	if err != nil {
+		return err
+	}
 
 	for {
 		reply, err := stream.Recv()

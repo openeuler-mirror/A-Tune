@@ -15,61 +15,73 @@
 Application initialization, including log configuration, restful api registration.
 """
 
+import os
+import ssl
+import sys
+import logging
+from configparser import ConfigParser
+from logging.handlers import SysLogHandler
 from flask import Flask
 from flask_restful import Api
-import os
-import sys
-from resources import configurator
-from resources import monitor
-from resources import optimizer
-from resources import collector
-from resources import classification
-from resources import profile
-from resources import train
 
-from configparser import ConfigParser
-import logging
-from logging.handlers import RotatingFileHandler, SysLogHandler
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+sys.path.insert(0, os.path.dirname(__file__) + "/../")
+from analysis.resources import configurator, monitor, optimizer, collector, \
+    classification, profile, train
 
+LOG = logging.getLogger('werkzeug')
+LOG.setLevel(logging.ERROR)
 
-app = Flask(__name__)
-api = Api(app)
+APP = Flask(__name__)
+API = Api(APP)
 
-api.add_resource(configurator.Configurator, '/v1/setting' ,'/setting')
-api.add_resource(monitor.Monitor, '/v1/monitor' ,'/monitor')
-api.add_resource(optimizer.Optimizer, '/v1/optimizer' ,'/v1/optimizer/<string:task_id>')
-api.add_resource(collector.Collector, '/v1/collector','/v1/collector')
-api.add_resource(classification.Classification, '/v1/classification','/v1/classification')
-api.add_resource(profile.Profile, '/v1/profile','/v1/profile')
-api.add_resource(train.Training, '/v1/training','/v1/training')
+API.add_resource(configurator.Configurator, '/v1/setting', '/setting')
+API.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
+API.add_resource(optimizer.Optimizer, '/v1/optimizer', '/v1/optimizer/<string:task_id>')
+API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
+API.add_resource(classification.Classification, '/v1/classification', '/v1/classification')
+API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
+API.add_resource(train.Training, '/v1/training', '/v1/training')
 
 
-def configLog(level):
-    loggingFormat = logging.Formatter('atuned: %(asctime)s [%(levelname)s] %(name)s : %(message)s')
-    syslogHandler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
-    syslogHandler.setFormatter(loggingFormat)
-    syslogHandler.setLevel(level)
+def config_log(level):
+    """app config log"""
+    logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] %(name)s : %(message)s')
+    syslog_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
+    syslog_handler.setFormatter(logging_format)
+    syslog_handler.setLevel(level)
 
-    rootLogger = logging.getLogger()
-    rootLogger.addHandler(syslogHandler)
+    root_logger = logging.getLogger()
+    root_logger.addHandler(syslog_handler)
 
 
 def main(filename):
+    """app main function"""
     if not os.path.exists(filename):
-        print("conf file is not exist")
         return
     config = ConfigParser()
     config.read(filename)
 
     level = logging.getLevelName(config.get("log", "level").upper())
-    configLog(level)
-    app.run(host="localhost", port=config.get("server", "rest_port"))
+    config_log(level)
+    APP.config.update(SESSION_COOKIE_SECURE=True,
+                      SESSION_COOKIE_HTTPONLY=True,
+                      SESSION_COOKIE_SAMESITE='Lax')
+
+    if config.has_option("server", "tls") and config.get("server", "tls") == "true":
+        cert_file = config.get("server", "tlshttpcertfile")
+        key_file = config.get("server", "tlshttpkeyfile")
+        ca_file = config.get("server", "tlshttpcacertfile")
+        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        context.load_cert_chain(certfile=cert_file, keyfile=key_file)
+        context.load_verify_locations(ca_file)
+        context.verify_mode = ssl.CERT_REQUIRED
+        APP.run(host="localhost", port=config.get("server", "rest_port"),
+                ssl_context=context)
+    else:
+        APP.run(host="localhost", port=config.get("server", "rest_port"))
 
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("lack of conf file parameter")
         sys.exit(-1)
     main(sys.argv[1])

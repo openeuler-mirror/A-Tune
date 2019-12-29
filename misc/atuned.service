@@ -1,5 +1,5 @@
 [Unit]
-Description=EulerOS Auto Tuning Daemon
+Description=A-Tune Daemon
 After=systemd-sysctl.service network.target
 Requires=polkit.service
 

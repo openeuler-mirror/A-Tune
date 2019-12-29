@@ -15,15 +15,9 @@
 The sub class of the Configurator, used to change the /sys/* config.
 """
 
-import sys
-import logging
 import re
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Configurator
 
 
 class Sysfs(Configurator):
@@ -36,33 +30,22 @@ class Sysfs(Configurator):
         Configurator.__init__(self, user)
 
     def _get(self, key):
-        f = open("{opt}/{key}".format(opt=self._option, key=key), mode='r',
-                 buffering=-1, encoding=None, errors=None, newline=None, closefd=True)
-        ret = f.read()
-        f.close()
+        with open("{opt}/{key}".format(opt=self._option, key=key), mode='r',
+                  buffering=-1, encoding=None, errors=None, newline=None, closefd=True) as file:
+            ret = file.read()
 
-        pattern = ".*\[(.*)\].*"
-        searchObj = re.search(pattern, ret, re.ASCII | re.MULTILINE)
-        if searchObj is not None:
-            return searchObj.group(1)
-        else:
-            return ret
+        pattern = r".*\[(.*)\].*"
+        search_obj = re.search(pattern, ret, re.ASCII | re.MULTILINE)
+        if search_obj is not None:
+            return search_obj.group(1)
+        return ret
 
     def _set(self, key, value):
-        f = open("{opt}/{key}".format(opt=self._option, key=key), mode='w',
-                 buffering=-1, encoding=None, errors=None, newline=None, closefd=True)
-        f.write(value)
-        f.close()
+        with open("{opt}/{key}".format(opt=self._option, key=key), mode='w',
+                  buffering=-1, encoding=None, errors=None, newline=None, closefd=True) as file:
+            file.write(value)
         return 0
 
-    def _check(self, config1, config2):
+    @staticmethod
+    def check(_, __):
         return True
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = Sysfs("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))

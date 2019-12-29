@@ -50,7 +50,6 @@ func init() {
 }
 
 func newProfileListCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
 	return profileListCommand, nil
 }
 

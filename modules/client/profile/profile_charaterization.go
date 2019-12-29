@@ -25,35 +25,34 @@ import (
 	CTX "golang.org/x/net/context"
 )
 
-var profileCharaterCommand = cli.Command{
-	Name:      "charaterization",
+var profileCharacterCommand = cli.Command{
+	Name:      "characterization",
 	Usage:     "analysis the workload type",
 	ArgsUsage: "",
 	Description: func() string {
 		desc := "\n    COMMAND:\n"
 		return desc
 	}(),
-	Action: profileCharater,
+	Action: profileCharacter,
 }
 
 func init() {
 	svc := SVC.ProfileService{
-		Name:    "opt.profile.charaterization",
+		Name:    "opt.profile.characterization",
 		Desc:    "opt profile system",
-		NewInst: newProfileCharaterCmd,
+		NewInst: newProfileCharacterCmd,
 	}
 	if err := SVC.AddService(&svc); err != nil {
-		fmt.Printf("Failed to load profile charaterization service : %s\n", err)
+		fmt.Printf("Failed to load profile characterization service : %s\n", err)
 		return
 	}
 }
 
-func newProfileCharaterCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
-
-	return profileCharaterCommand, nil
+func newProfileCharacterCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
+	return profileCharacterCommand, nil
 }
 
-func profileCharater(ctx *cli.Context) error {
+func profileCharacter(ctx *cli.Context) error {
 	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
 		return err
@@ -62,6 +61,9 @@ func profileCharater(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, err := svc.Charaterization(CTX.Background(), &PB.ProfileInfo{})
+	if err != nil {
+		return err
+	}
 
 	for {
 		reply, err := stream.Recv()

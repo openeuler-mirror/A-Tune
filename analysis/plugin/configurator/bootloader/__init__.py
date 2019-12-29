@@ -17,7 +17,9 @@ Init file.
 
 import sys
 import os
-sys.path.insert(0, os.path.dirname(__file__))
+
 __all__ = ["grub2", "cmdline"]
 
 from . import *
+
+sys.path.insert(0, os.path.dirname(__file__))

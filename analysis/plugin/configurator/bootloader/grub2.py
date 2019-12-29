@@ -14,80 +14,77 @@
 """
 The sub class of the Configurator, used to change the grub2 config.
 """
-
-import sys
+import inspect
 import logging
 import os
 import subprocess
 import random
 import shutil
 import re
-from bootutils import Utils
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
+from analysis.plugin.public import GetConfigError, NeedRebootWarning
+from .bootutils import Utils
+from ..common import Configurator, pre_check, file_modify
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Grub2(Configurator):
     """To change the grub2 config"""
     _module = "BOOTLOADER"
     _submod = "GRUB2"
+    __cfg_file = ""
 
     def __init__(self, user=None):
         Configurator.__init__(self, user)
         __cfg_files = ["/etc/grub2.cfg", "/etc/grub2-efi.cfg"]
-        for f in __cfg_files:
-            if os.path.isfile(f):
-                self.__cfg_file = f
+        for file in __cfg_files:
+            if os.path.isfile(file):
+                self.__cfg_file = file
                 break
-        self.__kernel_ver = subprocess.check_output("uname -r".split()).decode(
-        ).replace("\n", "")
+        self.__kernel_ver = subprocess.check_output("uname -r".split()).decode().replace("\n", "")
 
     def __get_cfg_entry(self, version):
-        with open(self.__cfg_file, 'r') as f:
-            ctx = f.read()
+        if not os.path.exists(self.__cfg_file):
+            err = GetConfigError("Fail to find grub2 file")
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            raise err
+        with open(self.__cfg_file, 'r') as file:
+            ctx = file.read()
         pattern = re.compile(
-            "\n(menuentry)[^\{\}]*?\{[^\{\}]*?\n\s+(linux)[^\{\}]*?" +
+            r"\n(menuentry)[^\{\}]*?\{[^\{\}]*?\n\s+(linux)[^\{\}]*?" +
             version.replace(
                 ".",
-                "\.") +
-            "[^\{\}]*?(\})",
+                r"\.") +
+            r"[^\{\}]*?(\})",
             re.ASCII | re.DOTALL)
-        searchObj = pattern.search(ctx)
-        start = searchObj.span(1)
-        cmd = searchObj.span(2)
-        end = searchObj.span(3)
+        search_obj = pattern.search(ctx)
+        start = search_obj.span(1)
+        cmd = search_obj.span(2)
+        end = search_obj.span(3)
         return {"START": start[0], "CMD": cmd[0], "END": end[1]}
 
     def _get(self, key):
         entry = self.__get_cfg_entry(self.__kernel_ver)
-        with open(self.__cfg_file, 'r') as f:
-            f.seek(entry["CMD"])
-            cmd = f.readline()
+        with open(self.__cfg_file, 'r') as file:
+            file.seek(entry["CMD"])
+            cmd = file.readline()
 
         keypos = Utils.get_keypos(cmd, key)
         if keypos == -1:
             err = GetConfigError("Fail to find {} config".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
 
         config = cmd[keypos:].split()[0]
         if config.find("=") != -1:
             return config.split("=")[1]
-        else:
-            return None
+        return None
 
     @pre_check(
         Configurator._precheck,
-        os.path.split(
-            os.path.realpath(__file__))[0] +
-        "/grub2.json")
+        os.path.split(os.path.realpath(__file__))[0] + "/grub2.json")
     def _set(self, key, value):
         entry = self.__get_cfg_entry(self.__kernel_ver)
         if value is None:
@@ -95,17 +92,17 @@ class Grub2(Configurator):
         else:
             new = "{key}={val}".format(key=key, val=value)
 
-        with open(self.__cfg_file, 'r+') as f:
-            f.seek(entry["CMD"])
-            cmd = f.readline()
+        with open(self.__cfg_file, 'r+') as file:
+            file.seek(entry["CMD"])
+            cmd = file.readline()
 
             keypos = Utils.get_keypos(cmd, key)
             if keypos != -1:
                 old = cmd[keypos:].split("\n")[0].split()[0]
-                file_modify(f, entry["CMD"] + keypos,
+                file_modify(file, entry["CMD"] + keypos,
                             entry["CMD"] + keypos + len(old) - 1, new)
             else:
-                file_modify(f, entry["CMD"] + len(cmd) - 1, -1, " " + new)
+                file_modify(file, entry["CMD"] + len(cmd) - 1, -1, " " + new)
 
         active = Utils.get_value(key)
         if value == active:
@@ -113,7 +110,7 @@ class Grub2(Configurator):
         raise NeedRebootWarning(
             "Need reboot to make the config change of grub2 effect.")
 
-    def _backup(self, key, rollback_info):
+    def _backup(self, _, rollback_info):
         name = os.path.basename(self.__cfg_file)
         bak_file = "{path}/{file}{ver}".format(path=rollback_info, file=name,
                                                ver=random.random())
@@ -123,23 +120,7 @@ class Grub2(Configurator):
     def _resume(self, key, value):
         if key != "CPI_ROLLBACK_INFO":
             err = ValueError("unsupported resume type: {}".format(key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
         shutil.copy(value, self.__cfg_file)
-        return None
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key[=value]')
-        sys.exit(-1)
-    ct = Grub2("UT1")
-    save = ct.backup(sys.argv[1], "./1/")
-    print(save)
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))
-    print(ct.resume(save))

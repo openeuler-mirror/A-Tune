@@ -16,52 +16,45 @@ Pipe used to send status to golang process.
 """
 
 import os
-import time
 
 
-class NPipe():
-    #pipe used to send status to golang process
-    def __init__(self, pipe_name, pipe_mode = os.O_SYNC | os.O_CREAT | os.O_WRONLY):
+class NPipe:
+    """pipe used to send status to golang process"""
+
+    def __init__(self, pipe_name, pipe_mode=os.O_SYNC | os.O_CREAT | os.O_WRONLY):
         self.pipe = pipe_name
         self.pipe_mode = pipe_mode
-        self.f = None
+        self.file = None
 
     def write(self, message):
-        print("send message:", self.f, message)
+        """write message to file"""
         if not isinstance(message, str):
             return None
         message = message.encode()
-        length = os.write(self.f, message)
+        length = os.write(self.file, message)
         return length
 
     def open(self):
+        """open pipe"""
         if not os.path.exists(self.pipe):
             return None
-        self.f = os.open(self.pipe, self.pipe_mode)
-        return self.f
+        self.file = os.open(self.pipe, self.pipe_mode)
+        return self.file
 
     def __del__(self):
         self.close()
 
     def close(self):
-        if not self.f:
+        """close file"""
+        if not self.file:
             return
-        os.close(self.f)
+        os.close(self.file)
 
 
-def getNpipe(pipe, pipe_mode=None):
+def get_npipe(pipe):
+    """get npipe"""
     npipe = NPipe(pipe)
-    f = npipe.open()
-    print(f)
-    if not f:
+    file = npipe.open()
+    if not file:
         return None
-    else:
-        return npipe
-
-
-if __name__ == "__main__":
-    npipe = getNpipe("/tmp/pipe.ipc")
-    if not npipe:
-        print("pipe is none")
-        exit(1)
-    npipe.write("just a npipe test")
+    return npipe

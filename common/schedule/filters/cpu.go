@@ -19,11 +19,13 @@ import (
 	"errors"
 )
 
-type CpuSchedule struct {
+// CPUSchedule : CPU schedule filter
+type CPUSchedule struct {
 	Name string
 }
 
-func (s *CpuSchedule) Filte(strategy string) error {
+// Tune CPU bindings according to input strategy
+func (s *CPUSchedule) Tune(strategy string) error {
 	switch strategy {
 	case "auto":
 	case "performance":
@@ -31,25 +33,25 @@ func (s *CpuSchedule) Filte(strategy string) error {
 	case "powersave":
 		return s.powersave()
 	default:
-		return errors.New("Strategy don't exist")
+		return errors.New("strategy don't exist")
 	}
 	return nil
 }
 
-func (s *CpuSchedule) performance() error {
-	system := system.GetSystem()
+func (s *CPUSchedule) performance() error {
+	sys := system.GetSystem()
 
-	for _, pid := range system.GetPids("") {
+	for _, pid := range sys.GetPids("") {
 		log.Infof("pid: %d", pid)
 	}
 
 	return nil
 }
 
-func (s *CpuSchedule) powersave() error {
-	system := system.GetSystem()
+func (s *CPUSchedule) powersave() error {
+	sys := system.GetSystem()
 
-	for _, pid := range system.GetPids("") {
+	for _, pid := range sys.GetPids("") {
 		log.Infof("pid: %d", pid)
 	}
 

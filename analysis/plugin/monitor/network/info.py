@@ -15,15 +15,9 @@
 The sub class of the monitor, used to collect the nic config info.
 """
 
-import sys
-import logging
 import subprocess
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+from ..common import Monitor
 
 
 class NetInfo(Monitor):
@@ -46,11 +40,3 @@ class NetInfo(Monitor):
                 outputs += output.decode()
             except StopIteration:
                 return outputs
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print('usage: ' + sys.argv[0] + ' fmt path dev')
-        sys.exit(-1)
-    ct = NetInfo("UT")
-    ct.report(sys.argv[1], sys.argv[2], sys.argv[3])

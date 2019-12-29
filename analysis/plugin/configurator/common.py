@@ -15,17 +15,17 @@
 The base class of the configuration, used to set the value, get the value of the given key,
 backup from the given config and resume from the saved config info.
 """
-
-import sys
+import inspect
 import logging
 import json
-from public import *
 from functools import wraps
 
-logger = logging.getLogger(__name__)
+from ..public import SetConfigError
+
+LOGGER = logging.getLogger(__name__)
 
 
-class Configurator():
+class Configurator:
     """Base class for configurators"""
 
     # sub class should init these
@@ -93,36 +93,27 @@ class Configurator():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
 
-        if (0 == ret) and self._check(cfg[1], self.get(cfg[0])):
+        if (ret == 0) and self.check(cfg[1], self.get(cfg[0])):
             err = None
         elif cfg[1] is None:
             err = SetConfigError(
                 "Fail to set {mod}.{sub} config: {key}".format(
                     mod=self.module(), sub=self.submod(), key=cfg[0]))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
         else:
             err = SetConfigError("Fail to set {mod}.{sub} config: {key}={val}".format(
                 mod=self.module(), sub=self.submod(), key=cfg[0], val=cfg[1]))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
         return err
 
-    def _precheck(self, key, value, file):
+    @staticmethod
+    def _precheck(key, value, file):
         """
         The common method to precheck config.
 
@@ -135,20 +126,20 @@ class Configurator():
         :raises KeyError: Fail, invalid key
         :raises Exceptions: Fail, with info
         """
-        with open(file, 'r') as f:
-            ctx = f.read()
+        with open(file, 'r') as data:
+            ctx = data.read()
             check_rules = json.loads(ctx)
 
-        if (type(check_rules).__name__ != 'dict'):
+        if type(check_rules).__name__ != 'dict':
             raise TypeError("Invalid rule file")
 
         rule = check_rules.get(key)
-        if (type(rule).__name__ == 'NoneType'):
+        if type(rule).__name__ == 'NoneType':
             raise KeyError('Invalid key "{}"'.format(key))
-        elif (type(rule).__name__ == 'list'):
+        if type(rule).__name__ == 'list':
             if value in rule:
                 return None
-        elif (type(rule).__name__ == 'dict'):
+        elif type(rule).__name__ == 'dict':
             start = rule.get("start")
             end = rule.get("end")
             step = rule.get("step")
@@ -178,11 +169,8 @@ class Configurator():
         :raises Exceptions: Fail, with info
         """
         err = NotImplementedError("_set method is not implemented")
-        logger.error(
-            "{}.{}: {}".format(
-                self.__class__.__name__,
-                sys._getframe().f_code.co_name,
-                str(err)))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
         raise err
 
     def get(self, key):
@@ -202,13 +190,9 @@ class Configurator():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
         return ret
 
     def _get(self, key):
@@ -222,14 +206,12 @@ class Configurator():
         :raises Exceptions: Fail, with info
         """
         err = NotImplementedError("_get method is not implemented")
-        logger.error(
-            "{}.{}: {}".format(
-                self.__class__.__name__,
-                sys._getframe().f_code.co_name,
-                str(err)))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
         raise err
 
-    def _getcfg(self, para):
+    @staticmethod
+    def _getcfg(para):
         """
         Get the the key and value from the config string.
 
@@ -238,13 +220,14 @@ class Configurator():
         :raises Exceptions: Error, unexpected errors
         """
         cfg = para.split("=", 1)
-        for i in range(0, len(cfg)):
+        for i, _ in enumerate(cfg):
             cfg[i] = cfg[i].strip()
         if len(cfg) == 1:
             cfg.append(None)
         return cfg
 
-    def _check(self, config1, config2):
+    @staticmethod
+    def check(config1, config2):
         """
         Check whether the given configs are the same.
 
@@ -256,7 +239,7 @@ class Configurator():
         """
         return config1 == config2
 
-    def _backup(self, key, rollback_info):
+    def _backup(self, key, _):
         """
         The inner method to backup config.
         The sub class should implement this method if needed.
@@ -285,13 +268,9 @@ class Configurator():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
         return ret
 
     def _resume(self, key, value):
@@ -307,11 +286,8 @@ class Configurator():
         """
         if key == "CPI_ROLLBACK_INFO":
             err = NotImplementedError("_resume method is not implemented")
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
         return self.set("{} = {}".format(key, value))
 
@@ -332,31 +308,38 @@ class Configurator():
         except Exception as err:
             if self._user == "UT":
                 raise err
-            else:
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
-                return err
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
+            return err
         return ret
 
 
-def file_modify(file, start, end, str):
+def file_modify(file, start, end, str_content):
+    """
+    modify the file content
+    :param file:  the file needs to be modified
+    :param start:  the starting position of the file needs to be modified
+    :param end:  the end position of the file needs to be modified
+    :param str_content:  the content needs to be modified
+    """
     file.seek(0)
     content = file.read()
     if end < start:
-        content = content[:start] + str + content[start:]
+        content = content[:start] + str_content + content[start:]
     else:
-        content = content[:start] + str + content[end + 1:]
+        content = content[:start] + str_content + content[end + 1:]
     file.seek(0)
     file.truncate()
     file.write(content)
 
 
 def pre_check(checker=None, file=None, strict=False):
-    def wrapper(set):
-        @wraps(set)
+    """
+    pre check parameters
+    """
+
+    def wrapper(func):
+        @wraps(func)
         def prechecked_set(self, key, value):
             if checker is not None:
                 try:
@@ -375,6 +358,8 @@ def pre_check(checker=None, file=None, strict=False):
                 except Exception as err:
                     if strict is True:
                         raise err
-            return set(self, key, value)
+            return func(self, key, value)
+
         return prechecked_set
+
     return wrapper

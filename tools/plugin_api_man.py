@@ -16,23 +16,23 @@ Temporary tool to generate the api help info, will be replaced by Sphinx.
 """
 
 import sys
-sys.path.insert(0, "./../analysis/")
-from plugin.plugin import CPI, MPI
 
+sys.path.insert(0, "./../analysis/")
+from analysis.plugin.plugin import CPI, MPI
 
 print("The CPI & MPI api manual")
 print("========================\n")
 
-cpi = CPI()
-help(cpi)
+CPI_HELP = CPI()
+help(CPI_HELP)
 
-cpis = cpi.get_configurators()
-for i in cpis:
-	help(i)
+CPIS_HELP = CPI_HELP.get_configurators()
+for i in CPIS_HELP:
+    help(i)
 
-mpi = MPI()
-help(mpi)
+MPI_HELP = MPI()
+help(MPI_HELP)
 
-mpis = mpi.get_monitors()
-for i in mpis:
-	help(i)
+MPIS_HELP = MPI_HELP.get_monitors()
+for i in MPIS_HELP:
+    help(i)

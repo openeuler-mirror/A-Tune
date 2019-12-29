@@ -15,16 +15,18 @@
 This class is used to find optimal settings and generate optimized profile.
 """
 
-import numpy as np
-from multiprocessing import Process
-from skopt.optimizer import gp_minimize
 import logging
+from multiprocessing import Process
+import numpy as np
+from skopt.optimizer import gp_minimize
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Optimizer(Process):
-    def __init__(self, name, params, child_conn, engine = "bayes", max_eval=50):
+    """find optimal settings and generate optimized profile"""
+
+    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
@@ -32,62 +34,69 @@ class Optimizer(Process):
         self.max_eval = int(max_eval)
 
     def build_space(self):
+        """build space"""
         objective_params_list = []
-        for p in self.knobs:
-            if p['type'] == 'discrete':
-                if p['dtype'] == 'int':
-                    items = p['items']
-                    r = p['range']
-                    s = 1
-                    if 'step' in p.keys():
-                        s = p['step']
-                    if r is not None:
-                        for i in range(0, len(r), 2):
-                            items.extend(list(np.arange(r[i], r[i + 1], step=s)))
+        for p_nob in self.knobs:
+            if p_nob['type'] == 'discrete':
+                if p_nob['dtype'] == 'int':
+                    items = p_nob['items']
+                    if items is None:
+                        items = []
+                    r_range = p_nob['range']
+                    step = 1
+                    if 'step' in p_nob.keys():
+                        step = p_nob['step']
+                    if r_range is not None:
+                        for i in range(0, len(r_range), 2):
+                            items.extend(list(np.arange(r_range[i], r_range[i + 1], step=step)))
+                    items = list(set(items))
                     objective_params_list.append(items)
-                if p['dtype'] == 'string':
-                    items = p['options']
+                if p_nob['dtype'] == 'string':
+                    items = p_nob['options']
                     keys = []
                     for i in range(len(items)):
                         keys.append(i)
                     objective_params_list.append(keys)
-            elif p['type'] == 'continuous':
-                r = p['range']
-                objective_params_list.append((r[0], r[1]))
+            elif p_nob['type'] == 'continuous':
+                r_range = p_nob['range']
+                objective_params_list.append((r_range[0], r_range[1]))
         return objective_params_list
 
     def run(self):
         def objective(var):
             for i, knob in enumerate(self.knobs):
-                params[knob['name']] = var[i]
-            print(params)
+                if knob['dtype'] == 'string':
+                    params[knob['name']] = knob['options'][var[i]]
+                else:
+                    params[knob['name']] = var[i]
             self.child_conn.send(params)
             result = self.child_conn.recv()
-            x = 0.0
-            evalList = result.split(',')
-            for value in evalList:
+            x_num = 0.0
+            eval_list = result.split(',')
+            for value in eval_list:
                 num = float(value)
-                x = x + num
-            return x
+                x_num = x_num + num
+            return x_num
 
-        ref = []
         params = {}
-        for knob in self.knobs:
-            ref.append(int(knob['ref']))
         try:
-            logger.info("Running performance evaluation.......")
+            LOGGER.info("Running performance evaluation.......")
             ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval)
-            logger.info("Minimization procedure has been completed.")
-        except ValueError as v:
-            logger.error('Value Error:', v)
+            LOGGER.info("Minimization procedure has been completed.")
+        except ValueError as value_error:
+            LOGGER.error('Value Error: %s', value_error)
 
         for i, knob in enumerate(self.knobs):
-            params[knob['name']] = ret.x[i]
+            if knob['dtype'] == 'string':
+                params[knob['name']] = knob['options'][ret.x[i]]
+            else:
+                params[knob['name']] = ret.x[i]
         self.child_conn.send(params)
-        logger.info("Optimized result: %s" % (params))
-        logger.info("The optimized profile has been generated.")
+        LOGGER.info("Optimized result: %s", params)
+        LOGGER.info("The optimized profile has been generated.")
         return params
 
-    def stopProcess(self):
+    def stop_process(self):
+        """stop process"""
         self.child_conn.close()
         self.terminate()

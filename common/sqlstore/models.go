@@ -58,8 +58,8 @@ type Tuned struct {
 // RuleTuned : table rule_tuned
 type RuleTuned struct {
 	ID             int64  `xorm:"id"`
-	Name           string `xorm;"name"`
-	Class          string `xorm;"class"`
+	Name           string `xorm:"name"`
+	Class          string `xorm:"class"`
 	Expression     string `xorm:"expression"`
 	Action         string `xorm:"action"`
 	OppositeAction string `xorm:"opposite_action"`
@@ -85,8 +85,9 @@ type ProfileLog struct {
 	Timestamp  time.Time `xorm:"timestamp"`
 }
 
+// Schedule : table schedule strategy
 type Schedule struct {
-	Id       int64  `xorm:"id"`
+	ID       int64  `xorm:"id"`
 	Type     string `xorm:"type"`
 	Strategy string `xorm:"strategy"`
 }

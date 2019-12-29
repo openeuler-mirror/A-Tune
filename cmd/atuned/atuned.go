@@ -24,13 +24,11 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
-	"os/exec"
-	"os/signal"
-	"syscall"
 
 	"github.com/coreos/go-systemd/daemon"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -103,20 +101,12 @@ func loadModules(ctx *cli.Context, svr *swServer, path string) error {
 	return nil
 }
 
-func checkValid(ctx *cli.Context) error {
-	return nil
-}
-
 func doBeforeJob(ctx *cli.Context) error {
-	if err := checkValid(ctx); err != nil {
-		return err
-	}
-
 	// Load conf file
 	cfg := config.NewCfg()
 	if err := cfg.Load(); err != nil {
 		log.Errorf("Faild to load config file, error: %v", err)
-		return fmt.Errorf("Faild to load config file, error: %v", err)
+		return fmt.Errorf("faild to load config file, error: %v", err)
 	}
 
 	store := &sqlstore.Sqlstore{
@@ -146,28 +136,16 @@ func doBeforeJob(ctx *cli.Context) error {
 			continue
 		}
 
-		go func() error {
+		go func() {
 			err := backgroundService.Run()
 			if err != nil {
 				log.Errorf("service %s running faild, reason: %v", service.Name, err)
-				return err
+				return
 			}
-			return nil
 		}()
 	}
 
 	return nil
-}
-
-func listenToSystemSignals(cmd *exec.Cmd) {
-	signalChan := make(chan os.Signal, 1)
-
-	signal.Notify(signalChan, os.Interrupt, os.Kill, syscall.SIGKILL)
-	select {
-	case <-signalChan:
-		syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-		os.Exit(-1)
-	}
 }
 
 func showlogo() {
@@ -180,15 +158,21 @@ func showlogo() {
 }
 
 func runatuned(ctx *cli.Context) error {
-	if err := checkValid(ctx); err != nil {
-		return err
-	}
-
 	lis, err := net.Listen("tcp", config.Address+":"+config.Port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+
+	var opts []grpc.ServerOption
+	if config.TLS {
+		log.Info("server tls enabled")
+		creds, err := credentials.NewServerTLSFromFile(config.TLSServerCertFile, config.TLSServerKeyFile)
+		if err != nil {
+			log.Fatalf("Failed to generate credentials %v", err)
+		}
+		opts = []grpc.ServerOption{grpc.Creds(creds)}
+	}
+	s := grpc.NewServer(opts...)
 
 	server, err := newServer(s)
 	if err != nil {
@@ -207,7 +191,7 @@ func runatuned(ctx *cli.Context) error {
 	}
 
 	log.Info("pyservice has been started")
-	daemon.SdNotify(false, "READY=1")
+	_, _ = daemon.SdNotify(false, "READY=1")
 
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {

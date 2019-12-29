@@ -95,7 +95,7 @@ func newCollectionCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error
 
 func checkCollectionCtx(ctx *cli.Context) error {
 	if ctx.String("filename") == "" {
-		cli.ShowCommandHelp(ctx, "collection")
+		_ = cli.ShowCommandHelp(ctx, "collection")
 		return fmt.Errorf("error: filename must be specified")
 	}
 
@@ -104,21 +104,21 @@ func checkCollectionCtx(ctx *cli.Context) error {
 	}
 
 	if ctx.String("disk") == "" {
-		cli.ShowCommandHelp(ctx, "collection")
+		_ = cli.ShowCommandHelp(ctx, "collection")
 		return fmt.Errorf("error: disk block must be specified")
 	}
 	if ctx.String("network") == "" {
-		cli.ShowCommandHelp(ctx, "collection")
+		_ = cli.ShowCommandHelp(ctx, "collection")
 		return fmt.Errorf("error: network must be specified")
 	}
 
 	if ctx.String("workload_type") == "" {
-		cli.ShowCommandHelp(ctx, "collection")
+		_ = cli.ShowCommandHelp(ctx, "collection")
 		return fmt.Errorf("error: workload type must be specified")
 	}
 
 	if ctx.String("output_path") == "" {
-		cli.ShowCommandHelp(ctx, "collection")
+		_ = cli.ShowCommandHelp(ctx, "collection")
 		return fmt.Errorf("error: output_path must be specified")
 	}
 

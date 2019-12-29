@@ -87,12 +87,12 @@ func (t *Timer) Run() error {
 		for {
 			<-t.ticker.C
 			log.Info("active the ticker, starting dynamic tuning,")
-			go func() error {
+			go func() {
 				svc := PB.NewProfileMgrClient(c.Connection())
 				stream, err := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{})
 				if err != nil {
 					log.Error(err)
-					return err
+					return
 				}
 				for {
 					_, err := stream.Recv()
@@ -102,15 +102,12 @@ func (t *Timer) Run() error {
 
 					if err != nil {
 						log.Error(err)
-						return err
+						return
 					}
 				}
-				return nil
 			}()
 		}
 	} else {
 		return fmt.Errorf("in section server, type must be dynamic or statis")
 	}
-
-	return nil
 }

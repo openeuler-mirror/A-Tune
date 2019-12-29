@@ -13,62 +13,278 @@
 
 package system
 
+import (
+	"atune/common/config"
+	"atune/common/log"
+	"atune/common/models"
+	"bufio"
+	"encoding/xml"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"strconv"
+	"strings"
+)
+
+type cpu struct {
+	cpus []int
+}
+
+// System information
 type System struct {
-	cpus     []int
-	irqs     []int
-	numa     []int
+	numa     map[int]cpu
 	isolated []int
 	nics     []string
 }
 
 var instance *System = nil
 
+// Init system instance
 func (system *System) Init() error {
+	system.numa = make(map[int]cpu)
+
+	numaFile := path.Join(config.DefaultCheckerPath, "mem_numa.raw")
+	_, err := models.MonitorGet("mem", "numa", "raw", numaFile, "")
+	if err != nil {
+		return err
+	}
+
+	if err := system.loadNuma(numaFile); err != nil {
+		return err
+	}
+
+	networkTopoFile := path.Join(config.DefaultCheckerPath, "net_topo.xml")
+	_, err = models.MonitorGet("net", "topo", "xml", networkTopoFile, "")
+	if err != nil {
+		return err
+	}
+	if err := system.loadNics(networkTopoFile); err != nil {
+		return err
+	}
+
+	if err := system.loadIsolcpus(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (system *System) GetAllCpu() []int {
-	return system.cpus
+// GetAllCPU :get all system cpus
+func (system *System) GetAllCPU() []int {
+	cpus := make([]int, 0)
+	for _, value := range system.numa {
+		cpus = append(cpus, value.cpus...)
+	}
+	return cpus
 }
 
-func (system *System) GetCpu(numa int) []int {
-	return system.cpus
+// GetCPU :get numa cpus
+func (system *System) GetCPU(numa int) []int {
+	if _, ok := system.numa[numa]; ok {
+		return system.numa[numa].cpus
+	}
+
+	return nil
 }
 
-func (system *System) GetIsolatedCpu() []int {
-	return system.cpus
+// GetIsolatedCPU :get system isolated cpus
+func (system *System) GetIsolatedCPU() []int {
+	return system.isolated
 }
 
+// GetAllIrq : get all system irqs
 func (system *System) GetAllIrq() []int {
-	return system.irqs
+	irqs, err := system.loadIrqs("")
+	if err != nil {
+		return nil
+	}
+	return irqs
 }
 
+// GetIrq : get device irqs
 func (system *System) GetIrq(device string) []int {
-	return system.irqs
+	irqs, err := system.loadIrqs(device)
+	if err != nil {
+		return nil
+	}
+	return irqs
 }
 
+// GetNuma : get all system numa nodes
 func (system *System) GetNuma() []int {
-	return system.numa
+	numas := make([]int, 0)
+	for key := range system.numa {
+		numas = append(numas, key)
+	}
+	return numas
 }
 
+// GetDeviceNuma : get device numa node
 func (system *System) GetDeviceNuma(device string) int {
-	return 0
+	key := fmt.Sprintf("class/net/%s/device/numa_node", device)
+	numaNode, err := models.ConfiguratorGet("sysfs.sysfs", key)
+	if err != nil {
+		return -1
+	}
+
+	value, err := strconv.Atoi(numaNode)
+	if err != nil {
+		return -1
+	}
+
+	return value
 }
 
+// GetNICs :get system network interfaces
 func (system *System) GetNICs() []string {
 	return system.nics
 }
 
-func (system *System) GetPids(Application string) []int {
-	/* Get pid from application */
+// GetPids :get all pids of application
+func (system *System) GetPids(application string) []int {
+	pidsStr, err := models.ConfiguratorGet("affinity.processid", application)
+	if err != nil {
+		log.Errorf(err.Error())
+		return nil
+	}
+
+	pidsArr := strings.Fields(strings.TrimSpace(pidsStr))
+	pids := make([]int, 0)
+
+	for _, pid := range pidsArr {
+		value, _ := strconv.Atoi(pid)
+		pids = append(pids, value)
+	}
+	return pids
+}
+
+func (system *System) loadNuma(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		parts := strings.Fields(scanner.Text())
+		if len(parts) < 4 {
+			continue
+		}
+		if "cpus" == strings.Trim(parts[2], ":") {
+			cpus := make([]int, 0)
+			cpuParts := parts[3:]
+			for _, cpuIndex := range cpuParts {
+				cpu, _ := strconv.Atoi(cpuIndex)
+				cpus = append(cpus, cpu)
+			}
+
+			node, _ := strconv.Atoi(parts[1])
+			system.numa[node] = cpu{cpus: cpus}
+		}
+	}
 
 	return nil
 }
 
+func (system *System) loadNics(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	networkTopo := NetworkTopo{}
+	err = xml.Unmarshal(data, &networkTopo)
+	if err != nil {
+		return err
+	}
+
+	for _, network := range networkTopo.Networks {
+		if network.Name == "" {
+			system.nics = append(system.nics, network.NetChild.Name)
+			continue
+		}
+		system.nics = append(system.nics, network.Name)
+	}
+
+	return nil
+}
+
+func (system *System) loadIrqs(device string) ([]int, error) {
+	if device != "" {
+		device = fmt.Sprintf(";--nic=%s", device)
+	}
+
+	irqsStr, err := models.MonitorGet("sys", "interrupts", "raw", "", device)
+	if err != nil {
+		return nil, err
+	}
+	irqs := make([]int, 0)
+
+	if strings.TrimSpace(irqsStr) == "" {
+		return irqs, nil
+	}
+	for _, value := range strings.Split(irqsStr, " ") {
+		irq, _ := strconv.Atoi(value)
+		irqs = append(irqs, irq)
+	}
+
+	return irqs, nil
+}
+
+func (system *System) loadIsolcpus() error {
+	isolcpus, err := models.ConfiguratorGet("bootloader.cmdline", "isolcpus")
+	if err != nil {
+		return err
+	}
+
+	if strings.TrimSpace(isolcpus) == "" {
+		return nil
+	}
+	isolCPUSlice := strings.Split(isolcpus, ",")
+	fmt.Println("isolCPUSlice:", isolCPUSlice)
+	for _, cpuIndex := range isolCPUSlice {
+		if !strings.Contains(cpuIndex, "-") {
+			cpu, _ := strconv.Atoi(cpuIndex)
+			system.isolated = append(system.isolated, cpu)
+			continue
+		}
+		cpuRange := strings.Split(cpuIndex, "-")
+		if len(cpuRange) != 2 {
+			continue
+		}
+		low, _ := strconv.Atoi(cpuRange[0])
+		high, _ := strconv.Atoi(cpuRange[1])
+		if high <= low {
+			continue
+		}
+
+		for cpu := low; cpu <= high; cpu++ {
+			system.isolated = append(system.isolated, cpu)
+		}
+	}
+
+	return nil
+}
+
+// GetSystem return System instance
 func GetSystem() *System {
 	if instance == nil {
 		instance = new(System)
-		instance.Init()
+		err := instance.Init()
+		if err != nil {
+			log.Errorf(err.Error())
+			return nil
+		}
 	}
 
 	return instance

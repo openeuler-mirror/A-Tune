@@ -28,7 +28,7 @@ install:
 	@echo "BEGIN INSTALL A-Tune"
 	mkdir -p $(BINDIR)
 	mkdir -p $(SYSTEMDDIR)
-	mkdir -p $(DESTDIR)/etc/atuned
+	mkdir -p $(DESTDIR)/etc/atuned/tuning
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts

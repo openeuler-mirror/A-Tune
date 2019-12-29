@@ -1,3 +1,13 @@
+# Copyright (c) 2019 Huawei Technologies Co., Ltd.
+# A-Tune is licensed under the Mulan PSL v1.
+# You can use this software according to the terms and conditions of the Mulan PSL v1.
+# You may obtain a copy of Mulan PSL v1 at:
+#     http://license.coscl.org.cn/MulanPSL
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v1 for more details.
+# Create: 2019-10-29
 
 #################################### server ###############################
 # atuned config
@@ -17,20 +27,26 @@ rest_port = 8383
 # default is 20
 sample_num = 20
 
+# Enable gRPC and http server authentication SSL/TLS
+# default is false
+# tls = true
+# tlsservercertfile = /etc/atuned/server.pem
+# tlsserverkeyfile = /etc/atuned/server.key
+# tlshttpcertfile = /etc/atuned/http/server.pem
+# tlshttpkeyfile = /etc/atuned/http/server.key
+# tlshttpcacertfile = /etc/atuned/http/cacert.pem
+
 #################################### log ###############################
 [log]
-# log path, must be a absolute path
-path = /var/log/atuned
-
 # Either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
 
 #################################### monitor ###############################
 [monitor]
-# With the module and format of the MPI, the format is {module}_{format}
-# The module is Either "mem", "net", "cpu", "STORAGE"
+# With the module and format of the MPI, the format is {module}_{purpose}
+# The module is Either "mem", "net", "cpu", "storage"
 # The purpose is "topo"
-module = mem_topo, cpu_topo 
+module = mem_topo, cpu_topo
 
 #################################### system ###############################
 # you can add arbitrary key-value here, just like key = value

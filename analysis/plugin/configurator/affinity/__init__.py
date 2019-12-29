@@ -14,7 +14,11 @@
 """
 Init file.
 """
+import sys
+import os
 
-__all__ = ["irq", "task"]
+__all__ = ["irq", "task", "processid"]
 
 from . import *
+
+sys.path.insert(0, os.path.dirname(__file__))

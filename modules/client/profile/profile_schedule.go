@@ -17,28 +17,28 @@ import (
 	PB "atune/api/profile"
 	"atune/common/client"
 	SVC "atune/common/service"
-	"strings"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
 )
 
 var scheduleCommand = cli.Command{
-	Name:      "schedule",
-	Usage:     "schedule",
-	Flags:     []cli.Flag{
-	    cli.StringFlag{
-		Name:  "type,t",
-		Usage: "--type=[cpu|irq|all]",
-		Value: "all",
-	    },
-	    cli.StringFlag{
-		Name:  "strategy,s",
-		Usage: "--strategy=[performance|powersave|auto]",
-		Value: "auto",
-	    },
+	Name:  "schedule",
+	Usage: "schedule",
+	Flags: []cli.Flag{
+		cli.StringFlag{
+			Name:  "type,t",
+			Usage: "--type=[cpu|irq|all]",
+			Value: "all",
+		},
+		cli.StringFlag{
+			Name:  "strategy,s",
+			Usage: "--strategy=[performance|powersave|auto]",
+			Value: "auto",
+		},
 	},
 	ArgsUsage: "[arguments...]",
 	Description: func() string {
@@ -65,14 +65,14 @@ func newScheduleCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) 
 }
 
 func checkScheduleCtx(ctx *cli.Context) error {
-	typename  := ctx.String("type")
+	typename := ctx.String("type")
 	if !((typename == "cpu") || (typename == "irq") || (typename == "all")) {
-		return  fmt.Errorf("type have error exist")
+		return fmt.Errorf("type have error exist")
 	}
 
 	strategy := ctx.String("strategy")
 	if !((strategy == "performance") || (strategy == "powersave") || (strategy == "auto")) {
-		return  fmt.Errorf("strategy have error exist")
+		return fmt.Errorf("strategy have error exist")
 	}
 
 	return nil
@@ -95,6 +95,10 @@ func schedule(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, err := svc.Schedule(CTX.Background(), &PB.ScheduleMessage{App: appname, Type: typename, Strategy: strategy})
+	if err != nil {
+		return err
+	}
+
 	for {
 		_, err := stream.Recv()
 		if err == io.EOF {

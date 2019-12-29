@@ -14,18 +14,16 @@
 """
 The sub class of the Configurator, used to extend script for CPI.
 """
-
-import sys
+import inspect
 import logging
 import os
 import subprocess
 import random
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
+from analysis.plugin.public import GetConfigError
+from ..common import Configurator
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Script(Configurator):
@@ -48,17 +46,17 @@ class Script(Configurator):
             check=True)
         if len(output.stderr) != 0:
             err = UserWarning(name + ": " + output.stderr.decode())
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
         return 0
 
     def _get(self, key):
         name = os.path.basename(key)
         script = "{}/get.sh".format(key)
+        if not os.path.exists(script):
+            raise GetConfigError("script {} not implement".format(script))
+
         output = subprocess.run(
             "bash {script}".format(
                 script=script).split(),
@@ -67,15 +65,13 @@ class Script(Configurator):
             check=True)
         if len(output.stderr) != 0:
             err = UserWarning(name + ": " + output.stderr.decode())
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
         return output.stdout.decode()
 
-    def _check(self, config1, config2):
+    @staticmethod
+    def check(_, __):
         return True
 
     def _backup(self, key, rollback_info):
@@ -92,15 +88,11 @@ class Script(Configurator):
                 check=True)
             if len(output.stderr) != 0:
                 err = UserWarning(name + ": " + output.stderr.decode())
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
+                LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                             inspect.stack()[0][3], str(err))
                 raise err
             return output.stdout.decode()
-        else:
-            return Configurator._backup(self, key, rollback_info)
+        return Configurator._backup(self, key, rollback_info)
 
     def _resume(self, key, value):
         name = os.path.basename(key)
@@ -115,21 +107,8 @@ class Script(Configurator):
                 check=True)
             if len(output.stderr) != 0:
                 err = UserWarning(name + ": " + output.stderr.decode())
-                logger.error(
-                    "{}.{}: {}".format(
-                        self.__class__.__name__,
-                        sys._getframe().f_code.co_name,
-                        str(err)))
+                LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                             inspect.stack()[0][3], str(err))
                 raise err
             return 0
-        else:
-            return Configurator._resume(self, key, value)
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' script_file=value')
-        sys.exit(-1)
-    ct = Script("UT")
-    print(ct.set(sys.argv[1]))
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))
+        return Configurator._resume(self, key, value)

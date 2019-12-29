@@ -14,18 +14,14 @@
 """
 The sub class of the monitor, used to collect the nic estat info.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 import getopt
 import re
+from ..common import Monitor
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class NetEStat(Monitor):
@@ -39,24 +35,22 @@ class NetEStat(Monitor):
         self.__cmd = "sar"
         self.__interval = 1
         self.decode.__func__.__doc__ = Monitor.decode.__doc__ % (
-            "--nic=x, --fields=time/nic/rxerrs/txerrs/colls/rxdrops/txdrops/txcarrs/rxframs/rxfifos/txfifos/errs/util")
+            "--nic=x, --fields=time/nic/rxerrs/txerrs/colls/rxdrops/"
+            "txdrops/txcarrs/rxframs/rxfifos/txfifos/errs/util")
 
     def _get(self, para=None):
         if para is not None:
-            opts, args = getopt.getopt(para.split(), None, ['interval='])
+            opts, _ = getopt.getopt(para.split(), None, ['interval='])
             for opt, val in opts:
-                if opt in ('--interval'):
+                if opt in '--interval':
                     if val.isdigit():
                         self.__interval = int(val)
                     else:
                         err = ValueError(
                             "Invalid parameter: {opt}={val}".format(
                                 opt=opt, val=val))
-                        logger.error(
-                            "{}.{}: {}".format(
-                                self.__class__.__name__,
-                                sys._getframe().f_code.co_name,
-                                str(err)))
+                        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                                     inspect.stack()[0][3], str(err))
                         raise err
                     continue
 
@@ -68,6 +62,12 @@ class NetEStat(Monitor):
         return output.decode()
 
     def decode(self, info, para):
+        """
+        decode the result of the operation
+        :param info:  content that needs to be decoded
+        :param para:  command line argument
+        :returns ret:  operation result
+        """
         if para is None:
             return info
 
@@ -89,52 +89,40 @@ class NetEStat(Monitor):
         nic = "e.*?"
         ret = ""
 
-        opts, args = getopt.getopt(para.split(), None, ['nic=', 'fields='])
+        opts, _ = getopt.getopt(para.split(), None, ['nic=', 'fields='])
         for opt, val in opts:
-            if opt in ('--nic'):
+            if opt in '--nic':
                 nic = val
                 continue
-            if opt in ('--fields'):
+            if opt in '--fields':
                 keys.append(keyword[val])
                 continue
 
         pattern = re.compile(
-            "^(\d.*?)\ {1,}(" +
+            r"^(\d.*?)\ {1,}(" +
             nic +
-            ")\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {2,}(\d*\.?\d*)",
+            r")\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)"
+            r"\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)\ {1,}(\d*\.?\d*)"
+            r"\ {2,}(\d*\.?\d*)",
             re.ASCII | re.MULTILINE)
-        searchObj = pattern.findall(info)
-        if len(searchObj) == 0:
+        search_obj = pattern.findall(info)
+        if len(search_obj) == 0:
             err = LookupError("Fail to find data for {}".format(nic))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                         inspect.stack()[0][3], str(err))
             raise err
 
         for i in keys:
             if type(i).__name__ == 'int':
-                ret = ret + " " + searchObj[-1][i]
+                ret = ret + " " + search_obj[-1][i]
             elif i == "errs":
-                errs = float(searchObj[-1][keyword["rxerrs"]]) + \
-                        float(searchObj[-1][keyword["txerrs"]])
+                errs = float(search_obj[-1][keyword["rxerrs"]]) + \
+                       float(search_obj[-1][keyword["txerrs"]])
                 ret = ret + " " + str(errs)
             elif i == "util":
-                util = float(searchObj[-1][keyword["rxdrops"]]) + \
-                        float(searchObj[-1][keyword["txdrops"]]) + \
-                        float(searchObj[-1][keyword["rxfifos"]]) + \
-                        float(searchObj[-1][keyword["txfifos"]])
+                util = float(search_obj[-1][keyword["rxdrops"]]) + \
+                       float(search_obj[-1][keyword["txdrops"]]) + \
+                       float(search_obj[-1][keyword["rxfifos"]]) + \
+                       float(search_obj[-1][keyword["txfifos"]])
                 ret = ret + " " + str(util)
         return ret
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = NetEStat("UT")
-    ct.report(
-        sys.argv[1],
-        sys.argv[2],
-        "--interval=2;--nic=lo --fields=rxdrops --fields=txfifos --fields=util")

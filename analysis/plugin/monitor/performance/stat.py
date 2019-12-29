@@ -14,25 +14,23 @@
 """
 The sub class of the monitor, used to collect the perf stat info.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 import getopt
 import re
+from ..common import Monitor
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from monitor.common import *
-
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class PerfStat(Monitor):
     """To collect the perf stat info"""
     _module = "PERF"
     _purpose = "STAT"
-    _option = "-a -e cycles,instructions,branches,branch-misses,cache-misses,cache-references,dTLB-load-misses,dTLB-loads,iTLB-load-misses,iTLB-loads,stalled-cycles-backend,r7004,r7005 --interval-print {int} --interval-count 1"
+    _option = "-a -e cycles,instructions,branches,branch-misses,cache-misses,cache-references," \
+              "dTLB-load-misses,dTLB-loads,iTLB-load-misses,iTLB-loads,stalled-cycles-backend," \
+              "r7004,r7005 --interval-print {int} --interval-count 1"
 
     def __init__(self, user=None):
         Monitor.__init__(self, user)
@@ -65,27 +63,22 @@ class PerfStat(Monitor):
             "STORE-BOUND": 0}
 
         help_info = "--fields="
-        for s in self.__stat:
-            help_info = help_info + s + "/"
+        for stat in self.__stat:
+            help_info = help_info + stat + "/"
         help_info = help_info.strip("/")
         self.decode.__func__.__doc__ = Monitor.decode.__doc__ % (help_info)
 
     def _get(self, para=None):
         if para is not None:
-            opts, args = getopt.getopt(para.split(), None, ['interval='])
+            opts, _ = getopt.getopt(para.split(), None, ['interval='])
             for opt, val in opts:
-                if opt in ('--interval'):
+                if opt in '--interval':
                     if val.isdigit():
                         self.__interval = int(val) * 1000
                     else:
-                        err = ValueError(
-                            "Invalid parameter: {opt}={val}".format(
-                                opt=opt, val=val))
-                        logger.error(
-                            "{}.{}: {}".format(
-                                self.__class__.__name__,
-                                sys._getframe().f_code.co_name,
-                                str(err)))
+                        err = ValueError("Invalid parameter: {opt}={val}".format(opt=opt, val=val))
+                        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                                     inspect.stack()[0][3], str(err))
                         raise err
                     continue
 
@@ -98,6 +91,12 @@ class PerfStat(Monitor):
         return output.decode()
 
     def decode(self, info, para):
+        """
+        decode the result of the operation
+        :param info:  content that needs to be decoded
+        :param para:  command line argument
+        :returns ret:  operation result
+        """
         if para is None:
             return info
 
@@ -112,63 +111,47 @@ class PerfStat(Monitor):
         keys = []
         ret = ""
 
-        opts, args = getopt.getopt(para.split(), None, ['fields='])
+        opts, _ = getopt.getopt(para.split(), None, ['fields='])
         for opt, val in opts:
-            if opt in ('--fields'):
+            if opt in '--fields':
                 keys.append(val)
                 continue
 
-        for s in self.__stat:
-            event = eventmap.get(s)
+        for stat in self.__stat:
+            event = eventmap.get(stat)
             if event is None:
-                event = s
-            pattern = "^\ {2,}(\d.*?)\ {2,}(\d.*?)\ {2,}(\w*)\ {2,}(" + \
-                event + ")\ {1,}.*"
-            searchObj = re.search(pattern, info, re.ASCII | re.MULTILINE)
-            if searchObj is not None:
-                self.__stat[s] = int(
-                    searchObj.group(
-                        keyword["counts"] +
-                        1).replace(
-                        ",",
-                        ""))
+                event = stat
+            pattern = r"^\ {2,}(\d.*?)\ {2,}(\d.*?)\ {2,}(\w*)\ {2,}(" + \
+                      event + r")\ {1,}.*"
+            search_obj = re.search(pattern, info, re.ASCII | re.MULTILINE)
+            if search_obj is not None:
+                self.__stat[stat] = int(search_obj.group(keyword["counts"] + 1).replace(",", ""))
             else:
-                self.__stat[s] = -1
+                self.__stat[stat] = -1
 
         self.__stat["IPC"] = self.__stat["instructions"] / \
-            self.__stat["cycles"]
+                             self.__stat["cycles"]
         self.__stat["BRANCH-MISS-RATIO"] = self.__stat["branch-misses"] / \
-            self.__stat["branches"] * 100
+                                           self.__stat["branches"] * 100
         self.__stat["CACHE-MISS-RATIO"] = self.__stat["cache-misses"] / \
-            self.__stat["cache-references"] * 100
+                                          self.__stat["cache-references"] * 100
         self.__stat["DTLB-LOAD-MISS-RATIO"] = self.__stat["dTLB-load-misses"] / \
-            self.__stat["dTLB-loads"] * 100
+                                              self.__stat["dTLB-loads"] * 100
         self.__stat["ITLB-LOAD-MISS-RATIO"] = self.__stat["iTLB-load-misses"] / \
-            self.__stat["iTLB-loads"] * 100
+                                              self.__stat["iTLB-loads"] * 100
         self.__stat["MPKI"] = self.__stat["cache-misses"] / \
-            self.__stat["instructions"] * 1000
+                              self.__stat["instructions"] * 1000
         self.__stat["SBPI"] = self.__stat["instructions"] / \
-            self.__stat["instructions"]
+                              self.__stat["instructions"]
         self.__stat["SBPC"] = self.__stat["instructions"] / \
-            self.__stat["cycles"]
+                              self.__stat["cycles"]
         self.__stat["MEMORY-BOUND"] = (self.__stat["memstall-load"] +
-            self.__stat["memstall-store"]) / \
-            self.__stat["cycles"] * 100
+                                       self.__stat["memstall-store"]) / \
+                                      self.__stat["cycles"] * 100
         self.__stat["STORE-BOUND"] = self.__stat["memstall-store"] / \
-            self.__stat["cycles"] * 100
+                                     self.__stat["cycles"] * 100
 
         for event in keys:
             ret = ret + " " + str(self.__stat[event])
 
         return ret
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print('usage: ' + sys.argv[0] + ' fmt path')
-        sys.exit(-1)
-    ct = PerfStat("UT")
-    ct.report(
-        sys.argv[1],
-        sys.argv[2],
-        "--interval=5;--fields=cycles --fields=instructions --fields=cache-misses --fields=MPKI --fields=MEMORY-BOUND")

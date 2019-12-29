@@ -14,16 +14,14 @@
 """
 The sub class of the Configurator, used to change the bios config.
 """
-
-import sys
+import inspect
 import logging
 import subprocess
 
-if __name__ == "__main__":
-    sys.path.insert(0, "./../../")
-from configurator.common import *
+from analysis.plugin.public import NeedConfigWarning
+from ..common import Configurator
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Bios(Configurator):
@@ -41,41 +39,44 @@ class Bios(Configurator):
 
     def _get(self, key):
         if key.lower() == "version":
-            output = subprocess.check_output(
-                "dmidecode -t bios | grep -Po '(?<=Version:)(.*)' | sed 's/^ *//g' | sed 's/ *$//g'",
-                shell=True)
-            return output.decode()
-        elif key.lower() == "hpre_support":
-            ret = subprocess.call(
-                "lspci | grep HPRE",
-                shell=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL)
-            if ret == 0:
-                return "yes"
-            else:
-                return "no"
-        else:
-            err = NotImplementedError(
-                "{} can not get {}".format(
-                    self._module, key))
-            logger.error(
-                "{}.{}: {}".format(
-                    self.__class__.__name__,
-                    sys._getframe().f_code.co_name,
-                    str(err)))
-            raise err
+            output_dmi = subprocess.Popen(["dmidecode", "-t", "bios"], stdout=subprocess.PIPE,
+                                          shell=False)
+            output_grep = subprocess.Popen(["grep", "-Po", "(?<=Version:)(.*)"],
+                                           stdin=output_dmi.stdout,
+                                           stdout=subprocess.PIPE,
+                                           shell=False)
+            output_sed = subprocess.Popen(["sed", "s/^ *//g"],
+                                          stdin=output_grep.stdout,
+                                          stdout=subprocess.PIPE,
+                                          shell=False)
+            output = subprocess.Popen(["sed", "s/ *$//g"],
+                                      stdin=output_sed.stdout,
+                                      stdout=subprocess.PIPE,
+                                      shell=False)
 
-    def _backup(self, key, rollback_info):
+            out = output.communicate()
+            return bytes.decode(out[0]).strip()
+        if key.lower() == "hpre_support":
+            output_lspci = subprocess.Popen(["lspci"],
+                                            stdout=subprocess.PIPE,
+                                            shell=False)
+            output = subprocess.Popen(["grep", "HPRE"],
+                                      stdin=output_lspci.stdout,
+                                      stdout=subprocess.PIPE,
+                                      shell=False)
+            out = output.communicate()
+            if bytes.decode(out[0]) != "":
+                return "yes"
+            return "no"
+        err = NotImplementedError(
+            "{} can not get {}".format(
+                self._module, key))
+        LOGGER.error("%s.%s: %s", self.__class__.__name__,
+                     inspect.stack()[0][3], str(err))
+        raise err
+
+    def _backup(self, _, __):
         return ""
 
-    def _resume(self, key, value):
+    def _resume(self, _, __):
         return None
-
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print('usage: ' + sys.argv[0] + ' key=value')
-        sys.exit(-1)
-    ct = Bios("UT")
-    print(ct.get(ct._getcfg(sys.argv[1])[0]))
