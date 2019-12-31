@@ -10,7 +10,7 @@
 
 ## 使用示例<a name="section5961238145111"></a>
 
-查看webserver的profile内容:
+查看webserver的profile内容：
 
 ```
 $ atune-adm info webserver

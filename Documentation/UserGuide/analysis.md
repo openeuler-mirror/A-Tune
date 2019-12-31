@@ -10,17 +10,16 @@
 
 ## 参数说明<a name="section16755152320311"></a>
 
--   OPTIONS
-
 <a name="table531317574132"></a>
-<table><tbody><tr id="row1031310575137"><td class="cellrowborder" valign="top" width="23.87%"><p id="p6313115718133"><a name="p6313115718133"></a><a name="p6313115718133"></a>参数</p>
-</td>
-<td class="cellrowborder" valign="top" width="76.13%"><p id="p16313157141312"><a name="p16313157141312"></a><a name="p16313157141312"></a>描述</p>
-</td>
+<table><thead align="left"><tr id="row1031310575137"><th class="cellrowborder" valign="top" width="23.87%" id="mcps1.1.3.1.1"><p id="p6313115718133"><a name="p6313115718133"></a><a name="p6313115718133"></a>参数</p>
+</th>
+<th class="cellrowborder" valign="top" width="76.13%" id="mcps1.1.3.1.2"><p id="p16313157141312"><a name="p16313157141312"></a><a name="p16313157141312"></a>描述</p>
+</th>
 </tr>
-<tr id="row7313105711139"><td class="cellrowborder" valign="top" width="23.87%"><p id="p203141657131315"><a name="p203141657131315"></a><a name="p203141657131315"></a>--model, -m</p>
+</thead>
+<tbody><tr id="row7313105711139"><td class="cellrowborder" valign="top" width="23.87%" headers="mcps1.1.3.1.1 "><p id="p203141657131315"><a name="p203141657131315"></a><a name="p203141657131315"></a>--model, -m</p>
 </td>
-<td class="cellrowborder" valign="top" width="76.13%"><p id="p13141157151316"><a name="p13141157151316"></a><a name="p13141157151316"></a>用户自训练产生的新模型</p>
+<td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="p13141157151316"><a name="p13141157151316"></a><a name="p13141157151316"></a>用户自训练产生的新模型</p>
 </td>
 </tr>
 </tbody>

@@ -6,15 +6,15 @@
 
 ## 命令格式<a name="section1019897115110"></a>
 
-**atune-adm profile **_<WORKLOAD\_TYPE\>_
+**atune-adm profile **_<_WORKLOAD\_TYPE_\>_
 
 ## 参数说明<a name="section13406211624"></a>
 
-_WORKLOAD\_TYPE_  支持的类型参考list命令查询结果。
+WORKLOAD\_TYPE 支持的类型参考list命令查询结果。
 
 ## 使用示例<a name="section5961238145111"></a>
 
-激活webserver对应的profile配置
+激活webserver对应的profile配置。
 
 ```
 $ atune-adm profile webserver

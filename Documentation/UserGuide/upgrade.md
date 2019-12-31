@@ -6,11 +6,11 @@
 
 ## 命令格式<a name="section1019897115110"></a>
 
-**atune-adm upgrade**  DB\_FILE
+**atune-adm upgrade**  <DB\_FILE\>
 
 ## 使用示例<a name="section5961238145111"></a>
 
-数据库更新为new\_sqlite.db
+数据库更新为new\_sqlite.db。
 
 ```
 $ atune-adm upgrade ./new_sqlite.db

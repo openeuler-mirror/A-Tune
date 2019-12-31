@@ -23,6 +23,15 @@
     -   [查询负载类型](查询负载类型.md)
         -   [list](list.md)
 
+    -   [自定义负载类型](自定义负载类型.md)
+        -   [define](define.md)
+        -   [update](update.md)
+        -   [undefine](undefine.md)
+
+    -   [自定义模型](自定义模型.md)
+        -   [collection](collection.md)
+        -   [train](train.md)
+
     -   [分析负载类型并自优化](分析负载类型并自优化.md)
         -   [analysis](analysis.md)
 
@@ -41,17 +50,11 @@
     -   [系统信息查询](系统信息查询.md)
         -   [check](check.md)
 
-    -   [自定义负载类型](自定义负载类型.md)
-        -   [define](define.md)
-        -   [update](update.md)
-        -   [undefine](undefine.md)
-
-    -   [自定义模型](自定义模型.md)
-        -   [collection](collection.md)
-        -   [train](train.md)
-
-    -   [最优配置动态搜索](最优配置动态搜索.md)
+    -   [参数自调优](参数自调优.md)
         -   [tuning](tuning.md)
 
+
+-   [附录](附录.md)
+    -   [术语和缩略语](术语和缩略语.md)
 
 
