@@ -45,12 +45,13 @@ API.add_resource(train.Training, '/v1/training', '/v1/training')
 
 def config_log(level):
     """app config log"""
-    logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] %(name)s : %(message)s')
+    logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
+                                       '%(name)s[line:%(lineno)d] : %(message)s')
     syslog_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
     syslog_handler.setFormatter(logging_format)
-    syslog_handler.setLevel(level)
 
     root_logger = logging.getLogger()
+    root_logger.setLevel(level)
     root_logger.addHandler(syslog_handler)
 
 
