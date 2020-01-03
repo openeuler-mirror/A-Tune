@@ -47,6 +47,8 @@ class Collector(Resource):
             monitors.append([monitor["module"], monitor["purpose"], monitor["field"]])
             mpis.append(MPI.get_monitor(monitor["module"], monitor["purpose"]))
         collect_num = args.get("sample_num")
+        if int(collect_num) < 1:
+            abort("sample_num must be greater than 0")
 
         current_app.logger.info(monitors)
 
