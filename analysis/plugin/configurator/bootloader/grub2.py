@@ -59,6 +59,11 @@ class Grub2(Configurator):
             r"[^\{\}]*?(\})",
             re.ASCII | re.DOTALL)
         search_obj = pattern.search(ctx)
+        if search_obj is None:
+            err = LookupError("Fail to find {} menu entry in {}"
+                              .format(self.__kernel_ver, self.__cfg_file))
+            LOGGER.error("%s.%s: %s", self.__class__.__name__, inspect.stack()[0][3], str(err))
+            raise err
         start = search_obj.span(1)
         cmd = search_obj.span(2)
         end = search_obj.span(3)
