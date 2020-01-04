@@ -594,7 +594,12 @@ A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户
     </tr>
     <tr id="zh-cn_topic_0210923698_row76452118115"><td class="cellrowborder" valign="top" width="23.87%" headers="mcps1.1.3.1.1 "><p id="zh-cn_topic_0210923698_p96451114116"><a name="zh-cn_topic_0210923698_p96451114116"></a><a name="zh-cn_topic_0210923698_p96451114116"></a>--duration, -d</p>
     </td>
-    <td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="p3205204519273"><a name="p3205204519273"></a><a name="p3205204519273"></a>业务运行时采集数据的时间</p>
+    <td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="p3205204519273"><a name="p3205204519273"></a><a name="p3205204519273"></a>业务运行时采集数据的时间，单位秒，默认采集时间1200秒</p>
+    </td>
+    </tr>
+    <tr id="zh-cn_topic_0210923698_row76452118115"><td class="cellrowborder" valign="top" width="23.87%" headers="mcps1.1.3.1.1 "><p id="zh-cn_topic_0210923698_p96451114116"><a name="zh-cn_topic_0210923698_p96451114116"></a><a name="zh-cn_topic_0210923698_p96451114116"></a>--interval, -i</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="p3205204519273"><a name="p3205204519273"></a><a name="p3205204519273"></a>采集数据的时间间隔，单位秒，默认采集间隔5秒</p>
     </td>
     </tr>
     </tbody>
@@ -604,7 +609,7 @@ A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户
 ## 使用示例<a name="section5961238145111"></a>
 
 ```
-$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path ./data –-disk sda --network eth0 --workload_type test_type 
+$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /data –-disk sda --network eth0 --workload_type test_type 
 ```
 
 <h2 id="train.md">train</h2>
