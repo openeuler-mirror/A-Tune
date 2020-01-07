@@ -154,11 +154,19 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 		paraMap[kvs[0]] = kvs[1]
 	}
 	for _, obj := range y.Object {
+		out, err := ExecCommand(obj.Info.GetScript)
+		if err != nil {
+			return err
+		}
+
+		if strings.TrimSpace(string(out)) == paraMap[obj.Name] {
+			log.Infof("%s need not be set, value is %s", obj.Name, paraMap[obj.Name])
+			continue
+		}
 		script := obj.Info.SetScript
 		newScript := strings.Replace(script, "$value", paraMap[obj.Name], -1)
 		log.Info("set script:", newScript)
-		cmd := exec.Command("sh", "-c", newScript)
-		err := cmd.Run()
+		_, err = ExecCommand(newScript)
 		if err != nil {
 			return err
 		}
@@ -180,22 +188,25 @@ func (y *YamlPrjSvr) RestartProject() error {
 		}
 	}
 	if needRestart {
-		cmd := exec.Command("sh", "-c", stopWorkload)
-		out, err := cmd.CombinedOutput()
-		log.Debug(string(out))
-
+		out, err := ExecCommand(stopWorkload)
 		if err != nil {
 			return err
 		}
-
-		cmd = exec.Command("sh", "-c", startWorkload)
-		out, err = cmd.CombinedOutput()
 		log.Debug(string(out))
 
+		out, err = ExecCommand(startWorkload)
 		if err != nil {
 			return err
 		}
+		log.Debug(string(out))
 	}
 
 	return nil
+}
+
+//exec command and get result
+func ExecCommand(script string) ([]byte, error) {
+	cmd := exec.Command("sh", "-c", script)
+	out, err := cmd.CombinedOutput()
+	return out, err
 }
