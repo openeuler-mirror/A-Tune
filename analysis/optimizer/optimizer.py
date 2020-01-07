@@ -79,9 +79,17 @@ class Optimizer(Process):
             return x_num
 
         params = {}
+        ref = []
+        for knob in self.knobs:
+            if knob['dtype'] == 'string':
+                for key, value in enumerate(knob['options']):
+                    if knob['ref'] == value:
+                        ref.append(key)
+            else:
+                ref.append(int(knob['ref']))
         try:
             LOGGER.info("Running performance evaluation.......")
-            ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval)
+            ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=ref)
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', value_error)

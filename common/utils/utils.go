@@ -25,6 +25,7 @@ import (
 	"path"
 	"path/filepath"
 	"plugin"
+	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -278,3 +279,30 @@ func DiskByName(disk string) error {
 
 	return fmt.Errorf("disk %s is not exist", disk)
 }
+
+// common input string validator
+func IsInputStringValid(input string) bool {
+	if input != "" {
+		if isOk, _ := regexp.MatchString("^[a-zA-Z0-9/.-_]*$", input); isOk {
+			return isOk
+		}
+	}
+	return false
+}
+
+//write or append string to file
+func WriteFile(filename string, data string, perm os.FileMode, wrapper int) error {
+	f, err := os.OpenFile(filename, wrapper, perm)
+	if err != nil {
+		return err
+	}
+	n, err := f.WriteString(data)
+	if err == nil && n < len(data) {
+		err = io.ErrShortWrite
+	}
+	if err1 := f.Close(); err == nil {
+		err = err1
+	}
+	return err
+}
+

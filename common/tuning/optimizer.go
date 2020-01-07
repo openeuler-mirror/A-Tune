@@ -22,7 +22,7 @@ import (
 	"atune/common/project"
 	"atune/common/utils"
 	"fmt"
-	"math"
+	"os"
 	"strconv"
 )
 
@@ -39,7 +39,7 @@ type BenchMark struct {
 
 var optimizerPutURL string
 var optimization *Optimizer
-var maxEval string
+var minEval string
 var respPutIns *models.RespPutBody
 var iter int
 var maxIter int
@@ -57,6 +57,24 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
 		ch <- &PB.AckCheck{Name: fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations)}
+	}
+
+	exist, err := utils.PathExist(config.DefaultTempPath)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		if err = os.MkdirAll(config.DefaultTempPath, 0750); err != nil {
+			return err
+		}
+	}
+
+	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
+	err = utils.WriteFile(config.TuningFile, projectName, config.FilePerm,
+		os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	if err != nil {
+		log.Error(err)
+		return err
 	}
 
 	optimizerBody := new(models.OptimizerPostBody)
@@ -93,7 +111,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	log.Infof("optimizer put url is: %s", optimizerPutURL)
 
 	optimization = o
-	maxEval = ""
+	minEval = ""
 	iter = 0
 
 	benchmark := BenchMark{Content: nil}
@@ -113,9 +131,17 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	if bench.Content != nil {
 		eval = string(bench.Content)
 
-		log.Info(eval)
-		ch <- &PB.AckCheck{Name: fmt.Sprintf("The %dth optimization result is: %s\n"+
-			" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)}
+		optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
+			" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)
+		ch <- &PB.AckCheck{Name: optimizationTerm}
+
+		log.Info(optimizationTerm)
+		err = utils.WriteFile(config.TuningFile, optimizationTerm+"\n", config.FilePerm,
+			os.O_APPEND|os.O_WRONLY)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
 
 		floatEval, err := strconv.ParseFloat(eval, 64)
 		if err != nil {
@@ -123,20 +149,22 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 			return err
 		}
 
-		if maxEval == "" {
-			maxEval = eval
+		if minEval == "" {
+			minEval = eval
 		}
 
-		floatMaxEval, err := strconv.ParseFloat(maxEval, 64)
+		floatMinEval, err := strconv.ParseFloat(minEval, 64)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
 
-		if math.Abs(floatEval) > math.Abs(floatMaxEval) {
-			maxEval = eval
+		if floatEval < floatMinEval {
+			minEval = eval
 		}
 	}
+
+	os.Setenv("ITERATION", strconv.Itoa(iter))
 
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = iter
@@ -161,8 +189,16 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	log.Info("restart project success")
 
 	if iter == maxIter {
-		ch <- &PB.AckCheck{Name: fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s", respPutIns.Param, maxEval), Status: utils.SUCCESS}
+		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
+			" The final evaluation value is: %s", respPutIns.Param, minEval)
+		ch <- &PB.AckCheck{Name: optimizationTerm, Status: utils.SUCCESS}
+		err := utils.WriteFile(config.TuningFile, optimizationTerm+"\n", config.FilePerm,
+			os.O_APPEND|os.O_WRONLY)
+                if err != nil {
+			log.Error(err)
+			return err
+		}
+
 		if err = deleteTask(optimizerPutURL); err != nil {
 			log.Error(err)
 		}
