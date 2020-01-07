@@ -289,3 +289,20 @@ func IsInputStringValid(input string) bool {
 	}
 	return false
 }
+
+//write or append string to file
+func WriteFile(filename string, data string, perm os.FileMode, wrapper int) error {
+	f, err := os.OpenFile(filename, wrapper, perm)
+	if err != nil {
+		return err
+	}
+	n, err := f.WriteString(data)
+	if err == nil && n < len(data) {
+		err = io.ErrShortWrite
+	}
+	if err1 := f.Close(); err == nil {
+		err = err1
+	}
+	return err
+}
+
