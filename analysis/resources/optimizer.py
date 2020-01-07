@@ -69,7 +69,7 @@ class Optimizer(Resource):
 
         result["task_id"] = task_id
         result["status"] = "OK"
-        return result, 201
+        return result, 200
 
     def put(self, task_id):
         """provide the method of put"""

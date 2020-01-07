@@ -17,6 +17,7 @@ import (
 	"atune/common/log"
 	"atune/common/utils"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -83,6 +84,12 @@ const (
 // monitor config
 const (
 	FileFormat string = "xml"
+)
+
+//tuning config
+const (
+	TuningFile string      = DefaultTempPath + "/tuning.log"
+	FilePerm   os.FileMode = 0600
 )
 
 // the grpc server config
