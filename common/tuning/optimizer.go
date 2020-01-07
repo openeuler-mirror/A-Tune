@@ -23,7 +23,6 @@ import (
 	"atune/common/utils"
 	"fmt"
 	"os"
-	"math"
 	"strconv"
 )
 
@@ -40,7 +39,7 @@ type BenchMark struct {
 
 var optimizerPutURL string
 var optimization *Optimizer
-var maxEval string
+var minEval string
 var respPutIns *models.RespPutBody
 var iter int
 var maxIter int
@@ -112,7 +111,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	log.Infof("optimizer put url is: %s", optimizerPutURL)
 
 	optimization = o
-	maxEval = ""
+	minEval = ""
 	iter = 0
 
 	benchmark := BenchMark{Content: nil}
@@ -150,18 +149,18 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 			return err
 		}
 
-		if maxEval == "" {
-			maxEval = eval
+		if minEval == "" {
+			minEval = eval
 		}
 
-		floatMaxEval, err := strconv.ParseFloat(maxEval, 64)
+		floatMinEval, err := strconv.ParseFloat(minEval, 64)
 		if err != nil {
 			log.Error(err)
 			return err
 		}
 
-		if math.Abs(floatEval) > math.Abs(floatMaxEval) {
-			maxEval = eval
+		if floatEval < floatMinEval {
+			minEval = eval
 		}
 	}
 
