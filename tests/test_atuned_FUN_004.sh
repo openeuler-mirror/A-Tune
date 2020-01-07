@@ -1,8 +1,6 @@
 #!/bin/sh
 # Copyright (c) 2019 Huawei Technologies Co., Ltd.
 #
-# The implementation was written so as to confirm atuned services.
-#
 # A-Tune is licensed under the Mulan PSL v1.
 # You can use this software according to the terms and conditions of the Mulan PSL v1.
 # You may obtain a copy of Mulan PSL v1 at:
@@ -35,21 +33,19 @@ cleanup()
     echo "Clean the System"
     echo "===================="
     mv $ATUNE_CONF.bak $ATUNE_CONF
-    rm -rf $ANALYSIS_LOG
 }
 
 test01()
 {
     tst_resm TINFO "atuned.cnf file's port configuration test"
+    # Default configuration test
     netstat -anp | grep 60001 | grep atuned
     check_result $? 0
     
     atune-adm analysis
     check_result $? 0
 
-    atune-adm analysis
-    check_result $? 0
-
+    # The value of the port configuration is null
     change_conf_value port ""
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
@@ -59,7 +55,7 @@ test01()
     atune-adm analysis
     check_result $? 0
 
-
+    # The value of the port configuration is special character and boundary
     array=("$SPECIAL_CHARACTERS" "65536" "-1")
     for ((i=0;i<${#array[@]};i++));do
         change_conf_value port ${array[i]}
@@ -67,6 +63,7 @@ test01()
         check_result $? 1
     done
 
+    # Comment port configuration
     comment_conf_value port
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME

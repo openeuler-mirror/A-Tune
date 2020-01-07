@@ -13,7 +13,7 @@
 # See the Mulan PSL v1 for more details.
 # Create: 2019-12-26
 
-export RET_VAL=0
+export EXIT_RET_VAL=0
 export TST_COUNT=1
 
 # Global variables

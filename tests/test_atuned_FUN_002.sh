@@ -1,8 +1,6 @@
 #!/bin/sh
 # Copyright (c) 2019 Huawei Technologies Co., Ltd.
 #
-# The implementation was written so as to confirm atuned services.
-#
 # A-Tune is licensed under the Mulan PSL v1.
 # You can use this software according to the terms and conditions of the Mulan PSL v1.
 # You may obtain a copy of Mulan PSL v1 at:
@@ -39,6 +37,7 @@ test01()
     # Reduce the numbers of collected data, reduce testcase running time
     change_conf_value sample_num 2
 
+    # Correct configuration test
     sys_network=`ip address | grep UP | awk 'NR==1{print $2}' | awk -F ':' '{print $1}'`
     change_conf_value network $sys_network
     systemctl restart $ATUNE_SERVICE_NAME
@@ -46,6 +45,7 @@ test01()
     atune-adm analysis
     check_result $? 0
 
+    # The value of the network configuration is special character and ultra long character and null
     array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     for ((i=0;i<${#array[@]};i++));do
         change_conf_value network ${array[i]}
@@ -58,6 +58,7 @@ test01()
         check_result $? 0
     done
     
+    # Comment network configuration
     comment_conf_value network
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
@@ -69,7 +70,6 @@ test01()
     else
         tst_resm TPASS
     fi
-
 }
 
 TST_CLEANUP=cleanup

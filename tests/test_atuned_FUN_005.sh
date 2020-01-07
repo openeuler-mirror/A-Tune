@@ -12,7 +12,7 @@
 # Create: 2020-01-06
 # Author: zhangtaibo <sonice1755@163.com>
 
-export TCID="atuned.cnf Disk configuration test"
+export TCID="atuned.cnf sample_num configuration test"
 
 . ./test_lib.sh
 
@@ -33,44 +33,51 @@ cleanup()
 
 test01()
 {
-    tst_resm TINFO "atuned.cnf file's disk configuration test"
-    # Reduce the numbers of collected data, reduce testcase running time
-    change_conf_value sample_num 2
+    tst_resm TINFO "atuned.cnf file's sample_num configuration test"
 
-    # Correct configuration test
-    sys_disk=`lsscsi | awk '($NF~/dev/){print $NF}' | awk -F '/' '{print $NF}'`
-    change_conf_value disk $sys_disk
+    # The value of the sample_num configuration is 1
+    change_conf_value sample_num 1
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
-    atune-adm analysis
+    atune-adm analysis > $ANALYSIS_LOG
     check_result $? 0
 
-    # The value of the disk configuration is special character and ultra long character and null
+    analysis_num=`grep '[0-9]\.[0-9]' $ANALYSIS_LOG | wc -l`
+    if [ ! $analysis_num -eq 1 ];then
+        ((EXIT_FLAG++))
+    fi
+
+    # The value of the sample_num configuration is special character and ultra long character and null
     array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     for ((i=0;i<${#array[@]};i++));do
-        change_conf_value disk ${array[i]}
+        change_conf_value sample_num ${array[i]}
         systemctl restart $ATUNE_SERVICE_NAME
         wait_service_ready $ATUNE_SERVICE_NAME
         atune-adm analysis > $ANALYSIS_LOG
-        check_result $? 1
-        
-        grep "collect data faild" $ANALYSIS_LOG
         check_result $? 0
+
+        analysis_num=`grep '[0-9]\.[0-9]' $ANALYSIS_LOG | wc -l`
+        if [ ! $analysis_num -eq 20 ];then
+            ((EXIT_FLAG++))
+        fi
     done
-    
-    # Comment disk configuration
-    comment_conf_value disk
+
+    # Comment sample_num configuration
+    comment_conf_value sample_num
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
-    atune-adm analysis
-    check_result $? 1
+    atune-adm analysis > $ANALYSIS_LOG
+    check_result $? 0
+    analysis_num=`grep '[0-9]\.[0-9]' $ANALYSIS_LOG | wc -l`
+    if [ ! $analysis_num -eq 20 ];then
+        ((EXIT_FLAG++))
+    fi
 
     if [ $EXIT_FLAG -ne 0 ];then
         tst_resm TFAIL
     else
         tst_resm TPASS
     fi
-
 }
 
 TST_CLEANUP=cleanup
@@ -80,4 +87,3 @@ init
 test01
 
 tst_exit
-
