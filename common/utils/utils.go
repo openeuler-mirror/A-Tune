@@ -25,6 +25,7 @@ import (
 	"path"
 	"path/filepath"
 	"plugin"
+	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -277,4 +278,14 @@ func DiskByName(disk string) error {
 	}
 
 	return fmt.Errorf("disk %s is not exist", disk)
+}
+
+// common input string validator
+func IsInputStringValid(input string) bool {
+	if input != "" {
+		if isOk, _ := regexp.MatchString("^[a-zA-Z0-9/.-_]*$", input); isOk {
+			return isOk
+		}
+	}
+	return false
 }

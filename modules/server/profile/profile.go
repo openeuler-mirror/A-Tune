@@ -691,6 +691,26 @@ func (s *ProfileServer) ProfileRollback(profileInfo *PB.ProfileInfo, stream PB.P
 Collection method call collection script to collect system data.
 */
 func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr_CollectionServer) error {
+	if valid := utils.IsInputStringValid(message.GetWorkload()); !valid {
+		return fmt.Errorf("input:%s is invalid", message.GetWorkload())
+	}
+
+	if valid := utils.IsInputStringValid(message.GetOutputPath()); !valid {
+		return fmt.Errorf("input:%s is invalid", message.GetOutputPath())
+	}
+
+	if valid := utils.IsInputStringValid(message.GetType()); !valid {
+		return fmt.Errorf("input:%s is invalid", message.GetType())
+	}
+
+	if valid := utils.IsInputStringValid(message.GetBlock()); !valid {
+		return fmt.Errorf("input:%s is invalid", message.GetBlock())
+	}
+
+	if valid := utils.IsInputStringValid(message.GetNetwork()); !valid {
+		return fmt.Errorf("input:%s is invalid", message.GetNetwork())
+	}
+
 	classApps := &sqlstore.GetClassApp{Class: message.GetType()}
 	err := sqlstore.GetClassApps(classApps)
 	if err != nil {
