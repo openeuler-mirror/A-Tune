@@ -1,6 +1,6 @@
 # A-Tune用户指南
 
-<h2 id="法律申明.md">法律申明</h2>
+## 法律申明
 
 **版权所有 © 2020 华为技术有限公司。**
 
@@ -14,19 +14,19 @@ A-Tune和其他华为商标均为华为技术有限公司的商标。本文档�
 
 本文档仅作为使用指导，除非适用法强制规定或者双方有明确书面约定, 华为技术有限公司对本文档中的所有陈述、信息和建议不做任何明示或默示的声明或保证，包括但不限于不侵权，时效性或满足特定目的的担保。
 
-<h2 id="前言.md">前言</h2>
+## 前言
 
-## 概述<a name="section4537382116410"></a>
+### 概述
 
 本文档介绍openEuler系统性能自优化软件A-Tune的安装部署和使用方法，以指导用户快速了解并使用A-Tune。
 
-## 读者对象<a name="section4378592816410"></a>
+### 读者对象
 
 本文档适用于使用openEuler系统并希望了解和使用A-Tune的社区开发者、开源爱好者以及相关合作伙伴。使用人员需要具备基本的Linux操作系统知识。
 
-<h2 id="认识A-Tune.md">认识A-Tune</h2>
+## 1 认识A-Tune
 
-<h2 id="简介.md">简介</h2>
+## 1.1 简介
 
 操作系统作为衔接应用和硬件的基础软件，如何调整系统和应用配置，充分发挥软硬件能力，从而使业务性能达到最优，对用户至关重要。然而，运行在操作系统上的业务类型成百上千，应用形态千差万别，对资源的要求各不相同。当前硬件和基础软件组成的应用环境涉及高达7000多个配置对象，随着业务复杂度和调优对象的增加，调优所需的时间成本呈指数级增长，导致调优效率急剧下降，调优成为了一项极其复杂的工程，给用户带来巨大挑战。
 其次，操作系统作为基础设施软件，提供了大量的软硬件管理能力，每种能力适用场景不尽相同，并非对所有的应用场景都通用有益，因此，不同的场景需要开启或关闭不同的能力，组合使用系统提供的各种能力，才能发挥应用程序的最佳性能；
@@ -37,7 +37,7 @@ A-Tune是一款基于AI开发的系统性能优化的基础软件，它利用人
 
 ![](figures/zh-cn_image_0215192422.png)
 
-<h2 id="架构.md">架构</h2>
+## 1.2 架构
 
 A-Tune核心技术架构如下图，主要包括智能决策、系统画像和交互系统三层。
 
@@ -47,9 +47,9 @@ A-Tune核心技术架构如下图，主要包括智能决策、系统画像和�
 
 ![](figures/zh-cn_image_0215591510.png)
 
-<h2 id="支持特性与业务模型.md">支持特性与业务模型</h2>
+## 1.3 支持特性与业务模型
 
-## 支持特性<a name="section1743310211743"></a>
+### 支持特性
 
 A-Tune支持的主要特性、特性成熟度以及使用建议请参见[表1](#table1919220557576)。
 
@@ -88,7 +88,7 @@ A-Tune支持的主要特性、特性成熟度以及使用建议请参见[表1](#
 </tbody>
 </table>
 
-## 支持业务模型<a name="section1899518171052"></a>
+### 支持业务模型
 
 根据应用的负载特征，A-Tune将业务分为七大类，各类型的负载特征和A-Tune支持的应用请参见[表2](#table2819164611311)。
 
@@ -193,29 +193,29 @@ A-Tune支持的主要特性、特性成熟度以及使用建议请参见[表1](#
 </tbody>
 </table>
 
-<h2 id="安装与部署.md">安装与部署</h2>
+## 2 安装与部署
 
 本章介绍如何安装和部署A-Tune。
 
-<h2 id="软硬件要求.md">软硬件要求</h2>
+## 2.1 软硬件要求
 
-## 硬件要求<a name="section175931749114410"></a>
+### 硬件要求
 
 -   鲲鹏920处理器
 
-## 软件要求<a name="section19201810164619"></a>
+### 软件要求
 
 -   操作系统：openEuler 1.0
 
-<h2 id="环境准备.md">环境准备</h2>
+## 2.2 环境准备
 
 安装openEuler系统，安装方法参考《openEuler 1.0 安装指南》。
 
-<h2 id="安装A-Tune.md">安装A-Tune</h2>
+## 2.3 安装A-Tune
 
 本章介绍A-Tune的安装模式和安装方法。
 
-<h2 id="安装模式介绍.md">安装模式介绍</h2>
+### 2.3.1 安装模式介绍
 
 A-Tune支持单机模式和分布式模式安装：
 
@@ -230,7 +230,7 @@ A-Tune支持单机模式和分布式模式安装：
 
 ![](figures/zh-cn_image_0214540005.png)
 
-<h2 id="安装操作.md">安装操作</h2>
+### 2.3.2 安装操作
 
 安装A-Tune的操作步骤如下：
 
@@ -283,11 +283,11 @@ A-Tune支持单机模式和分布式模式安装：
     有如上回显信息表示安装成功。
 
 
-<h2 id="部署A-Tune.md">部署A-Tune</h2>
+## 2.4 部署A-Tune
 
 本章介绍A-Tune的配置部署。
 
-<h2 id="配置介绍.md">配置介绍</h2>
+### 2.4.1 配置介绍
 
 A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 
@@ -326,7 +326,7 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
     为系统启动时默认采集的系统的硬件信息。
 
 
-## 配置示例<a name="section616213774714"></a>
+### 配置示例
 
 ```
 #################################### server ###############################
@@ -380,7 +380,7 @@ network = enp189s0f0
 user = root
 ```
 
-<h2 id="启动A-Tune.md">启动A-Tune</h2>
+## 2.5 启动A-Tune
 
 A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
@@ -402,23 +402,23 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
     ![](figures/zh-cn_image_0214540398.png)
 
 
-<h2 id="使用方法.md">使用方法</h2>
+## 3 使用方法
 
 用户可以通过调用A-Tune提供的命令行接口使用A-Tune提供的功能。本章介绍A-Tune命令行接口的功能和使用方式。
 
-<h2 id="查询负载类型.md">查询负载类型</h2>
+## 3.1 查询负载类型
 
-<h2 id="list.md">list</h2>
+## list
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 查询系统当前支持的workload\_type和对应的profile，以及当前处于active状态的profile。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm list**
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 ```
 $ atune-adm list
@@ -451,23 +451,23 @@ Support WorkloadTypes:
 >![](public_sys-resources/icon-note.gif) **说明：**   
 >Active为true表示当前激活的profile，示例表示当前激活的是default类型对应的profile。  
 
-<h2 id="自定义负载类型.md">自定义负载类型</h2>
+## 3.2 自定义负载类型
 
 除了系统已定义的负载类型，A-Tune也支持用户定义新的workload\_type及对应profile，并允许更新或删除自定义的workload\_type。
 
 用户也可以将“使用方法 \> 自定义模型”中用户训练的自定义模型添加到A-Tune中。
 
-<h2 id="define.md">define</h2>
+## define
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 添加用户自定义的workload\_type，及对应的profile优化项。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm define**  <WORKLOAD\_TYPE\> <PROFILE\_NAME\> <PROFILE\_PATH\>
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 新增一个workload type，workload type的名称为test\_type，profile name的名称为test\_name，优化项的配置文件为example.conf。
 
@@ -506,17 +506,17 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 # to change the resources limit of user
 ```
 
-<h2 id="update.md">update</h2>
+## update
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 将workload\_type原来的优化项更新为new.conf中的内容。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm update**  <WORKLOAD\_TYPE\> <PROFILE\_NAME\> <PROFILE\_FILE\>
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 更新负载类型为test\_type，优化项名称为test\_name的优化项为new.conf。
 
@@ -524,17 +524,17 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 $ atune-adm update test_type test_name ./new.conf
 ```
 
-<h2 id="undefine.md">undefine</h2>
+## undefine
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 删除用户自定义的workload\_type。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm undefine**  <WORKLOAD\_TYPE\>
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 删除自定义的负载类型test\_type。
 
@@ -542,24 +542,24 @@ $ atune-adm update test_type test_name ./new.conf
 $ atune-adm undefine test_type 
 ```
 
-<h2 id="自定义模型.md">自定义模型</h2>
+## 3.3 自定义模型
 
 A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户只要通过collection和train两条命令，即可完成新模型的训练。
 
-<h2 id="collection.md">collection</h2>
+## collection
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 采集业务运行时系统的全局资源使用情况以及OS的各项状态信息，并将收集的结果保存到csv格式的输出文件中，作为模型训练的输入数据集。
 
 >![](public_sys-resources/icon-note.gif) **说明：**   
 >本命令依赖采样工具perf，mpstat，vmstat，iostat，sar。CPU型号目前仅支持鲲鹏920，可通过dmidecode -t processor检查CPU型号。  
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm collection**  <OPTIONS\>
 
-## 参数说明<a name="section143803239510"></a>
+### 参数说明
 
 -   OPTIONS
 
@@ -609,23 +609,23 @@ A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户
     </table>
 
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 ```
 $ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /data –-disk sda --network eth0 --workload_type test_type 
 ```
 
-<h2 id="train.md">train</h2>
+## train
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 使用采集的数据进行模型的训练。训练时至少采集两种workload\_type的数据，否则会报错。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm train**  <OPTIONS\>
 
-## 参数说明<a name="section4591487175"></a>
+### 参数说明
 
 -   OPTIONS
 
@@ -650,7 +650,7 @@ $ atune-adm collection --filename name --interval 5 --duration 1200 --output_pat
     </table>
 
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 使用data目录下的csv文件作为训练输入，生成的新模型new-model.m存放在model目录下。
 
@@ -658,20 +658,20 @@ $ atune-adm collection --filename name --interval 5 --duration 1200 --output_pat
 $ atune-adm train --data_path ./data –output_file ./model/new-model.m 
 ```
 
-<h2 id="分析负载类型并自优化.md">分析负载类型并自优化</h2>
+## 3.4 分析负载类型并自优化
 
 
-<h2 id="analysis.md">analysis</h2>
+## analysis
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 采集系统的实时统计数据进行负载类型识别，并进行自动优化。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm analysis**  \[OPTIONS\]
 
-## 参数说明<a name="section16755152320311"></a>
+### 参数说明
 
 <a name="table531317574132"></a>
 <table><thead align="left"><tr id="row1031310575137"><th class="cellrowborder" valign="top" width="23.87%" id="mcps1.1.3.1.1"><p id="p6313115718133"><a name="p6313115718133"></a><a name="p6313115718133"></a>参数</p>
@@ -688,7 +688,7 @@ $ atune-adm train --data_path ./data –output_file ./model/new-model.m
 </tbody>
 </table>
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 -   使用默认的模型进行分类识别
 
@@ -703,19 +703,19 @@ $ atune-adm train --data_path ./data –output_file ./model/new-model.m
     ```
 
 
-<h2 id="查询profile.md">查询profile</h2>
+## 3.5 查询profile
 
-<h2 id="info.md">info</h2>
+## info
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 查看workload\_type对应的profile内容。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm info**  <_WORKLOAD\_TYPE\>_
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 查看webserver的profile内容：
 
@@ -800,23 +800,23 @@ prefetch = off
 
 ```
 
-<h2 id="设置profile.md">设置profile</h2>
+## 3.6 设置profile
 
-<h2 id="profile.md">profile</h2>
+## profile
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 手动激活workload\_type对应的profile，使得workload\_type处于active状态。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm profile **_<_WORKLOAD\_TYPE_\>_
 
-## 参数说明<a name="section13406211624"></a>
+### 参数说明
 
 WORKLOAD\_TYPE 支持的类型参考list命令查询结果。
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 激活webserver对应的profile配置。
 
@@ -824,37 +824,37 @@ WORKLOAD\_TYPE 支持的类型参考list命令查询结果。
 $ atune-adm profile webserver
 ```
 
-<h2 id="回滚profile.md">回滚profile</h2>
+## 3.7 回滚profile
 
-<h2 id="rollback.md">rollback</h2>
+## rollback
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 回退当前的配置到系统的初始配置。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm rollback**
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 ```
 $ atune-adm rollback
 ```
 
-<h2 id="更新数据库.md">更新数据库</h2>
+## 3.8 更新数据库
 
-<h2 id="upgrade.md">upgrade</h2>
+## upgrade
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 更新系统的数据库。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm upgrade**  <DB\_FILE\>
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 数据库更新为new\_sqlite.db。
 
@@ -862,19 +862,19 @@ $ atune-adm rollback
 $ atune-adm upgrade ./new_sqlite.db
 ```
 
-<h2 id="系统信息查询.md">系统信息查询</h2>
+## 3.9 系统信息查询
 
-<h2 id="check.md">check</h2>
+## check
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 检查系统当前的cpu、bios、os、网卡等信息。
 
-## 命令格式<a name="section1019897115110"></a>
+### 命令格式
 
 **atune-adm check**
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
 
 ```
 $ atune-adm check
@@ -896,28 +896,55 @@ $ atune-adm check
      name: docker0           product:
 ```
 
-<h2 id="参数自调优.md">参数自调优</h2>
+## 3.10 参数自调优
 
 A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数调整、性能评价的调优过程，极大地提升最优配置的搜寻效率。
 
-<h2 id="tuning.md">tuning</h2>
+## tuning
 
-## 功能描述<a name="section124121426195015"></a>
+### 功能描述
 
 使用指定的项目文件对参数进行动态空间的搜索，找到当前环境配置下的最优解。
 
-## 命令格式<a name="section17158022202716"></a>
+### 命令格式 
+
+**atune-adm tuning** \[OPTIONS\] <PROJECT\_YAML\>
 
 >![](public_sys-resources/icon-note.gif) **说明：**   
 >在运行命令前，需要满足如下条件：  
 >1.  编辑好服务端yaml配置文件，且需要服务端管理员将该配置文件放到服务端的/etc/atuned/tuning/目录下。  
->2.  编辑好客户端yaml配置文件并放在客户端任一目录。  
+>2.  编辑好客户端yaml配置文件并放在客户端任一目录。 
 
-**atune-adm tuning**  <PROJECT\_YAML\>
+### 参数说明
 
-其中PROJECT\_YAML为客户端yaml配置文件。
+-   PROJECT\_YAML
+客户端yaml配置文件
 
-## 配置说明<a name="section1489142862718"></a>
+-   OPTIONS
+
+**表 1** 
+
+<a name="table175005119553"></a>
+<table><thead align="left"><tr id="row75035111557"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p8501951115516"><a name="p8501951115516"></a><a name="p8501951115516"></a>参数</p>
+</th>
+<th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p11503512557"><a name="p11503512557"></a><a name="p11503512557"></a>描述</p>
+</th>
+</tr>
+</thead>
+<tbody><tr id="row1850175145518"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p35017511550"><a name="p35017511550"></a><a name="p35017511550"></a><span id="ph8629115120560"><a name="ph8629115120560"></a><a name="ph8629115120560"></a>--restore, -r</span></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p12501051155515"><a name="p12501051155515"></a><a name="p12501051155515"></a><span id="ph1062935113563"><a name="ph1062935113563"></a><a name="ph1062935113563"></a>恢复</span><span id="ph76295516569"><a name="ph76295516569"></a><a name="ph76295516569"></a>tuning</span><span id="ph76292051165615"><a name="ph76292051165615"></a><a name="ph76292051165615"></a>优化前的初始配置</span></p>
+</td>
+</tr>
+<tr id="row1950165145518"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p15509518559"><a name="p15509518559"></a><a name="p15509518559"></a><span id="ph2629451105613"><a name="ph2629451105613"></a><a name="ph2629451105613"></a>--project, </span><span id="ph262915512562"><a name="ph262915512562"></a><a name="ph262915512562"></a>-p</span></p>
+</td>
+<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p950105114556"><a name="p950105114556"></a><a name="p950105114556"></a><span id="ph0630251125611"><a name="ph0630251125611"></a><a name="ph0630251125611"></a>指定需要恢复的</span><span id="ph1630105135618"><a name="ph1630105135618"></a><a name="ph1630105135618"></a>yaml</span><span id="ph06301451135615"><a name="ph06301451135615"></a><a name="ph06301451135615"></a>文件中的项目名称</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+
+### 配置说明
 
 **服务端yaml文件配置说明**
 
@@ -1217,7 +1244,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tbody>
 </table>
 
-## 配置示例<a name="section1660853192719"></a>
+### 配置示例
 
 服务端yaml文件配置样例：
 
@@ -1320,15 +1347,23 @@ evaluations :
         threshold: 100
 ```
 
-## 使用示例<a name="section5961238145111"></a>
+### 使用示例
+
+-   进行tuning调优
 
 ```
 $ atune-adm tuning example-client.yaml
 ```
 
-<h2 id="附录.md">附录</h2>
+-   恢复tuning调优前的初始配置
 
-<h2 id="术语和缩略语.md">术语和缩略语</h2>
+```
+$ atune-adm tuning -restore -project example
+```
+
+## 4 附录
+
+### 术语和缩略语
 
 **表 1**  术语表
 
