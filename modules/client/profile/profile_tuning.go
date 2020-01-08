@@ -34,6 +34,17 @@ var profileTunningCommand = cli.Command{
 	Name:      "tuning",
 	Usage:     "dynamic bayes search optimal parameter sets",
 	ArgsUsage: "PROJECT_YAML",
+	Flags: []cli.Flag{
+		cli.BoolFlag{
+			Name:  "restore,r",
+			Usage: "restore pre-optimized initial configuration",
+		},
+		cli.StringFlag{
+			Name:  "project,p",
+			Usage: "the project name of the yaml file",
+			Value: "",
+		},
+	},
 	Description: func() string {
 		desc := `
 	 tuning command usning bayes method dynamic search optimal parameter sets,
@@ -62,6 +73,10 @@ func newProfileTuningCmd(ctx *cli.Context, opts ...interface{}) (interface{}, er
 }
 
 func profileTunning(ctx *cli.Context) error {
+	if ctx.Bool("restore") {
+		return checkRestoreConfig(ctx)
+	}
+
 	if err := utils.CheckArgs(ctx, 1, utils.ConstExactArgs); err != nil {
 		return err
 	}
@@ -149,3 +164,29 @@ func runTuningRPC(ctx *cli.Context, info *PB.ProfileInfo) (string, error) {
 
 	return "", nil
 }
+
+func checkTuningCtx(ctx *cli.Context) error {
+	if ctx.String("project") == "" {
+		_ = cli.ShowCommandHelp(ctx, "tuning")
+		return fmt.Errorf("error: project name must be specified")
+	}
+
+	if len(ctx.String("project")) > 255 {
+		return fmt.Errorf("error: project name length is longer than 255 charaters")
+	}
+
+	return nil
+}
+
+func checkRestoreConfig(ctx *cli.Context) error {
+	err := checkTuningCtx(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = runTuningRPC(ctx, &PB.ProfileInfo{Name: ctx.String("project")})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+

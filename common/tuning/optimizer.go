@@ -22,8 +22,11 @@ import (
 	"atune/common/project"
 	"atune/common/utils"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path"
 	"strconv"
+	"strings"
 )
 
 // Optimizer : the type implement the bayes serch service
@@ -77,6 +80,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		return err
 	}
 
+	initConfigure := ""
 	optimizerBody := new(models.OptimizerPostBody)
 	optimizerBody.MaxEval = maxIter
 
@@ -93,6 +97,20 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		knob.Step = item.Info.Step
 		knob.Options = item.Info.Options
 		optimizerBody.Knobs = append(optimizerBody.Knobs, *knob)
+
+		out, err := project.ExecCommand(item.Info.GetScript)
+		if err != nil {
+			return err
+		}
+		initConfigure += strings.TrimSpace(knob.Name+"="+string(out)) + ","
+	}
+
+	err = utils.WriteFile(path.Join(config.DefaultTempPath,
+		o.Prj.Project+config.TuningRestoreConfig), initConfigure,
+		config.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	if err != nil {
+		log.Error(err)
+		return err
 	}
 
 	respPostIns, err := optimizerBody.Post()
@@ -210,10 +228,44 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	return nil
 }
 
+//restore tuning config
+func (o *Optimizer) RestoreConfigTuned() error {
+	if !optimizer.TryLock() {
+		return fmt.Errorf("dynamic optimizer search has been in running")
+	}
+	defer optimizer.Unlock()
+
+	tuningRestoreConf := path.Join(config.DefaultTempPath, o.Prj.Project+config.TuningRestoreConfig)
+	exist, err := utils.PathExist(tuningRestoreConf)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		log.Errorf("%s project has not been executed the dynamic optimizer search", o.Prj.Project)
+		return fmt.Errorf("%s project has not been executed the dynamic optimizer search",
+			o.Prj.Project)
+	}
+
+	content, err := ioutil.ReadFile(tuningRestoreConf)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	log.Infof("restoring params is: %s", string(content))
+	if err := o.Prj.RunSet(string(content)); err != nil {
+		log.Error(err)
+		return err
+	}
+
+	log.Infof("restore %s project params success", o.Prj.Project)
+	return nil
+}
+
 func deleteTask(url string) error {
 	resp, err := http.Delete(url)
 	if err != nil {
-		log.Info("delete task faild:", err)
+		log.Error("delete task faild:", err)
 		return err
 	}
 	defer resp.Body.Close()
