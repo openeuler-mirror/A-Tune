@@ -668,7 +668,7 @@ Use the CSV file in the  **data**  directory as the training input. The generate
 $ atune-adm train --data_path ./data –output_file ./model/new-model.m 
 ```
 
-## Workload Type Analysis and Auto Optimization
+## 3.4 Workload Type Analysis and Auto Optimization
 
 
 ## analysis
@@ -713,7 +713,7 @@ Collect real-time statistics from the system to identify and automatically optim
     ```
 
 
-## Querying Profiles
+## 3.5 Querying Profiles
 
 
 ## info
@@ -811,7 +811,7 @@ prefetch = off
 
 ```
 
-## Setting Profiles
+## 3.6 Setting Profiles
 
 
 ## profile
@@ -836,7 +836,7 @@ Activate the profile configuration of webserver.
 $ atune-adm profile webserver
 ```
 
-## Rolling Back Profiles
+## 3.7 Rolling Back Profiles
 
 
 ## rollback
@@ -855,7 +855,7 @@ Roll back the current configuration to the initial configuration of the system.
 $ atune-adm rollback
 ```
 
-## Updating Database
+## 3.8 Updating Database
 
 
 ## upgrade
@@ -876,7 +876,7 @@ The database is updated to  **new\_sqlite.db**.
 $ atune-adm upgrade ./new_sqlite.db
 ```
 
-## Querying System Information
+## 3.9 Querying System Information
 
 
 ## check
@@ -911,7 +911,7 @@ $ atune-adm check
      name: docker0           product:
 ```
 
-## Automatic Parameter Optimization
+## 3.10 Automatic Parameter Optimization
 
 A-Tune provides the automatic search capability for optimal configurations, eliminating the need for repeated manual parameter adjustment and performance evaluation. This greatly improves the search efficiency of optimal configurations.
 
