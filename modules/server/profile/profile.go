@@ -515,6 +515,16 @@ func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr
 		return fmt.Errorf("project:%s not found", data)
 	}
 
+	//content == nil means in restore config
+	if content == nil {
+		optimizer := tuning.Optimizer{Prj: prj}
+		err := optimizer.RestoreConfigTuned()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	log.Info("begin to dynamic optimizer search")
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")})
 

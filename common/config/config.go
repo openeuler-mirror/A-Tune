@@ -88,8 +88,9 @@ const (
 
 //tuning config
 const (
-	TuningFile string      = DefaultTempPath + "/tuning.log"
-	FilePerm   os.FileMode = 0600
+	TuningFile          string      = DefaultTempPath + "/tuning.log"
+	TuningRestoreConfig string      = "-tuning-restore.conf"
+	FilePerm            os.FileMode = 0600
 )
 
 // the grpc server config
