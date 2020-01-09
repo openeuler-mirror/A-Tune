@@ -810,7 +810,7 @@ prefetch = off
 
 ### 命令格式
 
-**atune-adm profile **_<_WORKLOAD\_TYPE_\>_
+**atune-adm profile** <WORKLOAD\_TYPE\>
 
 ### 参数说明
 

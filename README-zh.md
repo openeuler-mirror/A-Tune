@@ -87,6 +87,7 @@ git clone https://gitee.com/openeuler/A-Tune.git atune
 #### 4、编译
 ```bash
 cd atune
+export GO111MODULE=off
 make
 ```
 
@@ -100,8 +101,9 @@ make install
 
 ### 1、管理atuned服务
 
-#### 启动atuned服务
+#### 加载并启动atuned服务
 ```bash
+systemctl daemon-reload
 systemctl start atuned
 ```
 

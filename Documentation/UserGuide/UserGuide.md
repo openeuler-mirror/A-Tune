@@ -822,7 +822,7 @@ Manually activate a profile of a workload type.
 
 ### Format
 
-**atune-adm profile **_<_WORKLOAD\_TYPE_\>_
+**atune-adm profile** <WORKLOAD\_TYPE\>
 
 ### Parameter Description
 

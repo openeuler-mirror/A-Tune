@@ -86,6 +86,7 @@ git clone https://gitee.com/openeuler/A-Tune.git atune
 #### 4. Compile.
 ```bash
 cd atune
+export GO111MODULE=off
 make
 ```
 
@@ -99,8 +100,9 @@ II. Quick Guide
 
 ### 1. Manage the atuned service.
 
-#### Start the atuned service.
+#### Load and start the atuned service.
 ```bash
+systemctl daemon-reload
 systemctl start atuned
 ```
 
