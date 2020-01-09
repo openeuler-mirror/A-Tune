@@ -1,8 +1,7 @@
-A-Tune介绍
+Introduction to A-Tune
 ============
 
-A-Tune是一款基于AI的操作系统性能调优软件。A-Tune利用AI技术，使操作系统“懂”业务，简化IT系统调优工作的同时，让应用程序发挥出色性能。
-
+**A-Tune** is an OS tuning software based on AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system optimization, and maximize optimal application performance.
 
                                           ````....---::::////////////-.`
                                       `.-//////::::/++/--++.```````./++//-.`
@@ -50,98 +49,100 @@ A-Tune是一款基于AI的操作系统性能调优软件。A-Tune利用AI技术�
 
 
 
-一、安装A-Tune
+I. A-Tune Installation
 ----------
 
-支持操作系统：openEuler 1.0及以上版本
+Supported OS: openEuler 1.0 or later
 
-### 方法一（适用于普通用户）：使用openEuler默认自带的A-Tune
+### Method 1 (applicable to common users): Use the default A-Tune of openEuler.
 
 ```bash
 yum install -y atune
 ```
 
-### 方法二（适用于开发者）：从本仓库源码安装
+### Method 2 (applicable to developers): Use the source code of the local repository for installation.
 
-#### 1、安装依赖系统软件包
+#### 1. Install dependent system software packages.
 ```bash
 yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
-#### 2、安装python依赖包
+#### 2. Install Python dependent packages.
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost
 ```
-或
+Or
 ```bash
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost
 ```
 
-#### 3、下载源码
+#### 3. Download the source code.
 ```bash
 mkdir -p /home/gopath/src
 cd /home/gopath/src
 git clone https://gitee.com/openeuler/A-Tune.git atune
 ```
 
-#### 4、编译
+#### 4. Compile.
 ```bash
 cd atune
+export GO111MODULE=off
 make
 ```
 
-#### 5、安装
+#### 5. Install.
 ```bash
 make install
 ```
 
-二、快速使用指南
+II. Quick Guide
 ------------
 
-### 1、管理atuned服务
+### 1. Manage the atuned service.
 
-#### 启动atuned服务
+#### Load and start the atuned service.
 ```bash
+systemctl daemon-reload
 systemctl start atuned
 ```
 
-#### 查看atuned服务状态
+#### Check the atuned service status.
 ```bash
 systemctl status atuned
 ```
 
-### 2、atune-adm命令
+### 2. Run the atune-adm command.
 
-#### list命令
-列出系统当前支持的workload类型和对应的profile，当前处于active状态的workload类型。
+#### The list command.
+This command is used to list the supported workload types, profiles, and the values of Active.
 
-接口语法：
+Format:
 
 atune-adm list
 
-示例：
+Example:
 ```bash
 atune-adm list
 ```
 
-#### analysis命令
-实时采集系统的信息进行负载类型的识别，并自动执行对应的优化。
+#### The analysis command.
+This command is used to collect real-time statistics from the system to identify and automatically optimize workload types.
 
-接口语法：
+Format:
 
 atune-adm analysis [OPTIONS] [APP_NAME]
 
-运行示例1：使用默认的模型进行分类识别
+Example 1: Use the default model for classification and identification.
 ```bash
 atune-adm analysis
 ```
-运行示例2：使用自定义训练的模型进行识别
+Example 2: Use the user-defined training model for recognition.
 ```bash
 atune-adm analysis –model ./model/new-model.m
 ```
-运行示例3：指定当前的系统应用为mysql，仅作为参考。
+Example 3: Specify the current system application as MySQL, which is for reference only.
 ```bash
 atune-adm analysis mysql
 ```
 
-其他命令使用详见atune-adm help信息或A-Tune用户指南。
+For details about other commands, see the atune-adm help information or A-Tune User Guide.
