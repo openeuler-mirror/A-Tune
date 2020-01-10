@@ -27,6 +27,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Optimizer : the type implement the bayes serch service
@@ -42,11 +43,12 @@ type BenchMark struct {
 
 var optimizerPutURL string
 var optimization *Optimizer
-var minEval string
+var evalMap map[string]float64
 var respPutIns *models.RespPutBody
 var iter int
 var maxIter int
 var optimizer = Optimizer{}
+var startIterTime string
 
 // InitTuned method for init tuning
 func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
@@ -129,7 +131,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	log.Infof("optimizer put url is: %s", optimizerPutURL)
 
 	optimization = o
-	minEval = ""
+	evalMap = make(map[string]float64)
 	iter = 0
 
 	benchmark := BenchMark{Content: nil}
@@ -144,41 +146,12 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 DynamicTuned method using bayes algorithm to search the best performance parameters
 */
 func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
-	var eval string
+	var evalValue string
 	var err error
 	if bench.Content != nil {
-		eval = string(bench.Content)
-
-		optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
-			" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)
-		ch <- &PB.AckCheck{Name: optimizationTerm}
-
-		log.Info(optimizationTerm)
-		err = utils.WriteFile(config.TuningFile, optimizationTerm+"\n", config.FilePerm,
-			os.O_APPEND|os.O_WRONLY)
+		evalValue, err = bench.evalParsing(ch)
 		if err != nil {
-			log.Error(err)
 			return err
-		}
-
-		floatEval, err := strconv.ParseFloat(eval, 64)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-
-		if minEval == "" {
-			minEval = eval
-		}
-
-		floatMinEval, err := strconv.ParseFloat(minEval, 64)
-		if err != nil {
-			log.Error(err)
-			return err
-		}
-
-		if floatEval < floatMinEval {
-			minEval = eval
 		}
 	}
 
@@ -186,7 +159,7 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = iter
-	optPutBody.Value = eval
+	optPutBody.Value = evalValue
 	respPutIns, err = optPutBody.Put(optimizerPutURL)
 	if err != nil {
 		log.Errorf("get setting parameter error: %v", err)
@@ -206,16 +179,18 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	}
 	log.Info("restart project success")
 
+	startIterTime = time.Now().Format(config.DefaultTimeFormat)
+
 	if iter == maxIter {
-		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s", respPutIns.Param, minEval)
-		ch <- &PB.AckCheck{Name: optimizationTerm, Status: utils.SUCCESS}
-		err := utils.WriteFile(config.TuningFile, optimizationTerm+"\n", config.FilePerm,
-			os.O_APPEND|os.O_WRONLY)
-                if err != nil {
-			log.Error(err)
-			return err
+		evaluation := make([]string, 0)
+		for evalKey, evalValue := range evalMap {
+			value := strconv.FormatFloat(evalValue, 'E', -1, 64)
+			evaluation = append(evaluation, evalKey+"="+value)
 		}
+		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
+			" The final evaluation value is: %s", respPutIns.Param, strings.Join(evaluation, ","))
+		log.Info(optimizationTerm)
+		ch <- &PB.AckCheck{Name: optimizationTerm, Status: utils.SUCCESS}
 
 		if err = deleteTask(optimizerPutURL); err != nil {
 			log.Error(err)
@@ -260,6 +235,52 @@ func (o *Optimizer) RestoreConfigTuned() error {
 
 	log.Infof("restore %s project params success", o.Prj.Project)
 	return nil
+}
+
+func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
+	eval := string(bench.Content)
+
+	optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
+		" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)
+	ch <- &PB.AckCheck{Name: optimizationTerm}
+	log.Info(optimizationTerm)
+
+	endIterTime := time.Now().Format(config.DefaultTimeFormat)
+	iterInfo := make([]string, 0)
+	iterInfo = append(iterInfo, strconv.Itoa(iter))
+	iterInfo = append(iterInfo, startIterTime)
+	iterInfo = append(iterInfo, endIterTime)
+	iterInfo = append(iterInfo, eval)
+	iterInfo = append(iterInfo, respPutIns.Param)
+	output := strings.Join(iterInfo, "|")
+
+	err := utils.WriteFile(config.TuningFile, output+"\n", config.FilePerm,
+		os.O_APPEND|os.O_WRONLY)
+	if err != nil {
+		log.Error(err)
+		return "", err
+	}
+
+	evalValue := make([]string, 0)
+	for _, benchStr := range strings.Split(eval, ",") {
+		kvs := strings.Split(benchStr, "=")
+		if len(kvs) < 2 {
+			continue
+		}
+
+		floatEval, err := strconv.ParseFloat(kvs[1], 64)
+		if err != nil {
+			log.Error(err)
+			return "", err
+		}
+
+		if floatEval < evalMap[kvs[0]] {
+			evalMap[kvs[0]] = floatEval
+		}
+
+		evalValue = append(evalValue, kvs[1])
+	}
+	return strings.Join(evalValue, ","), nil
 }
 
 func deleteTask(url string) error {

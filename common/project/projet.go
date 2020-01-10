@@ -108,7 +108,7 @@ func newProject(path string) (*YamlPrjSvr, error) {
 
 // BenchMark method call the benchmark script
 func (y *YamlPrjCli) BenchMark() (string, error) {
-	benchStr := ""
+	benchStr := make([]string, 0)
 
 	cmd := exec.Command("sh", "-c", y.Benchmark)
 	benchOutByte, err := cmd.CombinedOutput()
@@ -123,23 +123,22 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 		bout, err := cmd.Output()
 		if err != nil {
 			log.Error(err)
-			return benchStr, err
+			return strings.Join(benchStr, ","), err
 		}
 		floatout, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
 		if err != nil {
 			log.Error(err)
-			return benchStr, err
+			return strings.Join(benchStr, ","), err
 		}
 
 		out := strconv.FormatFloat((floatout * float64(evaluation.Info.Weight) / 100), 'E', -1, 64)
 		if evaluation.Info.Type == "negative" {
 			out = "-" + out
 		}
-		benchStr = benchStr + out + ","
+		benchStr = append(benchStr, evaluation.Name+"="+out)
 	}
 
-	benchStr = benchStr[:len(benchStr)-1]
-	return benchStr, nil
+	return strings.Join(benchStr, ","), nil
 }
 
 // RunSet method call the set script to set the value
