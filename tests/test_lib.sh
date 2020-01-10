@@ -163,7 +163,7 @@ function wait_condition()
 }
 
 # wait service running
-# input: serice name
+# input: service name
 # example: wait_service_ready atuned
 function wait_service_ready()
 {
@@ -196,5 +196,24 @@ function rpminstall()
             echo "this system not support install command" > /dev/null
             exit 1
         fi
+}
+
+# check if service is not started, restart it
+# input: service name
+# example: check_service_started atuned
+function check_service_started()
+{
+    local service_name=$1
+    if [ -z $service_name ];then
+        echo "You have to input a service name"
+        return 1
+    fi
+
+    systemctl status $service_name | grep "Active: active (running)"
+    local ret=$?
+    if [ $ret -ne 0 ];then
+        systemctl restart $service_name
+        wait_service_ready $service_name
+    fi
 }
 

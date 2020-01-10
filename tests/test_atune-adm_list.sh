@@ -19,6 +19,7 @@ export TCID="atune-adm list cmd test"
 init()
 {
     echo "init the sysytem"
+    check_service_started atuned
 }
 
 cleanup()
