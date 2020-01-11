@@ -1374,7 +1374,7 @@ $ atune-adm tuning example-client.yaml
 -   Restore the initial configuration before tuning
 
 ```
-$ atune-adm tuning -restore -project example
+$ atune-adm tuning --restore --project example
 ```
 
 ## 4 Appendixes

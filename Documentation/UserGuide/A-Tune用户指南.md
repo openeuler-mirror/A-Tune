@@ -296,7 +296,7 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 
     可根据需要进行修改。
 
-    -   address：系统grpc服务的侦听地址，默认为127.0.0.1，若为多机部署，需进行修改。
+    -   address：系统grpc服务的侦听地址，默认为127.0.0.1，若为分布式部署，需进行修改。
     -   port：系统grpc服务的侦听端口，范围为0\~65535未使用的端口。
     -   rest\_port：系统restservice的侦听端口, 范围为0\~65535未使用的端口。
     -   sample\_num：系统执行analysis流程时采集样本的数量。
