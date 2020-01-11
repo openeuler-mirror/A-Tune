@@ -1359,7 +1359,7 @@ $ atune-adm tuning example-client.yaml
 -   恢复tuning调优前的初始配置
 
 ```
-$ atune-adm tuning -restore -project example
+$ atune-adm tuning --restore --project example
 ```
 
 ## 4 附录
