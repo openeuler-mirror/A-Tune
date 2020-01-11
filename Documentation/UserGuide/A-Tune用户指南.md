@@ -1,4 +1,5 @@
 # A-Tune用户指南
+[English](./UserGuide.md) | 简体中文
 
 ## 法律申明
 
@@ -323,7 +324,7 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 
 -   monitor信息
 
-    为系统启动时默认采集的系统的硬件信息。
+    为系统启动时默认采集的系统硬件信息。
 
 
 ### 配置示例
@@ -332,22 +333,22 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 #################################### server ###############################
 # atuned config
 [server]
-# the address the grpc server to bind to, default is 127.0.0.1
+# the address that the grpc server to bind to, default is 127.0.0.1
 address = 127.0.0.1
 
 # the atuned grpc listening port, default is 60001
-# the port can be set between 0 to 65535 the not be used
+# the port can be set between 0 to 65535 which not be used
 port = 60001
 
 # the rest service listening port, default is 8383
-# the port can be set between 0 to 65535 than not be used
+# the port can be set between 0 to 65535 which not be used
 rest_port = 8383
 
 # when run analysis command, the numbers of collected data.
 # default is 20
 sample_num = 20
 
-# Enable gRPC and http server authentication SSL/TLS
+# enable gRPC and http server authentication SSL/TLS
 # default is false
 # tls = true
 # tlsservercertfile = /etc/atuned/server.pem
@@ -357,14 +358,14 @@ sample_num = 20
 # tlshttpcacertfile = /etc/atuned/http/cacert.pem
 
 #################################### log ###############################
-# Either "debug", "info", "warn", "error", "critical", default is "info"
+# either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
 
 #################################### monitor ###############################
 [monitor]
-# With the module and format of the MPI, the format is {module}_{purpose}
-# The module is Either "mem", "net", "cpu", "storage"
-# The purpose is "topo"
+# with the module and format of the MPI, the format is {module}_{purpose}
+# the module is Either "mem", "net", "cpu", "storage"
+# the purpose is "topo"
 module = mem_topo, cpu_topo
 
 #################################### system ###############################
@@ -572,7 +573,7 @@ A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户
     </thead>
     <tbody><tr id="zh-cn_topic_0210923698_row19645141112"><td class="cellrowborder" valign="top" width="23.87%" headers="mcps1.1.3.1.1 "><p id="zh-cn_topic_0210923698_p2645611710"><a name="zh-cn_topic_0210923698_p2645611710"></a><a name="zh-cn_topic_0210923698_p2645611710"></a>--filename, -f</p>
     </td>
-    <td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="zh-cn_topic_0210923698_p10645512017"><a name="zh-cn_topic_0210923698_p10645512017"></a><a name="zh-cn_topic_0210923698_p10645512017"></a>生成的用于训练的csv文件名：name-时间戳.csv</p>
+    <td class="cellrowborder" valign="top" width="76.13%" headers="mcps1.1.3.1.2 "><p id="zh-cn_topic_0210923698_p10645512017"><a name="zh-cn_topic_0210923698_p10645512017"></a><a name="zh-cn_topic_0210923698_p10645512017"></a>生成的用于训练的csv文件名：名称-时间戳.csv</p>
     </td>
     </tr>
     <tr id="zh-cn_topic_0210923698_row564581117"><td class="cellrowborder" valign="top" width="23.87%" headers="mcps1.1.3.1.1 "><p id="zh-cn_topic_0210923698_p15645911616"><a name="zh-cn_topic_0210923698_p15645911616"></a><a name="zh-cn_topic_0210923698_p15645911616"></a>--output_path, -o</p>
@@ -612,7 +613,7 @@ A-Tune支持用户训练新的workload\_type。训练方法非常简单，用户
 ### 使用示例
 
 ```
-$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /data –-disk sda --network eth0 --workload_type test_type 
+$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /data --disk sda --network eth0 --workload_type test_type 
 ```
 
 ## train
@@ -655,7 +656,7 @@ $ atune-adm collection --filename name --interval 5 --duration 1200 --output_pat
 使用data目录下的csv文件作为训练输入，生成的新模型new-model.m存放在model目录下。
 
 ```
-$ atune-adm train --data_path ./data –output_file ./model/new-model.m 
+$ atune-adm train --data_path ./data --output_file ./model/new-model.m 
 ```
 
 ## 3.4 分析负载类型并自优化
@@ -800,7 +801,7 @@ prefetch = off
 
 ```
 
-## 3.6 设置profile
+## 3.6 激活profile
 
 ## profile
 
@@ -1216,7 +1217,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tr>
 <tr id="row5963107142620"><td class="cellrowborder" valign="top" width="12.950000000000001%" headers="mcps1.2.5.1.1 "><p id="p169631073264"><a name="p169631073264"></a><a name="p169631073264"></a>type</p>
 </td>
-<td class="cellrowborder" valign="top" width="24.23%" headers="mcps1.2.5.1.2 "><p id="p29631478264"><a name="p29631478264"></a><a name="p29631478264"></a>评估结果的正负类型，positive代表最小化对应性能值，negative代表最大化对应性能</p>
+<td class="cellrowborder" valign="top" width="24.23%" headers="mcps1.2.5.1.2 "><p id="p29631478264"><a name="p29631478264"></a><a name="p29631478264"></a>评估结果的正负类型，positive代表最大化对应性能值，negative代表最小化对应性能值</p>
 </td>
 <td class="cellrowborder" valign="top" width="15.629999999999999%" headers="mcps1.2.5.1.3 "><p id="p76031331415"><a name="p76031331415"></a><a name="p76031331415"></a>枚举</p>
 </td>

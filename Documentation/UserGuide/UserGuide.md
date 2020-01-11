@@ -1,4 +1,5 @@
 # A-Tune User Guide
+English | [简体中文](./A-Tune用户指南.md)
 
 ## Legal Statement
 
@@ -338,22 +339,22 @@ The configuration items in the A-Tune configuration file  **/etc/atuned/atuned.c
 #################################### server ###############################
 # atuned config
 [server]
-# the address the grpc server to bind to, default is 127.0.0.1
+# the address that the grpc server to bind to, default is 127.0.0.1
 address = 127.0.0.1
 
 # the atuned grpc listening port, default is 60001
-# the port can be set between 0 to 65535 the not be used
+# the port can be set between 0 to 65535 which not be used
 port = 60001
 
 # the rest service listening port, default is 8383
-# the port can be set between 0 to 65535 than not be used
+# the port can be set between 0 to 65535 which not be used
 rest_port = 8383
 
 # when run analysis command, the numbers of collected data.
 # default is 20
 sample_num = 20
 
-# Enable gRPC and http server authentication SSL/TLS
+# enable gRPC and http server authentication SSL/TLS
 # default is false
 # tls = true
 # tlsservercertfile = /etc/atuned/server.pem
@@ -363,14 +364,14 @@ sample_num = 20
 # tlshttpcacertfile = /etc/atuned/http/cacert.pem
 
 #################################### log ###############################
-# Either "debug", "info", "warn", "error", "critical", default is "info"
+# either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
 
 #################################### monitor ###############################
 [monitor]
-# With the module and format of the MPI, the format is {module}_{purpose}
-# The module is Either "mem", "net", "cpu", "storage"
-# The purpose is "topo"
+# with the module and format of the MPI, the format is {module}_{purpose}
+# the module is Either "mem", "net", "cpu", "storage"
+# the purpose is "topo"
 module = mem_topo, cpu_topo
 
 #################################### system ###############################
@@ -622,7 +623,7 @@ Collect the global resource usage and OS status information during service runni
 ### Example
 
 ```
-$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home –-disk sda --network eth0 --workload_type test_type 
+$ atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home --disk sda --network eth0 --workload_type test_type 
 ```
 
 ## train
@@ -665,7 +666,7 @@ Use the collected data to train the model. Collect data of at least two workload
 Use the CSV file in the  **data**  directory as the training input. The generated model  **new-model.m**  is stored in the  **model**  directory.
 
 ```
-$ atune-adm train --data_path ./data –output_file ./model/new-model.m 
+$ atune-adm train --data_path ./data --output_file ./model/new-model.m 
 ```
 
 ## 3.4 Workload Type Analysis and Auto Optimization
@@ -811,7 +812,7 @@ prefetch = off
 
 ```
 
-## 3.6 Setting Profiles
+## 3.6 Activing Profiles
 
 
 ## profile
