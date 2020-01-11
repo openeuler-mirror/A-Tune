@@ -37,7 +37,7 @@ test01()
     atune-adm check > temp.log
     check_result $? 0
 
-    grep "FAILED" temp.log
+    grep -i "FAILED" temp.log
     check_result $? 1
 
     # Help info
