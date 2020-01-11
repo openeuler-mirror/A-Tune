@@ -283,7 +283,7 @@ func DiskByName(disk string) error {
 // common input string validator
 func IsInputStringValid(input string) bool {
 	if input != "" {
-		if isOk, _ := regexp.MatchString("^[a-zA-Z0-9/.-_]*$", input); isOk {
+		if isOk, _ := regexp.MatchString("^[a-zA-Z0-9/._-]*$", input); isOk {
 			return isOk
 		}
 	}
