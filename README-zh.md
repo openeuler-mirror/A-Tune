@@ -147,4 +147,4 @@ atune-adm analysis –model ./model/new-model.m
 atune-adm analysis mysql
 ```
 
-其他命令使用详见atune-adm help信息或A-Tune用户指南。
+其他命令使用详见atune-adm help信息或[A-Tune用户指南](./Documentation/UserGuide/A-Tune用户指南.md)。

@@ -146,4 +146,4 @@ Example 3: Specify the current system application as MySQL, which is for referen
 atune-adm analysis mysql
 ```
 
-For details about other commands, see the atune-adm help information or A-Tune User Guide.
+For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/UserGuide.md).
