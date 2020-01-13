@@ -21,7 +21,6 @@ import (
 	"atune/common/sqlstore"
 	"atune/common/utils"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 
