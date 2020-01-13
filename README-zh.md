@@ -1,5 +1,6 @@
 A-Tune介绍
 ============
+[English](./README.md) | 简体中文
 
 A-Tune是一款基于AI的操作系统性能调优软件。A-Tune利用AI技术，使操作系统“懂”业务，简化IT系统调优工作的同时，让应用程序发挥出色性能。
 
@@ -146,4 +147,4 @@ atune-adm analysis –model ./model/new-model.m
 atune-adm analysis mysql
 ```
 
-其他命令使用详见atune-adm help信息或A-Tune用户指南。
+其他命令使用详见atune-adm help信息或[A-Tune用户指南](./Documentation/UserGuide/A-Tune用户指南.md)。

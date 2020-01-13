@@ -1,5 +1,6 @@
 Introduction to A-Tune
 ============
+English | [简体中文](./README-zh.md)
 
 **A-Tune** is an OS tuning software based on AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system optimization, and maximize optimal application performance.
 
@@ -145,4 +146,4 @@ Example 3: Specify the current system application as MySQL, which is for referen
 atune-adm analysis mysql
 ```
 
-For details about other commands, see the atune-adm help information or A-Tune User Guide.
+For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/UserGuide.md).
