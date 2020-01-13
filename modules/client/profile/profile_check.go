@@ -28,7 +28,7 @@ import (
 var profileCheckCommand = cli.Command{
 	Name:      "check",
 	Usage:     "check system basic information",
-	ArgsUsage: "[arguments...]",
+	UsageText: "atune-adm check",
 	Description: func() string {
 		desc := "\n    check system basic information\n"
 		return desc
@@ -53,12 +53,8 @@ func newProfileCheckCmd(ctx *cli.Context, opts ...interface{}) (interface{}, err
 }
 
 func profileCheck(ctx *cli.Context) error {
-	appname := ""
-	if ctx.NArg() > 2 {
-		return fmt.Errorf("only one or zero argument required")
-	}
-	if ctx.NArg() == 1 {
-		appname = ctx.Args().Get(0)
+	if err := utils.CheckArgs(ctx, 0, utils.ConstExactArgs); err != nil {
+		return err
 	}
 
 	c, err := client.NewClientFromContext(ctx)
@@ -68,7 +64,7 @@ func profileCheck(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.CheckInitProfile(CTX.Background(), &PB.ProfileInfo{Name: appname})
+	stream, err := svc.CheckInitProfile(CTX.Background(), &PB.ProfileInfo{})
 	if err != nil {
 		return err
 	}
@@ -104,5 +100,6 @@ func profileCheck(ctx *cli.Context) error {
 		utils.Print(reply)
 	}
 
+	fmt.Println("\nCheck finished")
 	return nil
 }

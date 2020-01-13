@@ -104,6 +104,18 @@ func profileTunning(ctx *cli.Context) error {
 		return err
 	}
 
+	if len(prj.Project) < 1 || len(prj.Project) > 128 {
+		return fmt.Errorf("project name must be no less than 1 and no greater than 128 in yaml or yml")
+	}
+
+	if len(prj.Benchmark) < 1 {
+		return fmt.Errorf("benchmark must be specified in yaml or yml")
+	}
+
+	if len(prj.Evaluations) > 10 {
+		return fmt.Errorf("evaluations must be no greater than 10 in project %s", prj.Project)
+	}
+
 	_, err = runTuningRPC(ctx, &PB.ProfileInfo{Name: prj.Project, Content: []byte(strconv.Itoa(prj.Iterations))})
 	if err != nil {
 		return err
@@ -171,8 +183,8 @@ func checkTuningCtx(ctx *cli.Context) error {
 		return fmt.Errorf("error: project name must be specified")
 	}
 
-	if len(ctx.String("project")) > 255 {
-		return fmt.Errorf("error: project name length is longer than 255 charaters")
+	if len(ctx.String("project")) > 128 {
+		return fmt.Errorf("error: project name length is longer than 128 charaters")
 	}
 
 	return nil

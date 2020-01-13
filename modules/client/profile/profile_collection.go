@@ -99,8 +99,8 @@ func checkCollectionCtx(ctx *cli.Context) error {
 		return fmt.Errorf("error: filename must be specified")
 	}
 
-	if len(ctx.String("filename")) > 255 {
-		return fmt.Errorf("error: filename length is longer than 255 charaters")
+	if len(ctx.String("filename")) > 128 {
+		return fmt.Errorf("error: filename length is longer than 128 charaters")
 	}
 
 	if ctx.String("disk") == "" {

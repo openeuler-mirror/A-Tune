@@ -114,8 +114,7 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 	benchOutByte, err := cmd.CombinedOutput()
 
 	if err != nil {
-		log.Error(err)
-		return "", err
+		return "", fmt.Errorf("failed to run benchmark, err: %v", err)
 	}
 	for _, evaluation := range y.Evaluations {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)

@@ -53,7 +53,8 @@ class Optimizer(Resource):
         args = OPTIMIZER_POST_PARSER.parse_args()
         LOGGER.info(args)
         if args["max_eval"] < 10:
-            abort(400, "max_eval must be >=10")
+            LOGGER.error("the max iterations %s must be greater than 10", args["max_eval"])
+            abort(400, "the max iterations {} must be greater than 10".format(args["max_eval"]))
         task_id = str(uuid.uuid1())
 
         parent_conn, child_conn = Pipe()
@@ -74,7 +75,7 @@ class Optimizer(Resource):
     def put(self, task_id):
         """provide the method of put"""
         if not task_id:
-            abort(404)
+            abort(404, "task id does not exist")
         task = task_cache.TasksCache.get_instance().get(task_id)
         if not task:
             abort(404, "taskid {0} not found".format(task_id))
@@ -95,7 +96,7 @@ class Optimizer(Resource):
     def delete(self, task_id):
         """provide the method of delete"""
         if not task_id:
-            abort(404)
+            abort(404, "task id does not exist")
         process = task_cache.TasksCache.get_instance().get(task_id)
         if not process:
             abort(404, "{0} {1} not found".format(self.task_id_info, task_id))
