@@ -17,6 +17,7 @@ import (
 	"atune/common/config"
 	"atune/common/http"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 )
 
@@ -40,8 +41,9 @@ type Knob struct {
 
 // RespPostBody :the body returned of create optimizer task
 type RespPostBody struct {
-	TaskID string `json:"task_id"`
-	Status string `json:"status"`
+	TaskID  string `json:"task_id"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 // OptimizerPutBody send to the optimizer service when iterations
@@ -52,7 +54,8 @@ type OptimizerPutBody struct {
 
 // RespPutBody :the body returned of each optimizer iteration
 type RespPutBody struct {
-	Param string `json:"param"`
+	Param   string `json:"param"`
+	Message string `json:"message"`
 }
 
 // Post method create a optimizer task
@@ -77,6 +80,10 @@ func (o *OptimizerPostBody) Post() (*RespPostBody, error) {
 		return nil, err
 	}
 
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf(respPostIns.Message)
+	}
+
 	return respPostIns, nil
 }
 
@@ -99,6 +106,10 @@ func (o *OptimizerPutBody) Put(url string) (*RespPutBody, error) {
 	err = json.Unmarshal(respBody, respPutIns)
 	if err != nil {
 		return nil, err
+	}
+
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf(respPutIns.Message)
 	}
 
 	return respPutIns, nil

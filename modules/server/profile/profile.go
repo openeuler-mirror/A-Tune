@@ -15,7 +15,7 @@ package main
 
 import (
 	PB "atune/api/profile"
-	"atune/common/checker"
+	_ "atune/common/checker"
 	"atune/common/config"
 	"atune/common/http"
 	"atune/common/log"
@@ -243,8 +243,6 @@ func (s *ProfileServer) ListWorkload(profileInfo *PB.ProfileInfo, stream PB.Prof
 // like BIOS version, memory balanced...
 func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 	stream PB.ProfileMgr_CheckInitProfileServer) error {
-	elf := profileInfo.GetName()
-
 	ch := make(chan *PB.AckCheck)
 	defer close(ch)
 	go func() {
@@ -252,14 +250,6 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 			_ = stream.Send(value)
 		}
 	}()
-
-	elf = strings.Trim(elf, "")
-	if elf != "" {
-		if exist, _ := utils.PathExist(elf); exist {
-			program := checker.ELF{FileName: elf}
-			_ = program.Check(ch)
-		}
-	}
 
 	services := registry.GetCheckerServices()
 
