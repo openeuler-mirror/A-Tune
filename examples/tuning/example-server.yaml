@@ -7,7 +7,7 @@ object :
     name : "vm.swappiness"
     info :
         desc : "the vm.swappiness"
-        get : "sysctl -a | grep vm.swappiness"
+        get : "sysctl -a | grep vm.swappiness | awk '{print $3}'"
         set : "sysctl -w vm.swappiness=$value"
         needrestart: "false"
         type : "continuous"
@@ -19,7 +19,7 @@ object :
     name : "irqbalance"
     info :
         desc : "system irqbalance"
-        get : "systemctl status irqbalance"
+        get : "systemctl status irqbalance | grep running > /dev/null && echo start || echo stop"
         set : "systemctl $value sysmonitor;systemctl $value irqbalance"
         needrestart: "false"
         type : "discrete"
@@ -41,23 +41,10 @@ object :
           - 16
         ref : 2
   -
-    name : "prefetcher"
-    info :
-        desc : ""
-        get : "cat /sys/class/misc/prefetch/policy"
-        set : "echo $value > /sys/class/misc/prefetch/policy"
-        needrestart: "false"
-        type : "discrete"
-        options:
-          - "0"
-          - "15"
-        dtype : "string"
-        ref : "15"
-  -
     name : "kernel.sched_min_granularity_ns"
     info :
         desc : "Minimal preemption granularity for CPU-bound tasks"
-        get : "sysctl kernel.sched_min_granularity_ns"
+        get : "sysctl kernel.sched_min_granularity_ns | awk '{print $3}'"
         set : "sysctl -w kernel.sched_min_granularity_ns=$value"
         needrestart: "false"
         type : "continuous"
@@ -69,7 +56,7 @@ object :
     name : "kernel.sched_latency_ns"
     info :
         desc : ""
-        get : "sysctl kernel.sched_latency_ns"
+        get : "sysctl kernel.sched_latency_ns | awk '{print $3}'"
         set : "sysctl -w kernel.sched_latency_ns=$value"
         needrestart: "false"
         type : "continuous"
