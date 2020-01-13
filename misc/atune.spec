@@ -78,7 +78,6 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version}
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/libexec/atuned/collector
 %attr(0750,root,root) %dir /usr/share/atuned
-%attr(0640,root,root) /usr/share/atuned/atune.logo
 %attr(0750,root,root) %dir /etc/atuned
 %attr(0750,root,root) /etc/atuned/*
 
