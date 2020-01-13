@@ -38,7 +38,7 @@ test01()
         atune-adm profile ${ARRAY_WORKLOADTYPE[i]} >& temp.log
         check_result $? 0
 
-        grep "FAILED" temp.log
+        grep -i "FAILED" temp.log
         check_result $? 1
 
         atune-adm list > temp.log
