@@ -112,6 +112,8 @@ class Optimizer(Process):
             for value in eval_list:
                 num = float(value)
                 x_num = x_num + num
+            options.append(var)
+            performance.append(x_num)
             return x_num
 
         params = {}
