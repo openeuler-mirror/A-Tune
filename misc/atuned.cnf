@@ -12,12 +12,18 @@
 #################################### server ###############################
 # atuned config
 [server]
-# the address that the grpc server to bind to, default is 127.0.0.1
-address = 127.0.0.1
+# the protocol grpc server running on
+# ranges: unix or tcp
+protocol = unix
 
-# the atuned grpc listening port, default is 60001
+# the address that the grpc server to bind to
+# default is unix socket /var/run/atuned/atuned.sock
+# ranges: /var/run/atuned/atuned.sock or ip address
+address = /var/run/atuned/atuned.sock
+
+# the atuned grpc listening port
 # the port can be set between 0 to 65535 which not be used
-port = 60001
+# port = 60001
 
 # the rest service listening port, default is 8383
 # the port can be set between 0 to 65535 which not be used

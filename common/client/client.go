@@ -16,6 +16,7 @@ package client
 import (
 	"atune/common/config"
 	"fmt"
+	"net"
 	"os"
 	"time"
 
@@ -89,7 +90,14 @@ func NewWithConn(conn *grpc.ClientConn, opts ...Opt) (*Client, error) {
 //NewClientFromContext method create a grpc client depend the command context
 func NewClientFromContext(ctx *cli.Context, opts ...Opt) (*Client, error) {
 	addr, port := parseAddr(ctx)
-	return newClient(addr+":"+port, opts...)
+	var address string
+	if port == "" {
+		address = addr
+	} else {
+		address = addr + ":" + port
+	}
+
+	return newClient(address, opts...)
 }
 
 // NewClientWithoutCli method create a grpc client depend the address and port
@@ -100,7 +108,15 @@ func NewClientWithoutCli(addr string, port string, opts ...Opt) (*Client, error)
 	if port == config.DefaultTgtPort {
 		_, port = ParseEnvAddr()
 	}
-	return newClient(addr+":"+port, opts...)
+
+	var address string
+	if port == "" {
+		address = addr
+	} else {
+		address = addr + ":" + port
+	}
+
+	return newClient(address, opts...)
 }
 
 //NewClientFromConn method create a grpc client depend the conn, which is address:port format
@@ -110,7 +126,19 @@ func NewClientFromConn(conn string, opts ...Opt) (*Client, error) {
 
 //NewClient method create a grpc client depend the address and port
 func NewClient(addr string, port string, opts ...Opt) (*Client, error) {
-	return newClient(addr+":"+port, opts...)
+	var address string
+	if port == "" {
+		address = addr
+	} else {
+		address = addr + ":" + port
+	}
+	return newClient(address, opts...)
+}
+
+func UnixConnect(ctx context.Context, addr string) (net.Conn, error) {
+	unix_addr, _ := net.ResolveUnixAddr("unix", addr)
+	conn, err := net.DialUnix("unix", nil, unix_addr)
+	return conn, err
 }
 
 func newClient(address string, opts ...Opt) (*Client, error) {
@@ -137,6 +165,10 @@ func newClient(address string, opts ...Opt) (*Client, error) {
 		gopts = append(gopts, grpc.WithTransportCredentials(creds))
 	} else {
 		gopts = append(gopts, grpc.WithInsecure())
+	}
+
+	if address == config.DefaultTgtAddr {
+		gopts = append(gopts, grpc.WithContextDialer(UnixConnect))
 	}
 
 	if len(copts.dialOptions) > 0 {

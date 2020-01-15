@@ -33,8 +33,9 @@ const (
 	EnvTLS     = "ATUNE_TLS"
 	EnvCliCert = "ATUNE_CLICERT"
 
-	DefaultTgtPort = "60001"
-	DefaultTgtAddr = "127.0.0.1"
+	DefaultProtocol = "unix"
+	DefaultTgtAddr  = "/var/run/atuned/atuned.sock"
+	DefaultTgtPort  = ""
 )
 
 // default path config
@@ -96,6 +97,7 @@ const (
 
 // the grpc server config
 var (
+	TransProtocol     string
 	Address           string
 	Port              string
 	RestPort          string
@@ -132,8 +134,9 @@ func (c *Cfg) Load() error {
 	c.Raw = cfg
 
 	section := cfg.Section("server")
-	Address = section.Key("address").MustString("127.0.0.1")
-	Port = section.Key("port").MustString("60001")
+	TransProtocol = section.Key("protocol").MustString(DefaultProtocol)
+	Address = section.Key("address").MustString(DefaultTgtAddr)
+	Port = section.Key("port").MustString(DefaultTgtPort)
 	RestPort = section.Key("rest_port").MustString("8383")
 	TLS = section.Key("tls").MustBool(false)
 
