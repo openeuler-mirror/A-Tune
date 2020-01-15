@@ -158,7 +158,19 @@ func showlogo() {
 }
 
 func runatuned(ctx *cli.Context) error {
-	lis, err := net.Listen("tcp", config.Address+":"+config.Port)
+	var lis net.Listener
+	var err error
+	if config.TransProtocol == "tcp" {
+		lis, err = net.Listen("tcp", config.Address+":"+config.Port)
+	} else if config.TransProtocol == "unix" {
+		os.Remove(config.DefaultTgtAddr)
+		lis, err = net.Listen("unix", config.Address)
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
+		}
+		err = os.Chmod(config.DefaultTgtAddr, 0600)
+	}
+
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
