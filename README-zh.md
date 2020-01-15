@@ -1,8 +1,8 @@
-A-Tune介绍
-============
+<img src="misc/A-Tune-logo.png" style="zoom: 30%;" div align=left />
+
 [English](./README.md) | 简体中文
 
-<img src="misc/A-Tune-logo.png" style="zoom: 30%;" />
+## A-Tune介绍
 
 A-Tune是一款基于AI的操作系统性能调优软件。A-Tune利用AI技术，使操作系统“懂”业务，简化IT系统调优工作的同时，让应用程序发挥出色性能。
 
