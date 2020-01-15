@@ -88,6 +88,7 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version}
 
 %files db
 %attr(0750,root,root) %dir /var/lib/atuned
+%attr(0750,root,root) %dir /var/run/atuned
 %attr(0750,root,root) /var/lib/atuned/atuned.db
 %attr(0750,root,root) %dir /usr/libexec/atuned
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
