@@ -52,7 +52,7 @@ class Optimizer(Resource):
         """provide the method of post"""
         args = OPTIMIZER_POST_PARSER.parse_args()
         LOGGER.info(args)
-        if args["max_eval"] < 10:
+        if args["max_eval"] < 11:
             LOGGER.error("the max iterations %s must be greater than 10", args["max_eval"])
             abort(400, "the max iterations {} must be greater than 10".format(args["max_eval"]))
         task_id = str(uuid.uuid1())
@@ -88,6 +88,8 @@ class Optimizer(Resource):
 
         result = {}
         values = out_queue.recv()
+        if isinstance(values, Exception):
+            abort(404, "failed to get optimization results, err: {}".format(values))
         params = ["%s=%s" % (k, v) for k, v in values.items()]
         result["param"] = ",".join(params)
 

@@ -32,35 +32,58 @@ class Optimizer(Process):
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
+        self.ref = []
 
     def build_space(self):
         """build space"""
         objective_params_list = []
         for p_nob in self.knobs:
             if p_nob['type'] == 'discrete':
-                if p_nob['dtype'] == 'int':
-                    items = p_nob['items']
-                    if items is None:
-                        items = []
-                    r_range = p_nob['range']
-                    step = 1
-                    if 'step' in p_nob.keys():
-                        step = p_nob['step']
-                    if r_range is not None:
-                        for i in range(0, len(r_range), 2):
-                            items.extend(list(np.arange(r_range[i], r_range[i + 1], step=step)))
-                    items = list(set(items))
-                    objective_params_list.append(items)
-                if p_nob['dtype'] == 'string':
-                    items = p_nob['options']
-                    keys = []
-                    for i in range(len(items)):
-                        keys.append(i)
-                    objective_params_list.append(keys)
+                items = self.handle_discrete_data(p_nob)
+                objective_params_list.append(items)
             elif p_nob['type'] == 'continuous':
                 r_range = p_nob['range']
+                if int(p_nob['ref']) < int(r_range[0]) or int(p_nob['ref']) > int(r_range[1]):
+                    raise ValueError("the default value of {} is out of range"
+                                     .format(p_nob['name']))
+                self.ref.append(int(p_nob['ref']))
                 objective_params_list.append((r_range[0], r_range[1]))
+            else:
+                raise ValueError("the type of {} is not supported".format(p_nob['name']))
         return objective_params_list
+
+    def handle_discrete_data(self, p_nob):
+        """handle discrete data"""
+        if p_nob['dtype'] == 'int':
+            items = p_nob['items']
+            if items is None:
+                items = []
+            r_range = p_nob['range']
+            step = 1
+            if 'step' in p_nob.keys():
+                step = p_nob['step']
+            if r_range is not None:
+                for i in range(0, len(r_range), 2):
+                    items.extend(list(np.arange(r_range[i], r_range[i + 1] + 1, step=step)))
+            items = list(set(items))
+            if int(p_nob['ref']) not in items:
+                raise ValueError("the default value of {} is out of range"
+                                 .format(p_nob['name']))
+            self.ref.append(int(p_nob['ref']))
+            return items
+        if p_nob['dtype'] == 'string':
+            items = p_nob['options']
+            keys = []
+            length = len(self.ref)
+            for key, value in enumerate(items):
+                keys.append(key)
+                if p_nob['ref'] == value:
+                    self.ref.append(key)
+            if len(self.ref) == length:
+                raise ValueError("the default value of {} is out of range"
+                                 .format(p_nob['name']))
+            return keys
+        raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
 
     def run(self):
         def objective(var):
@@ -79,20 +102,14 @@ class Optimizer(Process):
             return x_num
 
         params = {}
-        ref = []
-        for knob in self.knobs:
-            if knob['dtype'] == 'string':
-                for key, value in enumerate(knob['options']):
-                    if knob['ref'] == value:
-                        ref.append(key)
-            else:
-                ref.append(int(knob['ref']))
         try:
             LOGGER.info("Running performance evaluation.......")
-            ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=ref)
+            ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=self.ref)
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', value_error)
+            self.child_conn.send(value_error)
+            return None
 
         for i, knob in enumerate(self.knobs):
             if knob['dtype'] == 'string':

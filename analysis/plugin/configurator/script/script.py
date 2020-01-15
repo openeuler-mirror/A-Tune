@@ -38,11 +38,12 @@ class Script(Configurator):
         name = os.path.basename(key)
         script = "{}/set.sh".format(key)
         output = subprocess.run(
-            "bash {script} {val}".format(
+            "{script} {val}".format(
                 script=script,
                 val=value).split(),
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
+            shell=False,
             check=True)
         if len(output.stderr) != 0:
             err = UserWarning(name + ": " + output.stderr.decode())
@@ -58,10 +59,11 @@ class Script(Configurator):
             raise GetConfigError("script {} not implement".format(script))
 
         output = subprocess.run(
-            "bash {script}".format(
+            "{script}".format(
                 script=script).split(),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            shell=False,
             check=True)
         if len(output.stderr) != 0:
             err = UserWarning(name + ": " + output.stderr.decode())
@@ -79,12 +81,13 @@ class Script(Configurator):
         script = "{}/backup.sh".format(key)
         if os.path.isfile(script):
             output = subprocess.run(
-                "bash {script} {rb_info} {ver}".format(
+                "{script} {rb_info} {ver}".format(
                     script=script,
                     rb_info=rollback_info,
                     ver=random.random()).split(),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                shell=False,
                 check=True)
             if len(output.stderr) != 0:
                 err = UserWarning(name + ": " + output.stderr.decode())
@@ -99,11 +102,12 @@ class Script(Configurator):
         script = "{}/resume.sh".format(key)
         if os.path.isfile(script):
             output = subprocess.run(
-                "bash {script} {val}".format(
+                "{script} {val}".format(
                     script=script,
                     val=value).split(),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
+                shell=False,
                 check=True)
             if len(output.stderr) != 0:
                 err = UserWarning(name + ": " + output.stderr.decode())
