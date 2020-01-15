@@ -252,7 +252,7 @@ class WorkloadCharacterization:
             print("The workload has been identified as non-intensive type")
             return resourcelimit, "default", 1
         if label == [0, 0, 0, 1]:
-            resourcelimit = "io"
+            resourcelimit = "memory"
             print("The workload has been identified as mem-intensive type")
             return resourcelimit, "in-memory_computing", 1
         if label == [0, 0, 1, 0]:
@@ -284,7 +284,7 @@ class WorkloadCharacterization:
             model = joblib.load(cpumem_clf)
             result = model.predict(data)
         elif label == [1, 0, 1, 0]:
-            resourcelimit = "cpu,io"
+            resourcelimit = "cpu,network"
             scaler = joblib.load(cpunet_scaler)
             data = scaler.transform(data)
             print("The workload has been identified as cpu-net-intensive type")
