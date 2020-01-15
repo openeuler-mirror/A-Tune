@@ -21,7 +21,6 @@ import (
 	"atune/common/sqlstore"
 	"atune/common/utils"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 
@@ -148,15 +147,6 @@ func doBeforeJob(ctx *cli.Context) error {
 	return nil
 }
 
-func showlogo() {
-	logo, err := ioutil.ReadFile("/usr/share/atuned/atune.logo")
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	fmt.Print(string(logo))
-}
-
 func runatuned(ctx *cli.Context) error {
 	var lis net.Listener
 	var err error
@@ -197,8 +187,6 @@ func runatuned(ctx *cli.Context) error {
 		return err
 	}
 
-	/* Show atuned Log*/
-	showlogo()
 	if err := utils.WaitForPyservice(); err != nil {
 		log.Errorf("waiting for pyservice faild: %v", err)
 		return err

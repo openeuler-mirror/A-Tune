@@ -44,7 +44,6 @@ install:
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
-	install -m 640 misc/atune.logo $(DESTDIR)$(PREFIX)/share/atuned
 	\cp -rf scripts/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
 	\cp -rf analysis/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
