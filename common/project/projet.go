@@ -154,7 +154,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 	for _, obj := range y.Object {
 		out, err := ExecCommand(obj.Info.GetScript)
 		if err != nil {
-			return err
+			return fmt.Errorf("faild to exec %s, err: %v", obj.Info.GetScript, err)
 		}
 
 		if strings.TrimSpace(string(out)) == paraMap[obj.Name] {
@@ -166,7 +166,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
-			return err
+			return fmt.Errorf("faild to exec %s, err: %v", newScript, err)
 		}
 	}
 	return nil
@@ -188,13 +188,13 @@ func (y *YamlPrjSvr) RestartProject() error {
 	if needRestart {
 		out, err := ExecCommand(stopWorkload)
 		if err != nil {
-			return err
+			return fmt.Errorf("faild to exec %s, err: %v", stopWorkload, err)
 		}
 		log.Debug(string(out))
 
 		out, err = ExecCommand(startWorkload)
 		if err != nil {
-			return err
+			return fmt.Errorf("faild to exec %s, err: %v", startWorkload, err)
 		}
 		log.Debug(string(out))
 	}

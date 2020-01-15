@@ -53,14 +53,7 @@ func (m *Monitor) Run() error {
 		return err
 	}
 
-	modules := m.Cfg.Raw.Section("monitor").Key("module").String()
-	if modules == "" {
-		log.Infof("module conf is empty string")
-		return nil
-	}
-	monitorModules := strings.Split(modules, ",")
 	monitorPath := config.DefaultCheckerPath
-
 	exist, err := utils.PathExist(monitorPath)
 	if err != nil {
 		return err
@@ -72,6 +65,12 @@ func (m *Monitor) Run() error {
 		}
 	}
 
+	modules := m.Cfg.Raw.Section("monitor").Key("module").String()
+	if modules == "" {
+		log.Errorf("module conf is empty string")
+		return nil
+	}
+	monitorModules := strings.Split(modules, ",")
 	for _, module := range monitorModules {
 		module = strings.TrimSpace(module)
 		modulePurpose := strings.Split(module, "_")
