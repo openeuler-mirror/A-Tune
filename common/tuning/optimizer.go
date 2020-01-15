@@ -33,7 +33,6 @@ import (
 // Optimizer : the type implement the bayes serch service
 type Optimizer struct {
 	Prj *project.YamlPrjSvr
-	utils.MutexLock
 }
 
 //BenchMark : the benchmark data
@@ -47,15 +46,11 @@ var evalMap map[string]float64
 var respPutIns *models.RespPutBody
 var iter int
 var maxIter int
-var optimizer = Optimizer{}
 var startIterTime string
 
 // InitTuned method for init tuning
 func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	//dynamic profle setting
-	if !optimizer.TryLock() {
-		return fmt.Errorf("dynamic optimizer search has been in running")
-	}
 	maxIter = askIter
 	if maxIter > o.Prj.Maxiterations {
 		maxIter = o.Prj.Maxiterations
@@ -102,7 +97,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 
 		out, err := project.ExecCommand(item.Info.GetScript)
 		if err != nil {
-			return err
+			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
 		}
 		initConfigure += strings.TrimSpace(knob.Name+"="+string(out)) + ","
 	}
@@ -135,7 +130,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	iter = 0
 
 	benchmark := BenchMark{Content: nil}
-	if err := benchmark.DynamicTuned(ch); err != nil {
+	if _, err := benchmark.DynamicTuned(ch); err != nil {
 		return err
 	}
 
@@ -145,13 +140,13 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 /*
 DynamicTuned method using bayes algorithm to search the best performance parameters
 */
-func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
+func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) (bool, error) {
 	var evalValue string
 	var err error
 	if bench.Content != nil {
 		evalValue, err = bench.evalParsing(ch)
 		if err != nil {
-			return err
+			return true, err
 		}
 	}
 
@@ -163,19 +158,19 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 	respPutIns, err = optPutBody.Put(optimizerPutURL)
 	if err != nil {
 		log.Errorf("get setting parameter error: %v", err)
-		return err
+		return true, err
 	}
 
 	log.Infof("setting params is: %s", respPutIns.Param)
 	if err := optimization.Prj.RunSet(respPutIns.Param); err != nil {
 		log.Error(err)
-		return err
+		return true, err
 	}
 
 	log.Info("set the parameter success")
 	if err := optimization.Prj.RestartProject(); err != nil {
 		log.Error(err)
-		return err
+		return true, err
 	}
 	log.Info("restart project success")
 
@@ -195,21 +190,15 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) error {
 		if err = deleteTask(optimizerPutURL); err != nil {
 			log.Error(err)
 		}
-		optimizer.Unlock()
-		return nil
+		return true, nil
 	}
 
 	iter++
-	return nil
+	return false, nil
 }
 
 //restore tuning config
 func (o *Optimizer) RestoreConfigTuned() error {
-	if !optimizer.TryLock() {
-		return fmt.Errorf("dynamic optimizer search has been in running")
-	}
-	defer optimizer.Unlock()
-
 	tuningRestoreConf := path.Join(config.DefaultTempPath, o.Prj.Project+config.TuningRestoreConfig)
 	exist, err := utils.PathExist(tuningRestoreConf)
 	if err != nil {

@@ -284,7 +284,7 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 // Analysis method analysis the system traffic load
 func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileMgr_AnalysisServer) error {
 	if !s.TryLock() {
-		return fmt.Errorf("analysis has been in running")
+		return fmt.Errorf("dynamic optimizer search or analysis has been in running")
 	}
 	defer s.Unlock()
 
@@ -465,7 +465,10 @@ func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr
 	// data == "" means in tuning process
 	if data == "" {
 		benchmark := tuning.BenchMark{Content: content}
-		err := benchmark.DynamicTuned(ch)
+		isEnd, err := benchmark.DynamicTuned(ch)
+		if isEnd {
+			s.Unlock()
+		}
 		if err != nil {
 			return err
 		}
@@ -507,8 +510,12 @@ func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr
 
 	//content == nil means in restore config
 	if content == nil {
+		if !s.TryLock() {
+			return fmt.Errorf("dynamic optimizer search or analysis has been in running")
+		}
 		optimizer := tuning.Optimizer{Prj: prj}
 		err := optimizer.RestoreConfigTuned()
+		s.Unlock()
 		if err != nil {
 			return err
 		}
@@ -518,11 +525,16 @@ func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr
 	log.Info("begin to dynamic optimizer search")
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")})
 
+	if !s.TryLock() {
+		return fmt.Errorf("dynamic optimizer search or analysis has been in running")
+	}
+
 	optimizer := tuning.Optimizer{Prj: prj}
 	iter, _ := strconv.Atoi(string(content))
 	log.Infof("client ask iterations:%d", iter)
 	err = optimizer.InitTuned(ch, iter)
 	if err != nil {
+		s.Unlock()
 		return err
 	}
 
