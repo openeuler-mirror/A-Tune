@@ -35,6 +35,7 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/collector
 	mkdir -p $(DESTDIR)/var/lib/atuned
+	mkdir -p $(DESTDIR)/var/run/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/share/bash-completion/completions
 	install -m 640 pkg/daemon_profile_server.so $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	install -m 750 pkg/atune-adm $(BINDIR)
