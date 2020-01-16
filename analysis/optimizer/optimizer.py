@@ -19,6 +19,8 @@ import logging
 from multiprocessing import Process
 import numpy as np
 from skopt.optimizer import gp_minimize
+from sklearn.linear_model import Lasso
+from sklearn.preprocessing import StandardScaler
 
 LOGGER = logging.getLogger(__name__)
 
@@ -85,6 +87,17 @@ class Optimizer(Process):
             return keys
         raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
 
+    @staticmethod
+    def feature_importance(options, performance, labels):
+        """feature importance"""
+        options = StandardScaler().fit_transform(options)
+        lasso = Lasso()
+        lasso.fit(options, performance)
+        result = zip(lasso.coef_, labels)
+        result = sorted(result, key=lambda x: -np.abs(x[0]))
+        rank = ", ".join("%s: %s" % (label, round(coef, 3))for coef, label in result)
+        return rank
+
     def run(self):
         def objective(var):
             for i, knob in enumerate(self.knobs):
@@ -99,9 +112,14 @@ class Optimizer(Process):
             for value in eval_list:
                 num = float(value)
                 x_num = x_num + num
+            options.append(var)
+            performance.append(x_num)
             return x_num
 
         params = {}
+        options = []
+        performance = []
+        labels = []
         try:
             LOGGER.info("Running performance evaluation.......")
             ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=self.ref)
@@ -116,9 +134,13 @@ class Optimizer(Process):
                 params[knob['name']] = knob['options'][ret.x[i]]
             else:
                 params[knob['name']] = ret.x[i]
+            labels.append(knob['name'])
         self.child_conn.send(params)
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
+
+        rank = self.feature_importance(options, performance, labels)
+        LOGGER.info("The feature importances of current evaluation are: %s", rank)
         return params
 
     def stop_process(self):
