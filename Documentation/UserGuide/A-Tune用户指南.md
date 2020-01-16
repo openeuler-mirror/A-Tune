@@ -296,8 +296,9 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 
     可根据需要进行修改。
 
-    -   address：系统grpc服务的侦听地址，默认为127.0.0.1，若为分布式部署，需进行修改。
-    -   port：系统grpc服务的侦听端口，范围为0\~65535未使用的端口。
+    -   protocol：系统grpc服务使用的协议，unix或tcp，unix为本地socket通信方式，tcp为socket监听端口方式。默认为unix。
+    -   address：系统grpc服务的侦听地址，默认为unix socket，若为分布式部署，需修改为侦听的ip地址。
+    -   port：系统grpc服务的侦听端口，范围为0\~65535未使用的端口。如果protocol配置是unix，则不需要配置。
     -   rest\_port：系统restservice的侦听端口, 范围为0\~65535未使用的端口。
     -   sample\_num：系统执行analysis流程时采集样本的数量。
 
@@ -333,12 +334,18 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 #################################### server ###############################
 # atuned config
 [server]
-# the address that the grpc server to bind to, default is 127.0.0.1
-address = 127.0.0.1
+# the protocol grpc server running on
+# ranges: unix or tcp
+protocol = unix
 
-# the atuned grpc listening port, default is 60001
+# the address that the grpc server to bind to
+# default is unix socket /var/run/atuned/atuned.sock
+# ranges: /var/run/atuned/atuned.sock or ip address
+address = /var/run/atuned/atuned.sock
+
+# the atuned grpc listening port
 # the port can be set between 0 to 65535 which not be used
-port = 60001
+# port = 60001
 
 # the rest service listening port, default is 8383
 # the port can be set between 0 to 65535 which not be used
@@ -358,6 +365,7 @@ sample_num = 20
 # tlshttpcacertfile = /etc/atuned/http/cacert.pem
 
 #################################### log ###############################
+[log]
 # either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
 

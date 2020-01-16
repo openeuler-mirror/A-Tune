@@ -1,4 +1,4 @@
-<img src="misc/A-Tune-logo.png" style="zoom: 30%;" div align=left />
+<img src="misc/A-Tune-logo.png" width=50% div align=left />
 
 English | [简体中文](./README-zh.md)
 
