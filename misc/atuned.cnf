@@ -13,10 +13,12 @@
 # atuned config
 [server]
 # the protocol grpc server running on
+# ranges: unix or tcp
 protocol = unix
 
 # the address that the grpc server to bind to
 # default is unix socket /var/run/atuned/atuned.sock
+# ranges: /var/run/atuned/atuned.sock or ip address
 address = /var/run/atuned/atuned.sock
 
 # the atuned grpc listening port

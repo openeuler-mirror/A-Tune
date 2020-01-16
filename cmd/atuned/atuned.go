@@ -169,6 +169,8 @@ func runatuned(ctx *cli.Context) error {
 			log.Fatalf("failed to listen: %v", err)
 		}
 		err = os.Chmod(config.DefaultTgtAddr, 0600)
+	} else {
+		return fmt.Errorf("not support protocol:%s", config.TransProtocol)
 	}
 
 	if err != nil {
