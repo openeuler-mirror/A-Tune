@@ -302,8 +302,9 @@ The configuration items in the A-Tune configuration file  **/etc/atuned/atuned.c
 
     You can modify the parameter value as required.
 
-    -   **address**: Listening IP address of the gRPC server. The default value is  **127.0.0.1**. Modify the value for distributed deployment.
-    -   **port**: Listening port of the gRPC server. The value ranges from 0 to 65535. The port is not in use.
+    -   **protocol**: Protocol of the gRPC server. The value can take **unix** or **tcp**. **unix** is local socket communication and **tcp** is listening port communication. The default value is **unix**.
+    -   **address**: Listening IP address of the gRPC server. The default value is  unix socket **/var/run/atuned/atuned.sock**. Modify the value as ip for distributed deployment.
+    -   **port**: Listening port of the gRPC server. The value ranges from 0 to 65535. The port is not in use. If **protocol** value is set to unix, the port need not be configured.
     -   **rest\_port**: Listening port of the system REST service. The value ranges from 0 to 65535. The port is not in use.
     -   **sample\_num**: Number of samples collected when the system executes the analysis process.
 
@@ -339,12 +340,18 @@ The configuration items in the A-Tune configuration file  **/etc/atuned/atuned.c
 #################################### server ###############################
 # atuned config
 [server]
-# the address that the grpc server to bind to, default is 127.0.0.1
-address = 127.0.0.1
+# the protocol grpc server running on
+# ranges: unix or tcp
+protocol = unix
 
-# the atuned grpc listening port, default is 60001
+# the address that the grpc server to bind to
+# default is unix socket /var/run/atuned/atuned.sock
+# ranges: /var/run/atuned/atuned.sock or ip address
+address = /var/run/atuned/atuned.sock
+
+# the atuned grpc listening port
 # the port can be set between 0 to 65535 which not be used
-port = 60001
+# port = 60001
 
 # the rest service listening port, default is 8383
 # the port can be set between 0 to 65535 which not be used
@@ -364,6 +371,7 @@ sample_num = 20
 # tlshttpcacertfile = /etc/atuned/http/cacert.pem
 
 #################################### log ###############################
+[log]
 # either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
 
