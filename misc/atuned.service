@@ -5,7 +5,6 @@ Requires=polkit.service
 
 [Service]
 Type=notify
-PIDFile=/run/atuned/atuned.pid
 ExecStart=/usr/bin/atuned
 
 [Install]

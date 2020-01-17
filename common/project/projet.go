@@ -130,7 +130,7 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 			return strings.Join(benchStr, ","), err
 		}
 
-		out := strconv.FormatFloat((floatout * float64(evaluation.Info.Weight) / 100), 'E', -1, 64)
+		out := strconv.FormatFloat((floatout * float64(evaluation.Info.Weight) / 100), 'f', -1, 64)
 		if evaluation.Info.Type == "negative" {
 			out = "-" + out
 		}

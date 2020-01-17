@@ -42,7 +42,8 @@ type BenchMark struct {
 
 var optimizerPutURL string
 var optimization *Optimizer
-var evalMap map[string]float64
+var finalEval string
+var minEvalSum float64
 var respPutIns *models.RespPutBody
 var iter int
 var maxIter int
@@ -126,7 +127,6 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 	log.Infof("optimizer put url is: %s", optimizerPutURL)
 
 	optimization = o
-	evalMap = make(map[string]float64)
 	iter = 0
 
 	benchmark := BenchMark{Content: nil}
@@ -177,13 +177,9 @@ func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) (bool, error) {
 	startIterTime = time.Now().Format(config.DefaultTimeFormat)
 
 	if iter == maxIter {
-		evaluation := make([]string, 0)
-		for evalKey, evalValue := range evalMap {
-			value := strconv.FormatFloat(evalValue, 'E', -1, 64)
-			evaluation = append(evaluation, evalKey+"="+value)
-		}
+		finalEval := strings.Replace(finalEval, "=-", "=", -1)
 		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s", respPutIns.Param, strings.Join(evaluation, ","))
+			" The final evaluation value is: %s", respPutIns.Param, finalEval)
 		log.Info(optimizationTerm)
 		ch <- &PB.AckCheck{Name: optimizationTerm, Status: utils.SUCCESS}
 
@@ -228,9 +224,9 @@ func (o *Optimizer) RestoreConfigTuned() error {
 
 func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
 	eval := string(bench.Content)
-
+	positiveEval := strings.Replace(eval, "=-", "=", -1)
 	optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
-		" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, eval)
+		" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, positiveEval)
 	ch <- &PB.AckCheck{Name: optimizationTerm}
 	log.Info(optimizationTerm)
 
@@ -239,7 +235,7 @@ func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
 	iterInfo = append(iterInfo, strconv.Itoa(iter))
 	iterInfo = append(iterInfo, startIterTime)
 	iterInfo = append(iterInfo, endIterTime)
-	iterInfo = append(iterInfo, eval)
+	iterInfo = append(iterInfo, positiveEval)
 	iterInfo = append(iterInfo, respPutIns.Param)
 	output := strings.Join(iterInfo, "|")
 
@@ -251,6 +247,7 @@ func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
 	}
 
 	evalValue := make([]string, 0)
+	evalSum := 0.0
 	for _, benchStr := range strings.Split(eval, ",") {
 		kvs := strings.Split(benchStr, "=")
 		if len(kvs) < 2 {
@@ -263,11 +260,13 @@ func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
 			return "", err
 		}
 
-		if floatEval < evalMap[kvs[0]] {
-			evalMap[kvs[0]] = floatEval
-		}
-
+		evalSum += floatEval
 		evalValue = append(evalValue, kvs[1])
+	}
+
+	if iter == 1 || evalSum < minEvalSum {
+		minEvalSum = evalSum
+		finalEval = eval
 	}
 	return strings.Join(evalValue, ","), nil
 }

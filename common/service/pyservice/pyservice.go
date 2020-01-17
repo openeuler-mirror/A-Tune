@@ -62,7 +62,7 @@ func (p *PyEngine) Run() error {
 
 	go listenToSystemSignals(cmd)
 	go logStdout(stdout)
-	go logStderr(stderr)
+	go logStdout(stderr)
 
 	err := cmd.Start()
 	if err != nil {
@@ -82,14 +82,6 @@ func (p *PyEngine) Run() error {
 
 func logStdout(stdout io.ReadCloser) {
 	scanner := bufio.NewScanner(stdout)
-	for scanner.Scan() {
-		line := scanner.Text()
-		log.Debug(line)
-	}
-}
-
-func logStderr(stderr io.ReadCloser) {
-	scanner := bufio.NewScanner(stderr)
 	for scanner.Scan() {
 		line := scanner.Text()
 		log.Debug(line)
