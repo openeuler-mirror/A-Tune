@@ -78,25 +78,18 @@ test02()
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        atune-adm define ${array[i]} $profile_name $profile_file >& temp.log
-
-        case ${array[i]} in
-            "$SPECIAL_CHARACTERS")
-                check_result $? 0
-                atune-adm list > temp.log
-                grep "$profile_name" temp.log
-                check_result $? 0
-                atune-adm undefine ${array[i]};;
-            $ULTRA_LONG_CHARACTERS)
-                check_result $? 0
-                atune-adm list > temp.log
-                grep "$profile_name" temp.log
-                check_result $? 0
-                atune-adm undefine ${array[i]};;
-            *)
-                check_result $? 1
-                grep -i "Incorrect Usage." temp.log;;
-        esac
+        if [ -z ${array[i]} ];then
+            atune-adm define ${array[i]} $profile_name $profile_file >& temp.log
+            check_result $? 1
+            grep -i "Incorrect Usage." temp.log
+        else
+            atune-adm define ${array[i]} $profile_name $profile_file >& temp.log
+            check_result $? 0
+            atune-adm list > temp.log
+            grep "$profile_name" temp.log
+            check_result $? 0
+            atune-adm undefine ${array[i]}
+        fi
         check_result $? 0
     done
 
@@ -123,25 +116,18 @@ test03()
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        atune-adm define $self_workload ${array[i]} $profile_file >& temp.log
-
-        case ${array[i]} in
-            "$SPECIAL_CHARACTERS")
-                check_result $? 0
-                atune-adm list > temp.log
-                grep "$self_workload" temp.log
-                check_result $? 0
-                atune-adm undefine $self_workload;;
-            $ULTRA_LONG_CHARACTERS)
-                check_result $? 0
-                atune-adm list > temp.log
-                grep "$self_workload" temp.log
-                check_result $? 0
-                atune-adm undefine $self_workload;;
-            *)
-                check_result $? 1
-                grep -i "Incorrect Usage." temp.log;;
-        esac
+        if [ -z ${array[i]} ];then
+            atune-adm define $self_workload ${array[i]} $profile_file >& temp.log
+            check_result $? 1
+            grep -i "Incorrect Usage." temp.log
+        else
+            atune-adm define $self_workload ${array[i]} $profile_file >& temp.log
+            check_result $? 0
+            atune-adm list > temp.log
+            grep "$self_workload" temp.log
+            check_result $? 0
+            atune-adm undefine $self_workload
+        fi
         check_result $? 0
     done
 

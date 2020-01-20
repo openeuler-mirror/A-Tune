@@ -76,19 +76,15 @@ test02()
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        atune-adm undefine ${array[i]}  >& temp.log
-
-        case ${array[i]} in
-            "$SPECIAL_CHARACTERS")
-                check_result $? 0
-                grep "workload type.* may be not exist in the table" temp.log;;
-            $ULTRA_LONG_CHARACTERS)
-                check_result $? 0
-                grep "workload type.* may be not exist in the table" temp.log;;
-            *)
-                check_result $? 1
-                grep -i "Incorrect Usage." temp.log;;
-        esac
+        if [ -z ${array[i]} ];then
+            atune-adm undefine ${array[i]}  >& temp.log
+            check_result $? 1
+            grep -i "Incorrect Usage." temp.log
+        else
+            atune-adm undefine ${array[i]}  >& temp.log
+            check_result $? 0
+            grep "workload type.* may be not exist in the table" temp.log
+        fi
         check_result $? 0
     done
 
