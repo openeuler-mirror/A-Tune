@@ -1,3 +1,4 @@
+VERSION = 0.1
 .PHONY: all clean modules
 
 PKGPATH=pkg
@@ -6,14 +7,19 @@ PREFIX    ?= /usr
 LIBEXEC   ?= libexec
 BINDIR     = $(DESTDIR)$(PREFIX)/bin
 SYSTEMDDIR = $(DESTDIR)$(PREFIX)/lib/systemd/system
+SRCVERSION = $(shell git rev-parse --short HEAD 2>/dev/null)
+ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
+
+GOLDFLAGS += -X atune/common/config.Version=$(ATUNEVERSION)
+GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
 all: modules atune-adm atuned db
 
 atune-adm:
-	export GOPATH=`cd ../../;pwd` && go build -v -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
+	export GOPATH=`cd ../../;pwd` && go build -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
 
 atuned:
-	export GOPATH=`cd ../../;pwd` && go build -v -o $(PKGPATH)/atuned cmd/atuned/*.go
+	export GOPATH=`cd ../../;pwd` && go build -v $(GOFLAGS) -o $(PKGPATH)/atuned cmd/atuned/*.go
 
 modules:
 	export GOPATH=`cd ../../;pwd` && cd ${CURDIR}/modules/server/profile/ && go build -buildmode=plugin -o ${CURDIR}/pkg/daemon_profile_server.so *.go
