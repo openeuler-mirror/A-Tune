@@ -21,7 +21,6 @@ import (
 	"atune/common/log"
 	"atune/common/models"
 	"atune/common/profile"
-	"atune/common/project"
 	"atune/common/registry"
 	"atune/common/schedule"
 	SVC "atune/common/service"
@@ -32,11 +31,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -450,92 +449,59 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 }
 
 // Tuning method calling the bayes search method to tuned parameters
-func (s *ProfileServer) Tuning(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_TuningServer) error {
-	//dynamic profle setting
-	data := profileInfo.GetName()
-	content := profileInfo.GetContent()
+func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
+	if !s.TryLock() {
+		return fmt.Errorf("dynamic optimizer search or analysis has been in running")
+	}
+	defer s.Unlock()
 
 	ch := make(chan *PB.AckCheck)
+	defer close(ch)
 	go func() {
 		for value := range ch {
 			_ = stream.Send(value)
 		}
 	}()
 
-	// data == "" means in tuning process
-	if data == "" {
-		benchmark := tuning.BenchMark{Content: content}
-		isEnd, err := benchmark.DynamicTuned(ch)
-		if isEnd {
-			s.Unlock()
-		}
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	prjfound := false
-	var prjs []*project.YamlPrjSvr
-	err := filepath.Walk(config.DefaultTuningPath, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			prj, ret := project.LoadProject(path)
-			if ret != nil {
-				log.Errorf("load %s faild(%s)", path, ret)
-				return ret
-			}
-			log.Infof("project:%s load %s success", prj.Project, path)
-			prjs = append(prjs, prj)
-		}
-		return nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	var prj *project.YamlPrjSvr
-	for _, prj = range prjs {
-		if data == prj.Project {
-			log.Infof("found Project:%v", prj.Project)
-			prjfound = true
+	var optimizer = tuning.Optimizer{}
+	for {
+		reply, err := stream.Recv()
+		if err == io.EOF {
 			break
 		}
-	}
-
-	if !prjfound {
-		log.Errorf("project:%s not found", data)
-		return fmt.Errorf("project:%s not found", data)
-	}
-
-	//content == nil means in restore config
-	if content == nil {
-		if !s.TryLock() {
-			return fmt.Errorf("dynamic optimizer search or analysis has been in running")
-		}
-		optimizer := tuning.Optimizer{Prj: prj}
-		err := optimizer.RestoreConfigTuned()
-		s.Unlock()
 		if err != nil {
 			return err
 		}
-		return nil
-	}
 
-	log.Info("begin to dynamic optimizer search")
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")})
+		data := reply.Name
+		content := reply.Content
 
-	if !s.TryLock() {
-		return fmt.Errorf("dynamic optimizer search or analysis has been in running")
-	}
+		// data == "" means in tuning process
+		if data == "" {
+			optimizer.Content = content
+			err := optimizer.DynamicTuned(ch)
+			if err != nil {
+				return err
+			}
+			continue
+		}
 
-	optimizer := tuning.Optimizer{Prj: prj}
-	iter, _ := strconv.Atoi(string(content))
-	log.Infof("client ask iterations:%d", iter)
-	err = optimizer.InitTuned(ch, iter)
-	if err != nil {
-		s.Unlock()
-		return err
+		if err := tuning.CheckServerPrj(data, &optimizer); err != nil {
+			return err
+		}
+
+		//content == nil means in restore config
+		if content == nil {
+			if err := optimizer.RestoreConfigTuned(ch); err != nil {
+				return err
+			}
+			continue
+		}
+
+		optimizer.Content = content
+		if err = optimizer.InitTuned(ch); err != nil {
+			return err
+		}
 	}
 
 	return nil

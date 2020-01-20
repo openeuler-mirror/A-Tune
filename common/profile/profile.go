@@ -407,10 +407,10 @@ func (p *Profile) Check(ch chan *PB.AckCheck) error {
 				description := fmt.Sprintf("value: %s", value)
 				sendChanToAdm(ch, key.Name(), utils.SUCCESS, description)
 			} else if statusStr == utils.UNKNOWN {
-				description := fmt.Sprintf("expext value: %s, real value: %s", value, statusStr)
+				description := fmt.Sprintf("expect value: %s, real value: %s", value, statusStr)
 				sendChanToAdm(ch, key.Name(), utils.WARNING, description)
 			} else {
-				description := fmt.Sprintf("expext value: %s, real value: %s", value, statusStr)
+				description := fmt.Sprintf("expect value: %s, real value: %s", value, statusStr)
 				sendChanToAdm(ch, key.Name(), utils.FAILD, description)
 			}
 		}

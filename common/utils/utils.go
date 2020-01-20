@@ -16,8 +16,11 @@ package utils
 import (
 	PB "atune/api/profile"
 	"bufio"
+	"encoding/xml"
 	"fmt"
+	"gopkg.in/yaml.v2"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"net"
 	"os"
@@ -304,5 +307,51 @@ func WriteFile(filename string, data string, perm os.FileMode, wrapper int) erro
 		err = err1
 	}
 	return err
+}
+
+//parse yaml or xml file
+func ParseFile(filePath string, fileFormat string, out interface{}) error {
+	exist, err := PathExist(filePath)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		return fmt.Errorf("%s is not exist", filePath)
+	}
+
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	switch fileFormat {
+	case "yaml":
+		if err := yaml.Unmarshal(data, out); err != nil {
+			return err
+		}
+	case "xml":
+		if err := xml.Unmarshal(data, out); err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("this conversion mode of %s is not supported", fileFormat)
+	}
+
+	return nil
+}
+
+//create dir if the dir is not exist
+func CreateDir(dir string, perm os.FileMode) error {
+	exist, err := PathExist(dir)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		if err = os.MkdirAll(dir, perm); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
