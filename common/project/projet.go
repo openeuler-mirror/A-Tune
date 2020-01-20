@@ -15,14 +15,10 @@ package project
 
 import (
 	"atune/common/log"
-	"atune/common/utils"
 	"fmt"
-	"io/ioutil"
 	"os/exec"
 	"strconv"
 	"strings"
-
-	yaml "gopkg.in/yaml.v2"
 )
 
 // Evaluate :store the evaluate object
@@ -78,59 +74,30 @@ type YamlPrjObj struct {
 	Info YamlObj `yaml:"info"`
 }
 
-// LoadProject method load the tuning yaml
-func LoadProject(path string) (*YamlPrjSvr, error) {
-	exist, err := utils.PathExist(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if !exist {
-		return nil, fmt.Errorf("the path %s doesn't exist", path)
-	}
-
-	return newProject(path)
-}
-
-func newProject(path string) (*YamlPrjSvr, error) {
-	info, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	prj := new(YamlPrjSvr)
-	if err := yaml.Unmarshal(info, prj); err != nil {
-		return nil, fmt.Errorf("parse %s failed : %s", path, err)
-	}
-
-	return prj, nil
-}
-
 // BenchMark method call the benchmark script
 func (y *YamlPrjCli) BenchMark() (string, error) {
 	benchStr := make([]string, 0)
 
-	cmd := exec.Command("sh", "-c", y.Benchmark)
-	benchOutByte, err := cmd.CombinedOutput()
-
+	benchOutByte, err := ExecCommand(y.Benchmark)
 	if err != nil {
 		return "", fmt.Errorf("failed to run benchmark, err: %v", err)
 	}
+
 	for _, evaluation := range y.Evaluations {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)
-		cmd := exec.Command("sh", "-c", newScript)
-		bout, err := cmd.Output()
+		bout, err := ExecCommand(newScript)
 		if err != nil {
-			log.Error(err)
-			return strings.Join(benchStr, ","), err
-		}
-		floatout, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
-		if err != nil {
-			log.Error(err)
+			err = fmt.Errorf("faild to exec %s, err: %v", newScript, err)
 			return strings.Join(benchStr, ","), err
 		}
 
-		out := strconv.FormatFloat((floatout * float64(evaluation.Info.Weight) / 100), 'f', -1, 64)
+		floatOut, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
+		if err != nil {
+			err = fmt.Errorf("faild to parse float, err: %v", err)
+			return strings.Join(benchStr, ","), err
+		}
+
+		out := strconv.FormatFloat(floatOut*float64(evaluation.Info.Weight)/100, 'f', -1, 64)
 		if evaluation.Info.Type == "negative" {
 			out = "-" + out
 		}
@@ -208,3 +175,4 @@ func ExecCommand(script string) ([]byte, error) {
 	out, err := cmd.CombinedOutput()
 	return out, err
 }
+

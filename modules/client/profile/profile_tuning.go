@@ -21,13 +21,11 @@ import (
 	"atune/common/utils"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strconv"
 	"strings"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
-	yaml "gopkg.in/yaml.v2"
 )
 
 var profileTunningCommand = cli.Command{
@@ -82,99 +80,92 @@ func profileTunning(ctx *cli.Context) error {
 	}
 
 	yamlPath := ctx.Args().Get(0)
-	exist, err := utils.PathExist(yamlPath)
-	if err != nil {
-		return err
-	}
-
-	if !exist {
-		return fmt.Errorf("project file %s is not exist", yamlPath)
-	}
-
 	if !strings.HasSuffix(yamlPath, ".yaml") && !strings.HasSuffix(yamlPath, ".yml") {
-		return fmt.Errorf("project file is not ends with yaml or yml")
+		return fmt.Errorf("error: %s is not ends with yaml or yml", yamlPath)
 	}
 
-	data, err := ioutil.ReadFile(yamlPath)
-	if err != nil {
-		return err
-	}
 	prj := project.YamlPrjCli{}
-	if err := yaml.Unmarshal(data, &prj); err != nil {
+	if err := utils.ParseFile(yamlPath, "yaml", &prj); err != nil {
+		return err
+	}
+	if err := checkTuningPrjYaml(prj); err != nil {
 		return err
 	}
 
-	if len(prj.Project) < 1 || len(prj.Project) > 128 {
-		return fmt.Errorf("project name must be no less than 1 and no greater than 128 in yaml or yml")
-	}
+	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
+		content := &PB.ProfileInfo{Name: prj.Project, Content: []byte(strconv.Itoa(prj.Iterations))}
+		if err := stream.Send(content); err != nil {
+			return fmt.Errorf("client sends failure, error: %v", err)
+		}
 
-	if len(prj.Benchmark) < 1 {
-		return fmt.Errorf("benchmark must be specified in yaml or yml")
-	}
+		iter := 0
+		for {
+			reply, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			if reply.Status != utils.SUCCESS {
+				utils.Print(reply)
+				continue
+			}
+			if iter >= prj.Iterations {
+				break
+			}
 
-	if len(prj.Evaluations) > 10 {
-		return fmt.Errorf("evaluations must be no greater than 10 in project %s", prj.Project)
-	}
+			benchmarkByte, err := prj.BenchMark()
+			if err != nil {
+				return err
+			}
+			if err := stream.Send(&PB.ProfileInfo{Content: []byte(benchmarkByte)}); err != nil {
+				return fmt.Errorf("client sends failure, error: %v", err)
+			}
+			iter++
+		}
+		return nil
+	})
 
-	_, err = runTuningRPC(ctx, &PB.ProfileInfo{Name: prj.Project, Content: []byte(strconv.Itoa(prj.Iterations))})
 	if err != nil {
 		return err
-	}
-
-	iter := 0
-	for iter < prj.Iterations {
-		benchmarkByte, err := prj.BenchMark()
-		if err != nil {
-			return err
-		}
-
-		var status string
-		status, err = runTuningRPC(ctx, &PB.ProfileInfo{Content: []byte(benchmarkByte)})
-		if err != nil {
-			return err
-		}
-
-		if status == utils.SUCCESS {
-			break
-		}
-
-		iter++
 	}
 	return nil
 }
 
-func runTuningRPC(ctx *cli.Context, info *PB.ProfileInfo) (string, error) {
-	c, err := client.NewClientFromContext(ctx)
+func checkRestoreConfig(ctx *cli.Context) error {
+	if err := checkTuningCtx(ctx); err != nil {
+		return err
+	}
+
+	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
+		content := &PB.ProfileInfo{Name: ctx.String("project")}
+		if err := stream.Send(content); err != nil {
+			return fmt.Errorf("client sends failure, error: %v", err)
+		}
+
+		for {
+			reply, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			utils.Print(reply)
+
+			if reply.Status == utils.SUCCESS {
+				break
+			}
+		}
+		return nil
+	})
+
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	defer c.Close()
-	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Tuning(CTX.Background(), info)
-	if err != nil {
-		return "", err
-	}
-
-	for {
-		reply, err := stream.Recv()
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return "", err
-		}
-
-		utils.Print(reply)
-
-		if reply.Status == utils.SUCCESS {
-			return reply.Status, nil
-		}
-	}
-
-	return "", nil
+	return nil
 }
 
 func checkTuningCtx(ctx *cli.Context) error {
@@ -190,15 +181,49 @@ func checkTuningCtx(ctx *cli.Context) error {
 	return nil
 }
 
-func checkRestoreConfig(ctx *cli.Context) error {
-	err := checkTuningCtx(ctx)
+func checkTuningPrjYaml(prj project.YamlPrjCli) error {
+	if len(prj.Project) < 1 || len(prj.Project) > 128 {
+		return fmt.Errorf("error: project name must be no less than 1 " +
+			"and no greater than 128 in yaml or yml")
+	}
+
+	if len(prj.Benchmark) < 1 {
+		return fmt.Errorf("error: benchmark must be specified in yaml or yml")
+	}
+
+	if len(prj.Evaluations) > 10 {
+		return fmt.Errorf("error: evaluations must be no greater than 10 "+
+			"in project %s", prj.Project)
+	}
+
+	if prj.Iterations < 11 {
+		return fmt.Errorf("error: iterations must be greater than 10 "+
+			"in project %s", prj.Project)
+	}
+	return nil
+}
+
+func runTuningRPC(ctx *cli.Context, sendTask func(stream PB.ProfileMgr_TuningClient) error) error {
+	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
 		return err
 	}
-	_, err = runTuningRPC(ctx, &PB.ProfileInfo{Name: ctx.String("project")})
+
+	defer c.Close()
+	svc := PB.NewProfileMgrClient(c.Connection())
+	stream, err := svc.Tuning(CTX.Background())
 	if err != nil {
 		return err
 	}
+
+	if err := sendTask(stream); err != nil {
+		return err
+	}
+
+	if err := stream.CloseSend(); err != nil {
+		return fmt.Errorf("failed to close stream, error: %v", err)
+	}
+
 	return nil
 }
 

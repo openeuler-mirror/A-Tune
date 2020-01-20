@@ -20,7 +20,7 @@ service ProfileMgr {
 	rpc Profile(ProfileInfo) returns (stream AckCheck) {}
 	rpc CheckInitProfile(ProfileInfo) returns (stream AckCheck) {}
     	rpc Analysis(AnalysisMessage) returns (stream AckCheck) {}
-	rpc Tuning(ProfileInfo) returns (stream AckCheck) {}
+	rpc Tuning(stream ProfileInfo) returns (stream AckCheck) {}
 	rpc ListWorkload(ProfileInfo) returns (stream ListMessage) {}
 	rpc UpgradeProfile(ProfileInfo) returns (stream AckCheck) {}
 	rpc InfoProfile(ProfileInfo) returns (stream ProfileInfo) {}

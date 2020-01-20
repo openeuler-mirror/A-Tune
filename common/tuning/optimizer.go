@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -32,42 +33,38 @@ import (
 
 // Optimizer : the type implement the bayes serch service
 type Optimizer struct {
-	Prj *project.YamlPrjSvr
+	Prj             *project.YamlPrjSvr
+	Content         []byte
+	Iter            int
+	MaxIter         int
+	OptimizerPutURL string
+	FinalEval       string
+	MinEvalSum      float64
+	RespPutIns      *models.RespPutBody
+	StartIterTime   string
 }
-
-//BenchMark : the benchmark data
-type BenchMark struct {
-	Content []byte
-}
-
-var optimizerPutURL string
-var optimization *Optimizer
-var finalEval string
-var minEvalSum float64
-var respPutIns *models.RespPutBody
-var iter int
-var maxIter int
-var startIterTime string
 
 // InitTuned method for init tuning
-func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
+func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
+	clientIter, err := strconv.Atoi(string(o.Content))
+	if err != nil {
+		return err
+	}
+
+	log.Infof("begin to dynamic optimizer search, client ask iterations:%d", clientIter)
+	ch <- &PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")}
+
 	//dynamic profle setting
-	maxIter = askIter
-	if maxIter > o.Prj.Maxiterations {
-		maxIter = o.Prj.Maxiterations
+	o.MaxIter = clientIter
+	if o.MaxIter > o.Prj.Maxiterations {
+		o.MaxIter = o.Prj.Maxiterations
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
 		ch <- &PB.AckCheck{Name: fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations)}
 	}
 
-	exist, err := utils.PathExist(config.DefaultTempPath)
-	if err != nil {
+	if err := utils.CreateDir(config.DefaultTempPath, 0750); err != nil {
 		return err
-	}
-	if !exist {
-		if err = os.MkdirAll(config.DefaultTempPath, 0750); err != nil {
-			return err
-		}
 	}
 
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
@@ -78,12 +75,10 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		return err
 	}
 
-	initConfigure := ""
+	initConfigure := make([]string, 0)
 	optimizerBody := new(models.OptimizerPostBody)
-	optimizerBody.MaxEval = maxIter
-
+	optimizerBody.MaxEval = o.MaxIter
 	optimizerBody.Knobs = make([]models.Knob, 0)
-
 	for _, item := range o.Prj.Object {
 		knob := new(models.Knob)
 		knob.Dtype = item.Info.Dtype
@@ -100,11 +95,11 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		if err != nil {
 			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
 		}
-		initConfigure += strings.TrimSpace(knob.Name+"="+string(out)) + ","
+		initConfigure = append(initConfigure, strings.TrimSpace(knob.Name+"="+string(out)))
 	}
 
 	err = utils.WriteFile(path.Join(config.DefaultTempPath,
-		o.Prj.Project+config.TuningRestoreConfig), initConfigure,
+		o.Prj.Project+config.TuningRestoreConfig), strings.Join(initConfigure, ","),
 		config.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		log.Error(err)
@@ -116,21 +111,17 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 		return err
 	}
 	if respPostIns.Status != "OK" {
-		log.Errorf(respPostIns.Status)
-		return fmt.Errorf("create task failed: %s", respPostIns.Status)
+		err := fmt.Errorf("create task failed: %s", respPostIns.Status)
+		log.Errorf(err.Error())
+		return err
 	}
 
-	log.Infof("create task id is %s", respPostIns.TaskID)
 	url := config.GetURL(config.OptimizerURI)
-	optimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
+	o.OptimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
+	log.Infof("optimizer put url is: %s", o.OptimizerPutURL)
 
-	log.Infof("optimizer put url is: %s", optimizerPutURL)
-
-	optimization = o
-	iter = 0
-
-	benchmark := BenchMark{Content: nil}
-	if _, err := benchmark.DynamicTuned(ch); err != nil {
+	o.Content = nil
+	if err := o.DynamicTuned(ch); err != nil {
 		return err
 	}
 
@@ -140,70 +131,72 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck, askIter int) error {
 /*
 DynamicTuned method using bayes algorithm to search the best performance parameters
 */
-func (bench *BenchMark) DynamicTuned(ch chan *PB.AckCheck) (bool, error) {
+func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 	var evalValue string
 	var err error
-	if bench.Content != nil {
-		evalValue, err = bench.evalParsing(ch)
+	if o.Content != nil {
+		evalValue, err = o.evalParsing(ch)
 		if err != nil {
-			return true, err
+			return err
 		}
 	}
 
-	os.Setenv("ITERATION", strconv.Itoa(iter))
+	os.Setenv("ITERATION", strconv.Itoa(o.Iter))
 
 	optPutBody := new(models.OptimizerPutBody)
-	optPutBody.Iterations = iter
+	optPutBody.Iterations = o.Iter
 	optPutBody.Value = evalValue
-	respPutIns, err = optPutBody.Put(optimizerPutURL)
+	o.RespPutIns, err = optPutBody.Put(o.OptimizerPutURL)
 	if err != nil {
 		log.Errorf("get setting parameter error: %v", err)
-		return true, err
+		return err
 	}
 
-	log.Infof("setting params is: %s", respPutIns.Param)
-	if err := optimization.Prj.RunSet(respPutIns.Param); err != nil {
+	log.Infof("setting params is: %s", o.RespPutIns.Param)
+	if err := o.Prj.RunSet(o.RespPutIns.Param); err != nil {
 		log.Error(err)
-		return true, err
+		return err
 	}
-
 	log.Info("set the parameter success")
-	if err := optimization.Prj.RestartProject(); err != nil {
+
+	if err := o.Prj.RestartProject(); err != nil {
 		log.Error(err)
-		return true, err
+		return err
 	}
 	log.Info("restart project success")
 
-	startIterTime = time.Now().Format(config.DefaultTimeFormat)
+	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
 
-	if iter == maxIter {
-		finalEval := strings.Replace(finalEval, "=-", "=", -1)
+	if o.Iter == o.MaxIter {
+		finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
 		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s", respPutIns.Param, finalEval)
+			" The final evaluation value is: %s", o.RespPutIns.Param, finalEval)
 		log.Info(optimizationTerm)
-		ch <- &PB.AckCheck{Name: optimizationTerm, Status: utils.SUCCESS}
+		ch <- &PB.AckCheck{Name: optimizationTerm}
 
-		if err = deleteTask(optimizerPutURL); err != nil {
+		if err = deleteTask(o.OptimizerPutURL); err != nil {
 			log.Error(err)
 		}
-		return true, nil
 	}
 
-	iter++
-	return false, nil
+	o.Iter++
+	ch <- &PB.AckCheck{Status: utils.SUCCESS}
+
+	return nil
 }
 
 //restore tuning config
-func (o *Optimizer) RestoreConfigTuned() error {
+func (o *Optimizer) RestoreConfigTuned(ch chan *PB.AckCheck) error {
 	tuningRestoreConf := path.Join(config.DefaultTempPath, o.Prj.Project+config.TuningRestoreConfig)
 	exist, err := utils.PathExist(tuningRestoreConf)
 	if err != nil {
 		return err
 	}
 	if !exist {
-		log.Errorf("%s project has not been executed the dynamic optimizer search", o.Prj.Project)
-		return fmt.Errorf("%s project has not been executed the dynamic optimizer search",
-			o.Prj.Project)
+		err := fmt.Errorf("%s project has not been executed "+
+			"the dynamic optimizer search", o.Prj.Project)
+		log.Errorf(err.Error())
+		return err
 	}
 
 	content, err := ioutil.ReadFile(tuningRestoreConf)
@@ -218,27 +211,25 @@ func (o *Optimizer) RestoreConfigTuned() error {
 		return err
 	}
 
-	log.Infof("restore %s project params success", o.Prj.Project)
+	result := fmt.Sprintf("restore %s project params success", o.Prj.Project)
+	ch <- &PB.AckCheck{Name: result, Status: utils.SUCCESS}
+	log.Infof(result)
 	return nil
 }
 
-func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
-	eval := string(bench.Content)
+func (o *Optimizer) evalParsing(ch chan *PB.AckCheck) (string, error) {
+	eval := string(o.Content)
 	positiveEval := strings.Replace(eval, "=-", "=", -1)
 	optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
-		" The %dth evaluation value is: %s", iter, respPutIns.Param, iter, positiveEval)
+		" The %dth evaluation value is: %s", o.Iter, o.RespPutIns.Param, o.Iter, positiveEval)
 	ch <- &PB.AckCheck{Name: optimizationTerm}
 	log.Info(optimizationTerm)
 
 	endIterTime := time.Now().Format(config.DefaultTimeFormat)
 	iterInfo := make([]string, 0)
-	iterInfo = append(iterInfo, strconv.Itoa(iter))
-	iterInfo = append(iterInfo, startIterTime)
-	iterInfo = append(iterInfo, endIterTime)
-	iterInfo = append(iterInfo, positiveEval)
-	iterInfo = append(iterInfo, respPutIns.Param)
+	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
+		positiveEval, o.RespPutIns.Param)
 	output := strings.Join(iterInfo, "|")
-
 	err := utils.WriteFile(config.TuningFile, output+"\n", config.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
 	if err != nil {
@@ -264,9 +255,9 @@ func (bench *BenchMark) evalParsing(ch chan *PB.AckCheck) (string, error) {
 		evalValue = append(evalValue, kvs[1])
 	}
 
-	if iter == 1 || evalSum < minEvalSum {
-		minEvalSum = evalSum
-		finalEval = eval
+	if o.Iter == 1 || evalSum < o.MinEvalSum {
+		o.MinEvalSum = evalSum
+		o.FinalEval = eval
 	}
 	return strings.Join(evalValue, ","), nil
 }
@@ -280,3 +271,34 @@ func deleteTask(url string) error {
 	defer resp.Body.Close()
 	return nil
 }
+
+//check server prj
+func CheckServerPrj(data string, optimizer *Optimizer) error {
+	var prjs []*project.YamlPrjSvr
+	err := filepath.Walk(config.DefaultTuningPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			prj := new(project.YamlPrjSvr)
+			if err := utils.ParseFile(path, "yaml", &prj); err != nil {
+				return fmt.Errorf("load %s faild, err: %v", path, err)
+			}
+			log.Infof("project:%s load %s success", prj.Project, path)
+			prjs = append(prjs, prj)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	for _, prj := range prjs {
+		if data == prj.Project {
+			log.Infof("find Project:%s", prj.Project)
+			optimizer.Prj = prj
+			return nil
+		}
+	}
+
+	return fmt.Errorf("project:%s not found", data)
+}
+
