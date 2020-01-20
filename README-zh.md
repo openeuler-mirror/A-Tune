@@ -1,7 +1,4 @@
-<img src="misc/A-Tune-logo.png" width="50%" height="50%" div align=left />
-
-
-
+<img src="misc/A-Tune-logo.png" width="50%" height="50%"/>
 
 [English](./README.md) | 简体中文
 
