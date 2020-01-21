@@ -24,10 +24,10 @@ import (
 	"github.com/go-ini/ini"
 )
 
+var Version = "no version specified"
+
 // application common config
 const (
-	Version = "0.0.1"
-
 	EnvAddr    = "ATUNED_ADDR"
 	EnvPort    = "ATUNED_PORT"
 	EnvTLS     = "ATUNE_TLS"

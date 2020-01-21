@@ -2,7 +2,7 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 1.0
+Version: 0.1
 Release: 0.1%{?dist}
 License: Mulan PSL v1
 Source: %{name}-%{version}.tar.gz
@@ -104,5 +104,5 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version}
 %systemd_postun_with_restart atuned.service
 
 %changelog
-* Tue Nov 12 2019 openEuler Buildteam <buildteam@openeuler.org> - 1.0-0.1
+* Tue Nov 12 2019 openEuler Buildteam <buildteam@openeuler.org> - 0.1-0.1
 - Package init
