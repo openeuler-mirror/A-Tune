@@ -49,13 +49,22 @@ test01()
     array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     for ((i=0;i<${#array[@]};i++));do
         change_conf_value network ${array[i]}
-        systemctl restart $ATUNE_SERVICE_NAME
-        wait_service_ready $ATUNE_SERVICE_NAME
-        atune-adm analysis > $ANALYSIS_LOG
-        check_result $? 1
-        
-        grep "collect data faild" $ANALYSIS_LOG
-        check_result $? 0
+        if [ -z ${array[i]} ];then
+            change_conf_value network ${array[i]}
+            systemctl restart $ATUNE_SERVICE_NAME
+            wait_service_ready $ATUNE_SERVICE_NAME
+            atune-adm analysis
+            # if network's configuration is null, last net card will be obtained using "sar -n DEV 1" command
+            check_result $? 0
+        else
+            systemctl restart $ATUNE_SERVICE_NAME
+            wait_service_ready $ATUNE_SERVICE_NAME
+            atune-adm analysis > $ANALYSIS_LOG
+            check_result $? 1
+
+            grep "collect data faild" $ANALYSIS_LOG
+            check_result $? 0
+        fi
     done
     
     # Comment network configuration

@@ -157,7 +157,7 @@ function wait_condition()
         sleep 0.05 # 50ms
     done
 
-    if [ $i -ge $loop_count ]; then
+    if [ $wait_loop -ge $loop_count ]; then
         return 1 # wait condition fail
     fi
 }

@@ -38,7 +38,7 @@ test01()
     change_conf_value sample_num 2
 
     # Correct configuration test
-    sys_disk=`lsscsi | awk '($NF~/dev/){print $NF}' | awk -F '/' '{print $NF}'`
+    sys_disk=`lsscsi | awk '($NF~/dev/){print $NF}' | awk -F '/' '{print $NF} | awk 'NR==1{print $1}''`
     change_conf_value disk $sys_disk
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
