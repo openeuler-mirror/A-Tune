@@ -129,7 +129,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 			continue
 		}
 		script := obj.Info.SetScript
-		newScript := strings.Replace(script, "$value", paraMap[obj.Name], -1)
+		newScript := strings.Replace(script, "$value", "\""+paraMap[obj.Name]+"\"", -1)
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {

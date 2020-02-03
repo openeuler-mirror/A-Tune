@@ -26,7 +26,7 @@ class TestBootloaderCmdline:
         """test get bootloader grub2"""
         try:
             grub2 = Grub2(self.user)
-            root = grub2.get("root")
-            assert root == "UUID"
+            grub2.get("bootloader")
+            assert False
         except GetConfigError:
             assert True
