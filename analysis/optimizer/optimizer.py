@@ -45,10 +45,17 @@ class Optimizer(Process):
                 objective_params_list.append(items)
             elif p_nob['type'] == 'continuous':
                 r_range = p_nob['range']
-                if int(p_nob['ref']) < int(r_range[0]) or int(p_nob['ref']) > int(r_range[1]):
-                    raise ValueError("the default value of {} is out of range"
+                if r_range is None or len(r_range) != 2:
+                    raise ValueError("the item of the scope value of {} must be 2"
                                      .format(p_nob['name']))
-                self.ref.append(int(p_nob['ref']))
+                try:
+                    ref_value = int(p_nob['ref'])
+                except ValueError:
+                    raise ValueError("the ref value of {} is not an integer value"
+                                     .format(p_nob['name']))
+                if ref_value < r_range[0] or ref_value > r_range[1]:
+                    raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+                self.ref.append(ref_value)
                 objective_params_list.append((r_range[0], r_range[1]))
             else:
                 raise ValueError("the type of {} is not supported".format(p_nob['name']))
@@ -63,15 +70,20 @@ class Optimizer(Process):
             r_range = p_nob['range']
             step = 1
             if 'step' in p_nob.keys():
-                step = p_nob['step']
+                step = 1 if p_nob['step'] < 1 else p_nob['step']
             if r_range is not None:
-                for i in range(0, len(r_range), 2):
+                length = len(r_range) if len(r_range) % 2 == 0 else len(r_range) - 1
+                for i in range(0, length, 2):
                     items.extend(list(np.arange(r_range[i], r_range[i + 1] + 1, step=step)))
             items = list(set(items))
-            if int(p_nob['ref']) not in items:
-                raise ValueError("the default value of {} is out of range"
+            try:
+                ref_value = int(p_nob['ref'])
+            except ValueError:
+                raise ValueError("the ref value of {} is not an integer value"
                                  .format(p_nob['name']))
-            self.ref.append(int(p_nob['ref']))
+            if ref_value not in items:
+                raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+            self.ref.append(ref_value)
             return items
         if p_nob['dtype'] == 'string':
             items = p_nob['options']
@@ -82,7 +94,7 @@ class Optimizer(Process):
                 if p_nob['ref'] == value:
                     self.ref.append(key)
             if len(self.ref) == length:
-                raise ValueError("the default value of {} is out of range"
+                raise ValueError("the ref value of {} is out of range"
                                  .format(p_nob['name']))
             return keys
         raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
@@ -95,7 +107,7 @@ class Optimizer(Process):
         lasso.fit(options, performance)
         result = zip(lasso.coef_, labels)
         result = sorted(result, key=lambda x: -np.abs(x[0]))
-        rank = ", ".join("%s: %s" % (label, round(coef, 3))for coef, label in result)
+        rank = ", ".join("%s: %s" % (label, round(coef, 3)) for coef, label in result)
         return rank
 
     def run(self):
@@ -124,7 +136,7 @@ class Optimizer(Process):
             LOGGER.info("Running performance evaluation.......")
             ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=self.ref)
             LOGGER.info("Minimization procedure has been completed.")
-        except ValueError as value_error:
+        except Exception as value_error:
             LOGGER.error('Value Error: %s', value_error)
             self.child_conn.send(value_error)
             return None
@@ -147,3 +159,4 @@ class Optimizer(Process):
         """stop process"""
         self.child_conn.close()
         self.terminate()
+

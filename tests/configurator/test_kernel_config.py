@@ -15,6 +15,7 @@
 Test case.
 """
 from analysis.plugin.configurator.kernel_config.kconfig import KernelConfig
+from analysis.plugin.public import NeedConfigWarning
 
 
 class TestKernelConfig:
@@ -28,7 +29,7 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             value = kernel_config.get("CONFIG_EULEROS_TEST_KERNEL_CONFIG")
             assert value is None
-        except FileNotFoundError:
+        except (FileNotFoundError, LookupError):
             assert True
 
     def test_get_kernel_config(self):
@@ -46,7 +47,7 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             value = kernel_config.set("{}=y".format(self.config_key))
             assert value is None
-        except FileNotFoundError:
+        except (FileNotFoundError, NeedConfigWarning):
             assert True
 
     def test_set_kernel_config(self):
@@ -55,5 +56,6 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             kernel_config.set("{}=n".format(self.config_key))
             assert False
-        except FileNotFoundError:
+        except (FileNotFoundError, NeedConfigWarning):
             assert True
+

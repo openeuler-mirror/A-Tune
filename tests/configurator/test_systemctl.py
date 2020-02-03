@@ -20,16 +20,17 @@ from analysis.plugin.configurator.systemctl.systemctl import Systemctl
 class TestSystemctl:
     """ test systemctl"""
     user = "UT"
-    key = "sshd"
+    key = "no_process"
 
     def test_get_systemctl(self):
         """test get systemctl"""
         systemctl = Systemctl(self.user)
         value = systemctl.get(self.key)
-        assert value == ""
+        assert value in ("", "inactive")
 
     def test_set_systemctl(self):
         """test set systemctl"""
         systemctl = Systemctl(self.user)
         value = systemctl.set("{}=start".format(self.key))
-        assert value is not None
+        assert value is None
+
