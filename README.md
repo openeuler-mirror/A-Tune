@@ -4,7 +4,7 @@ English | [简体中文](./README-zh.md)
 
 ## Introduction to A-Tune 
 
-**A-Tune** is an OS tuning software based on AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system optimization, and maximize optimal application performance.
+**A-Tune** is an OS tuning engine based on AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system optimization, and maximize optimal application performance.
 
 
 I. A-Tune Installation
