@@ -52,15 +52,16 @@ class Script(Configurator):
             raise err
         return 0
 
-    def _get(self, key):
+    def _get(self, key, value):
         name = os.path.basename(key)
         script = "{}/get.sh".format(key)
         if not os.path.exists(script):
             raise GetConfigError("script {} not implement".format(script))
 
         output = subprocess.run(
-            "{script}".format(
-                script=script).split(),
+            "{script} {val}".format(
+                script=script,
+                val=value).split(),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             shell=False,
@@ -76,9 +77,9 @@ class Script(Configurator):
     def check(_, __):
         return True
 
-    def _backup(self, key, rollback_info):
-        name = os.path.basename(key)
-        script = "{}/backup.sh".format(key)
+    def _backup(self, config, rollback_info):
+        name = os.path.basename(config)
+        script = "{}/backup.sh".format(config)
         if os.path.isfile(script):
             output = subprocess.run(
                 "{script} {rb_info} {ver}".format(
@@ -95,7 +96,7 @@ class Script(Configurator):
                              inspect.stack()[0][3], str(err))
                 raise err
             return output.stdout.decode()
-        return Configurator._backup(self, key, rollback_info)
+        return Configurator._backup(self, config, rollback_info)
 
     def _resume(self, key, value):
         name = os.path.basename(key)

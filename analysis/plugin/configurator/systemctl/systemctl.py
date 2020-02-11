@@ -30,7 +30,7 @@ class Systemctl(Configurator):
         Configurator.__init__(self, user)
         self.__cmd = "systemctl"
 
-    def _get(self, key):
+    def _get(self, key, _):
         with open('/dev/null', 'w') as no_print:
             output = subprocess.Popen(
                 [self.__cmd, self._option, key],
@@ -43,7 +43,7 @@ class Systemctl(Configurator):
     def _set(self, key, value):
         if not os.path.exists(self._path + key + ".service"):
             return 0
-        status = self._get(key)
+        status = self._get(key, value)
         if status == "active" and value == "start" or status == "inactive" and value == "stop":
             return 0
         with open('/dev/null', 'w') as no_print:
@@ -55,10 +55,12 @@ class Systemctl(Configurator):
     def check(_, __):
         return True
 
-    def _backup(self, key, _):
-        val = self._get(key)
+    def _backup(self, config, _):
+        cfg = self._getcfg(config)
+        val = self._get(cfg[0], cfg[1])
         if val in ("active", "activating"):
             val = "start"
         else:
             val = "stop"
-        return "{} = {}".format(key, val)
+        return "{} = {}".format(cfg[0], val)
+

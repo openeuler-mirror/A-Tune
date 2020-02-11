@@ -49,7 +49,7 @@ class KernelConfig(Configurator):
             "Please change the kernel configuration {key} to {val}.".format(
                 key=key, val=value))
 
-    def _get(self, key):
+    def _get(self, key, _):
         file_type = os.path.splitext(self.__cfg_file)[-1]
         if file_type == ".gz":
             with gzip.open(self.__cfg_file, 'rt') as file:

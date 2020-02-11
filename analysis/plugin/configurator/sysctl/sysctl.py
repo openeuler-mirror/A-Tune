@@ -30,7 +30,7 @@ class Sysctl(Configurator):
         Configurator.__init__(self, user)
         self.__cmd = "sysctl"
 
-    def _get(self, key):
+    def _get(self, key, _):
         with open('/dev/null', 'w') as no_print:
             output = subprocess.check_output("{cmd} -n {key}".format(
                 cmd=self.__cmd, key=key).split(), stderr=no_print)
