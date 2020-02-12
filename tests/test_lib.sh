@@ -217,3 +217,15 @@ function check_service_started()
     fi
 }
 
+# init env enable to analysis
+function init_env()
+{
+    local sys_disk=`lsscsi | awk '($NF~/dev/){print $NF}' | awk -F '/' '{print $NF}' | awk 'NR==1{print $1}'`
+    change_conf_value disk $sys_disk
+
+    local sys_network=`ip address | grep UP | awk 'NR==1{print $2}' | awk -F ':' '{print $1}'`
+    change_conf_value network $sys_network
+
+    change_conf_value user $sys_user
+}
+

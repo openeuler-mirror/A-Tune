@@ -20,6 +20,7 @@ init()
 {
     echo "init the sysytem"
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
+    init_env
 }
 
 cleanup()

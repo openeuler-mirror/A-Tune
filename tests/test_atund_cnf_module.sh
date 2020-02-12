@@ -20,6 +20,7 @@ init()
 {
     echo "init the sysytem"
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
+    init_env
     # Reduce the numbers of collected data, reduce testcase running time
     change_conf_value sample_num 2
 }
