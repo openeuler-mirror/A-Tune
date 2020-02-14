@@ -54,7 +54,7 @@ class IrqAffinity(Configurator):
                     break
         return irq_id
 
-    def _get(self, key):
+    def _get(self, key, _):
         irq_id = self.__get_irq_id(key)
         if irq_id is None:
             err = LookupError("Fail to find irq {}".format(key))

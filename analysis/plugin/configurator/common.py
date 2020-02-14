@@ -97,7 +97,7 @@ class Configurator:
                          inspect.stack()[0][3], str(err))
             return err
 
-        if (ret == 0) and self.check(cfg[1], self.get(cfg[0])):
+        if (ret == 0) and self.check(cfg[1], self.get(cfg[0], cfg[1])):
             err = None
         elif cfg[1] is None:
             err = SetConfigError(
@@ -173,18 +173,19 @@ class Configurator:
                      inspect.stack()[0][3], str(err))
         raise err
 
-    def get(self, key):
+    def get(self, key, value=None):
         """
         Get the given config.
 
         :param key: The config to be getted, string like "key"
+        :param value: The config to be getted, string like "value"
         :returns None: Success
         :returns value: Success, config value string
         :returns Exceptions: Fail, error in _get()
         :raises: None
         """
         try:
-            ret = self._get(key)
+            ret = self._get(key, value)
             if ret is not None:
                 ret = ret.replace('\n', ' ').strip()
         except Exception as err:
@@ -195,12 +196,13 @@ class Configurator:
             return err
         return ret
 
-    def _get(self, key):
+    def _get(self, key, value):
         """
         The inner method to get config.
         The sub class should implement this method.
 
         :param key: The config key
+        :param value: The config value
         :returns None: Success
         :returns value: Success, config value string
         :raises Exceptions: Fail, with info
@@ -239,18 +241,19 @@ class Configurator:
         """
         return config1 == config2
 
-    def _backup(self, key, _):
+    def _backup(self, config, _):
         """
         The inner method to backup config.
         The sub class should implement this method if needed.
 
-        :param key: The config key
+        :param config: The config
         :param rollback_info: The additional info for rollback, mostly a path
         :returns value: Success, config info
         :raises Exceptions: Fail, with info
         """
-        val = self._get(key).replace('\n', ' ').strip()
-        return "{} = {}".format(key, val)
+        cfg = self._getcfg(config)
+        val = self._get(cfg[0], cfg[1]).replace('\n', ' ').strip()
+        return "{} = {}".format(cfg[0], val)
 
     def backup(self, config, rollback_info):
         """
@@ -262,9 +265,8 @@ class Configurator:
         :returns value: Success, config info
         :raises: None
         """
-        cfg = self._getcfg(config)
         try:
-            ret = self._backup(cfg[0], rollback_info)
+            ret = self._backup(config, rollback_info)
         except Exception as err:
             if self._user == "UT":
                 raise err

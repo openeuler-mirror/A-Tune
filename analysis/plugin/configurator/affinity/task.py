@@ -37,7 +37,7 @@ class TaskAffinity(Configurator):
         self._set.__func__.__doc__ = Configurator._set.__doc__ % (
             'pid', 'cpumask in hex, no "0x" prefix, "," is permitted')
 
-    def _get(self, key):
+    def _get(self, key, _):
         task_id = Utils.get_task_id(key)
         if task_id is None:
             err = LookupError("Fail to find task {}".format(key))
