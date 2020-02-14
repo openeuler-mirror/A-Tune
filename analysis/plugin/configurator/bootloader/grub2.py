@@ -69,7 +69,7 @@ class Grub2(Configurator):
         end = search_obj.span(3)
         return {"START": start[0], "CMD": cmd[0], "END": end[1]}
 
-    def _get(self, key):
+    def _get(self, key, _):
         entry = self.__get_cfg_entry(self.__kernel_ver)
         with open(self.__cfg_file, 'r') as file:
             file.seek(entry["CMD"])

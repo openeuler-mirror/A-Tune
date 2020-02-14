@@ -29,7 +29,7 @@ class Sysfs(Configurator):
     def __init__(self, user=None):
         Configurator.__init__(self, user)
 
-    def _get(self, key):
+    def _get(self, key, _):
         with open("{opt}/{key}".format(opt=self._option, key=key), mode='r',
                   buffering=-1, encoding=None, errors=None, newline=None, closefd=True) as file:
             ret = file.read()

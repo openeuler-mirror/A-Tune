@@ -19,7 +19,7 @@ This document is used only as a guide. Unless otherwise specified by applicable 
 
 ## Overview
 
-This document describes how to install and use A-Tune, which is a performance self-optimization software for openEuler.
+This document describes how to install and use A-Tune, which is a performance self-optimization engine for openEuler.
 
 ## Intended Audience
 
@@ -38,7 +38,7 @@ In addition, thousands of actual service scenarios exist, and hardware configura
 
 To address the preceding challenges, openEuler launches A-Tune.
 
-A-Tune is AI-based software that optimizes system performance. It uses AI technologies to create precise system profiles for service scenarios, aware and infer service characteristics, make intelligent decisions, and match and recommend the optimal system parameter configuration combination, ensuring the optimal running status of services.
+A-Tune is AI-based engine that optimizes system performance. It uses AI technologies to create precise system profiles for service scenarios, aware and infer service characteristics, make intelligent decisions, and match and recommend the optimal system parameter configuration combination, ensuring the optimal running status of services.
 
 ![](figures/en-us_image_0215192422.png)
 

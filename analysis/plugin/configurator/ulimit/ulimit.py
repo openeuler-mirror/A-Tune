@@ -58,7 +58,7 @@ class Ulimit(Configurator):
                     domain=keyword[0], type=keyword[1], item=keyword[2], value=value))
         return 0
 
-    def _get(self, key):
+    def _get(self, key, _):
         with open(self.__cfg_file, 'r') as file:
             info = file.read()
         keyword = key.split(".")

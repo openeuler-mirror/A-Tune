@@ -10,45 +10,25 @@
 # See the Mulan PSL v1 for more details.
 # Create: 2019-10-29
 
-SCRIPT=$(basename $0)
-SCRIPT_PATH=$(
-  cd "$(dirname "$0")"
-  pwd
-)
+command -v swapoff >/dev/null 2>&1
+ret=$?
+[ $ret -ne 0 ] && echo "\033[31m command swapoff is not exist \033[31m" && exit 1
 
-if [ $# != 1 ]; then
-  echo "Usage: ${SCRIPT} on or off"
-  exit 1
-fi
+command -v swapon >/dev/null 2>&1
+ret=$?
+[ $ret -ne 0 ] && echo "\033[31m command swapon is not exist \033[31m" && exit 1
 
-lsmod | grep prefetch_tuning &>/dev/null
-uninstall=$?
-
-case "$1" in
-"on")
-  policy=15
-  ;;
+value=$(echo "$@" | awk '{$NF="";print}')
+option=$(echo "$@" | awk '{print $NF}')
+case "$option" in
 "off")
-  policy=0
+  swapoff $(eval echo "$value")
   ;;
-"reset")
-  if [ ${uninstall} = 0 ]; then
-    rmmod prefetch_tuning
-  fi
-  exit 0
+"on")
+  swapon $(eval echo "$value")
   ;;
 *)
-  exit 2
+  echo "\033[31m this command option is not supported \033[31m" && exit 1
   ;;
 esac
-
-if [ ${uninstall} != 0 ]; then
-  modprobe prefetch_tuning
-  [ $? != 0 ] && exit 3
-fi
-
-echo ${policy} >/sys/class/misc/prefetch/policy
-[ $? != 0 ] && exit 4
-
-exit 0
 

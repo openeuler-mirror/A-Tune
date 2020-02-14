@@ -31,7 +31,7 @@ class ProcessidAffinity(Configurator):
     def __init__(self, user=None):
         Configurator.__init__(self, user)
 
-    def _get(self, key):
+    def _get(self, key, _):
         task_id = Utils.get_task_id(key)
         task_id = " ".join(task_id)
         if task_id == "":

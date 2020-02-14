@@ -10,14 +10,6 @@
 # See the Mulan PSL v1 for more details.
 # Create: 2019-10-29
 
-SCRIPT=$(basename $0)
-SCRIPT_PATH=$(cd "$(dirname "$0")";pwd)
-
-if [ $# != 0 ]; then
-	echo "Usage: ${SCRIPT}"
-	exit 1
-fi
-
 lsmod | grep prefetch_tuning &> /dev/null
 [ $? != 0 ] && echo "reset" && exit 0
 
@@ -35,3 +27,4 @@ case "$policy" in
 esac
 
 exit 0
+
