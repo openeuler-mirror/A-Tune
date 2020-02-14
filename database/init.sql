@@ -286,8 +286,8 @@ prefetch = off
 ethtool =  -K {network} gro on
 ethtool =  -K {network} gso on
 ethtool =  -K {network} tso on
-ethtool =  -X {network} equal 32 hkey 6d:5a:56:da:25:5b:0e:c2:41:67:25:3d:43:a3:8f:b0:d0:ca:2b:cb:ae:7b:30:b4:77:cb:2d:a3:80:30:f2:0c:6a:42:b7:3b:be:ac:01:fa hfunc toeplitz
-swapoff = -a
+ethtool =  -X {network} hfunc toeplitz
+swap = -a off
 
 [tip]
 relogin into the system to enable limits setting = OS
@@ -655,7 +655,7 @@ bind network interrupts to its affinity numa node = affinity
 [script]
 prefetch = off
 ifconfig = {network} mtu 1500
-ethtool = -c {network} adaptive-rx on
+ethtool = -C {network} adaptive-rx on
 ethtool =  -K {network} gro on
 ethtool =  -K {network} gso on
 ethtool =  -K {network} tso on
@@ -780,7 +780,7 @@ INSERT INTO tuned_item(property, item) VALUES("{user}.hard.nofile", "OS");
 INSERT INTO tuned_item(property, item) VALUES("{user}.soft.nofile", "OS");
 INSERT INTO tuned_item(property, item) VALUES("{user}.soft.stack", "OS");
 INSERT INTO tuned_item(property, item) VALUES("{user}.hard.stack", "OS");
-INSERT INTO tuned_item(property, item) VALUES("swapoff", "OS");
+INSERT INTO tuned_item(property, item) VALUES("swap", "OS");
 INSERT INTO tuned_item(property, item) VALUES("kernel.randomize_va_space", "OS");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sched_cfs_bandwidth_slice_us", "OS");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sched_migration_cost_ns", "OS");

@@ -26,5 +26,5 @@ class Cmdline(Configurator):
     def __init__(self, user=None):
         Configurator.__init__(self, user)
 
-    def _get(self, key):
+    def _get(self, key, _):
         return Utils.get_value(key)

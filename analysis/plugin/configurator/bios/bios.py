@@ -37,7 +37,7 @@ class Bios(Configurator):
             "Please change the BIOS configuration {key} to {val}.".format(
                 key=key, val=value))
 
-    def _get(self, key):
+    def _get(self, key, _):
         if key.lower() == "version":
             output_dmi = subprocess.Popen(["dmidecode", "-t", "bios"], stdout=subprocess.PIPE,
                                           shell=False)

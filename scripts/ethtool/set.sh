@@ -10,5 +10,21 @@
 # See the Mulan PSL v1 for more details.
 # Create: 2019-10-29
 
-ethtool $*
-exit $?
+RUN_HOME=$(
+  cd "$(dirname "$0")"
+  pwd
+)
+source "$RUN_HOME"/common.sh
+
+command -v ethtool >/dev/null 2>&1
+ret=$?
+[ $ret -ne 0 ] && echo "\033[31m command ethtool is not exist \033[31m" && exit 1
+
+value=$(get_ethtool_value "$@")
+if [[ "$value" == $(eval echo "$*") ]]; then
+  echo "no need to set"
+  exit 0
+fi
+
+ethtool "$@"
+
