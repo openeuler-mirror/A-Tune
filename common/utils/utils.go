@@ -48,6 +48,16 @@ const (
 	ConstMinArgs
 )
 
+// const for function ParseXxx
+const (
+	DecimalBase = 10
+	HexBase     = 16
+	Uint64Bits  = 64
+)
+
+// ProcDir is path of proc sysfs
+var ProcDir = "/proc/"
+
 // Status of AckCheck
 const (
 	SUCCESS = "SUCCESS"
@@ -355,3 +365,11 @@ func CreateDir(dir string, perm os.FileMode) error {
 	return nil
 }
 
+// ReadAllFile read all file to string.
+func ReadAllFile(path string) string {
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	return string(content)
+}

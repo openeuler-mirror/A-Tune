@@ -19,12 +19,17 @@ import (
 	"atune/common/http"
 	"atune/common/log"
 	"atune/common/registry"
+	"atune/common/sched"
+	"atune/common/schedule/framework"
+	"atune/common/schedule/plugins"
 	"atune/common/sqlstore"
+	"atune/common/sysload"
+	"atune/common/topology"
 	"atune/common/utils"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 
 	"github.com/go-ini/ini"
@@ -104,7 +109,8 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 // Scheduler class
 type Scheduler struct {
 	schedule []*sqlstore.Schedule
-	IsExit   bool
+	plugins  map[string]framework.Plugin
+	load     *sysload.SystemLoad
 }
 
 var instance *Scheduler = nil
@@ -113,33 +119,111 @@ var instance *Scheduler = nil
 func (s *Scheduler) Init() error {
 	s.schedule = sqlstore.GetSchedule()
 
+	topology.InitTopo()
+	s.load = sysload.NewSysload()
+
+	s.plugins = make(map[string]framework.Plugin)
+
+	for name, factory := range plugins.PluginTables() {
+		p, err := factory()
+		if err != nil {
+			return fmt.Errorf("init plugin %s fail:%v", name, err)
+		}
+		s.plugins[name] = p
+	}
+
 	return nil
 }
 
 // Schedule :update database and do schedule
-func (s *Scheduler) Schedule(typename string, strategy string, save bool) error {
-	if save {
-		_ = sqlstore.UpdateSchedule(typename, strategy)
+func (s *Scheduler) Schedule(pids string, strategy string, save bool, ch chan *PB.AckCheck) error {
+	//
+	err := s.DoSchedule(pids, strategy, ch)
+	return err
+}
 
-		s.schedule = sqlstore.GetSchedule()
-		for _, item := range s.schedule {
-			_ = s.DoSchedule(item.Type, item.Strategy)
-		}
-	} else {
-		_ = s.DoSchedule(typename, strategy)
+func setTaskAffinity(tid int, node *topology.TopoNode) error {
+	var cpus []uint32
+
+	for cpu := node.Mask().Foreach(-1); cpu != -1; cpu = node.Mask().Foreach(cpu) {
+		cpus = append(cpus, uint32(cpu))
 	}
-
+	log.Info("bind ", tid, " to cpu ", cpus)
+	if err := sched.SetAffinity(uint64(tid), cpus); err != nil {
+		return err
+	}
 	return nil
 }
 
-// DoSchedule : get schedule filter and tune
-func (s *Scheduler) DoSchedule(typename string, strategy string) error {
-	filter := Factory(typename)
-	if filter == nil {
-		return errors.New("type don't exist")
+func bindTaskToTopoNode(taskInfo *[]framework.BindTaskInfo) {
+	for _, ti := range *taskInfo {
+		if err := setTaskAffinity(ti.Pid, ti.Node); err != nil {
+			log.Error(err)
+		}
+	}
+}
+
+type updateLoadCallback struct {
+	load *sysload.SystemLoad
+}
+
+// callback to update cpu load
+func (callback *updateLoadCallback) Callback(node *topology.TopoNode) {
+	cpu := node.ID()
+	load := callback.load.GetCPULoad(cpu)
+	node.SetLoad(load)
+}
+
+func updateNodeLoad(load *sysload.SystemLoad) {
+	var callback updateLoadCallback
+
+	callback.load = load
+	topology.ForeachTypeCall(topology.TopoTypeCPU, &callback)
+}
+
+// DoSchedule : run schedule plugin and tune
+func (s *Scheduler) DoSchedule(pids string, strategy string, ch chan *PB.AckCheck) error {
+
+	log.Infof("do schedule: %s for %s", strategy, pids)
+	plugin, ok := s.plugins[strategy]
+	var taskinfo []framework.BindTaskInfo
+
+	if !ok {
+		return fmt.Errorf("strategy not support : %s", strategy)
 	}
 
-	return filter.Tune(strategy)
+	for _, pidstr := range strings.Split(pids, ",") {
+		var ti framework.BindTaskInfo
+		pid, err := strconv.Atoi(pidstr)
+		if err != nil {
+			return fmt.Errorf("pids error : %s", err)
+		}
+		ti.Pid = pid
+		ti.Node = topology.DefaultSelectNode()
+		taskinfo = append(taskinfo, ti)
+	}
+
+	s.load.Update()
+	updateNodeLoad(s.load)
+
+	plugin.Preprocessing(&taskinfo)
+	sendChanToAdm(ch, "Preprocessing", utils.SUCCESS, "")
+
+	plugin.PickNodesforPids(&taskinfo)
+	sendChanToAdm(ch, "PickNodesforPids Results:", utils.SUCCESS, "")
+
+	for _, ti := range taskinfo {
+		sendChanToAdm(ch, strconv.Itoa(ti.Pid), utils.INFO, fmt.Sprintf(
+			"type:%v id:%v", ti.Node.Type(), ti.Node.ID()))
+	}
+
+	bindTaskToTopoNode(&taskinfo)
+	sendChanToAdm(ch, "bindTaskToTopoNode finished", utils.SUCCESS, "")
+
+	plugin.Postprocessing(&taskinfo)
+	sendChanToAdm(ch, "Postprocessing", utils.SUCCESS, "")
+
+	return nil
 }
 
 // Active schedule strategy
@@ -165,7 +249,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 			}
 			if section.Name() == "schedule" {
 				for _, key := range section.Keys() {
-					_ = s.Schedule(key.Name(), key.Value(), false)
+					_ = s.Schedule(key.Name(), key.Value(), false, ch)
 				}
 				continue
 			}

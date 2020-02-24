@@ -17,9 +17,9 @@ import (
 	PB "atune/api/profile"
 	"atune/common/client"
 	SVC "atune/common/service"
+	"atune/common/utils"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
@@ -30,19 +30,17 @@ var scheduleCommand = cli.Command{
 	Usage: "schedule",
 	Flags: []cli.Flag{
 		cli.StringFlag{
-			Name:  "type,t",
-			Usage: "--type=[cpu|irq|all]",
-			Value: "all",
+			Name:  "pid,t",
+			Usage: "--pid=<pid1>,<pid2>...",
 		},
 		cli.StringFlag{
 			Name:  "strategy,s",
-			Usage: "--strategy=[performance|powersave|auto]",
-			Value: "auto",
+			Usage: "--strategy=<listed in atune-adm schedule --list>",
 		},
 	},
 	ArgsUsage: "[arguments...]",
 	Description: func() string {
-		desc := "\n    schedule: schedule all available resource into system \n"
+		desc := "\n    schedule: schedule resource for instrances\n"
 		return desc
 	}(),
 	Action: schedule,
@@ -65,16 +63,6 @@ func newScheduleCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) 
 }
 
 func checkScheduleCtx(ctx *cli.Context) error {
-	typename := ctx.String("type")
-	if !((typename == "cpu") || (typename == "irq") || (typename == "all")) {
-		return fmt.Errorf("type have error exist")
-	}
-
-	strategy := ctx.String("strategy")
-	if !((strategy == "performance") || (strategy == "powersave") || (strategy == "auto")) {
-		return fmt.Errorf("strategy have error exist")
-	}
-
 	return nil
 }
 
@@ -83,8 +71,7 @@ func schedule(ctx *cli.Context) error {
 		return err
 	}
 
-	appname := strings.Join(ctx.Args(), ",")
-	typename := ctx.String("type")
+	appname := ctx.String("pid")
 	strategy := ctx.String("strategy")
 
 	c, err := client.NewClientFromContext(ctx)
@@ -94,13 +81,13 @@ func schedule(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Schedule(CTX.Background(), &PB.ScheduleMessage{App: appname, Type: typename, Strategy: strategy})
+	stream, err := svc.Schedule(CTX.Background(), &PB.ScheduleMessage{App: appname, Type: "", Strategy: strategy})
 	if err != nil {
 		return err
 	}
 
 	for {
-		_, err := stream.Recv()
+		reply, err := stream.Recv()
 		if err == io.EOF {
 			break
 		}
@@ -108,6 +95,7 @@ func schedule(ctx *cli.Context) error {
 		if err != nil {
 			return err
 		}
+		utils.Print(reply)
 	}
 
 	return nil
