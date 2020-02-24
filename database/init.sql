@@ -283,10 +283,7 @@ irqbalance=stop
 
 [script]
 prefetch = off 
-ethtool =  -K {network} gro on
-ethtool =  -K {network} gso on
-ethtool =  -K {network} tso on
-ethtool =  -X {network} hfunc toeplitz
+ethtool =  -K {network} gro on | -K {network} gso on | -K {network} tso on | -X {network} hfunc toeplitz
 swap = -a off
 
 [tip]
@@ -655,11 +652,7 @@ bind network interrupts to its affinity numa node = affinity
 [script]
 prefetch = off
 ifconfig = {network} mtu 1500
-ethtool = -C {network} adaptive-rx on
-ethtool =  -K {network} gro on
-ethtool =  -K {network} gso on
-ethtool =  -K {network} tso on
-#ethtool =  -K {network} lro on
+ethtool = -C {network} adaptive-rx on | -K {network} gro on | -K {network} gso on | -K {network} tso on
 
 [ulimit]
 {user}.hard.nofile = 102400
