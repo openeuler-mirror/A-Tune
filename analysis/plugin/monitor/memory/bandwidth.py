@@ -98,10 +98,17 @@ class MemBandwidth(Monitor):
         self.__cnt["CPU0_Max"] = self.__get_theory_bandwidth(0) / 1024 / 1024
         self.__cnt["CPU1_Max"] = self.__get_theory_bandwidth(1) / 1024 / 1024
 
+        all_events = subprocess.check_output(
+            "perf list".split(),
+            shell=False,
+            stderr=subprocess.STDOUT).decode()
         self.__events = ""
         for event in self.__evs:
-            self.__events = self.__events + self.__evs[event] + ","
+            search_obj = re.search(self.__evs[event], all_events, re.ASCII | re.MULTILINE)
+            if search_obj is not None:
+                self.__events = self.__events + self.__evs[event] + ","
         self.__events = self.__events.strip(",")
+        LOGGER.info("events is %s", self.__events)
 
         help_info = "--fields="
         for cnt in self.__cnt:
@@ -214,10 +221,7 @@ class MemBandwidth(Monitor):
             if search_obj is not None:
                 c_evs[evs] = search_obj.group(2).replace(",", "")
             else:
-                err = LookupError("Fail to find {}".format(self.__evs[evs]))
-                LOGGER.error("%s.%s: %s", self.__class__.__name__,
-                             inspect.stack()[0][3], str(err))
-                raise err
+                c_evs[evs] = 0
 
         self.__read_counters(c_evs)
         fields = []
