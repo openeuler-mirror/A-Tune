@@ -20,11 +20,13 @@ command -v ethtool >/dev/null 2>&1
 ret=$?
 [ $ret -ne 0 ] && echo "\033[31m command ethtool is not exist \033[31m" && exit 1
 
+fixed="fixed"
+para=$(cmd_conversion "$@")
 value=$(get_ethtool_value "$@")
-if [[ "$value" == $(eval echo "$*") ]]; then
+if [[ "$value" == "$para" ]] || [[ "$value" == "$fixed" ]] || [[ "$para" == "$fixed" ]]; then
   echo "no need to set"
   exit 0
 fi
 
-ethtool "$@"
+ethtool $(eval echo "$para")
 

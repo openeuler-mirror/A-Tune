@@ -104,6 +104,7 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_computi
 INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_database", "in-memory_database", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("single_computer_intensive_jobs", "compute-intensive", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("communication", "rpc_communication", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("kvm_virtualization", "kvm_virtualization", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("idle", "default", 0);
 
 
@@ -120,7 +121,7 @@ INSERT INTO profile (profile_type, profile_information) VALUES("default", "
 CONFIG_NUMA_AWARE_SPINLOCKS=y
 
 [bios]
-#TODO CONFIG
+NUMA=Enable
 
 [bootloader.grub2]
 numa_spinlock=on
@@ -146,6 +147,42 @@ numa_spinlock=on
 
 [check]
 check_environment=on
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("kvm_virtualization", "
+#
+# compute-intensive A-Tune configuration
+#
+[main]
+include=default
+
+[kernel_config]
+#TODO CONFIG
+
+[bios]
+SRIOV=Enable
+
+[bootloader.grub2]
+#TODO CONFIG
+
+[sysfs]
+#TODO CONFIG
+
+[sysctl]
+#TODO CONFIG
+
+[script]
+#TODO CONFIG
+
+[ulimit]
+#TODO CONFIG
+
+[schedule_policy]
+#TODO CONFIG
+
+[check]
+#TODO CONFIG
 
 ");
 
@@ -416,6 +453,7 @@ iommu.strict=0
 
 [sysctl]
 vm.swappiness=1
+vm.dirty_ratio=5
 
 # schedule
 kernel.sched_cfs_bandwidth_slice_us=21000
@@ -437,10 +475,13 @@ net.core.dev_weight=97
 # support more connections for mysql
 net.ipv4.tcp_max_syn_backlog=20480	
 net.core.somaxconn=1280	
+net.ipv4.tcp_max_tw_buckets = 360000
 
 [sysfs]
 block/{disk}/queue/read_ahead_kb=32
 block/{disk}/queue/scheduler=deadline
+block/{disk}/queue/nr_requests=2048
+block/{disk}/device/queue_depth=256
 kernel/mm/transparent_hugepage/defrag=never
 kernel/mm/transparent_hugepage/enabled=never
 
@@ -481,7 +522,7 @@ iommu.passthrough=1
 iommu.strict=0
 
 [sysfs]
-#TODO CONFIG
+block/{disk}/device/queue_depth=256
 
 [systemctl]
 firewalld=stop
@@ -491,9 +532,13 @@ irqbalance=stop
 [sysctl]
 fs.file-max=1000000
 fs.nr_open=2000000
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+vm.zone_reclaim_mode=0
 
 [script]
-#TODO CONFIG
+ethtool = -K {network} lro on | -G {network} rx 4096 | -G {network} tx 4096
+hinic = 8
 
 [ulimit]
 {user}.hard.nofile = 2000000
@@ -592,11 +637,7 @@ irqbalance=stop
 [script]
 prefetch = off
 ifconfig = {network} mtu 1500
-ethtool = -C {network} adaptive-rx on
-ethtool =  -K {network} gro on
-ethtool =  -K {network} gso on
-ethtool =  -K {network} tso on
-#ethtool =  -K {network} lro on
+ethtool = -C {network} adaptive-rx on | -K {network} gro on | -K {network} gso on | -K {network} tso on | -L {network} combined max
 
 [ulimit]
 {user}.hard.nofile = 102400
@@ -629,7 +670,10 @@ INSERT INTO tuned_item(property, item) VALUES("skew_tick", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("numa_spinlock", "Bootloader");
 
 INSERT INTO tuned_item(property, item) VALUES("openssl_hpre", "Script");
+INSERT INTO tuned_item(property, item) VALUES("hinic", "Script");
 
+INSERT INTO tuned_item(property, item) VALUES("NUMA", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("SRIOV", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Custom Refresh Rate", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Stream Write Mode", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Support Smmu", "Bios");
@@ -653,6 +697,7 @@ INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/en
 INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/scheduler", "Sysfs");
 INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/read_ahead_kb", "Sysfs");
 INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/nr_requests", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/device/queue_depth", "Sysfs");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_syn_backlog", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.core.somaxconn", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_time", "Sysctl");
@@ -718,7 +763,7 @@ INSERT INTO tuned_item(property, item) VALUES("{user}.soft.nofile", "Ulimit");
 INSERT INTO tuned_item(property, item) VALUES("{user}.soft.stack", "Ulimit");
 INSERT INTO tuned_item(property, item) VALUES("{user}.hard.stack", "Ulimit");
 INSERT INTO tuned_item(property, item) VALUES("swap", "Script");
-NSERT INTO tuned_item(property, item) VALUES("kernel.randomize_va_space", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.randomize_va_space", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sched_cfs_bandwidth_slice_us", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sched_migration_cost_ns", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sched_latency_ns", "Sysctl");

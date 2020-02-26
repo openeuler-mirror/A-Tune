@@ -13,6 +13,8 @@
 declare -A kmap=(["gro"]="generic-receive-offload" ["gso"]="generic-segmentation-offload"
   ["tso"]="tcp-segmentation-offload" ["lro"]="large-receive-offload")
 declare -A cmap=(["adaptive-rx"]="Adaptive" ["adaptive-tx"]="Adaptive")
+declare -A lmap=(["combined"]="Combined")
+declare -A gmap=(["rx"]="RX:" ["tx"]="TX:")
 koption="on off"
 xoption="toeplitz xor crc32"
 coption="on off"
@@ -32,12 +34,18 @@ function get_ethtool_value() {
   network=${para[1]}
   case "$option" in
   "-K")
-    value=$(ethtool -k "$network" | grep -w "${kmap["${para[2]}"]}" | awk '{print $2}')
+    property=$(ethtool -k "$network" | grep -w "${kmap["${para[2]}"]}")
+    value=$(echo "$property" | awk '{print $2}')
     if !(judge_value "$value" $koption); then
       echo "\033[31m the last parameter of ethtool must select in [$koption] \033[31m"
       return 1
     fi
-    echo "-K $network "${para[2]}" $value"
+    affix=$(echo "$property" | awk '{print $3}')
+    if [[ "$affix" == "[fixed]" ]]; then
+      echo "fixed"
+    else
+      echo "-K $network "${para[2]}" $value"
+    fi
     ;;
   "-X")
     for opt in $xoption; do
@@ -65,6 +73,14 @@ function get_ethtool_value() {
     fi
     echo "-C $network "${para[2]}" $value"
     ;;
+  "-L")
+    value=$(ethtool -l "$network" | grep -w "${lmap["${para[2]}"]}" | awk 'NR==2{print $2}')
+    echo "-L $network "${para[2]}" $value"
+    ;;
+  "-G")
+    value=$(ethtool -g "$network" | grep -w "${gmap["${para[2]}"]}" | awk 'NR==2{print $2}')
+    echo "-G $network "${para[2]}" $value"
+    ;;
   *)
     echo "\033[31m this option is not supported \033[31m" && return 1
     ;;
@@ -84,5 +100,23 @@ function judge_value() {
     fi
   done
   false
+}
+
+function cmd_conversion() {
+  option=$(echo "$@" | awk '{print $1}')
+  network=$(echo "$@" | awk '{print $2}')
+  case "$option" in
+  "-L")
+    if [[ $(echo "$@" | awk '{print $4}') == "max" ]]; then
+      max_value=$(ethtool -l "$network" | grep -w "Combined" | awk 'NR==1{print $2}')
+      echo "$@" | sed "s/max/$max_value/"
+    else
+      echo "$@"
+    fi
+    ;;
+  *)
+    echo "$@"
+    ;;
+  esac
 }
 
