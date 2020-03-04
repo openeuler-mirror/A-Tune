@@ -96,8 +96,7 @@ func profileUpdate(ctx *cli.Context) error {
 		ProfileName:  profileName,
 		Content:      data})
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return err
 	}
 	if reply.GetStatus() != "OK" {
 		fmt.Println(reply.GetStatus())

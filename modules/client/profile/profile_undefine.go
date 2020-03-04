@@ -74,7 +74,6 @@ func profileDelete(ctx *cli.Context) error {
 	svc := PB.NewProfileMgrClient(c.Connection())
 	reply, err := svc.Delete(CTX.Background(), &PB.DefineMessage{WorkloadType: workloadType})
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	if reply.GetStatus() != "OK" {

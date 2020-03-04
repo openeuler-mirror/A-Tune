@@ -14,7 +14,12 @@
 package module
 
 import (
+	"atune/common/config"
+	"context"
 	"fmt"
+	"google.golang.org/grpc/peer"
+	"net"
+	"strings"
 	"sync"
 
 	"github.com/urfave/cli"
@@ -115,3 +120,33 @@ func GetServices() ([]string, error) {
 
 	return svc, nil
 }
+
+//CheckRpcIsLocalAddr return whether rpc is a local addr
+func CheckRpcIsLocalAddr(ctx context.Context) (bool, error) {
+	if config.TransProtocol != "tcp" {
+		return true, nil
+	}
+
+	pr, ok := peer.FromContext(ctx)
+	if !ok || pr.Addr == net.Addr(nil) {
+		return false, fmt.Errorf("failed to get rpc client ip")
+	}
+	clientAddr := strings.Split(pr.Addr.String(), ":")[0]
+
+	serverAddr, err := net.InterfaceAddrs()
+	if err != nil {
+		return false, err
+	}
+
+	for i := range serverAddr {
+		addr, _, err := net.ParseCIDR(serverAddr[i].String())
+		if err != nil {
+			return false, err
+		}
+		if net.ParseIP(clientAddr).Equal(addr) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+

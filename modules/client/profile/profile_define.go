@@ -104,7 +104,6 @@ func profileDefined(ctx *cli.Context) error {
 		ProfileName:  profileName,
 		Content:      data})
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	if reply.GetStatus() != "OK" {
