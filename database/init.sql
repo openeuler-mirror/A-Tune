@@ -104,7 +104,10 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_computi
 INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_database", "in-memory_database", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("single_computer_intensive_jobs", "compute-intensive", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("communication", "rpc_communication", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("kvm_virtualization", "kvm_virtualization", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("kvm_host", "kvm_host", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("arm_native", "arm_native", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("distributed_storage", "distributed_storage", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("hpc", "hpc", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("idle", "default", 0);
 
 
@@ -150,9 +153,9 @@ check_environment=on
 
 ");
 
-INSERT INTO profile (profile_type, profile_information) VALUES("kvm_virtualization", "
+INSERT INTO profile (profile_type, profile_information) VALUES("arm_native", "
 #
-# compute-intensive A-Tune configuration
+# arm_native A-Tune configuration
 #
 [main]
 include=default
@@ -161,7 +164,7 @@ include=default
 #TODO CONFIG
 
 [bios]
-SRIOV=Enable
+#TODO CONFIG
 
 [bootloader.grub2]
 #TODO CONFIG
@@ -170,7 +173,222 @@ SRIOV=Enable
 #TODO CONFIG
 
 [sysctl]
+kernel.pid_max=655360
+fs.inotify.max_user_instances=8192
+
+[script]
+logind=UserTasksMax 655360
+
+[ulimit]
+{user}.hard.nofile = 65535
+{user}.soft.nofile = 65535
+
+[schedule_policy]
 #TODO CONFIG
+
+[check]
+#TODO CONFIG
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("distributed_storage", "
+#
+# distributed_storage A-Tune configuration
+#
+[main]
+include=default
+
+[kernel_config]
+#TODO CONFIG
+
+[bios]
+#TODO CONFIG
+
+[bootloader.grub2]
+iommu.passthrough=1
+
+[sysfs]
+block/{disk}/queue/scheduler=deadline
+block/{disk}/queue/nr_requests=512
+
+[sysctl]
+kernel.pid_max=4194303
+fs.file-max=6553600
+vm.swappiness=0
+
+[script]
+ifconfig = {network} mtu 9000
+blockdev = {disk} 8192
+
+[ulimit]
+#TODO CONFIG
+
+[schedule_policy]
+#TODO CONFIG
+
+[check]
+#TODO CONFIG
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("kvm_host", "
+#
+# kvm_host A-Tune configuration
+#
+[main]
+include=throughput-performance
+
+[kernel_config]
+#TODO CONFIG
+
+[bios]
+SRIOV=Enable
+Stream Write Mode=Allocate share LLC
+Custom Refresh Rate=64ms
+
+[bootloader.grub2]
+iommu.passthrough=0
+default_hugepagesz=512M
+
+[sysfs]
+kernel/mm/transparent_hugepage/enabled=never
+
+[sysctl]
+vm.dirty_background_ratio = 5
+kernel.sched_migration_cost_ns = 5000000
+
+[script]
+prefetch = on
+ethtool = -L {network} combined max
+
+[ulimit]
+#TODO CONFIG
+
+[schedule_policy]
+#TODO CONFIG
+
+[check]
+#TODO CONFIG
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("hpc", "
+#
+# hpc A-Tune configuration
+#
+[main]
+include=default
+
+[kernel_config]
+CONFIG_ARM64_64K_PAGES=y
+
+[bios]
+Rank Interleaving=4Way
+
+[bootloader.grub2]
+selinux=0
+
+[sysfs]
+block/{disk}/queue/scheduler=deadline
+kernel/mm/transparent_hugepage/enabled=always
+
+[sysctl]
+vm.dirty_background_ratio=5
+vm.dirty_ratio=40
+vm.dirty_expire_centisecs=2000
+vm.min_free_kbytes=135168
+vm.zone_reclaim_mode=1
+kernel.numa_balancing=0
+net.core.busy_read=50
+net.core.busy_poll=50
+net.ipv4.tcp_fastopen=3
+kernel.sched_min_granularity_ns=3000000
+kernel.sched_wakeup_granularity_ns=4000000
+vm.dirty_ratio=10
+vm.dirty_background_ratio=3
+vm.swappiness=10
+kernel.sched_migration_cost_ns=5000000
+
+[script]
+prefetch = on
+blockdev = {disk} 4096
+
+[ulimit]
+{user}.hard.stack = unlimited
+{user}.soft.stack = unlimited
+
+[schedule_policy]
+#TODO CONFIG
+
+[check]
+#TODO CONFIG
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("network-intensive", "
+#
+# network-intensive A-Tune configuration
+#
+[main]
+include=throughput-performance
+
+[kernel_config]
+#TODO CONFIG
+
+[bios]
+#TODO CONFIG
+
+[bootloader.grub2]
+#TODO CONFIG
+
+[sysfs]
+kernel/mm/transparent_hugepage/defrag=never
+kernel/mm/transparent_hugepage/enabled=never
+
+[sysctl]
+net.ipv4.udp_mem =  3145728 4194304 16777216
+net.ipv4.tcp_rmem = 4096         87380   16777216
+net.ipv4.tcp_wmem = 4096         16384   16777216
+kernel.numa_balancing=0
+
+[script]
+#TODO CONFIG
+
+[ulimit]
+#TODO CONFIG
+
+[schedule_policy]
+#TODO CONFIG
+
+[check]
+#TODO CONFIG
+
+");
+
+INSERT INTO profile (profile_type, profile_information) VALUES("memory-intensive", "
+#
+# memory-intensive A-Tune configuration
+#
+[main]
+include=default
+
+[kernel_config]
+#TODO CONFIG
+
+[bios]
+Custom Refresh Rate=64ms
+
+[bootloader.grub2]
+default_hugepagesz=2M
+hugepagesz=2M
+hugepages=150000
+
+[sysfs]
+#TODO CONFIG
+
+[sysctl]
+vm.swappiness=10
+kernel.randomize_va_space=0
 
 [script]
 #TODO CONFIG
@@ -252,6 +470,8 @@ vm.dirty_ratio=40
 vm.dirty_background_ratio=20
 vm.dirty_writeback_centisecs=800
 vm.dirty_expire_centisecs=30000
+kernel.sched_min_granularity_ns=3000000
+kernel.sched_wakeup_granularity_ns=4000000
 
 [script]
 #TODO CONFIG
@@ -679,6 +899,7 @@ INSERT INTO tuned_item(property, item) VALUES("Stream Write Mode", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Support Smmu", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Max Payload Size", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Power Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Rank Interleaving", "Bios");
 
 INSERT INTO tuned_item(property, item) VALUES("vm.nr_hugepages", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("vm.swappiness", "Sysctl");
@@ -690,8 +911,7 @@ INSERT INTO tuned_item(property, item) VALUES("vm.dirty_writeback_centisecs", "S
 INSERT INTO tuned_item(property, item) VALUES("vm.dirty_expire_centisecs", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("vm.overcommit_memory", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("vm.zone_reclaim_mode", "Sysctl");
-INSERT INTO tuned_item(property, item) VALUES("vm.min_free_kbytes", "Sysctl ");
-INSERT INTO tuned_item(property, item) VALUES("vm.hugepages_treat_as_movable", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.min_free_kbytes", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/defrag", "Sysfs");
 INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/enabled", "Sysfs");
 INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/scheduler", "Sysfs");
@@ -749,6 +969,7 @@ INSERT INTO tuned_item(property, item) VALUES("fs.file-max", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("fs.nr_open", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("fs.suid_dumpable", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("fs.aio-max-nr", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("fs.inotify.max_user_instances", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.threads-max", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.sem", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.msgmnb", "Sysctl");
@@ -785,6 +1006,9 @@ INSERT INTO tuned_item(property, item) VALUES("vm.stat_interval", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("kernel.timer_migration", "Sysctl");
 
 INSERT INTO tuned_item(property, item) VALUES("prefetch", "Script");
+INSERT INTO tuned_item(property, item) VALUES("logind", "Script");
+INSERT INTO tuned_item(property, item) VALUES("blockdev", "Script");
+INSERT INTO tuned_item(property, item) VALUES("hugepage", "Script");
 
 INSERT INTO tuned_item(property, item) VALUES("sysmonitor", "Systemctl");
 INSERT INTO tuned_item(property, item) VALUES("irqbalance", "Systemctl");
