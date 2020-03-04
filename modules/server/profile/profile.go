@@ -511,6 +511,14 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 UpgradeProfile method update the db file
 */
 func (s *ProfileServer) UpgradeProfile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_UpgradeProfileServer) error {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(stream.Context())
+	if err != nil {
+		return err
+	}
+	if !isLocalAddr {
+		return fmt.Errorf("the upgrade command can not be remotely operated")
+	}
+
 	log.Debug("Begin to upgrade profiles\n")
 	currenDbPath := path.Join(config.DatabasePath, config.DatabaseName)
 	newDbPath := profileInfo.GetName()
@@ -880,6 +888,14 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 
 // Define method user define workload type and profile
 func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)
+	if err != nil {
+		return &PB.Ack{}, err
+	}
+	if !isLocalAddr {
+		return &PB.Ack{}, fmt.Errorf("the define command can not be remotely operated")
+	}
+
 	workloadType := message.GetWorkloadType()
 	profileName := message.GetProfileName()
 	content := string(message.GetContent())
@@ -924,10 +940,18 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 
 // Delete method delete the self define workload type from database
 func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)
+	if err != nil {
+		return &PB.Ack{}, err
+	}
+	if !isLocalAddr {
+		return &PB.Ack{}, fmt.Errorf("the undefine command can not be remotely operated")
+	}
+
 	workloadType := message.GetWorkloadType()
 
 	classApps := &sqlstore.GetClassApp{Class: workloadType}
-	err := sqlstore.GetClassApps(classApps)
+	err = sqlstore.GetClassApps(classApps)
 	if err != nil {
 		return &PB.Ack{}, err
 	}
@@ -981,6 +1005,14 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 
 // Update method update the content of the specified workload type from database
 func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)
+	if err != nil {
+		return &PB.Ack{}, err
+	}
+	if !isLocalAddr {
+		return &PB.Ack{}, fmt.Errorf("the update command can not be remotely operated")
+	}
+
 	workloadType := message.GetWorkloadType()
 	profileName := message.GetProfileName()
 	content := string(message.GetContent())
