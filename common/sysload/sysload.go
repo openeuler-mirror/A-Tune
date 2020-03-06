@@ -21,6 +21,13 @@ import (
 // #include <unistd.h>
 import "C"
 
+
+var Sysload SystemLoad
+
+func init() {
+	Sysload.Init()
+}
+
 var clockTicks uint64
 
 // ScaleShift is in order to avoid float compute

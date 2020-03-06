@@ -79,6 +79,11 @@ const (
 	TopoTypeEnd
 )
 
+// Compare of TopoType return > 0 if TopoType t contains more cpus than TopoType src
+func (t TopoType) Compare(src TopoType) int {
+	return int(t) - int(src)
+}
+
 // TopoLoadInfo save load info for different TopoNode
 type TopoLoadInfo struct {
 	bindCount int
@@ -115,18 +120,18 @@ func (loadInfo *TopoLoadInfo) GetLoad() int {
 	return loadInfo.load
 }
 
-// AddBind loadInfo bindCount++
-func (loadInfo *TopoLoadInfo) AddBind() {
+// addBind loadInfo bindCount++
+func (loadInfo *TopoLoadInfo) addBind() {
 	loadInfo.bindCount++
 }
 
-// SubBind loadInfo bindCount--
-func (loadInfo *TopoLoadInfo) SubBind() {
+// subBind loadInfo bindCount--
+func (loadInfo *TopoLoadInfo) subBind() {
 	loadInfo.bindCount--
 }
 
-// GetBind return loadInfo bindCount
-func (loadInfo *TopoLoadInfo) GetBind() int {
+// getBind return loadInfo bindCount
+func (loadInfo *TopoLoadInfo) getBind() int {
 	return loadInfo.bindCount
 }
 
@@ -409,6 +414,26 @@ func (node *TopoNode) GetLoad() int {
 	return node.loadInfo.GetLoad()
 }
 
+// AddBind add bind number of TopoNode
+func (node *TopoNode) AddBind() {
+	node.loadInfo.addBind()
+}
+
+// SubBind sub bind number of TopoNode
+func (node *TopoNode) SubBind() {
+	node.loadInfo.subBind()
+}
+
+// GetBind get bind number of TopoNode
+func (node *TopoNode) GetBind() int {
+	return node.loadInfo.getBind()
+}
+
+// GetLoadInfo get loadinfo from TopoNode
+func (node *TopoNode) GetLoadInfo() *TopoLoadInfo {
+	return &node.loadInfo
+}
+
 // ID return node.id
 func (node *TopoNode) ID() int {
 	return node.id
@@ -422,6 +447,20 @@ func (node *TopoNode) Type() TopoType {
 // Mask return &node.mask
 func (node *TopoNode) Mask() *cpumask.Cpumask {
 	return &node.mask
+}
+
+// Parent return parent TopoNode
+func (node *TopoNode) Parent(t TopoType) *TopoNode {
+	var p *TopoNode
+
+	if t.Compare(node.topotype) < 0 {
+		return nil
+	}
+
+	for p = node; p != nil && p.topotype != t; p = p.parent {
+		// NULL
+	}
+	return p
 }
 
 // GetNumaNodeByID return TopoNode of given numa id

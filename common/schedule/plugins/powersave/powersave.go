@@ -34,12 +34,12 @@ func (callback *powerSaveCallback) Callback(node *topology.TopoNode) {
 }
 
 // Preprocessing do some work before pick nodes
-func (na *PowerSave) Preprocessing(bindtaskinfo *[]framework.BindTaskInfo) {
+func (na *PowerSave) Preprocessing(bindtaskinfo *[]*framework.BindTaskInfo) {
 	log.Infof("preprocessing in %s plugin", Name)
 }
 
 // PickNodesforPids set nodes for given tasks
-func (na *PowerSave) PickNodesforPids(bindtaskinfo *[]framework.BindTaskInfo) {
+func (na *PowerSave) PickNodesforPids(bindtaskinfo *[]*framework.BindTaskInfo) {
 	var callback powerSaveCallback
 
 	log.Infof("PickNodesforPids in %s plugin", Name)
@@ -52,7 +52,7 @@ func (na *PowerSave) PickNodesforPids(bindtaskinfo *[]framework.BindTaskInfo) {
 }
 
 // Postprocessing do some work after task bindings
-func (na *PowerSave) Postprocessing(bindtaskinfo *[]framework.BindTaskInfo) {
+func (na *PowerSave) Postprocessing(bindtaskinfo *[]*framework.BindTaskInfo) {
 	log.Infof("BalanceNode in %s plugin", Name)
 }
 
