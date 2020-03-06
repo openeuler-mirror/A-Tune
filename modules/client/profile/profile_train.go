@@ -77,11 +77,17 @@ func checkTrainCtx(ctx *cli.Context) error {
 		_ = cli.ShowCommandHelp(ctx, "train")
 		return fmt.Errorf("error: data_path must be specified")
 	}
+	if !utils.IsInputStringValid(dataPath) {
+		return fmt.Errorf("input:%s is invalid", dataPath)
+	}
 
 	outputPath := ctx.String("output_file")
 	if outputPath == "" {
 		_ = cli.ShowCommandHelp(ctx, "train")
 		return fmt.Errorf("error: output_file must be specified")
+	}
+	if !utils.IsInputStringValid(outputPath) {
+		return fmt.Errorf("input:%s is invalid", outputPath)
 	}
 
 	return nil

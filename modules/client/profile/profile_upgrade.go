@@ -60,6 +60,10 @@ func profileUpgrade(ctx *cli.Context) error {
 	}
 
 	dbPath := ctx.Args().Get(0)
+	if !utils.IsInputStringValid(dbPath) {
+		return fmt.Errorf("input:%s is invalid", dbPath)
+	}
+
 	exist, err := utils.PathExist(dbPath)
 	if err != nil {
 		return err

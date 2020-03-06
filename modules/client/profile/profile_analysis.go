@@ -72,6 +72,9 @@ func profileAnalysis(ctx *cli.Context) error {
 	}
 	if ctx.NArg() == 1 {
 		appname = ctx.Args().Get(0)
+		if !utils.IsInputStringValid(appname) {
+			return fmt.Errorf("input:%s is invalid", appname)
+		}
 	}
 
 	c, err := client.NewClientFromContext(ctx)
@@ -81,6 +84,10 @@ func profileAnalysis(ctx *cli.Context) error {
 	defer c.Close()
 
 	modelFile := ctx.String("model")
+	if modelFile != "" && !utils.IsInputStringValid(modelFile) {
+		return fmt.Errorf("input:%s is invalid", modelFile)
+	}
+
 	svc := PB.NewProfileMgrClient(c.Connection())
 	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile})
 

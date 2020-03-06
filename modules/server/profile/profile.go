@@ -677,6 +677,14 @@ func (s *ProfileServer) ProfileRollback(profileInfo *PB.ProfileInfo, stream PB.P
 Collection method call collection script to collect system data.
 */
 func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr_CollectionServer) error {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(stream.Context())
+	if err != nil {
+		return err
+	}
+	if !isLocalAddr {
+		return fmt.Errorf("the collection command can not be remotely operated")
+	}
+
 	if valid := utils.IsInputStringValid(message.GetWorkload()); !valid {
 		return fmt.Errorf("input:%s is invalid", message.GetWorkload())
 	}
@@ -698,7 +706,7 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	}
 
 	classApps := &sqlstore.GetClassApp{Class: message.GetType()}
-	err := sqlstore.GetClassApps(classApps)
+	err = sqlstore.GetClassApps(classApps)
 	if err != nil {
 		return err
 	}
@@ -785,6 +793,14 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 Training method train the collected data to generate the model
 */
 func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_TrainingServer) error {
+	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(stream.Context())
+	if err != nil {
+		return err
+	}
+	if !isLocalAddr {
+		return fmt.Errorf("the train command can not be remotely operated")
+	}
+
 	DataPath := message.GetDataPath()
 	OutputPath := message.GetOutputPath()
 

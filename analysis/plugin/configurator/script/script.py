@@ -31,11 +31,15 @@ class Script(Configurator):
     _module = "SCRIPT"
     _submod = "SCRIPT"
     cmd_delimiter = "|"
+    scripts_path = "/usr/libexec/atuned/scripts"
 
     def __init__(self, user=None):
         Configurator.__init__(self, user)
 
     def _set(self, key, value):
+        script_dir = os.path.dirname(key)
+        if self.scripts_path != os.path.realpath(script_dir):
+            raise SetConfigError("key:{} is invalid".format(key))
         name = os.path.basename(key)
         script = "{}/set.sh".format(key)
         if not os.path.exists(script):
@@ -48,6 +52,9 @@ class Script(Configurator):
         return 0
 
     def _get(self, key, value):
+        script_dir = os.path.dirname(key)
+        if self.scripts_path != os.path.realpath(script_dir):
+            raise GetConfigError("key:{} is invalid".format(key))
         name = os.path.basename(key)
         script = "{}/get.sh".format(key)
         if not os.path.exists(script):

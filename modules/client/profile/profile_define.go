@@ -64,6 +64,10 @@ func profileDefineCheck(ctx *cli.Context) error {
 	}
 
 	file := ctx.Args().Get(2)
+	if !utils.IsInputStringValid(file) {
+		return fmt.Errorf("input:%s is invalid", file)
+	}
+
 	exist, err := utils.PathExist(file)
 	if err != nil {
 		return err
@@ -85,7 +89,14 @@ func profileDefined(ctx *cli.Context) error {
 		return err
 	}
 	workloadType := ctx.Args().Get(0)
+	if !utils.IsInputStringValid(workloadType) {
+		return fmt.Errorf("input:%s is invalid", workloadType)
+	}
+
 	profileName := ctx.Args().Get(1)
+	if !utils.IsInputStringValid(profileName) {
+		return fmt.Errorf("input:%s is invalid", profileName)
+	}
 
 	data, err := ioutil.ReadFile(ctx.Args().Get(2))
 	if err != nil {
