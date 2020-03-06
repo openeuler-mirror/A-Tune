@@ -20,7 +20,7 @@ from analysis.plugin.configurator.script.script import Script
 class TestScript:
     """ test script"""
     user = "UT"
-    path = "scripts/hugepage"
+    path = "/usr/libexec/atuned/scripts/hugepage"
 
     def test_get_script_with_hugepage(self):
         """test get script result with hugepage"""
