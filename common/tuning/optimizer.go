@@ -301,4 +301,3 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 
 	return fmt.Errorf("project:%s not found", data)
 }
-

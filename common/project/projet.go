@@ -175,4 +175,3 @@ func ExecCommand(script string) ([]byte, error) {
 	out, err := cmd.CombinedOutput()
 	return out, err
 }
-

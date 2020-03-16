@@ -187,7 +187,7 @@ func runatuned(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := utils.WaitForPyservice(); err != nil {
+	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
 		log.Errorf("waiting for pyservice faild: %v", err)
 		return err
 	}
