@@ -16,7 +16,6 @@ package profile
 import (
 	PB "atune/api/profile"
 	"atune/common/client"
-	SVC "atune/common/service"
 	"fmt"
 	"io"
 	"strings"
@@ -46,18 +45,6 @@ var scheduleCommand = cli.Command{
 		return desc
 	}(),
 	Action: schedule,
-}
-
-func init() {
-	svc := SVC.ProfileService{
-		Name:    "opt.profile.schedule",
-		Desc:    "opt profile system",
-		NewInst: newScheduleCmd,
-	}
-	if err := SVC.AddService(&svc); err != nil {
-		fmt.Printf("Failed to load schedule service : %s\n", err)
-		return
-	}
 }
 
 func newScheduleCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {
