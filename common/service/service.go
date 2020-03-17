@@ -149,4 +149,3 @@ func CheckRpcIsLocalAddr(ctx context.Context) (bool, error) {
 	}
 	return false, nil
 }
-

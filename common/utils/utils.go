@@ -59,6 +59,12 @@ const (
 	UNKNOWN = "UNKNOWN"
 )
 
+// config for waiting rest service
+const (
+	period  = 2
+	timeout = 120
+)
+
 // CheckArgs method check command args num
 func CheckArgs(context *cli.Context, expected, checkType int) error {
 	var err error
@@ -229,13 +235,14 @@ func RemoveDuplicateElement(message []string) []string {
 }
 
 // WaitForPyservice method waiting for pyEngine service start success
-func WaitForPyservice() error {
-	ticker := time.NewTicker(time.Second * 2)
-	timeout := time.After(time.Second * 120)
+func WaitForPyservice(address string, port string) error {
+	ticker := time.NewTicker(time.Second * period)
+	timeout := time.After(time.Second * timeout)
+	addr := address + ":" + port
 	for {
 		select {
 		case <-ticker.C:
-			_, err := net.Dial("tcp", "localhost:8383")
+			_, err := net.Dial("tcp", addr)
 			if err != nil {
 				continue
 			}
@@ -354,4 +361,3 @@ func CreateDir(dir string, perm os.FileMode) error {
 	}
 	return nil
 }
-
