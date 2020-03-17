@@ -210,15 +210,31 @@ iommu.passthrough=1
 [sysfs]
 block/{disk}/queue/scheduler=deadline
 block/{disk}/queue/nr_requests=512
+block/{disk}/queue/read_ahead_kb=8192
 
 [sysctl]
 kernel.pid_max=4194303
 fs.file-max=6553600
 vm.swappiness=0
+net.ipv4.tcp_sack=0
+net.ipv4.tcp_timestamps=0
+net.core.netdev_max_backlog=250000
+net.core.rmem_max=2147483647
+net.core.wmem_max=2147483647
+net.ipv4.tcp_rmem=10240 87380 2147483647
+net.ipv4.tcp_wmem=10240 87380 2147483647
+net.ipv4.tcp_low_latency=1
+net.ipv4.tcp_fastopen=1
+net.core.somaxconn=2048
+net.core.optmem_max=16777216
+net.core.rmem_default=16777216
+net.core.wmem_default=16777216
+net.ipv4.tcp_mem=16777216 16777216 16777216
 
 [script]
 ifconfig = {network} mtu 9000
 blockdev = {disk} 8192
+ethtool = -K {network} lro on | -G {network} rx 32760 | -G {network} tx 32760
 
 [ulimit]
 #TODO CONFIG
@@ -248,7 +264,9 @@ Custom Refresh Rate=64ms
 
 [bootloader.grub2]
 iommu.passthrough=0
-default_hugepagesz=512M
+default_hugepagesz=1G
+hugepagesz=1G
+hugepages=300
 
 [sysfs]
 kernel/mm/transparent_hugepage/enabled=never
@@ -256,6 +274,9 @@ kernel/mm/transparent_hugepage/enabled=never
 [sysctl]
 vm.dirty_background_ratio = 5
 kernel.sched_migration_cost_ns = 5000000
+
+[systemctl]
+irqbalance=stop
 
 [script]
 prefetch = on
@@ -291,6 +312,7 @@ selinux=0
 [sysfs]
 block/{disk}/queue/scheduler=deadline
 kernel/mm/transparent_hugepage/enabled=always
+block/{disk}/queue/read_ahead_kb=4096
 
 [sysctl]
 vm.dirty_background_ratio=5
@@ -316,6 +338,10 @@ blockdev = {disk} 4096
 [ulimit]
 {user}.hard.stack = unlimited
 {user}.soft.stack = unlimited
+{user}.hard.nproc = unlimited
+{user}.soft.nproc = unlimited
+{user}.hard.memlock = unlimited
+{user}.soft.memlock = unlimited
 
 [schedule_policy]
 #TODO CONFIG
@@ -930,6 +956,7 @@ INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.accept_sour
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_tw_recycle", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_tw_reuse", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_syncookies", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_low_latency", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_max", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_established", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-ip6tables", "Sysctl");
@@ -947,6 +974,7 @@ INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_mem", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_rmem", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_wmem", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.udp_mem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_sack", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_fastopen", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.core.wmem_default", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("net.core.rmem_default", "Sysctl");
