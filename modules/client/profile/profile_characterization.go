@@ -16,9 +16,7 @@ package profile
 import (
 	PB "atune/api/profile"
 	"atune/common/client"
-	SVC "atune/common/service"
 	"atune/common/utils"
-	"fmt"
 	"io"
 
 	"github.com/urfave/cli"
@@ -34,18 +32,6 @@ var profileCharacterCommand = cli.Command{
 		return desc
 	}(),
 	Action: profileCharacter,
-}
-
-func init() {
-	svc := SVC.ProfileService{
-		Name:    "opt.profile.characterization",
-		Desc:    "opt profile system",
-		NewInst: newProfileCharacterCmd,
-	}
-	if err := SVC.AddService(&svc); err != nil {
-		fmt.Printf("Failed to load profile characterization service : %s\n", err)
-		return
-	}
 }
 
 func newProfileCharacterCmd(ctx *cli.Context, opts ...interface{}) (interface{}, error) {

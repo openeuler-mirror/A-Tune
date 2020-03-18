@@ -32,7 +32,7 @@ class Training(Resource):
 
     def post(self):
         """
-        charaterization retrain
+        characterization retrain
         """
         args = TRAIN_POST_PARSER.parse_args()
         LOGGER.info(args)
@@ -41,9 +41,9 @@ class Training(Resource):
         output_path = args.get(self.output_path)
         data_path = args.get(self.data_path)
 
-        charaterization = WorkloadCharacterization(model_path)
+        characterization = WorkloadCharacterization(model_path)
         try:
-            charaterization.retrain(data_path, output_path)
+            characterization.retrain(data_path, output_path)
         except Exception as err:
             LOGGER.error(err)
             abort(500)
