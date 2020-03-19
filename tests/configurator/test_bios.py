@@ -28,7 +28,7 @@ class TestBios:
             bios = Bios(self.user)
             version = bios.get("version")
             assert version is not None
-        except PermissionError:
+        except (PermissionError, FileNotFoundError):
             assert True
 
     def test_is_supported_hpre(self):
@@ -37,7 +37,7 @@ class TestBios:
             bios = Bios(self.user)
             hpre = bios.get("hpre_support")
             assert hpre is not None
-        except PermissionError:
+        except (PermissionError, FileNotFoundError):
             assert True
 
     def test_set_bios_info(self):
