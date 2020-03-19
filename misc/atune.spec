@@ -21,6 +21,7 @@ Requires: prefetch_tuning
 Requires: perf
 Requires: sysstat
 Requires: hwloc-gui
+Requires: psmisc
 
 %define  debug_package %{nil}
 
