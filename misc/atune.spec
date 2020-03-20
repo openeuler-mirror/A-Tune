@@ -2,10 +2,11 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 0.1
-Release: 0.1%{?dist}
+Version: 0.2
+Release: 0.1
 License: Mulan PSL v1
-Source: %{name}-%{version}.tar.gz
+URL: https://gitee.com/openeuler/A-Tune
+Source: openeuler-A-Tune-v%{version}.tar.gz
 
 BuildRequires: rpm-build protobuf-compiler golang-bin python3-pytest procps-ng
 BuildRequires: sqlite >= 3.24.0
@@ -43,24 +44,23 @@ License: MuLan PSL v1
 Database and AI model used by atuned AI tuning system.
 
 %prep
-%setup -n %{name}-%{version} -q
+%setup -n A-Tune -q
 
 %build
 cd ../
 mkdir -p gopath/src/
 rm -rf gopath/src/%{name}
-mv %{name}-%{version} gopath/src/%{name}
+mv A-Tune gopath/src/%{name}
 cd gopath/src/%{name}
 export GO111MODULE=off
 make
 cd ../
-cp -rf %{name} ../../%{name}-%{version}
+cp -rf %{name} ../../A-Tune
 
 %install
 %make_install
 
 %check
-PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version}
 
 %files
 %license License/LICENSE
@@ -105,5 +105,8 @@ PYTHONPATH=%{buildroot}%{python3_sitelib} py.test-%{python3_version}
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Thu Mar 19 2020 openEuler Buildteam <buildteam@openeuler.org> - 0.2-0.1
+- Package init
+
 * Tue Nov 12 2019 openEuler Buildteam <buildteam@openeuler.org> - 0.1-0.1
 - Package init

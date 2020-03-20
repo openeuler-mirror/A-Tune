@@ -1,4 +1,4 @@
-VERSION = 0.1
+VERSION = 0.2
 .PHONY: all clean modules
 
 PKGPATH=pkg
