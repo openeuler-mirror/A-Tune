@@ -108,7 +108,7 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 }
 
 // RunSet method call the set script to set the value
-func (y *YamlPrjSvr) RunSet(optStr string) error {
+func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 	paraMap := make(map[string]string)
 	paraSlice := strings.Split(optStr, ",")
 	for _, para := range paraSlice {
@@ -118,10 +118,11 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 		}
 		paraMap[kvs[0]] = kvs[1]
 	}
+	scripts := make([]string, 0)
 	for _, obj := range y.Object {
 		out, err := ExecCommand(obj.Info.GetScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", obj.Info.GetScript, err)
+			return fmt.Errorf("faild to exec %s, err: %v", obj.Info.GetScript, err), ""
 		}
 
 		if strings.TrimSpace(string(out)) == paraMap[obj.Name] {
@@ -133,14 +134,15 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", newScript, err)
+			return fmt.Errorf("faild to exec %s, err: %v", newScript, err), ""
 		}
+		scripts = append(scripts, newScript)
 	}
-	return nil
+	return nil, strings.Join(scripts, ",")
 }
 
 // RestartProject method call the StartWorkload and StopWorkload script to restart the service
-func (y *YamlPrjSvr) RestartProject() error {
+func (y *YamlPrjSvr) RestartProject() (error, string) {
 	startWorkload := y.Startworkload
 	stopWorkload := y.Stopworkload
 
@@ -152,21 +154,26 @@ func (y *YamlPrjSvr) RestartProject() error {
 			break
 		}
 	}
+
+	scripts := make([]string, 0)
 	if needRestart {
 		out, err := ExecCommand(stopWorkload)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", stopWorkload, err)
+			return fmt.Errorf("faild to exec %s, err: %v", stopWorkload, err), ""
 		}
 		log.Debug(string(out))
+		scripts = append(scripts, stopWorkload)
 
 		out, err = ExecCommand(startWorkload)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", startWorkload, err)
+			return fmt.Errorf("faild to exec %s, err: %v", startWorkload, err), ""
 		}
 		log.Debug(string(out))
+
+		scripts = append(scripts, startWorkload)
 	}
 
-	return nil
+	return nil, strings.Join(scripts, ",")
 }
 
 //exec command and get result

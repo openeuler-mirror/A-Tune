@@ -368,7 +368,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
-	if err := sqlstore.GetClasses(classProfile); err != nil {
+	err = sqlstore.GetClasses(classProfile)
+	if err != nil {
 		log.Errorf("inquery workload type table faild %v", err)
 		return fmt.Errorf("inquery workload type table faild %v", err)
 	}
@@ -476,23 +477,35 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		data := reply.Name
 		content := reply.Content
 
-		// data == "" means in tuning process
-		if data == "" {
+		//sync config with other server
+		if data == "sync-config" {
 			optimizer.Content = content
-			err := optimizer.DynamicTuned(ch)
+			err = optimizer.SyncTunedNode(ch)
 			if err != nil {
 				return err
 			}
 			continue
 		}
 
-		if err := tuning.CheckServerPrj(data, &optimizer); err != nil {
+		// data == "" means in tuning process
+		if data == "" {
+			optimizer.Content = content
+			err = optimizer.DynamicTuned(ch)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+		
+		err = tuning.CheckServerPrj(data, &optimizer)
+		if err != nil {
 			return err
 		}
 
 		//content == nil means in restore config
 		if content == nil {
-			if err := optimizer.RestoreConfigTuned(ch); err != nil {
+			err = optimizer.RestoreConfigTuned(ch)
+			if err != nil {
 				return err
 			}
 			continue
@@ -565,9 +578,10 @@ func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.Profi
 
 	profileType := classProfile.Result[0].ProfileType
 	profileNames := strings.Split(profileType, ",")
+	context := ""
 	for _, name := range profileNames {
 		name = strings.Trim(name, " ")
-		context, _ := sqlstore.GetContext(name)
+		context, _ = sqlstore.GetContext(name)
 		context = "\n*** " + name + ":\n" + context
 		_ = stream.Send(&PB.ProfileInfo{Name: context})
 	}
@@ -706,11 +720,13 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return fmt.Errorf("output_path %s is not exist", message.GetOutputPath())
 	}
 
-	if err := utils.InterfaceByName(message.GetNetwork()); err != nil {
+	err = utils.InterfaceByName(message.GetNetwork())
+	if err != nil {
 		return err
 	}
 
-	if err := utils.DiskByName(message.GetBlock()); err != nil {
+	err = utils.DiskByName(message.GetBlock())
+	if err != nil {
 		return err
 	}
 
