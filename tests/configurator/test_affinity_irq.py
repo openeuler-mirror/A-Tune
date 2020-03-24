@@ -29,7 +29,7 @@ class TestAffinityIrq:
             irq_affinity = IrqAffinity(self.user)
             irq_affinity.get(self.actions_info_not_exist)
             assert False
-        except LookupError:
+        except (LookupError, FileNotFoundError):
             assert True
 
     def test_set_affinity_irq_with_none(self):
