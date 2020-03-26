@@ -4,7 +4,7 @@ Summary: AI auto tuning system
 Name: atune
 Version: 0.2
 Release: 0.1
-License: Mulan PSL v1
+License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
 Source: openeuler-A-Tune-v%{version}.tar.gz
 
@@ -31,14 +31,14 @@ atune is a service for atuned AI tuning system.
 
 %package client
 Summary: client tool for auto tuning system
-License: MuLan PSL v1
+License: MuLan PSL v2
 
 %description client
 atune client tool for manage atuned AI tuning system.
 
 %package db
 Summary: database and AI model for auto tuning system
-License: MuLan PSL v1
+License: MuLan PSL v2
 
 %description db
 Database and AI model used by atuned AI tuning system.
