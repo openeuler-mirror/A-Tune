@@ -38,7 +38,7 @@ func (s *Sqlstore) Init() error {
 
 	err := os.MkdirAll(config.DatabasePath, 0750)
 	if err != nil {
-		return fmt.Errorf("faild to mkdir: %s(%v)", config.DatabasePath, err)
+		return fmt.Errorf("failed to mkdir: %s(%v)", config.DatabasePath, err)
 	}
 
 	dbName := path.Join(config.DatabasePath, config.DatabaseName)
@@ -48,7 +48,7 @@ func (s *Sqlstore) Init() error {
 
 	engine, err = xorm.NewEngine(config.DatabaseType, connStr)
 	if err != nil {
-		return fmt.Errorf("faild to connect to database: %v", err)
+		return fmt.Errorf("failed to connect to database: %v", err)
 	}
 
 	s.engine = engine
@@ -68,7 +68,7 @@ func Reload(path string) error {
 	log.Infof("Reload DB: %s", path)
 	engine, err := xorm.NewEngine("sqlite3", connStr)
 	if err != nil {
-		return fmt.Errorf("faild to connect to database: %v", err)
+		return fmt.Errorf("failed to connect to database: %v", err)
 	}
 
 	globalEngine = engine

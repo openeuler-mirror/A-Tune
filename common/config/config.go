@@ -128,7 +128,7 @@ func (c *Cfg) Load() error {
 
 	cfg, err := ini.Load(defaultConfigFile)
 	if err != nil {
-		return fmt.Errorf("faild to parse %s, %v", defaultConfigFile, err)
+		return fmt.Errorf("failed to parse %s, %v", defaultConfigFile, err)
 	}
 
 	c.Raw = cfg

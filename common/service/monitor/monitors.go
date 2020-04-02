@@ -49,7 +49,7 @@ func (m *Monitor) Set(cfg *config.Cfg) {
 // Run method start the monitor service
 func (m *Monitor) Run() error {
 	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
-		log.Errorf("waiting for pyservice faild: %v", err)
+		log.Errorf("waiting for pyservice failed: %v", err)
 		return err
 	}
 
@@ -85,7 +85,7 @@ func (m *Monitor) Run() error {
 		if _, err := models.MonitorGet(strings.ToUpper(modulePurpose[0]),
 			strings.ToUpper(modulePurpose[1]),
 			config.FileFormat, filename, ""); err != nil {
-			log.Errorf("collect module %s faild, error: %v", module, err)
+			log.Errorf("collect module %s failed, error: %v", module, err)
 			continue
 		}
 	}

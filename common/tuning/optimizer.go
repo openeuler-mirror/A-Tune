@@ -93,7 +93,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 
 		out, err := project.ExecCommand(item.Info.GetScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
+			return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
 		}
 		initConfigure = append(initConfigure, strings.TrimSpace(knob.Name+"="+string(out)))
 	}
@@ -265,7 +265,7 @@ func (o *Optimizer) evalParsing(ch chan *PB.AckCheck) (string, error) {
 func deleteTask(url string) error {
 	resp, err := http.Delete(url)
 	if err != nil {
-		log.Error("delete task faild:", err)
+		log.Error("delete task failed:", err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -279,7 +279,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 		if !info.IsDir() {
 			prj := new(project.YamlPrjSvr)
 			if err := utils.ParseFile(path, "yaml", &prj); err != nil {
-				return fmt.Errorf("load %s faild, err: %v", path, err)
+				return fmt.Errorf("load %s failed, err: %v", path, err)
 			}
 			log.Infof("project:%s load %s success", prj.Project, path)
 			prjs = append(prjs, prj)

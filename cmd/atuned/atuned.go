@@ -105,7 +105,7 @@ func doBeforeJob(ctx *cli.Context) error {
 	cfg := config.NewCfg()
 	if err := cfg.Load(); err != nil {
 		log.Errorf("Faild to load config file, error: %v", err)
-		return fmt.Errorf("faild to load config file, error: %v", err)
+		return fmt.Errorf("failed to load config file, error: %v", err)
 	}
 
 	store := &sqlstore.Sqlstore{
@@ -123,7 +123,7 @@ func doBeforeJob(ctx *cli.Context) error {
 		log.Infof("initializing service: %s", service.Name)
 		service.Instance.Set(cfg)
 		if err := service.Instance.Init(); err != nil {
-			return fmt.Errorf("service init faild: %v", err)
+			return fmt.Errorf("service init failed: %v", err)
 		}
 	}
 
@@ -138,7 +138,7 @@ func doBeforeJob(ctx *cli.Context) error {
 		go func() {
 			err := backgroundService.Run()
 			if err != nil {
-				log.Errorf("service %s running faild, reason: %v", service.Name, err)
+				log.Errorf("service %s running failed, reason: %v", service.Name, err)
 				return
 			}
 		}()
@@ -188,7 +188,7 @@ func runatuned(ctx *cli.Context) error {
 	}
 
 	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
-		log.Errorf("waiting for pyservice faild: %v", err)
+		log.Errorf("waiting for pyservice failed: %v", err)
 		return err
 	}
 

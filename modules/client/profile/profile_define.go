@@ -78,7 +78,7 @@ func profileDefineCheck(ctx *cli.Context) error {
 
 	_, err = ini.Load(file)
 	if err != nil {
-		return fmt.Errorf("load profile faild, file format may be not correct")
+		return fmt.Errorf("load profile failed, file format may be not correct")
 	}
 
 	return nil

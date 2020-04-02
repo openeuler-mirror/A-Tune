@@ -36,7 +36,7 @@ func (t *Training) Post() (bool, error) {
 
 	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		return false, fmt.Errorf("training data faild")
+		return false, fmt.Errorf("training data failed")
 	}
 
 	return true, nil

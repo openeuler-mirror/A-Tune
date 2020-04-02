@@ -49,7 +49,7 @@ func InitLogger(modes []string, cfg *ini.File) error {
 		case "syslog":
 			syslogHook, err := logrus_syslog.NewSyslogHook("", "", syslog.LOG_INFO, "atuned")
 			if err != nil {
-				baseLogger.Errorf("syslog hook init faild:%v", err)
+				baseLogger.Errorf("syslog hook init failed:%v", err)
 			}
 			baseLogger.entry.Logger.AddHook(syslogHook)
 		}

@@ -48,7 +48,7 @@ func (m *MonitorBody) Get() (*MonitorGetResp, error) {
 
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to monitor service faild")
+		return nil, fmt.Errorf("connect to monitor service failed")
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)
@@ -77,12 +77,12 @@ func MonitorGet(module string, purpose string, format string, path string, para 
 
 	respGetIns, err := monitorBody.Get()
 	if err != nil {
-		log.Errorf("model monitor module %s get data faild: %v", module, err)
+		log.Errorf("model monitor module %s get data failed: %v", module, err)
 		return "", err
 	}
 
 	if respGetIns.Status != "OK" {
-		log.Errorf("model monitor module %s get data faild, error: %s", module, respGetIns.Value)
+		log.Errorf("model monitor module %s get data failed, error: %s", module, respGetIns.Value)
 		return "", fmt.Errorf(respGetIns.Value)
 	}
 	return respGetIns.Value, nil

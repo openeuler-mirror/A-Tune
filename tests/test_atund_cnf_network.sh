@@ -63,7 +63,7 @@ test01()
             atune-adm analysis > $ANALYSIS_LOG
             check_result $? 1
 
-            grep "collect data faild" $ANALYSIS_LOG
+            grep "collect data failed" $ANALYSIS_LOG
             check_result $? 0
         fi
     done
