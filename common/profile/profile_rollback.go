@@ -57,7 +57,7 @@ func (p *HistoryProfile) Resume(ch chan *PB.AckCheck) error {
 				description := fmt.Sprintf("value: %s", key.Value())
 				sendChanToAdm(ch, key.Name(), utils.SUCCESS, description)
 			} else {
-				description := fmt.Sprintf("faild: %s", statusStr)
+				description := fmt.Sprintf("failed: %s", statusStr)
 				sendChanToAdm(ch, key.Name(), utils.FAILD, description)
 			}
 		}
@@ -80,7 +80,7 @@ func (p *HistoryProfile) Load(context string) error {
 func Rollback() error {
 	profileLogs, err := sqlstore.GetProfileLogs()
 	if err != nil {
-		log.Errorf("get profile history faild, %v", err)
+		log.Errorf("get profile history failed, %v", err)
 		return err
 	}
 

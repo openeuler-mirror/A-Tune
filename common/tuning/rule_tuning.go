@@ -45,7 +45,7 @@ func (r *RuleBody) Post() (*map[string]interface{}, error) {
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Errorf("URL: %s, response code: %d", url, res.StatusCode)
-		return nil, fmt.Errorf("get monitor data faild, url: %s", url)
+		return nil, fmt.Errorf("get monitor data failed, url: %s", url)
 	}
 
 	respBody, err := ioutil.ReadAll(res.Body)

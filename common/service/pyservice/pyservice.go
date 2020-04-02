@@ -66,14 +66,14 @@ func (p *PyEngine) Run() error {
 
 	err := cmd.Start()
 	if err != nil {
-		log.Errorf("cmd.Start() analysis service faild: %v", err)
+		log.Errorf("cmd.Start() analysis service failed: %v", err)
 		os.Exit(-1)
 	}
 
 	err = cmd.Wait()
 
 	if err != nil {
-		log.Errorf("cmd.Run() analysis faild with: %v", err)
+		log.Errorf("cmd.Run() analysis failed with: %v", err)
 		os.Exit(-1)
 	}
 

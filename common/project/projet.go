@@ -87,13 +87,13 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)
 		bout, err := ExecCommand(newScript)
 		if err != nil {
-			err = fmt.Errorf("faild to exec %s, err: %v", newScript, err)
+			err = fmt.Errorf("failed to exec %s, err: %v", newScript, err)
 			return strings.Join(benchStr, ","), err
 		}
 
 		floatOut, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
 		if err != nil {
-			err = fmt.Errorf("faild to parse float, err: %v", err)
+			err = fmt.Errorf("failed to parse float, err: %v", err)
 			return strings.Join(benchStr, ","), err
 		}
 
@@ -121,7 +121,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 	for _, obj := range y.Object {
 		out, err := ExecCommand(obj.Info.GetScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", obj.Info.GetScript, err)
+			return fmt.Errorf("failed to exec %s, err: %v", obj.Info.GetScript, err)
 		}
 
 		if strings.TrimSpace(string(out)) == paraMap[obj.Name] {
@@ -133,7 +133,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) error {
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", newScript, err)
+			return fmt.Errorf("failed to exec %s, err: %v", newScript, err)
 		}
 	}
 	return nil
@@ -155,13 +155,13 @@ func (y *YamlPrjSvr) RestartProject() error {
 	if needRestart {
 		out, err := ExecCommand(stopWorkload)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", stopWorkload, err)
+			return fmt.Errorf("failed to exec %s, err: %v", stopWorkload, err)
 		}
 		log.Debug(string(out))
 
 		out, err = ExecCommand(startWorkload)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", startWorkload, err)
+			return fmt.Errorf("failed to exec %s, err: %v", startWorkload, err)
 		}
 		log.Debug(string(out))
 	}

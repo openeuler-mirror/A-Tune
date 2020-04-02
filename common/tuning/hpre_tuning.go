@@ -57,7 +57,7 @@ func (h *HprePostBody) Get() (*RespHprePost, error) {
 		fmt.Println(res.StatusCode)
 		respBody, err := ioutil.ReadAll(res.Body)
 		fmt.Println(string(respBody), err)
-		return nil, fmt.Errorf("get hpre support faild")
+		return nil, fmt.Errorf("get hpre support failed")
 	}
 
 	respBody, err := ioutil.ReadAll(res.Body)
@@ -125,8 +125,8 @@ func IsSupportHpre() (bool, error) {
 	}
 	respGetIns, err := body.Get()
 	if err != nil {
-		log.Infof("get support_hpre faild")
-		return false, fmt.Errorf("get support_hpre faild")
+		log.Infof("get support_hpre failed")
+		return false, fmt.Errorf("get support_hpre failed")
 	}
 
 	if respGetIns.Value == "yes" {

@@ -60,7 +60,7 @@ func (c *ConfigPutBody) Put() (*RespPut, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to configurator service faild")
+		return nil, fmt.Errorf("connect to configurator service failed")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -85,7 +85,7 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to configurator service faild")
+		return nil, fmt.Errorf("connect to configurator service failed")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -182,7 +182,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 				for _, service := range services {
 					log.Infof("initializing checker service: %s", service.Name)
 					if err := service.Instance.Init(); err != nil {
-						return fmt.Errorf("service init faild: %v", err)
+						return fmt.Errorf("service init failed: %v", err)
 					}
 				}
 
@@ -199,7 +199,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 					}
 					err := checkerService.Check(ch)
 					if err != nil {
-						log.Errorf("service %s running faild, reason: %v", service.Name, err)
+						log.Errorf("service %s running failed, reason: %v", service.Name, err)
 						continue
 					}
 				}

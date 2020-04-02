@@ -165,7 +165,7 @@ func LoadFromWorkloadType(workloadType string) (Profile, bool) {
 	classProfile := &sqlstore.GetClass{Class: workloadType}
 	err := sqlstore.GetClasses(classProfile)
 	if err != nil {
-		log.Errorf("inquery class_profile table faild")
+		log.Errorf("inquery class_profile table failed")
 		return Profile{}, false
 	}
 	if len(classProfile.Result) == 0 {

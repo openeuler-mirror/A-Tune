@@ -54,7 +54,7 @@ func (t *Timer) Set(cfg *config.Cfg) {
 func (t *Timer) Run() error {
 	/* Static & Dynamic judge */
 	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
-		log.Errorf("waiting for pyservice faild: %v", err)
+		log.Errorf("waiting for pyservice failed: %v", err)
 		return err
 	}
 

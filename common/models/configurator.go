@@ -48,7 +48,7 @@ func (c *Configurator) Put() (*RespConfigurator, error) {
 		return nil, fmt.Errorf("section %s is not exist", c.Section)
 	}
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to configurator service faild")
+		return nil, fmt.Errorf("connect to configurator service failed")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -77,7 +77,7 @@ func (c *Configurator) Post() (*RespConfigurator, error) {
 		return nil, fmt.Errorf("section %s is not exist", c.Section)
 	}
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to configurator service faild")
+		return nil, fmt.Errorf("connect to configurator service failed")
 	}
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -106,7 +106,7 @@ func (c *Configurator) Get() (*RespConfigurator, error) {
 		return nil, fmt.Errorf("section %s is not exist", c.Section)
 	}
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("connect to configurator service faild")
+		return nil, fmt.Errorf("connect to configurator service failed")
 	}
 
 	resBody, err := ioutil.ReadAll(res.Body)

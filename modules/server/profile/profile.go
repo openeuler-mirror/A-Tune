@@ -117,7 +117,7 @@ func NewProfileServer(ctx *cli.Context, opts ...interface{}) (interface{}, error
 
 	cfg, err := ini.Load(defaultConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("faild to parse %s, %v", defaultConfigFile, err)
+		return nil, fmt.Errorf("failed to parse %s, %v", defaultConfigFile, err)
 	}
 
 	return &ProfileServer{
@@ -146,7 +146,7 @@ func (p *ClassifyPostBody) Post() (*RespClassify, error) {
 
 	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("online learning faild")
+		return nil, fmt.Errorf("online learning failed")
 	}
 	resBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -172,7 +172,7 @@ func (c *CollectorPost) Post() (*RespCollectorPost, error) {
 
 	defer response.Body.Close()
 	if response.StatusCode != 200 {
-		return nil, fmt.Errorf("collect data faild")
+		return nil, fmt.Errorf("collect data failed")
 	}
 	resBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -255,7 +255,7 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 	for _, service := range services {
 		log.Infof("initializing checker service: %s", service.Name)
 		if err := service.Instance.Init(); err != nil {
-			return fmt.Errorf("service init faild: %v", err)
+			return fmt.Errorf("service init failed: %v", err)
 		}
 	}
 
@@ -272,7 +272,7 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 		}
 		err := checkerService.Check(ch)
 		if err != nil {
-			log.Errorf("service %s running faild, reason: %v", service.Name, err)
+			log.Errorf("service %s running failed, reason: %v", service.Name, err)
 			continue
 		}
 	}
@@ -291,7 +291,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	npipe, err := utils.CreateNamedPipe()
 	if err != nil {
-		return fmt.Errorf("create named pipe faild")
+		return fmt.Errorf("create named pipe failed")
 	}
 
 	defer os.Remove(npipe)
@@ -369,8 +369,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
 	if err := sqlstore.GetClasses(classProfile); err != nil {
-		log.Errorf("inquery workload type table faild %v", err)
-		return fmt.Errorf("inquery workload type table faild %v", err)
+		log.Errorf("inquery workload type table failed %v", err)
+		return fmt.Errorf("inquery workload type table failed %v", err)
 	}
 	if len(classProfile.Result) == 0 {
 		log.Errorf("%s is not exist in the table", workloadType)
@@ -562,8 +562,8 @@ func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.Profi
 	classProfile := &sqlstore.GetClass{Class: workloadType}
 	err := sqlstore.GetClasses(classProfile)
 	if err != nil {
-		log.Errorf("inquery class_profile table faild")
-		return fmt.Errorf("inquery class_profile table faild")
+		log.Errorf("inquery class_profile table failed")
+		return fmt.Errorf("inquery class_profile table failed")
 	}
 
 	if len(classProfile.Result) == 0 {
@@ -818,7 +818,7 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 		return nil
 	}
 
-	_ = stream.Send(&PB.AckCheck{Name: "training the self collect data faild"})
+	_ = stream.Send(&PB.AckCheck{Name: "training the self collect data failed"})
 	return nil
 }
 
@@ -828,7 +828,7 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 
 	npipe, err := utils.CreateNamedPipe()
 	if err != nil {
-		return fmt.Errorf("create named pipe faild")
+		return fmt.Errorf("create named pipe failed")
 	}
 
 	defer os.Remove(npipe)
@@ -989,8 +989,8 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 	// get the profile type from the classprofile table
 	classProfile := &sqlstore.GetClass{Class: workloadType}
 	if err := sqlstore.GetClasses(classProfile); err != nil {
-		log.Errorf("inquery workload type table faild %v", err)
-		return &PB.Ack{}, fmt.Errorf("inquery workload type table faild %v", err)
+		log.Errorf("inquery workload type table failed %v", err)
+		return &PB.Ack{}, fmt.Errorf("inquery workload type table failed %v", err)
 	}
 	if len(classProfile.Result) == 0 {
 		log.Errorf("%s is not exist in the table", workloadType)
@@ -1007,13 +1007,13 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 	// delete profile depend the profiletype
 	for _, profileName := range profileNames {
 		if err := sqlstore.DeleteProfile(profileName); err != nil {
-			log.Errorf("delete item from profile table faild %v ", err)
+			log.Errorf("delete item from profile table failed %v ", err)
 		}
 	}
 
 	// delete classprofile depend the workloadType
 	if err := sqlstore.DeleteClassProfile(workloadType); err != nil {
-		log.Errorf("delete item from classprofile tabble faild.")
+		log.Errorf("delete item from classprofile tabble failed.")
 		return &PB.Ack{}, err
 	}
 	return &PB.Ack{Status: "OK"}, nil
@@ -1044,8 +1044,8 @@ func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (
 	// get the profile type from the classprofile table
 	classProfile := &sqlstore.GetClass{Class: workloadType}
 	if err := sqlstore.GetClasses(classProfile); err != nil {
-		log.Errorf("inquery workload type table faild %v", err)
-		return &PB.Ack{}, fmt.Errorf("inquery workload type table faild %v", err)
+		log.Errorf("inquery workload type table failed %v", err)
+		return &PB.Ack{}, fmt.Errorf("inquery workload type table failed %v", err)
 	}
 	if len(classProfile.Result) == 0 {
 		log.Errorf("%s is not exist in the table", workloadType)
