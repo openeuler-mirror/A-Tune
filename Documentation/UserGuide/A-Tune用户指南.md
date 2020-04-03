@@ -1001,7 +1001,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </td>
 <td class="cellrowborder" valign="top" width="15.72%" headers="mcps1.1.5.1.3 "><p id="p19798165601917"><a name="p19798165601917"></a><a name="p19798165601917"></a>整型</p>
 </td>
-<td class="cellrowborder" valign="top" width="47.47%" headers="mcps1.1.5.1.4 "><p id="p16798135651912"><a name="p16798135651912"></a><a name="p16798135651912"></a>&gt;=10</p>
+<td class="cellrowborder" valign="top" width="47.47%" headers="mcps1.1.5.1.4 "><p id="p16798135651912"><a name="p16798135651912"></a><a name="p16798135651912"></a>&gt;10</p>
 </td>
 </tr>
 <tr id="row1430843016301"><td class="cellrowborder" valign="top" width="16.84%" headers="mcps1.1.5.1.1 "><p id="p385711417311"><a name="p385711417311"></a><a name="p385711417311"></a>object</p>
@@ -1015,6 +1015,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tr>
 </tbody>
 </table>
+
 
 **表 1**  object项配置说明
 
@@ -1168,7 +1169,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </td>
 <td class="cellrowborder" valign="top" width="15.72%" headers="mcps1.1.5.1.3 "><p id="p543211018210"><a name="p543211018210"></a><a name="p543211018210"></a>整型</p>
 </td>
-<td class="cellrowborder" valign="top" width="47.47%" headers="mcps1.1.5.1.4 "><p id="p1343231017218"><a name="p1343231017218"></a><a name="p1343231017218"></a>&gt;=10</p>
+<td class="cellrowborder" valign="top" width="47.47%" headers="mcps1.1.5.1.4 "><p id="p1343231017218"><a name="p1343231017218"></a><a name="p1343231017218"></a>&gt;10</p>
 </td>
 </tr>
 <tr id="row1543215101726"><td class="cellrowborder" valign="top" width="16.84%" headers="mcps1.1.5.1.1 "><p id="p2043215101522"><a name="p2043215101522"></a><a name="p2043215101522"></a>benchmark</p>
@@ -1191,6 +1192,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tr>
 </tbody>
 </table>
+
 
 **表 2**  evaluations项配置说明
 
@@ -1234,11 +1236,11 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tr>
 <tr id="row59635792614"><td class="cellrowborder" valign="top" width="12.950000000000001%" headers="mcps1.2.5.1.1 "><p id="p096320712268"><a name="p096320712268"></a><a name="p096320712268"></a>weight</p>
 </td>
-<td class="cellrowborder" valign="top" width="24.23%" headers="mcps1.2.5.1.2 "><p id="p2096347192620"><a name="p2096347192620"></a><a name="p2096347192620"></a>该指标的权重百分比，0-100</p>
+<td class="cellrowborder" valign="top" width="24.23%" headers="mcps1.2.5.1.2 "><p id="p2096347192620"><a name="p2096347192620"></a><a name="p2096347192620"></a>该指标的权重百分比</p>
 </td>
 <td class="cellrowborder" valign="top" width="15.629999999999999%" headers="mcps1.2.5.1.3 "><p id="p1666738163"><a name="p1666738163"></a><a name="p1666738163"></a>整型</p>
 </td>
-<td class="cellrowborder" valign="top" width="47.19%" headers="mcps1.2.5.1.4 "><p id="p154712292047"><a name="p154712292047"></a><a name="p154712292047"></a>0-100</p>
+<td class="cellrowborder" valign="top" width="47.19%" headers="mcps1.2.5.1.4 "><p id="p154712292047"><a name="p154712292047"></a><a name="p154712292047"></a>&gt;=0</p>
 </td>
 </tr>
 <tr id="row17963117152615"><td class="cellrowborder" valign="top" width="12.950000000000001%" headers="mcps1.2.5.1.1 "><p id="p6963677267"><a name="p6963677267"></a><a name="p6963677267"></a>threshold</p>
@@ -1253,13 +1255,14 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 </tbody>
 </table>
 
+
 ### 配置示例
 
 服务端yaml文件配置样例：
 
 ```
 project: "example"
-maxiterations: 10
+maxiterations: 11
 startworkload: ""
 stopworkload: ""
 object :
@@ -1344,7 +1347,7 @@ object :
 
 ```
 project: "example"
-iterations : 10
+iterations : 11
 benchmark : "sh /home/Benchmarks/mysql/tunning_mysql.sh"
 evaluations :
   -
