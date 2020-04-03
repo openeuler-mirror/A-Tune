@@ -123,7 +123,7 @@ class IoStat(Monitor):
             raise err
 
         for i, _ in enumerate(search_obj[0]):
-            device_data[re.sub("/|%", "", search_obj[0][j])] = search_obj[-1][i]
+            device_data[re.sub("/|%", "", search_obj[0][i])] = search_obj[-1][i]
         for i in keys:
             ret = ret + " " + device_data[i]
         return ret
