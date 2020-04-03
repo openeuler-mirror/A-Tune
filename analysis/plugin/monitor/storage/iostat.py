@@ -92,26 +92,10 @@ class IoStat(Monitor):
         if para is None:
             return info
 
-        keyword = {"dev": 0,
-                   "rs": 1,
-                   "ws": 2,
-                   "rMBs": 3,
-                   "wMBs": 4,
-                   "rrqms": 5,
-                   "wrqms": 6,
-                   "rrqm": 7,
-                   "wrqm": 8,
-                   "r_await": 9,
-                   "w_await": 10,
-                   "aqu-sz": 11,
-                   "rareq-sz": 12,
-                   "wareq-sz": 13,
-                   "svctm": 14,
-                   "util": 15}
-
         keys = []
         dev = "sd.*?"
         ret = ""
+        device_data = {}
 
         opts, _ = getopt.getopt(para.split(), None, ['device=', 'fields='])
         for opt, val in opts:
@@ -119,23 +103,27 @@ class IoStat(Monitor):
                 dev = val
                 continue
             if opt in '--fields':
-                keys.append(keyword[val])
+                keys.append(val)
                 continue
 
+        dev = "Device|" + dev
         pattern = re.compile(
             "^(" +
             dev +
-            r")\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)"
-            r"\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)"
-            r"\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)\ {1,}(\d*\.\d*)",
+            r")\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
+            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
+            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
+            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)",
             re.ASCII | re.MULTILINE)
         search_obj = pattern.findall(info)
-        if len(search_obj) == 0:
+        if len(search_obj) < 2:
             err = LookupError("Fail to find data for {}".format(dev))
             LOGGER.error("%s.%s: %s", self.__class__.__name__,
                          inspect.stack()[0][3], str(err))
             raise err
 
+        for i, _ in enumerate(search_obj[0]):
+            device_data[re.sub("/|%", "", search_obj[0][j])] = search_obj[-1][i]
         for i in keys:
-            ret = ret + " " + search_obj[-1][i]
+            ret = ret + " " + device_data[i]
         return ret
