@@ -104,3 +104,14 @@ atune-adm analysis mysql
 ```
 
 For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/UserGuide.md).
+
+III. How to contribute
+--------
+
+We welcome new contributors to participate in the project. And we are happy to provide guidance for new contributors. You need to sign [CLA](https://openeuler.org/en/cla.html) before contribution.
+
+### Mail list
+Any question or discussion please contact **a-tune@openeuler.org**.
+
+### Routine Meeting
+Holding at PM 2:30-4:30 on Monday every two weeks. You can apply topic by mail list.
