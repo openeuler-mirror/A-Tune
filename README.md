@@ -31,7 +31,7 @@ yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-sci
 ```
 Or
 ```bash
-pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost
+pip3 install dict2xml Flask-RESTful pandas scikit-optimize==0.5.2 xgboost==0.90 scikit-learn==0.20.4
 ```
 
 #### 3. Download the source code.
