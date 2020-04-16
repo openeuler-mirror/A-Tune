@@ -106,8 +106,12 @@ class Optimizer(Process):
         lasso = Lasso()
         lasso.fit(options, performance)
         result = zip(lasso.coef_, labels)
+        total_sum = sum(map(abs, lasso.coef_))
+        if total_sum == 0:
+            return ", ".join("%s: 0" % label for label in labels)
         result = sorted(result, key=lambda x: -np.abs(x[0]))
-        rank = ", ".join("%s: %s" % (label, round(coef, 3)) for coef, label in result)
+        rank = ", ".join("%s: %s%%" % (label, round(coef * 100 / total_sum, 2))
+                         for coef, label in result)
         return rank
 
     def run(self):
