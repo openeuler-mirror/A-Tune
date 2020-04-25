@@ -14,6 +14,7 @@
 package tuning
 
 import (
+	"bufio"
 	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
@@ -52,9 +53,11 @@ type Optimizer struct {
 	EvalBase            string
 	RespPutIns          *models.RespPutBody
 	StartIterTime       string
+	TotalTime           float64
 	Percentage          float64
 	BackupFlag          bool
 	FeatureFilter       bool
+	Restart             bool
 }
 
 // InitTuned method for iniit tuning
@@ -70,6 +73,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 	//dynamic profle setting
 	o.MaxIter = int32(clientIter)
 	if o.MaxIter > o.Prj.Maxiterations {
+		o.MaxIter = o.Prj.Maxiterations
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
 		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations))}
@@ -80,9 +84,10 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 		return err
 	}
 
+	o.TuningFile = path.Join(config.DefaultTempPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
-	err = utils.WriteFile(config.TuningFile, projectName, utils.FilePerm,
-		os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	err = utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
+		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -107,7 +112,13 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 
 func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
 	optimizerBody := new(models.OptimizerPostBody)
-	optimizerBody.MaxEval = iters
+	if o.Restart {
+		o.readTuningLog(optimizerBody)
+	}
+	if iters <= int32(len(optimizerBody.Xref)) {
+		return fmt.Errorf("create task failed for client ask iters less than tuning history")
+	}
+	optimizerBody.MaxEval = iters - int32(len(optimizerBody.Xref))
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
 	optimizerBody.Knobs = make([]models.Knob, 0)
@@ -143,6 +154,48 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	log.Infof("optimizer put url is: %s", o.OptimizerPutURL)
 
 	return nil
+}
+
+func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
+	file, err := os.Open(o.TuningFile)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	defer file.Close()
+
+	var startTime time.Time
+	var endTime time.Time
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		line := scanner.Text()
+		items := strings.Split(line, "|")
+		if len(items) != 5 {
+			continue
+		}
+		o.Iter, _ = strconv.Atoi(items[0])
+		yFloat, _ := utils.CalculateBenchMark(items[3])
+		if o.Iter == 1 {
+			o.EvalBase = fmt.Sprintf("%s=%.2f", project.BASE_BENCHMARK_VALUE, yFloat)
+			o.MinEvalSum = yFloat
+		}
+		startTime, _ = time.Parse(config.DefaultTimeFormat, items[1])
+		endTime, _ = time.Parse(config.DefaultTimeFormat, items[2])
+		o.TotalTime = o.TotalTime + endTime.Sub(startTime).Seconds()
+
+		if yFloat < o.MinEvalSum {
+			o.MinEvalSum = yFloat
+		}
+		xPara := strings.Split(items[4], ",")
+		xValue := make([]string, 0)
+		for _, para := range xPara {
+			xValue = append(xValue, para)
+		}
+
+		body.Xref = append(body.Xref, xValue)
+		body.Yref = append(body.Yref, strconv.FormatFloat(yFloat, 'f', -1, 64))
+	}
 }
 
 /*
@@ -224,16 +277,15 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		message := fmt.Sprintf("Current Tuning Progress.....(%d/%d)", o.Iter, o.MaxIter)
 		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 	}
-	content := make([]string, 0)
-	content = append(content, o.EvalBase)
 	evalMinSum := fmt.Sprintf("%s=%.2f", project.MIN_BENCHMARK_VALUE, o.MinEvalSum)
-	content = append(content, evalMinSum)
-	log.Infof("send back to client to start benchmark: %s", strings.Join(content, ","))
-	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(o.RespPutIns.Param)}
+	log.Infof("send back to client to start benchmark")
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark,
+		Content:   []byte(o.RespPutIns.Param),
+		TuningLog: &PB.TuningHistory{BaseEval: o.EvalBase, MinEval: evalMinSum, TotalTime: int64(o.TotalTime), Starts: int32(o.Iter)}}
 	return nil
 }
 
-func (o *Optimizer) filterParams()  string {
+func (o *Optimizer) filterParams() string {
 	log.Infof("params importance weight is: %s", o.RespPutIns.Rank)
 	sortedParams := make(utils.SortedPair, 0)
 	paramList := strings.Split(o.RespPutIns.Rank, ",")
@@ -255,7 +307,7 @@ func (o *Optimizer) filterParams()  string {
 	log.Infof("sorted params: %+v", sortedParams)
 
 	var skipIndex int
-	skipIndex = int(float64(len(sortedParams))*o.Percentage)
+	skipIndex = int(float64(len(sortedParams)) * o.Percentage)
 	if len(sortedParams) <= 10 {
 		skipIndex = len(sortedParams)
 	}
@@ -323,7 +375,7 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
 		eval, o.RespPutIns.Param)
 	output := strings.Join(iterInfo, "|")
-	err := utils.WriteFile(config.TuningFile, output+"\n", utils.FilePerm,
+	err := utils.WriteFile(o.TuningFile, output+"\n", utils.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
 	if err != nil {
 		log.Error(err)
@@ -500,9 +552,10 @@ func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) e
 		return err
 	}
 
+	o.TuningFile = path.Join(config.DefaultTempPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
-	err := utils.WriteFile(config.TuningFile, projectName, utils.FilePerm,
-		os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	err := utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
+		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -542,5 +595,19 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 		log.Error(err)
 		return err
 	}
+	return nil
+}
+
+// DeleteTask method delete the optimizer task in runing
+func (o *Optimizer) DeleteTask() error {
+	if o.OptimizerPutURL == "" {
+		return nil
+	}
+
+	if err := deleteTask(o.OptimizerPutURL); err != nil {
+		return err
+	}
+	log.Infof("delete task %s success!", o.OptimizerPutURL)
+	o.OptimizerPutURL = ""
 	return nil
 }

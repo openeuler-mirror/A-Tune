@@ -29,14 +29,16 @@ LOGGER = logging.getLogger(__name__)
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, n_random_starts=20):
+    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, x0=None, y0=None, n_random_starts=20):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
         self.ref = []
-        self._n_random_starts = 10 if n_random_starts is None else n_random_starts
+        self.x0 = x0
+        self.y0 = y0
+        self._n_random_starts = 20 if n_random_starts is None else n_random_starts
 
     def build_space(self):
         """build space"""
@@ -116,6 +118,47 @@ class Optimizer(multiprocessing.Process):
                          for coef, label in result)
         return rank
 
+    def _get_intvalue_from_knobs(self, kv):
+        """get the int value from knobs if dtype if string"""
+        x_each = []
+        for p_nob in self.knobs:
+            if p_nob['name'] not in kv.keys():
+                raise ValueError("the param {} is not in the x0 ref".format(p_nob['name']))
+            if p_nob['dtype'] != 'string':
+                x_each.append(int(kv[p_nob['name']]))
+                continue
+            options = p_nob['options']
+            for key, value in enumerate(options):
+                if value != kv[p_nob['name']]:
+                    continue
+                x_each.append(key)
+        return x_each
+
+    def transfer(self):
+        """transfer ref x0 to int, y0 to float"""
+        list_ref_x = []
+        list_ref_y = []
+        if self.x0 is None or self.y0 is None:
+            return (list_ref_x, list_ref_y)
+
+        for xValue in self.x0:
+            kv = {}
+            if len(xValue) != len(self.knobs):
+                raise ValueError("x0 is not the same length with knobs")
+
+            for i, val in enumerate(xValue):
+                params = val.split("=")
+                if len(params) != 2:
+                    raise ValueError("the param format of {} is not correct".format(params))
+                kv[params[0]] = params[1]
+
+            ref_x = self._get_intvalue_from_knobs(kv)
+            if len(ref_x) != len(self.knobs):
+                raise ValueError("tuning parameter is not the same length with knobs")
+            list_ref_x.append(ref_x)
+        list_ref_y = [float(y) for y in self.y0]
+        return (list_ref_x, list_ref_y)
+
     def run(self):
         """start the tuning process"""
         def objective(var):
@@ -145,12 +188,27 @@ class Optimizer(multiprocessing.Process):
         labels = []
         try:
             params_space = self.build_space()
+            ref_x, ref_y = self.transfer()
+            if len(ref_x) == 0:
+                ref_x = self.ref
+                ref_y = None
+            if not isinstance(ref_x[0], (list, tuple)):
+                ref_x = [ref_x]
+
+            LOGGER.info('x0: %s', ref_x)
+            LOGGER.info('y0: %s', ref_y)
+
+            if ref_x is not None and isinstance(ref_x[0], (list, tuple)):
+                self._n_random_starts = 0 if len(ref_x) >= self._n_random_starts \
+                        else self._n_random_starts - len(ref_x) + 1
+
+            LOGGER.info('n_random_starts parameter is: %d', self._n_random_starts)
             LOGGER.info("Running performance evaluation.......")
             if self.engine == 'random':
                 ret = dummy_minimize(objective, params_space, n_calls=self.max_eval)
             elif self.engine == 'bayes':
                 ret = gp_minimize(objective, params_space, n_calls=self.max_eval, \
-                                   n_random_starts=self._n_random_starts)
+                                   n_random_starts=self._n_random_starts, x0=ref_x, y0=ref_y)
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', repr(value_error))
@@ -162,7 +220,7 @@ class Optimizer(multiprocessing.Process):
             return None
         except Exception as e:
             LOGGER.error('Unexpected Error: %s', repr(e))
-            self.child_conn.send(Exception("Unexpected Error:", repr(e))
+            self.child_conn.send(Exception("Unexpected Error:", repr(e)))
             return None
 
         for i, knob in enumerate(self.knobs):

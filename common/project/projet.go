@@ -15,6 +15,7 @@ package project
 
 import (
 	"fmt"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
 	"math"
@@ -55,6 +56,7 @@ type YamlPrjCli struct {
 	FeatureFilterIters  int32      `yaml:"feature_filter_iters"`
 	Evaluations         []Evaluate `yaml:"evaluations"`
 	StartsTime          time.Time  `yaml:"-"`
+	TotalTime           int64      `yaml:"-"`
 	EvalMin             float64    `yaml:"-"`
 	EvalBase            float64    `yaml:"-"`
 	EvalCurrent         float64    `yaml:"-"`
@@ -142,28 +144,28 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 }
 
 // SetHistoryEvalBase method call the set the current EvalBase to history baseline
-func (y *YamlPrjCli) SetHistoryEvalBase(evalBase string) {
+func (y *YamlPrjCli) SetHistoryEvalBase(tuningHistory *PB.TuningHistory) {
 	if !utils.IsEquals(y.EvalBase, 0.0) {
 		return
 	}
-	kv := strings.Split(evalBase, ",")
 
-	for _, value := range kv {
-		evaluation := strings.Split(value, "=")
-		if len(evaluation) != 2 {
-			continue
-		}
-		floatOut, _ := strconv.ParseFloat(evaluation[1], 64)
-		if evaluation[0] == BASE_BENCHMARK_VALUE {
-			y.EvalBase = floatOut
-			continue
-		}
-		if evaluation[0] == MIN_BENCHMARK_VALUE {
-			y.EvalMin = floatOut
-			continue
-		}
-
+	evaluation := strings.Split(tuningHistory.BaseEval, "=")
+	if len(evaluation) != 2 {
+		return
 	}
+
+	evalBase, _ := strconv.ParseFloat(evaluation[1], 64)
+	y.EvalBase = evalBase
+
+	minEval := strings.Split(tuningHistory.MinEval, "=")
+	if len(minEval) != 2 {
+		return
+	}
+
+	y.EvalMin, _ = strconv.ParseFloat(minEval[1], 64)
+
+	y.TotalTime = tuningHistory.TotalTime
+	y.StartIters = tuningHistory.Starts
 }
 
 // ImproveRateString method return the string format of performance improve rate

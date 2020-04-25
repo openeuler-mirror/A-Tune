@@ -55,9 +55,12 @@ class Optimizer(Resource):
         task_id = str(uuid.uuid1())
 
         parent_conn, child_conn = Pipe()
+        x0 = args.get("x_ref")
+        y0 = args.get("y_ref")
         result = {}
         engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, engine=args.get("engine"),
-                                     max_eval=args.get("max_eval"), n_random_starts=args.get("random_starts"))
+                                     max_eval=args.get("max_eval"), n_random_starts=args.get("random_starts"), 
+                                     x0=x0, y0=y0)
         engine.start()
 
         value = {}
@@ -80,7 +83,7 @@ class Optimizer(Resource):
         args = OPTIMIZER_PUT_PARSER.parse_args()
         LOGGER.info(args)
         out_queue = task[self.pipe]
-        if args["iterations"] != 0:
+        if args["iterations"] != 0 and len(args["value"]) != 0:
             out_queue.send(args.get("value"))
 
         result = {}

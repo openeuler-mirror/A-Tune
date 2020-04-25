@@ -23,10 +23,12 @@ import (
 
 // OptimizerPostBody send to the service to create a optimizer task
 type OptimizerPostBody struct {
-	MaxEval      int32  `json:"max_eval"`
-	Knobs        []Knob `json:"knobs"`
-	Engine       string `json:"engine"`
-	RandomStarts int32  `json:"random_starts"`
+	MaxEval      int32      `json:"max_eval"`
+	Knobs        []Knob     `json:"knobs"`
+	Engine       string     `json:"engine"`
+	RandomStarts int32      `json:"random_starts"`
+	Xref         [][]string `json:"x_ref,omitempty"`
+	Yref         []string   `json:"y_ref,omitempty"`
 }
 
 // Knob body store the tuning properties

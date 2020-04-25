@@ -112,8 +112,17 @@ message TuningMessage {
 		Threshold = 8;
     }
     status state = 4;
-    int32 RandomStarts = 6;
-    string FeatureFilterEngine = 7;
-    int32 FeatureFilterCycle = 8;
-    int32 FeatureFilterIters = 9;
+    int32 RandomStarts = 5;
+    string FeatureFilterEngine = 6;
+    int32 FeatureFilterCycle = 7;
+    int32 FeatureFilterIters = 8;
+    bool Restart = 9;
+    TuningHistory TuningLog = 10;
+}
+
+message TuningHistory {
+    string BaseEval = 1;
+    string MinEval = 2;
+    int64 TotalTime = 3;
+    int32 Starts = 4;
 }
