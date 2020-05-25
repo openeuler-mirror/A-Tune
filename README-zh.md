@@ -111,7 +111,7 @@ atune-adm analysis mysql
 我们非常欢迎新贡献者加入到项目中来，也非常高兴能为新加入贡献者提供指导和帮助。在您贡献代码前，需要先签署[CLA](https://openeuler.org/en/cla.html)。
 
 ### 邮件列表
-如果您有任何疑问或讨论，请通过邮件列表**a-tune@openeuler.org**和我们进行联系。
+如果您有任何疑问或讨论，请通过[A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/)邮件列表和我们进行联系。
 
 ### 会议
-项目组每双周举行例会，具体时间为周一下午2:30-4:30。您可以通过邮件方式申报议题。
+每双周周一下午2:30-4:30召开SIG组例会。您可以通过邮件方式申报议题。

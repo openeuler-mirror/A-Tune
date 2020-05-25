@@ -103,7 +103,7 @@ Example 3: Specify the current system application as MySQL, which is for referen
 atune-adm analysis mysql
 ```
 
-For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/UserGuide.md).
+For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/A-Tune-User-Guide.md).
 
 III. How to contribute
 --------
@@ -111,7 +111,7 @@ III. How to contribute
 We welcome new contributors to participate in the project. And we are happy to provide guidance for new contributors. You need to sign [CLA](https://openeuler.org/en/cla.html) before contribution.
 
 ### Mail list
-Any question or discussion please contact **a-tune@openeuler.org**.
+Any question or discussion please contact [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/).
 
 ### Routine Meeting
-Holding at PM 2:30-4:30 on Monday every two weeks. You can apply topic by mail list.
+Holding SIG Meeting at 2:30-4:30 PM on Monday every two weeks. You can apply topic by mail list.
