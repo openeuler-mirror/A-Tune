@@ -637,13 +637,13 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
  irqbalance=stop 
 
  [bootloader.grub2] 
- selinux=0 
  iommu.passthrough=1 
 
  [tip] 
  bind your master process to the CPU near the network = affinity 
  bind your network interrupt to the CPU that has this network = affinity 
  relogin into the system to enable limits setting = OS 
+ SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = OS
 
  [script] 
  openssl_hpre = 0 

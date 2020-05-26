@@ -407,13 +407,13 @@ sysmonitor=stop
 irqbalance=stop
 
 [bootloader.grub2]
-selinux=0
 iommu.passthrough=1
 
 [tip]
 bind your master process to the CPU near the network = affinity
 bind your network interrupt to the CPU that has this network = affinity
 relogin into the system to enable limits setting = OS
+SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = OS
 
 [script]
 openssl_hpre = 0
@@ -681,7 +681,6 @@ INSERT INTO tuned_item(property, item) VALUES("iommu.passthrough", "Bootloader")
 INSERT INTO tuned_item(property, item) VALUES("default_hugepagesz", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("hugepagesz", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("hugepages", "Bootloader");
-INSERT INTO tuned_item(property, item) VALUES("selinux", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("skew_tick", "Bootloader");
 
 INSERT INTO tuned_item(property, item) VALUES("openssl_hpre", "Library");
