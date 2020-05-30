@@ -21,7 +21,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net"
 	"os"
 	"os/exec"
@@ -65,6 +64,13 @@ const (
 	timeout = 120
 )
 
+//file attribute
+const (
+	PipeMode    uint32	= 0600
+	FilePerm    os.FileMode	= 0600
+	MaxFileSize int64	= 100 * 1024 * 1024
+)
+
 // CheckArgs method check command args num
 func CheckArgs(context *cli.Context, expected, checkType int) error {
 	var err error
@@ -94,12 +100,6 @@ func Fatal(err error) {
 	os.Exit(1)
 }
 
-// Random method return a random uint value, the source is the timestamp
-func Random() uint64 {
-	rand.Seed(time.Now().Unix())
-	return rand.Uint64()
-}
-
 // LoadPlugins method load the plugin service
 func LoadPlugins(path string) error {
 	abs, err := filepath.Abs(path)
@@ -125,8 +125,12 @@ func LoadPlugins(path string) error {
 
 // PathExist method check path if exist or not
 func PathExist(path string) (bool, error) {
-	_, err := os.Stat(path)
+	fileInfo, err := os.Stat(path)
 	if err == nil {
+		if !fileInfo.IsDir() && fileInfo.Size() > MaxFileSize {
+			return true, fmt.Errorf("the size of %s exceeds"+
+				" the maximum value which is %d", fileInfo.Name(), MaxFileSize)
+		}
 		return true, nil
 	}
 	if os.IsNotExist(err) {
@@ -194,7 +198,7 @@ func CreateNamedPipe() (string, error) {
 		_ = os.Remove(npipe)
 	}
 
-	err = syscall.Mkfifo(npipe, 0666)
+	err = syscall.Mkfifo(npipe, PipeMode)
 	if err != nil {
 		return "", err
 	}

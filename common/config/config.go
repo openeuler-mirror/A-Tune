@@ -17,7 +17,6 @@ import (
 	"atune/common/log"
 	"atune/common/utils"
 	"fmt"
-	"os"
 	"path"
 	"strings"
 
@@ -91,7 +90,6 @@ const (
 const (
 	TuningFile          string      = DefaultTempPath + "/tuning.log"
 	TuningRestoreConfig string      = "-tuning-restore.conf"
-	FilePerm            os.FileMode = 0600
 	DefaultTimeFormat   string      = "2006-01-02 15:04:05"
 )
 
