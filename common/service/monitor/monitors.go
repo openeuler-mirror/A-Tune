@@ -107,7 +107,6 @@ func activeProfile() error {
 		return fmt.Errorf("no active profile or more than 1 active profile")
 	}
 
-	//profile_names := strings.Split(strings.Trim(profiles.Result[0].ProfileType, "\n"), " ")
 	profileType := profiles.Result[0].Class
 	pro, _ := profile.LoadFromWorkloadType(profileType)
 	if err = pro.RollbackActive(nil); err != nil {

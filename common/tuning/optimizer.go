@@ -68,7 +68,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 	}
 
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
-	err = utils.WriteFile(config.TuningFile, projectName, config.FilePerm,
+	err = utils.WriteFile(config.TuningFile, projectName, utils.FilePerm,
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		log.Error(err)
@@ -100,7 +100,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 
 	err = utils.WriteFile(path.Join(config.DefaultTempPath,
 		o.Prj.Project+config.TuningRestoreConfig), strings.Join(initConfigure, ","),
-		config.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+		utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -230,7 +230,7 @@ func (o *Optimizer) evalParsing(ch chan *PB.AckCheck) (string, error) {
 	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
 		positiveEval, o.RespPutIns.Param)
 	output := strings.Join(iterInfo, "|")
-	err := utils.WriteFile(config.TuningFile, output+"\n", config.FilePerm,
+	err := utils.WriteFile(config.TuningFile, output+"\n", utils.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
 	if err != nil {
 		log.Error(err)
@@ -268,7 +268,7 @@ func deleteTask(url string) error {
 		log.Error("delete task failed:", err)
 		return err
 	}
-	defer resp.Body.Close()
+	resp.Body.Close()
 	return nil
 }
 

@@ -114,7 +114,7 @@ func train(ctx *cli.Context) error {
 		return err
 	}
 	if !exist {
-		err = os.MkdirAll(dir, 0660)
+		err = os.MkdirAll(dir, utils.FilePerm)
 		if err != nil {
 			return err
 		}

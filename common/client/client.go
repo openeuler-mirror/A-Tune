@@ -157,7 +157,6 @@ func newClient(address string, opts ...Opt) (*Client, error) {
 	tls := os.Getenv(config.EnvTLS)
 	if tls == "yes" {
 		clicrt := os.Getenv(config.EnvCliCert)
-		// creds, err := credentials.NewClientTLSFromFile(clicrt, "x.test.youtube.com")
 		creds, err := credentials.NewClientTLSFromFile(clicrt, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create TLS credentials %v", err)

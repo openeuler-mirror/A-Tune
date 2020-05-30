@@ -128,7 +128,6 @@ func merge(profiles []Profile) Profile {
 				section, _ := final.config.GetSection(unit.Name())
 				for _, key := range unit.Keys() {
 					if final.units[index].HasKey(key.Name()) {
-						/*FIXME: Ignore the same key*/
 						continue
 					} else {
 						_, _ = final.units[index].NewKey(key.Name(), key.Value())
@@ -218,9 +217,7 @@ func loadConfigData(name string) (*ini.File, error) {
 		return nil, err
 	}
 
-	//dir_name := path.Dir(filename)
 	dirName := CONF.DefaultScriptPath
-	// Filter script=
 	for _, section := range config.Sections() {
 		if section.Name() == "script" {
 			if section.HasKey("shell") {
