@@ -368,7 +368,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
-	if err := sqlstore.GetClasses(classProfile); err != nil {
+	if err = sqlstore.GetClasses(classProfile); err != nil {
 		log.Errorf("inquery workload type table failed %v", err)
 		return fmt.Errorf("inquery workload type table failed %v", err)
 	}
@@ -476,23 +476,31 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		data := reply.Name
 		content := reply.Content
 
-		// data == "" means in tuning process
-		if data == "" {
+		//sync config with other server
+		if data == "sync-config" {
 			optimizer.Content = content
-			err := optimizer.DynamicTuned(ch)
-			if err != nil {
+			if err = optimizer.SyncTunedNode(ch); err != nil {
 				return err
 			}
 			continue
 		}
 
-		if err := tuning.CheckServerPrj(data, &optimizer); err != nil {
+		// data == "" means in tuning process
+		if data == "" {
+			optimizer.Content = content
+			if err = optimizer.DynamicTuned(ch); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err = tuning.CheckServerPrj(data, &optimizer); err != nil {
 			return err
 		}
 
 		//content == nil means in restore config
 		if content == nil {
-			if err := optimizer.RestoreConfigTuned(ch); err != nil {
+			if err = optimizer.RestoreConfigTuned(ch); err != nil {
 				return err
 			}
 			continue
@@ -575,9 +583,9 @@ func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.Profi
 	profileNames := strings.Split(profileType, ",")
 	for _, name := range profileNames {
 		name = strings.Trim(name, " ")
-		context, _ := sqlstore.GetContext(name)
-		context = "\n*** " + name + ":\n" + context
-		_ = stream.Send(&PB.ProfileInfo{Name: context})
+		infoName, _ := sqlstore.GetContext(name)
+		infoName = "\n*** " + name + ":\n" + infoName
+		_ = stream.Send(&PB.ProfileInfo{Name: infoName})
 	}
 
 	return nil
@@ -706,8 +714,7 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	}
 
 	classApps := &sqlstore.GetClassApp{Class: message.GetType()}
-	err = sqlstore.GetClassApps(classApps)
-	if err != nil {
+	if err = sqlstore.GetClassApps(classApps); err != nil {
 		return err
 	}
 	if len(classApps.Result) == 0 {
@@ -722,11 +729,11 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return fmt.Errorf("output_path %s is not exist", message.GetOutputPath())
 	}
 
-	if err := utils.InterfaceByName(message.GetNetwork()); err != nil {
+	if err = utils.InterfaceByName(message.GetNetwork()); err != nil {
 		return err
 	}
 
-	if err := utils.DiskByName(message.GetBlock()); err != nil {
+	if err = utils.DiskByName(message.GetBlock()); err != nil {
 		return err
 	}
 

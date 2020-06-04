@@ -60,7 +60,7 @@ func (t *Timer) Run() error {
 
 	section, err := t.Cfg.Raw.GetSection("server")
 	if err != nil {
-		log.Errorf("Faild to get section system, error: %v", err)
+		log.Errorf("failed to get section system, error: %v", err)
 		return err
 	}
 	if !section.Haskey("type") {

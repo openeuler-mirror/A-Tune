@@ -128,7 +128,7 @@ func (p *Profile) Backup() error {
 	backedPath := path.Join(config.DefaultBackupPath, p.name+"_"+timeUnix)
 	err := os.MkdirAll(backedPath, 0750)
 	if err != nil {
-		log.Error(err.Error())
+		log.Error("failed to create backup path")
 		return nil
 	}
 

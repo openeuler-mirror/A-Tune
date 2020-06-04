@@ -137,8 +137,7 @@ func NewClient(addr string, port string, opts ...Opt) (*Client, error) {
 
 func UnixConnect(ctx context.Context, addr string) (net.Conn, error) {
 	unix_addr, _ := net.ResolveUnixAddr("unix", addr)
-	conn, err := net.DialUnix("unix", nil, unix_addr)
-	return conn, err
+	return net.DialUnix("unix", nil, unix_addr)
 }
 
 func newClient(address string, opts ...Opt) (*Client, error) {

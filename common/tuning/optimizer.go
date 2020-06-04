@@ -15,6 +15,7 @@ package tuning
 
 import (
 	PB "atune/api/profile"
+	"atune/common/client"
 	"atune/common/config"
 	"atune/common/http"
 	"atune/common/log"
@@ -22,6 +23,8 @@ import (
 	"atune/common/project"
 	"atune/common/utils"
 	"fmt"
+	"golang.org/x/net/context"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -57,7 +60,6 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 	//dynamic profle setting
 	o.MaxIter = clientIter
 	if o.MaxIter > o.Prj.Maxiterations {
-		o.MaxIter = o.Prj.Maxiterations
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
 		ch <- &PB.AckCheck{Name: fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations)}
@@ -153,17 +155,29 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 	}
 
 	log.Infof("setting params is: %s", o.RespPutIns.Param)
-	if err := o.Prj.RunSet(o.RespPutIns.Param); err != nil {
+	err, scripts := o.Prj.RunSet(o.RespPutIns.Param)
+	if err != nil {
 		log.Error(err)
 		return err
 	}
 	log.Info("set the parameter success")
 
-	if err := o.Prj.RestartProject(); err != nil {
+	err = syncConfigToOthers(scripts)
+	if err != nil {
+		return err
+	}
+
+	err, scripts = o.Prj.RestartProject()
+	if err != nil {
 		log.Error(err)
 		return err
 	}
 	log.Info("restart project success")
+
+	err = syncConfigToOthers(scripts)
+	if err != nil {
+		return err
+	}
 
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
 
@@ -206,8 +220,13 @@ func (o *Optimizer) RestoreConfigTuned(ch chan *PB.AckCheck) error {
 	}
 
 	log.Infof("restoring params is: %s", string(content))
-	if err := o.Prj.RunSet(string(content)); err != nil {
+	err, scripts := o.Prj.RunSet(string(content))
+	if err != nil {
 		log.Error(err)
+		return err
+	}
+
+	if err := syncConfigToOthers(scripts); err != nil {
 		return err
 	}
 
@@ -300,4 +319,81 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	}
 
 	return fmt.Errorf("project:%s not found", data)
+}
+
+//sync tuned node
+func (o *Optimizer) SyncTunedNode(ch chan *PB.AckCheck) error {
+	log.Infof("setting params is: %s", string(o.Content))
+	commands := strings.Split(string(o.Content), ",")
+	for _, command := range commands {
+		_, err := project.ExecCommand(command)
+		if err != nil {
+			return fmt.Errorf("failed to exec %s, err: %v", command, err)
+		}
+	}
+
+	log.Info("set the parameter success")
+	ch <- &PB.AckCheck{Status: utils.SUCCESS}
+
+	return nil
+}
+
+//sync config to other nodes in cluster mode
+func syncConfigToOthers(scripts string) error {
+	if config.TransProtocol != "tcp" || scripts == "" {
+		return nil
+	}
+
+	otherServers := strings.Split(strings.TrimSpace(config.Connect), ",")
+	log.Infof("sync other nodes: %s", otherServers)
+
+	for _, server := range otherServers {
+		if server == config.Address || server == "" {
+			continue
+		}
+		if err := syncConfigToNode(server, scripts); err != nil {
+			log.Errorf("server %s failed to sync config, err: %v", server, err)
+			return err
+		}
+	}
+	return nil
+}
+
+//sync config to server node
+func syncConfigToNode(server string, scripts string) error {
+	c, err := client.NewClient(server, config.Port)
+	if err != nil {
+		return err
+	}
+
+	defer c.Close()
+	svc := PB.NewProfileMgrClient(c.Connection())
+	stream, err := svc.Tuning(context.Background())
+	if err != nil {
+		return err
+	}
+
+	defer stream.CloseSend()
+	content := &PB.ProfileInfo{Name: "sync-config", Content: []byte(scripts)}
+	if err := stream.Send(content); err != nil {
+		return fmt.Errorf("sends failure, error: %v", err)
+	}
+
+	for {
+		reply, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+
+		if reply.Status == utils.SUCCESS {
+			log.Infof("server %s reply status success", server)
+			break
+		}
+	}
+
+	return nil
 }
