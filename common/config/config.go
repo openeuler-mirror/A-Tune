@@ -97,6 +97,7 @@ const (
 var (
 	TransProtocol     string
 	Address           string
+	Connect           string
 	Port              string
 	RestPort          string
 	TLS               bool
@@ -134,6 +135,7 @@ func (c *Cfg) Load() error {
 	section := cfg.Section("server")
 	TransProtocol = section.Key("protocol").MustString(DefaultProtocol)
 	Address = section.Key("address").MustString(DefaultTgtAddr)
+	Connect = section.Key("connect").MustString("")
 	Port = section.Key("port").MustString(DefaultTgtPort)
 	RestPort = section.Key("rest_port").MustString("8383")
 	TLS = section.Key("tls").MustBool(false)
