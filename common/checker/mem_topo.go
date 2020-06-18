@@ -166,7 +166,7 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 	}
 
 	if memNum%(maxChannel+1) != 0 {
-		sendChanToAdm(ch, "memory", utils.FAILD, fmt.Sprintf("memory num is %d, not recommend, recommand 8,16 or 32", memNum))
+		sendChanToAdm(ch, "memory", utils.SUGGEST, fmt.Sprintf("memory num is %d, not recommend, recommand 8,16 or 32", memNum))
 		return nil
 	}
 
@@ -174,7 +174,8 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 
 	for i := 0; i < memHalf; i++ {
 		if memLocation[i] != memLocation[i+memHalf] {
-			sendChanToAdm(ch, "memory", utils.FAILD, fmt.Sprintf("memory location is not balanced"))
+			sendChanToAdm(ch, "memory", utils.SUGGEST,
+				fmt.Sprintf("memory location is not balanced, recommand to balance memory location"))
 			return nil
 		}
 	}
