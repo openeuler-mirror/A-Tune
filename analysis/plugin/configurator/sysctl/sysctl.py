@@ -44,6 +44,7 @@ class Sysctl(Configurator):
 
     @staticmethod
     def check(config1, config2):
+        """substring"""
         config1 = re.sub(r"\s{1,}", " ", config1)
         config2 = re.sub(r"\s{1,}", " ", config2)
         return config1 == config2

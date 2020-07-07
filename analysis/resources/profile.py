@@ -79,7 +79,7 @@ class Profile(Resource):
             result["status"] = "FAILED"
             result["value"] = str(real_value)
         else:
-            if not real_value:
+            if real_value is None:
                 result["status"] = "FAILED"
                 result["value"] = "UNKNOWN"
             else:

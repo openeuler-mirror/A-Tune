@@ -90,6 +90,12 @@ class Configurator:
         cfg = self._getcfg(config)
         try:
             ret = self._set(cfg[0], cfg[1])
+        except Warning as warn:
+            if self._user == "UT":
+                raise warn
+            LOGGER.warning("%s.%s: %s", self.__class__.__name__,
+                           inspect.stack()[0][3], str(warn))
+            return warn
         except Exception as err:
             if self._user == "UT":
                 raise err
@@ -188,6 +194,12 @@ class Configurator:
             ret = self._get(key, value)
             if ret is not None:
                 ret = ret.replace('\n', ' ').strip()
+        except Warning as warn:
+            if self._user == "UT":
+                raise warn
+            LOGGER.warning("%s.%s: %s", self.__class__.__name__,
+                           inspect.stack()[0][3], str(warn))
+            return warn
         except Exception as err:
             if self._user == "UT":
                 raise err
