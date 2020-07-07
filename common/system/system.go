@@ -17,6 +17,7 @@ import (
 	"atune/common/config"
 	"atune/common/log"
 	"atune/common/models"
+	"atune/common/utils"
 	"bufio"
 	"encoding/xml"
 	"fmt"
@@ -134,6 +135,29 @@ func (system *System) GetDeviceNuma(device string) int {
 	}
 
 	return value
+}
+
+// GetIrqAffinity : get irq affinity list
+func (system *System) GetIrqAffinity(irq int) int {
+	irqAffinityPath := fmt.Sprintf("%s/irq/%d/smp_affinity_list", utils.ProcDir, irq)
+	line := utils.ReadAllFile(irqAffinityPath)
+	line = strings.Replace(line, "\n", "", -1)
+	cpuId, err := strconv.Atoi(line)
+	if err != nil {
+		log.Errorf("get cpuId from %s failed\n", irqAffinityPath)
+		return -1
+	}
+	return cpuId
+}
+
+// SetIrqAffinity : set irq affinity
+func (system *System) SetIrqAffinity(irq int, cpuId int) error {
+	path := fmt.Sprintf("%s/irq/%d/smp_affinity_list", utils.ProcDir, irq)
+	err := utils.WriteFile(path, strconv.Itoa(cpuId), utils.FilePerm, os.O_WRONLY)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetNICs :get system network interfaces

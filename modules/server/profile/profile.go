@@ -1089,12 +1089,26 @@ func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (
 // Schedule cpu/irq/numa ...
 func (s *ProfileServer) Schedule(message *PB.ScheduleMessage,
 	stream PB.ProfileMgr_ScheduleServer) error {
-	_ = message.GetApp()
-	Type := message.GetType()
+	pids := message.GetApp()
 	Strategy := message.GetStrategy()
 
 	scheduler := schedule.GetScheduler()
-	_ = scheduler.Schedule(Type, Strategy, true)
 
+	ch := make(chan *PB.AckCheck)
+	defer close(ch)
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
+		}
+	}()
+
+	err := scheduler.Schedule(pids, Strategy, true, ch)
+
+	if err != nil {
+		_ = stream.Send(&PB.AckCheck{Name: err.Error(), Status: utils.FAILD})
+		return err
+	}
+
+	_ = stream.Send(&PB.AckCheck{Name: "schedule finished"})
 	return nil
 }
