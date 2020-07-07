@@ -48,4 +48,5 @@ class Sysfs(Configurator):
 
     @staticmethod
     def check(_, __):
+        """check"""
         return True

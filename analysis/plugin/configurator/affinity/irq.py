@@ -93,6 +93,7 @@ class IrqAffinity(Configurator):
 
     @staticmethod
     def check(config1, config2):
+        """replace comma"""
         config1 = config1.replace(",", "")
         config2 = config2.replace(",", "")
         return int(config1, base=16) == int(config2, base=16)

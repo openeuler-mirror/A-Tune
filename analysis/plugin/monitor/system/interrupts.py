@@ -59,6 +59,6 @@ class SysInterrupts(Monitor):
                 nic = val
                 break
 
-        pattern = re.compile(r"^(\d*):{}$".format(nic.strip()), re.MULTILINE)
+        pattern = re.compile(r"^(\d*):{}".format(nic.strip()), re.MULTILINE)
         interrupts = pattern.findall(info)
         return " ".join(interrupts).strip()

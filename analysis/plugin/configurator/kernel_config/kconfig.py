@@ -15,7 +15,6 @@
 The sub class of the Configurator, used to change the kernel config.
 """
 import gzip
-import inspect
 import os
 import logging
 import subprocess
@@ -46,7 +45,7 @@ class KernelConfig(Configurator):
         if self.get(key) == value:
             return 0
         raise NeedConfigWarning(
-            "Please change the kernel configuration {key} to {val}.".format(
+            "please change the kernel configuration {key} to {val}".format(
                 key=key, val=value))
 
     def _get(self, key, _):
@@ -61,9 +60,7 @@ class KernelConfig(Configurator):
         pattern = re.compile("^" + key + "=(.+)", re.ASCII | re.MULTILINE)
         search_obj = pattern.findall(cfgs)
         if len(search_obj) != 1:
-            err = LookupError("not find one " + key)
-            LOGGER.error("%s.%s: %s", self.__class__.__name__,
-                         inspect.stack()[0][3], str(err))
+            err = Warning("not find one " + key)
             raise err
         return search_obj[0]
 

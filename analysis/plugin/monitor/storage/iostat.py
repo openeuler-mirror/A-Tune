@@ -95,6 +95,7 @@ class IoStat(Monitor):
         keys = []
         dev = "sd.*?"
         ret = ""
+        resplitobj = re.compile(r'\s*\n')
         device_data = {}
 
         opts, _ = getopt.getopt(para.split(), None, ['device=', 'fields='])
@@ -106,17 +107,15 @@ class IoStat(Monitor):
                 keys.append(val)
                 continue
 
+        rows_contents = resplitobj.split(info)
         dev = "Device|" + dev
-        pattern = re.compile(
-            "^(" +
-            dev +
-            r")\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
-            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
-            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)"
-            r"\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)\ {1,}(\S*)",
-            re.ASCII | re.MULTILINE)
-        search_obj = pattern.findall(info)
-        if len(search_obj) < 2:
+        search_obj = []
+        pattern = re.compile("^(" + dev + r").+", re.ASCII)
+        for row in rows_contents:
+            if pattern.match(row):
+                search_obj.append([data for data in row.split()])
+
+        if len(search_obj) < 3:
             err = LookupError("Fail to find data for {}".format(dev))
             LOGGER.error("%s.%s: %s", self.__class__.__name__,
                          inspect.stack()[0][3], str(err))

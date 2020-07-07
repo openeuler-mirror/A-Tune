@@ -53,6 +53,7 @@ class Systemctl(Configurator):
 
     @staticmethod
     def check(_, __):
+        """check"""
         return True
 
     def _backup(self, config, _):

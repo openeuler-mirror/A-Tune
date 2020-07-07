@@ -100,6 +100,7 @@ class Script(Configurator):
 
     @staticmethod
     def check(_, __):
+        """check"""
         return True
 
     def _backup(self, config, rollback_info):

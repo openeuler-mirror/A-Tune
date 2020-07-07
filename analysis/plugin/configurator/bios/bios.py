@@ -34,7 +34,7 @@ class Bios(Configurator):
 
     def _set(self, key, value):
         raise NeedConfigWarning(
-            "Please change the BIOS configuration {key} to {val}.".format(
+            "please change the BIOS configuration {key} to {val}".format(
                 key=key, val=value))
 
     def _get(self, key, _):
