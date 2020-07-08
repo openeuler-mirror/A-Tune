@@ -108,6 +108,11 @@ var (
 	TLSHTTPCACertFile string
 )
 
+// the system config in atuned.cnf
+var (
+	Network string
+)
+
 // Cfg type, the type that load the conf file
 type Cfg struct {
 	Raw *ini.File
@@ -147,6 +152,9 @@ func (c *Cfg) Load() error {
 		TLSHTTPKeyFile = section.Key("tlshttpkeyfile").MustString("")
 		TLSHTTPCACertFile = section.Key("tlshttpcacertfile").MustString("")
 	}
+
+	section = cfg.Section("system")
+	Network = section.Key("network").MustString("")
 
 	if err := initLogging(cfg); err != nil {
 		return err

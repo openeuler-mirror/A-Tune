@@ -22,7 +22,6 @@ import (
 	"atune/common/sqlstore"
 	"atune/common/utils"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -104,7 +103,6 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 // Scheduler class
 type Scheduler struct {
 	schedule []*sqlstore.Schedule
-	IsExit   bool
 }
 
 var instance *Scheduler = nil
@@ -117,29 +115,22 @@ func (s *Scheduler) Init() error {
 }
 
 // Schedule :update database and do schedule
-func (s *Scheduler) Schedule(typename string, strategy string, save bool) error {
-	if save {
-		_ = sqlstore.UpdateSchedule(typename, strategy)
+func (s *Scheduler) Schedule(pids string, strategy string, save bool, ch chan *PB.AckCheck) error {
+	schedManager := GetScheduleManager()
 
-		s.schedule = sqlstore.GetSchedule()
-		for _, item := range s.schedule {
-			_ = s.DoSchedule(item.Type, item.Strategy)
-		}
-	} else {
-		_ = s.DoSchedule(typename, strategy)
+	scheduler, err := schedManager.New(strategy,
+		pids,
+		WithChannel(ch),
+	)
+
+	if err != nil {
+		return err
 	}
+
+	schedManager.Submit(scheduler)
+	schedManager.Start()
 
 	return nil
-}
-
-// DoSchedule : get schedule filter and tune
-func (s *Scheduler) DoSchedule(typename string, strategy string) error {
-	filter := Factory(typename)
-	if filter == nil {
-		return errors.New("type don't exist")
-	}
-
-	return filter.Tune(strategy)
 }
 
 // Active schedule strategy
@@ -165,7 +156,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 			}
 			if section.Name() == "schedule" {
 				for _, key := range section.Keys() {
-					_ = s.Schedule(key.Name(), key.Value(), false)
+					_ = s.Schedule(key.Name(), key.Value(), false, ch)
 				}
 				continue
 			}
