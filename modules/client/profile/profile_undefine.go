@@ -26,10 +26,10 @@ import (
 
 var profileDeleteCommand = cli.Command{
 	Name:      "undefine",
-	Usage:     "delete the specified workload type",
-	ArgsUsage: "WORKLOAD_TYPE",
+	Usage:     "delete the specified profile",
+	ArgsUsage: "[profile]",
 	Description: func() string {
-		desc := "\n   delete the specified workload type, only self defined workload type can be delete.\n"
+		desc := "\n   delete the specified profile.\n"
 		return desc
 	}(),
 	Action: profileDelete,
@@ -63,7 +63,10 @@ func profileDelete(ctx *cli.Context) error {
 	if err := profileDeleteCheck(ctx); err != nil {
 		return err
 	}
-	workloadType := ctx.Args().Get(0)
+	profileName := ctx.Args().Get(0)
+	if !utils.IsInputStringValid(profileName) {
+		return fmt.Errorf("input:%s is invalid", profileName)
+	}
 
 	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
@@ -72,7 +75,7 @@ func profileDelete(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	reply, err := svc.Delete(CTX.Background(), &PB.DefineMessage{WorkloadType: workloadType})
+	reply, err := svc.Delete(CTX.Background(), &PB.ProfileInfo{Name: profileName})
 	if err != nil {
 		return err
 	}
@@ -80,6 +83,6 @@ func profileDelete(ctx *cli.Context) error {
 		fmt.Println(reply.GetStatus())
 		return nil
 	}
-	fmt.Println("delete workload type success")
+	fmt.Println("delete application profile success")
 	return nil
 }

@@ -257,17 +257,8 @@ func (p *Profile) active(ch chan *PB.AckCheck) error {
 
 	scheduler := schedule.GetScheduler()
 	_ = scheduler.Active(ch, itemKeys, p.items)
-	err := p.Save()
-	if err != nil {
-		log.Errorf(err.Error())
-	}
 
 	return nil
-}
-
-// Save method set the workload type of Profile to active state
-func (p *Profile) Save() error {
-	return sqlstore.ActiveProfile(p.name)
 }
 
 // SetWorkloadType method set the workload type name to Profile

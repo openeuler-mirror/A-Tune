@@ -110,52 +110,10 @@ func ExistWorkloadType(workloadType string) (bool, error) {
 	return exist, nil
 }
 
-// GetContext method return the optimization item of workload type name
-func GetContext(name string) (string, error) {
-	query := make([]*Profile, 0)
-
-	session := globalEngine.Table("profile")
-	if err := session.Where("profile_type=?", name).Find(&query); err != nil {
-		return "", err
-	}
-
-	if len(query) != 1 {
-		return "", errors.New("name not exist")
-	}
-
-	context := query[0].ProfileInformation
-	return context, nil
-}
-
-// InsertProfile method insert self define profile to table profile
-func InsertProfile(value *Profile) error {
-	session := globalEngine.Table("profile")
-	_, err := session.Insert(value)
-	return err
-}
-
-// UpdateProfile method update the profile table
-func UpdateProfile(value *Profile) error {
-	session := globalEngine.Table("profile")
-	if _, err := session.Where("profile_type = ?", value.ProfileType).Update(value); err != nil {
-		return err
-	}
-	return nil
-}
-
-// DeleteProfile method delete the item from profile table
-func DeleteProfile(profileType string) error {
-	session := globalEngine.Table("profile")
-	if _, err := session.Exec("delete from profile where profile_type = ?", profileType); err != nil {
-		return err
-	}
-	return nil
-}
-
-// ExistProfile method return true if profileType exist otherwise return false
-func ExistProfile(profileType string) (bool, error) {
-	session := globalEngine.Table("profile")
-	exist, err := session.Where("profile_type=?", profileType).Exist()
+// ExistProfileName method return true if workloadType exist otherwise return false
+func ExistProfileName(workloadType string) (bool, error) {
+	session := globalEngine.Table("class_profile")
+	exist, err := session.Where("class=?", workloadType).Exist()
 
 	if err != nil {
 		return false, err
@@ -224,25 +182,6 @@ func GetPropertyItem(property string) (string, error) {
 	item := tunedItem.Item
 
 	return item, nil
-}
-
-// GetProfileIDByName method return the profile history ID.
-// the parameter name is workload type
-func GetProfileIDByName(name string) (int64, error) {
-	query := make([]*Profile, 0)
-
-	session := globalEngine.Table("profile")
-	if err := session.Where("name=?", name).Find(&query); err != nil {
-		return -1, err
-	}
-
-	if len(query) != 1 {
-		return -1, errors.New("profile name not exist")
-	}
-
-	//id := query[0].Id
-	id := int64(0)
-	return id, nil
 }
 
 // GetTuneds method return the dynamic tuned items which used for bayes search

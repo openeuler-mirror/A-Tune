@@ -31,7 +31,7 @@ var profileListCommand = cli.Command{
 	Usage:     "list support workload type",
 	UsageText: "atune-adm list",
 	Description: func() string {
-		desc := "\n   list current support workload type\n"
+		desc := "\n   list current support profiles\n"
 		return desc
 	}(),
 	Action: profileList,
@@ -79,7 +79,7 @@ func profileList(ctx *cli.Context) error {
 	}
 
 	table := make([][]string, 0)
-	fmt.Println("\nSupport WorkloadTypes:")
+	fmt.Println("\nSupport profiles:")
 	for {
 		reply, err := stream.Recv()
 
@@ -91,7 +91,6 @@ func profileList(ctx *cli.Context) error {
 			return err
 		}
 		row := make([]string, 0)
-		row = append(row, reply.WorkloadType)
 		row = append(row, reply.ProfileNames)
 		row = append(row, reply.Active)
 
@@ -99,7 +98,7 @@ func profileList(ctx *cli.Context) error {
 	}
 
 	tabulate := gotabulate.Create(table)
-	tabulate.SetHeaders([]string{"WorkloadType", "ProfileName", "Active"})
+	tabulate.SetHeaders([]string{"ProfileName", "Active"})
 	tabulate.SetAlign("left")
 	tabulate.SetMaxCellSize(60)
 	tabulate.SetWrapStrings(true)

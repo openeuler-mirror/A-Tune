@@ -180,6 +180,13 @@ func LoadFromWorkloadType(workloadType string) (Profile, bool) {
 	return pro, exist
 }
 
+// LoadFromProfile method load the profile content depend the profile name
+func LoadFromProfile(profiles string) (Profile, bool) {
+	profileNames := strings.Split(profiles, ",")
+	pro, exist := Load(profileNames)
+	return pro, exist
+}
+
 // Load method load the profile content depned the profile names list
 func Load(profileNames []string) (Profile, bool) {
 	profileNames = filter(profileNames)

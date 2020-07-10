@@ -38,12 +38,6 @@ type ClassProfile struct {
 	Active      bool   `xorm:"active"`
 }
 
-// Profile : table profile
-type Profile struct {
-	ProfileType        string `xorm:"profile_type"`
-	ProfileInformation string `xorm:"profile_information"`
-}
-
 // Tuned : table tuned
 type Tuned struct {
 	ID    int64  `xorm:"id"`

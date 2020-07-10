@@ -30,8 +30,8 @@ service ProfileMgr {
 	rpc Collection(CollectFlag) returns (stream AckCheck) {}
 	rpc Training(TrainMessage) returns (stream AckCheck) {}
 	rpc Define(DefineMessage) returns (Ack) {}
-	rpc Delete(DefineMessage) returns (Ack) {}
-	rpc Update(DefineMessage) returns (Ack) {}
+	rpc Delete(ProfileInfo) returns (Ack) {}
+	rpc Update(ProfileInfo) returns (Ack) {}
 	rpc Schedule(ScheduleMessage) returns (stream AckCheck) {}
 }
 
@@ -83,9 +83,10 @@ message TrainMessage {
 }
 
 message DefineMessage {
-    string WorkloadType = 1;
-    string ProfileName  = 2;
-    bytes  Content      = 3;
+    string ServiceType = 1;
+    string ApplicationName  = 2;
+    string ScenarioName  = 3;
+    bytes  Content      = 4;
 }
 
 message ScheduleMessage {

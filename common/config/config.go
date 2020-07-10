@@ -41,6 +41,7 @@ const (
 const (
 	DefaultPath             = "/usr/lib/atuned/"
 	DefaultModDaemonSvrPath = DefaultPath + "modules"
+	DefaultProfilePath      = DefaultPath + "profiles"
 	DefaultConfPath         = "/etc/atuned/"
 	DefaultTuningPath       = DefaultConfPath + "tuning/"
 	DefaultScriptPath       = "/usr/libexec/atuned/scripts"
