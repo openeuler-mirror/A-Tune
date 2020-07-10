@@ -480,7 +480,7 @@ net.ipv4.tcp_max_syn_backlog=20480
 net.core.somaxconn=1280	
 
 [sysfs]
-block/{disk}/queue/read_ahead_kb=32
+block/{disk}/queue/read_ahead_kb=32768
 block/{disk}/queue/scheduler=deadline
 kernel/mm/transparent_hugepage/defrag=never
 kernel/mm/transparent_hugepage/enabled=never
