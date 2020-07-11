@@ -36,6 +36,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -189,9 +190,9 @@ func (c *CollectorPost) Post() (*RespCollectorPost, error) {
 
 // Profile method set the workload type to effective manual
 func (s *ProfileServer) Profile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_ProfileServer) error {
-	profileNames := profileInfo.GetName()
-
-	profile, ok := profile.LoadFromWorkloadType(profileNames)
+	profileNamesStr := profileInfo.GetName()
+	profileNames := strings.Split(profileNamesStr, ",")
+	profile, ok := profile.Load(profileNames)
 
 	if !ok {
 		fmt.Println("Failure Load ", profileInfo.GetName())
@@ -223,16 +224,55 @@ func (s *ProfileServer) Profile(profileInfo *PB.ProfileInfo, stream PB.ProfileMg
 // ListWorkload method list support workload
 func (s *ProfileServer) ListWorkload(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_ListWorkloadServer) error {
 	log.Debug("Begin to inquire all workloads\n")
-	workloads := &sqlstore.GetClass{}
-	err := sqlstore.GetClasses(workloads)
+	profileLogs, err := sqlstore.GetProfileLogs()
 	if err != nil {
 		return err
 	}
 
-	for _, classProfile := range workloads.Result {
-		_ = stream.Send(&PB.ListMessage{WorkloadType: classProfile.Class,
-			ProfileNames: classProfile.ProfileType,
-			Active:       strconv.FormatBool(classProfile.Active)})
+	var activeName string
+	if len(profileLogs) > 0 {
+		activeName = profileLogs[0].ProfileID
+	}
+
+	if activeName != "" {
+		classProfile := &sqlstore.GetClass{Class: activeName}
+		err = sqlstore.GetClasses(classProfile)
+		if err != nil {
+			return fmt.Errorf("inquery workload type table faild %v", err)
+		}
+		if len(classProfile.Result) > 0 {
+			activeName = classProfile.Result[0].ProfileType
+		}
+	}
+	log.Debugf("active name is %s", activeName)
+
+	err = filepath.Walk(config.DefaultProfilePath, func(absPath string, info os.FileInfo, err error) error {
+		if info.Name() == "include" {
+			return filepath.SkipDir
+		}
+		if !info.IsDir() {
+			if !strings.HasSuffix(info.Name(), ".conf") {
+				return nil
+			}
+
+			absFilename := absPath[len(config.DefaultProfilePath)+1:]
+			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
+				path.Ext(info.Name()))
+
+			var active bool
+			if filenameOnly == activeName {
+				active = true
+			}
+			_ = stream.Send(&PB.ListMessage{
+				ProfileNames: filenameOnly,
+				Active:       strconv.FormatBool(active)})
+
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -566,26 +606,33 @@ func (s *ProfileServer) UpgradeProfile(profileInfo *PB.ProfileInfo, stream PB.Pr
 InfoProfile method display the content of the specified workload type
 */
 func (s *ProfileServer) InfoProfile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_InfoProfileServer) error {
-	workloadType := profileInfo.GetName()
-	classProfile := &sqlstore.GetClass{Class: workloadType}
-	err := sqlstore.GetClasses(classProfile)
+	var context string
+	profileName := profileInfo.GetName()
+	err := filepath.Walk(config.DefaultProfilePath, func(absPath string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			absFilename := absPath[len(config.DefaultProfilePath)+1:]
+			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
+				path.Ext(info.Name()))
+			if filenameOnly == profileName {
+				data, err := ioutil.ReadFile(absPath)
+				if err != nil {
+					return err
+				}
+				context = "\n*** " + profileName + ":\n" + string(data)
+				_ = stream.Send(&PB.ProfileInfo{Name: context})
+				return nil
+			}
+		}
+		return nil
+	})
+
 	if err != nil {
-		log.Errorf("inquery class_profile table failed")
-		return fmt.Errorf("inquery class_profile table failed")
+		return err
 	}
 
-	if len(classProfile.Result) == 0 {
-		log.Errorf("%s is not exist in the class_profile table", workloadType)
-		return fmt.Errorf("%s is not exist in the class_profile table", workloadType)
-	}
-
-	profileType := classProfile.Result[0].ProfileType
-	profileNames := strings.Split(profileType, ",")
-	for _, name := range profileNames {
-		name = strings.Trim(name, " ")
-		infoName, _ := sqlstore.GetContext(name)
-		infoName = "\n*** " + name + ":\n" + infoName
-		_ = stream.Send(&PB.ProfileInfo{Name: infoName})
+	if context == "" {
+		log.Errorf("profile %s is not exist", profileName)
+		return fmt.Errorf("profile %s is not exist", profileName)
 	}
 
 	return nil
@@ -597,21 +644,35 @@ CheckActiveProfile method check current active profile is effective
 func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo,
 	stream PB.ProfileMgr_CheckActiveProfileServer) error {
 	log.Debug("Begin to check active profiles\n")
-	profiles := &sqlstore.GetClass{Active: true}
-	err := sqlstore.GetClasses(profiles)
+
+	profileLogs, err := sqlstore.GetProfileLogs()
 	if err != nil {
 		return err
 	}
-	if len(profiles.Result) != 1 {
-		return fmt.Errorf("no active profile or more than 1 active profile")
+
+	var activeName string
+	if len(profileLogs) > 0 {
+		activeName = profileLogs[0].ProfileID
 	}
 
-	workloadType := profiles.Result[0].Class
-	profile, ok := profile.LoadFromWorkloadType(workloadType)
+	if activeName == "" {
+		return fmt.Errorf("no active profile or more than 1 active profile")
+	}
+	classProfile := &sqlstore.GetClass{Class: activeName}
+	err = sqlstore.GetClasses(classProfile)
+	if err != nil {
+		return fmt.Errorf("inquery workload type table faild %v", err)
+	}
+	if len(classProfile.Result) > 0 {
+		activeName = classProfile.Result[0].ProfileType
+	}
+	log.Debugf("active name is %s", activeName)
+
+	profile, ok := profile.LoadFromProfile(activeName)
 
 	if !ok {
-		log.WithField("profile", workloadType).Errorf("Load profile %s Faild", workloadType)
-		return fmt.Errorf("load workload type %s Faild", workloadType)
+		log.WithField("profile", activeName).Errorf("Load profile %s Faild", activeName)
+		return fmt.Errorf("load profile %s Faild", activeName)
 	}
 
 	ch := make(chan *PB.AckCheck)
@@ -919,19 +980,38 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 		return &PB.Ack{}, fmt.Errorf("the define command can not be remotely operated")
 	}
 
-	workloadType := message.GetWorkloadType()
-	profileName := message.GetProfileName()
+	serviceType := message.GetServiceType()
+	applicationName := message.GetApplicationName()
+	scenarioName := message.GetScenarioName()
 	content := string(message.GetContent())
+	profileName := serviceType + "-" + applicationName + "-" + scenarioName
 
-	workloadTypeExist, err := sqlstore.ExistWorkloadType(workloadType)
+	workloadTypeExist, err := sqlstore.ExistWorkloadType(profileName)
 	if err != nil {
 		return &PB.Ack{}, err
 	}
-	if workloadTypeExist {
-		return &PB.Ack{Status: fmt.Sprintf("%s is already exist", workloadType)}, nil
+	if !workloadTypeExist {
+		if err = sqlstore.InsertClassApps(&sqlstore.ClassApps{
+			Class:     profileName,
+			Deletable: true}); err != nil {
+			return &PB.Ack{}, err
+		}
 	}
 
-	profileExist, err := sqlstore.ExistProfile(profileName)
+	profileNameExist, err := sqlstore.ExistProfileName(profileName)
+	if err != nil {
+		return &PB.Ack{}, err
+	}
+	if !profileNameExist {
+		if err = sqlstore.InsertClassProfile(&sqlstore.ClassProfile{
+			Class:       profileName,
+			ProfileType: profileName,
+			Active:      false}); err != nil {
+			return &PB.Ack{}, err
+		}
+	}
+
+	profileExist, err := profile.ExistProfile(profileName)
 	if err != nil {
 		return &PB.Ack{}, err
 	}
@@ -940,21 +1020,16 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 		return &PB.Ack{Status: fmt.Sprintf("%s is already exist", profileName)}, nil
 	}
 
-	if err := sqlstore.InsertClassApps(&sqlstore.ClassApps{
-		Class:     workloadType,
-		Deletable: true}); err != nil {
-		return &PB.Ack{}, err
-	}
-	if err := sqlstore.InsertClassProfile(&sqlstore.ClassProfile{
-		Class:       workloadType,
-		ProfileType: profileName,
-		Active:      false}); err != nil {
+	dstPath := path.Join(config.DefaultProfilePath, serviceType, applicationName)
+	err = utils.CreateDir(dstPath, utils.FilePerm)
+	if err != nil {
 		return &PB.Ack{}, err
 	}
 
-	if err := sqlstore.InsertProfile(&sqlstore.Profile{
-		ProfileType:        profileName,
-		ProfileInformation: content}); err != nil {
+	dstFile := path.Join(dstPath, fmt.Sprintf("%s.conf", scenarioName))
+	err = utils.WriteFile(dstFile, content, utils.FilePerm, os.O_WRONLY|os.O_CREATE)
+	if err != nil {
+		log.Error(err)
 		return &PB.Ack{}, err
 	}
 
@@ -962,7 +1037,7 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 }
 
 // Delete method delete the self define workload type from database
-func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
+func (s *ProfileServer) Delete(ctx context.Context, message *PB.ProfileInfo) (*PB.Ack, error) {
 	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)
 	if err != nil {
 		return &PB.Ack{}, err
@@ -971,63 +1046,40 @@ func (s *ProfileServer) Delete(ctx context.Context, message *PB.DefineMessage) (
 		return &PB.Ack{}, fmt.Errorf("the undefine command can not be remotely operated")
 	}
 
-	workloadType := message.GetWorkloadType()
+	profileName := message.GetName()
 
-	classApps := &sqlstore.GetClassApp{Class: workloadType}
-	err = sqlstore.GetClassApps(classApps)
+	classApps := &sqlstore.GetClassApp{Class: profileName}
+	if err = sqlstore.GetClassApps(classApps); err != nil {
+		return &PB.Ack{}, err
+	}
+
+	if len(classApps.Result) != 1 || !classApps.Result[0].Deletable {
+		return &PB.Ack{Status: "only self defined type can be deleted"}, nil
+	}
+
+	if err = sqlstore.DeleteClassApps(profileName); err != nil {
+		return &PB.Ack{}, err
+	}
+
+	profileNameExist, err := sqlstore.ExistProfileName(profileName)
 	if err != nil {
 		return &PB.Ack{}, err
 	}
-
-	log.Infof("the result length: %d, query the classapp table of workload: %s", len(classApps.Result), workloadType)
-	if len(classApps.Result) != 1 {
-		return &PB.Ack{Status: fmt.Sprintf("workload type %s may be not exist in the table", workloadType)}, nil
-	}
-
-	classApp := classApps.Result[0]
-	if !classApp.Deletable {
-		return &PB.Ack{Status: "only self defined workload type can be deleted"}, nil
-	}
-
-	if err := sqlstore.DeleteClassApps(workloadType); err != nil {
-		return &PB.Ack{}, err
-	}
-
-	// get the profile type from the classprofile table
-	classProfile := &sqlstore.GetClass{Class: workloadType}
-	if err := sqlstore.GetClasses(classProfile); err != nil {
-		log.Errorf("inquery workload type table failed %v", err)
-		return &PB.Ack{}, fmt.Errorf("inquery workload type table failed %v", err)
-	}
-	if len(classProfile.Result) == 0 {
-		log.Errorf("%s is not exist in the table", workloadType)
-		return &PB.Ack{}, fmt.Errorf("%s is not exist in the table", workloadType)
-	}
-
-	profileType := classProfile.Result[0].ProfileType
-	profileNames := strings.Split(profileType, ",")
-	if len(profileNames) == 0 {
-		log.Errorf("No profile or invaild profiles were specified.")
-		return &PB.Ack{}, fmt.Errorf("no profile or invaild profiles were specified")
-	}
-
-	// delete profile depend the profiletype
-	for _, profileName := range profileNames {
-		if err := sqlstore.DeleteProfile(profileName); err != nil {
-			log.Errorf("delete item from profile table failed %v ", err)
+	if profileNameExist {
+		if err := sqlstore.DeleteClassProfile(profileName); err != nil {
+			log.Errorf("delete item from class_profile table failed %v ", err)
 		}
 	}
 
-	// delete classprofile depend the workloadType
-	if err := sqlstore.DeleteClassProfile(workloadType); err != nil {
-		log.Errorf("delete item from classprofile tabble failed.")
-		return &PB.Ack{}, err
+	if err := profile.DeleteProfile(profileName); err != nil {
+		log.Errorf("delete item from profile table failed %v", err)
 	}
+
 	return &PB.Ack{Status: "OK"}, nil
 }
 
 // Update method update the content of the specified workload type from database
-func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
+func (s *ProfileServer) Update(ctx context.Context, message *PB.ProfileInfo) (*PB.Ack, error) {
 	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)
 	if err != nil {
 		return &PB.Ack{}, err
@@ -1036,51 +1088,20 @@ func (s *ProfileServer) Update(ctx context.Context, message *PB.DefineMessage) (
 		return &PB.Ack{}, fmt.Errorf("the update command can not be remotely operated")
 	}
 
-	workloadType := message.GetWorkloadType()
-	profileName := message.GetProfileName()
+	profileName := message.GetName()
 	content := string(message.GetContent())
 
-	workloadTypeExist, err := sqlstore.ExistWorkloadType(workloadType)
+	profileExist, err := profile.ExistProfile(profileName)
 	if err != nil {
 		return &PB.Ack{}, err
 	}
-	if !workloadTypeExist {
-		return &PB.Ack{Status: fmt.Sprintf("workload type %s is not exist in the table", workloadType)}, nil
+
+	if !profileExist {
+		return &PB.Ack{}, fmt.Errorf("profile name %s is exist", profileName)
 	}
 
-	// get the profile type from the classprofile table
-	classProfile := &sqlstore.GetClass{Class: workloadType}
-	if err := sqlstore.GetClasses(classProfile); err != nil {
-		log.Errorf("inquery workload type table failed %v", err)
-		return &PB.Ack{}, fmt.Errorf("inquery workload type table failed %v", err)
-	}
-	if len(classProfile.Result) == 0 {
-		log.Errorf("%s is not exist in the table", workloadType)
-		return &PB.Ack{}, fmt.Errorf("%s is not exist in the table", workloadType)
-	}
-
-	profileType := classProfile.Result[0].ProfileType
-	profileNames := strings.Split(profileType, ",")
-	if len(profileNames) == 0 {
-		log.Errorf("No profile or invaild profiles were specified.")
-		return &PB.Ack{}, fmt.Errorf("no profile exist corresponding to workload type")
-	}
-
-	exist := false
-	for _, profile := range profileNames {
-		if profileName == strings.TrimSpace(profile) {
-			exist = true
-			break
-		}
-	}
-	if !exist {
-		return &PB.Ack{}, fmt.Errorf("profile name %s is exist corresponding to workload type %s",
-			profileName, workloadType)
-	}
-
-	if err := sqlstore.UpdateProfile(&sqlstore.Profile{
-		ProfileType:        profileName,
-		ProfileInformation: content}); err != nil {
+	err = profile.UpdateProfile(profileName, content)
+	if err != nil {
 		return &PB.Ack{}, err
 	}
 	return &PB.Ack{Status: "OK"}, nil

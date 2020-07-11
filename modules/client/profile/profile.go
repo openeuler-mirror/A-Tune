@@ -30,12 +30,12 @@ import (
 
 var profileCommand = cli.Command{
 	Name:      "profile",
-	Usage:     "active the specified workload type and check the actived workload type",
-	UsageText: "atune-adm profile <WORKLOAD_TYPE>",
+	Usage:     "active the specified profile and check the actived profile",
+	UsageText: "atune-adm profile [profile]",
 	Description: func() string {
 		desc := `
-	 1. active the specified workload_type,for example,avtive the idle workload type.
-	     example: atune-adm profile idle`
+	 1. active the specified profile,for example,avtive the idle profile.
+	     example: atune-adm profile idle `
 		return desc
 	}(),
 	Action: profile,

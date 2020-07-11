@@ -19,19 +19,17 @@ import (
 	SVC "atune/common/service"
 	"atune/common/utils"
 	"fmt"
-	"io"
-	"strings"
-
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
+	"io"
 )
 
 var profileInfoCommand = cli.Command{
 	Name:      "info",
-	Usage:     "display profile info corresponding to specified workload type",
-	ArgsUsage: "WORKLOAD_TYPE",
+	Usage:     "display profile info corresponding to specified profile",
+	ArgsUsage: "[profile]",
 	Description: func() string {
-		desc := "\n   display profile info corresponding to WORKLOAD_TYPE\n"
+		desc := "\n   display profile info corresponding to profile\n"
 		return desc
 	}(),
 	Action: profileInfo,
@@ -65,6 +63,10 @@ func profileInfo(ctx *cli.Context) error {
 	if err := profileInfoCheck(ctx); err != nil {
 		return err
 	}
+	profileName := ctx.Args().Get(0)
+	if !utils.IsInputStringValid(profileName) {
+		return fmt.Errorf("input:%s is invalid", profileName)
+	}
 
 	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
@@ -74,7 +76,7 @@ func profileInfo(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 
-	stream, err := svc.InfoProfile(CTX.Background(), &PB.ProfileInfo{Name: strings.Join(ctx.Args(), " ")})
+	stream, err := svc.InfoProfile(CTX.Background(), &PB.ProfileInfo{Name: profileName})
 	if err != nil {
 		return err
 	}

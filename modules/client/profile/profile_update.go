@@ -27,12 +27,12 @@ import (
 
 var profileUpdateCommand = cli.Command{
 	Name:      "update",
-	Usage:     "update the optimization content of the specified workload type and profile name",
-	ArgsUsage: "WORKLOAD_TYPE PROFILE_NAME PROFILE_FILE",
+	Usage:     "update the optimization content of the specified profile name",
+	ArgsUsage: "[profile] [profile_path]",
 	Description: func() string {
 		desc := `
-	 update the optimization content of the specified workload type and profile name,
-	     example: atune-adm update idle default ./update.conf
+	 update the optimization content of the profile name,
+	     example: atune-adm update test_profile ./update.conf
 	`
 		return desc
 	}(),
@@ -56,11 +56,11 @@ func newProfileUpdate(ctx *cli.Context, opts ...interface{}) (interface{}, error
 }
 
 func profileUpdateCheck(ctx *cli.Context) error {
-	if err := utils.CheckArgs(ctx, 3, utils.ConstExactArgs); err != nil {
+	if err := utils.CheckArgs(ctx, 2, utils.ConstExactArgs); err != nil {
 		return err
 	}
 
-	file := ctx.Args().Get(2)
+	file := ctx.Args().Get(1)
 	if !utils.IsInputStringValid(file) {
 		return fmt.Errorf("input:%s is invalid", file)
 	}
@@ -80,17 +80,12 @@ func profileUpdate(ctx *cli.Context) error {
 	if err := profileUpdateCheck(ctx); err != nil {
 		return err
 	}
-	workloadType := ctx.Args().Get(0)
-	if !utils.IsInputStringValid(workloadType) {
-		return fmt.Errorf("input:%s is invalid", workloadType)
-	}
-
-	profileName := ctx.Args().Get(1)
+	profileName := ctx.Args().Get(0)
 	if !utils.IsInputStringValid(profileName) {
 		return fmt.Errorf("input:%s is invalid", profileName)
 	}
 
-	data, err := ioutil.ReadFile(ctx.Args().Get(2))
+	data, err := ioutil.ReadFile(ctx.Args().Get(1))
 	if err != nil {
 		return err
 	}
@@ -102,10 +97,9 @@ func profileUpdate(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	reply, err := svc.Update(CTX.Background(), &PB.DefineMessage{
-		WorkloadType: workloadType,
-		ProfileName:  profileName,
-		Content:      data})
+	reply, err := svc.Update(CTX.Background(), &PB.ProfileInfo{
+		Name:    profileName,
+		Content: data})
 	if err != nil {
 		return err
 	}
@@ -114,6 +108,6 @@ func profileUpdate(ctx *cli.Context) error {
 		return nil
 	}
 
-	fmt.Println("update workload type success")
+	fmt.Println("update application profile success")
 	return nil
 }

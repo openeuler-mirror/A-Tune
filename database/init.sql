@@ -14,14 +14,6 @@ CREATE TABLE IF NOT EXISTS class_profile(
   active BOOLEN NOT NULL
 );
 
-
-drop table if exists profile;
-CREATE TABLE IF NOT EXISTS profile(
-  profile_type TEXT PRIMARY KEY NOT NULL,
-  profile_information TEXT NOT NULL
-);
-
-
 drop table if exists tuned;
 CREATE TABLE IF NOT EXISTS tuned(
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -86,722 +78,241 @@ CREATE TABLE IF NOT EXISTS schedule(
 
 -- class_apps:
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default", "", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("webserver", "nginx,httpd", "cpu", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_database", "mongoDB,mysql,postgresql,mariadb", "cpu, memory, network, io", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("big_data", "hadoop, spark", "cpu, io", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("in-memory_computing", "specjbb2015", "cpu, memory", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("in-memory_database", "redis", "cpu, network", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("single_computer_intensive_jobs", "speccpu2006", "cpu, memory", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("communication", "dubbo", "cpu, network", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("idle", "idle", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("ceph", "ceph", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_hdd", "hadoop-hdfs", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_ssd", "hadoop-hdfs", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb", "mariadb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mysql", "mysql", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx", "nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("redis", "redis", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("speccpu", "speccpu", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("specjbb", "specjbb", "", 0);
 
 -- class_profile:
-INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default", 1);
-INSERT INTO class_profile(class, profile_type, active) VALUES("webserver", "ssl_webserver", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("big_database", "database", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("big_data", "big_data", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_computing", "in-memory_computing", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("in-memory_database", "in-memory_database", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("single_computer_intensive_jobs", "compute-intensive", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("communication", "rpc_communication", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("idle", "default", 0);
-
-
-
--- profile:
-INSERT INTO profile (profile_type, profile_information) VALUES("default", "
-#
-# A-Tune configuration for others, which could not be classified
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-#TODO CONFIG
-
-[systemctl]
-#sysmonitor=stop
-#irqbalance=stop
-
-[tip]
-#bind network interrupts to its affinity numa node = affinity
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-check_environment=on
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("compute-intensive", "
-#
-# compute-intensive A-Tune configuration
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-CONFIG_HZ=100
-CONFIG_ARM64_64K_PAGES=y
-
-[bios]
-Custom Refresh Rate=64ms
-Stream Write Mode=Allocate share LLC
-
-[bootloader.grub2]
-default_hugepagesz=2M
-hugepagesz=2M
-hugepages=150000
-
-[sysfs]
-kernel/mm/transparent_hugepage/defrag=never
-kernel/mm/transparent_hugepage/enabled=never
-
-[sysctl]
-kernel.randomize_va_space=0
-#vm.nr_hugepages=150000
-
-[tip]
-bind task to corresponding cpu core = affinity
-use optimized compile = compile
-
-[script]
-prefetch = on 
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("io-intensive", "
-#
-# io-intensive A-Tune configuration
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-block/{disk}/queue/read_ahead_kb=4096
-
-[sysctl]
-vm.dirty_ratio=40
-vm.dirty_background_ratio=20
-vm.dirty_writeback_centisecs=800
-vm.dirty_expire_centisecs=30000
-
-[script]
-#TODO CONFIG
-
-[tip]
-mount your filesystem using noatime and nobarrier option = filesystem
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-
-INSERT INTO profile (profile_type, profile_information) VALUES("rpc_communication", "
-#
-# rpc_communication A-Tune configuration
-#
-[main]
-include=throughput-performance
-
-[bios]
-Custom Refresh Rate=64ms
-Power Policy = Performance
-
-[kernel_config]
-CONFIG_HZ=100
-
-[bootloader.grub2]
-default_hugepagesz=2M
-hugepagesz=2M
-hugepages=230000
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-kernel.sched_latency_ns = 16000000 
-kernel.sched_min_granularity_ns = 3000000 
-kernel.sched_migration_cost_ns = 1000
-
-[systemctl]
-sysmonitor=stop
-irqbalance=stop
-
-[script]
-prefetch = off 
-ethtool =  -K {network} gro on | -K {network} gso on | -K {network} tso on | -X {network} hfunc toeplitz
-swap = -a off
-
-[tip]
-relogin into the system to enable limits setting = OS
-bind your master process to the numa node that has the network card = affinity
-bind network interrupts to its affinity numa node = affinity
-
-[ulimit]
-{user}.hard.stack = unlimited
-{user}.soft.stack = unlimited
-{user}.hard.nofile = 32768
-{user}.soft.nofile = 32768
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-
-INSERT INTO profile (profile_type, profile_information) VALUES("throughput-performance", "
-#
-# throughput-performance A-Tune configuration
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-#TODO CONFIG
-
-[sysfs]
-block/{disk}/queue/read_ahead_kb=4096
-
-[sysctl]
-kernel.sched_min_granularity_ns = 10000000
-kernel.sched_wakeup_granularity_ns = 15000000
-
-vm.dirty_ratio = 40
-vm.dirty_background_ratio = 10
-vm.swappiness=10
-
-[tip]
-#TODO CONFIG
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-
-INSERT INTO profile (profile_type, profile_information) VALUES("ssl_webserver", "
-#
-# webserver A-Tune configuration
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-fs.file-max=6553600
-fs.suid_dumpable = 1
-fs.aio-max-nr = 1048576
-kernel.shmmax = 68719476736
-kernel.shmall = 4294967296
-kernel.shmmni = 4096
-kernel.sem = 250 32000 100 128
-net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_syncookies = 1
-net.ipv4.ip_local_port_range = 1024     65500
-net.ipv4.tcp_max_tw_buckets = 5000
-net.core.somaxconn = 65535
-net.core.netdev_max_backlog = 262144
-net.ipv4.tcp_max_orphans = 262144
-net.ipv4.tcp_max_syn_backlog = 262144
-net.ipv4.tcp_timestamps = 0
-net.ipv4.tcp_synack_retries = 1
-net.ipv4.tcp_syn_retries = 1
-net.ipv4.tcp_fin_timeout = 1
-net.ipv4.tcp_keepalive_time = 60
-net.ipv4.tcp_mem =  362619      483495   725238
-net.ipv4.tcp_rmem = 4096         87380   6291456
-net.ipv4.tcp_wmem = 4096         16384   4194304
-net.core.wmem_default = 8388608
-net.core.rmem_default = 8388608
-net.core.rmem_max = 16777216
-net.core.wmem_max = 16777216
-
-[systemctl]
-sysmonitor=stop
-irqbalance=stop
-
-[bootloader.grub2]
-iommu.passthrough=1
-
-[tip]
-bind your master process to the CPU near the network = affinity
-bind your network interrupt to the CPU that has this network = affinity
-relogin into the system to enable limits setting = OS
-SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = OS
-
-[script]
-openssl_hpre = 0
-prefetch = off
-
-[ulimit]
-{user}.hard.nofile = 102400
-{user}.soft.nofile = 102400
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("database", "
-#
-# database A-Tune configuration
-#
-[main]
-#TODO CONFIG
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[tip]
-use xfs as filesystem and mount-option using noatime and nobarrier = filesystem
-bind network interrupts to its affinity numa node = affinity
-relogin into the system to enable limits setting = OS
-
-[bootloader.grub2]
-iommu.passthrough=1
-
-[sysctl]
-vm.swappiness=1
-
-# schedule
-kernel.sched_cfs_bandwidth_slice_us=21000
-kernel.sched_migration_cost_ns=1381000
-kernel.sched_latency_ns=16110000
-kernel.sched_min_granularity_ns=8250000
-kernel.sched_nr_migrate=53
-kernel.sched_wakeup_granularity_ns=50410000
-
-# network core
-net.core.rmem_default=21299200		
-net.core.rmem_max=21299200		
-net.core.wmem_default=21299200		
-net.core.wmem_max=21299200		
-net.ipv4.tcp_rmem=40960 8738000 62914560		
-net.ipv4.tcp_wmem=40960 8738000 62914560		
-net.core.dev_weight=97
-
-# support more connections for mysql
-net.ipv4.tcp_max_syn_backlog=20480	
-net.core.somaxconn=1280	
-
-[sysfs]
-block/{disk}/queue/read_ahead_kb=32768
-block/{disk}/queue/scheduler=deadline
-kernel/mm/transparent_hugepage/defrag=never
-kernel/mm/transparent_hugepage/enabled=never
-
-[systemctl]
-sysmonitor=stop
-irqbalance=stop
-
-[script]
-prefetch = off 
-
-[ulimit]
-{user}.hard.nofile = 102400
-{user}.soft.nofile = 102400
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("big_data", "
-#
-# big_data A-Tune configuration
-#
-[main]
-include=io-intensive
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-iommu.passthrough=1
-
-[sysfs]
-#TODO CONFIG
-
-[systemctl]
-firewalld=stop
-sysmonitor=stop
-irqbalance=stop
-
-[tip]
-bind network interrupts to its affinity numa node  = affinity
-relogin into the system to enable limits setting = OS
-
-[sysctl]
-fs.file-max=1000000
-fs.nr_open=2000000
-
-[script]
-#TODO CONFIG
-
-[ulimit]
-{user}.hard.nofile = 2000000
-{user}.soft.nofile = 1800000
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("in-memory_computing", "
-#
-# in-memory_computing A-Tune configuration
-#
-[main]
-include=throughput-performance
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-Custom Refresh Rate=64ms
-Power Policy = Performance
-
-[bootloader.grub2]
-default_hugepagesz=2M
-hugepagesz=2M
-hugepages=102400
-
-[sysfs]
-#TODO CONFIG
-
-[sysctl]
-#vm.nr_hugepages=102400
-
-[script]
-prefetch = off 
-
-[tip]
-use numactl to bind your task = affinity
-
-[ulimit]
-#TODO CONFIG
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-INSERT INTO profile (profile_type, profile_information) VALUES("in-memory_database", "
-#
-# in-memory_database A-Tune configuration
-#
-[main]
-include=throughput-performance
-
-#[cpu]
-#force_latency=70
-
-[kernel_config]
-#TODO CONFIG
-
-[bios]
-#TODO CONFIG
-
-[bootloader.grub2]
-iommu.passthrough=1
-
-[sysctl]
-vm.overcommit_memory=1
-net.core.netdev_budget =600
-net.core.rmem_max =16777216
-net.core.somaxconn =2048
-net.core.optmem_max =40960
-net.core.rmem_default =65535
-net.core.wmem_default =65535
-net.core.wmem_max =8388608
-net.ipv4.tcp_rmem =16384 349520 16777216
-net.ipv4.tcp_wmem =16384 349520 16777216
-net.ipv4.tcp_mem =8388608 8388608 8388608
-
-kernel.sem = 32000 1024000000 500 32000
-kernel.numa_balancing = 0
-
-[sysfs]
-kernel/mm/transparent_hugepage/defrag=never
-kernel/mm/transparent_hugepage/enabled=never
-
-[systemctl]
-sysmonitor=stop
-irqbalance=stop
-
-[tip]
-leverage numactl to make CPU to access its local memory = affinity
-bind network interrupts to its affinity numa node = affinity
-
-[script]
-prefetch = off
-ifconfig = {network} mtu 1500
-ethtool = -C {network} adaptive-rx on | -K {network} gro on | -K {network} gso on | -K {network} tso on
-
-[ulimit]
-{user}.hard.nofile = 102400
-{user}.soft.nofile = 102400
-
-[affinity.task]
-#TODO CONFIG
-
-[affinity.irq]
-#TODO CONFIG
-
-[check]
-#TODO CONFIG
-
-");
-
-
+INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default-default", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("ceph", "storage-ceph-vdbench-hdd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_hdd", "big-data-hadoop-hdfs-dfsio-hdd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_ssd", "big-data-hadoop-hdfs-dfsio-ssd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb", "database-mariadb-2p-tpcc-c3", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("mysql", "database-mysql-2p-sysbench-hdd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx", "web-nginx-https-short-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("redis", "in-memory-database-redis-redis-benchmark", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("speccpu", "basic-test-suite-speccpu-speccpu2006", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("specjbb", "basic-test-suite-specjbb-specjbb2015", 0);
 
 -- Performance Point
 INSERT INTO tuned_item(property, item) VALUES("check_environment", "Check");
 
 INSERT INTO tuned_item(property, item) VALUES("CONFIG_HZ", "Kernel");
 INSERT INTO tuned_item(property, item) VALUES("CONFIG_ARM64_64K_PAGES", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_NUMA_AWARE_SPINLOCKS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_CGROUP_FILES", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_SLUB_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_PM_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_PM_SLEEP_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_STACKPROTECTOR", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_STACKPROTECTOR_STRONG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_VMAP_STACK", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BLK_DEBUG_FS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BLK_DEBUG_FS_ZONED", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_NET_DROP_MONITOR", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DM_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_MLX4_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_VIDEO_ADV_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_INFINIBAND_IPOIB_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_NFS_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_SUNRPC_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_CIFS_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BINARY_PRINTF", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DEBUG_INFO_DWARF4", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DEBUG_MEMORY_INIT", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_SCHED_DEBUG", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DEBUG_BUGVERBOSE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DEBUG_LIST", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACEPOINTS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_NOP_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACER_MAX_TRACE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACE_CLOCK", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_RING_BUFFER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_EVENT_TRACING", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_CONTEXT_SWITCH_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACING", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_GENERIC_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_FTRACE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_FUNCTION_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_FUNCTION_GRAPH_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_SCHED_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_HWLAT_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_FTRACE_SYSCALLS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACER_SNAPSHOT", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BRANCH_PROFILE_NONE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_STACK_TRACER", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BLK_DEV_IO_TRACE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_KPROBE_EVENTS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_UPROBE_EVENTS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_BPF_EVENTS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_PROBE_EVENTS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DYNAMIC_FTRACE", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_FTRACE_MCOUNT_RECORD", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_TRACING_MAP", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_HIST_TRIGGERS", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_RING_BUFFER_BENCHMARK", "Kernel");
+INSERT INTO tuned_item(property, item) VALUES("CONFIG_DEBUG_ALIGN_RODATA", "Kernel");
 
 INSERT INTO tuned_item(property, item) VALUES("iommu.passthrough", "Bootloader");
+INSERT INTO tuned_item(property, item) VALUES("iommu.strict", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("default_hugepagesz", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("hugepagesz", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("hugepages", "Bootloader");
+INSERT INTO tuned_item(property, item) VALUES("selinux", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("skew_tick", "Bootloader");
+INSERT INTO tuned_item(property, item) VALUES("numa_spinlock", "Bootloader");
+INSERT INTO tuned_item(property, item) VALUES("scsi_mod.use_blk_mq", "Bootloader");
 
-INSERT INTO tuned_item(property, item) VALUES("openssl_hpre", "Library");
+INSERT INTO tuned_item(property, item) VALUES("openssl_hpre", "Script");
+INSERT INTO tuned_item(property, item) VALUES("hinic", "Script");
 
-INSERT INTO tuned_item(property, item) VALUES("Custom Refresh Rate", "BIOS");
-INSERT INTO tuned_item(property, item) VALUES("Stream Write Mode", "BIOS");
-INSERT INTO tuned_item(property, item) VALUES("Support Smmu", "BIOS");
-INSERT INTO tuned_item(property, item) VALUES("Max Payload Size", "BIOS");
-INSERT INTO tuned_item(property, item) VALUES("Power Policy", "BIOS");
+INSERT INTO tuned_item(property, item) VALUES("NUMA", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("SRIOV", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Custom Refresh Rate", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Stream Write Mode", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Support Smmu", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Support SPCR", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Max Payload Size", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Power Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Rank Interleaving", "Bios");
 
-INSERT INTO tuned_item(property, item) VALUES("vm.nr_hugepages", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.swappiness", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.dirty_ratio", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.max_map_count", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.panic_on_oom", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.dirty_background_ratio", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.dirty_writeback_centisecs", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.dirty_expire_centisecs", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.overcommit_memory", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.zone_reclaim_mode", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.min_free_kbytes", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.hugepages_treat_as_movable", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/defrag", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/enabled", "OS");
-INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/scheduler", "OS");
-INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/read_ahead_kb", "OS");
-INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/nr_requests", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_syn_backlog", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.somaxconn", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_time", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_probes", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_intvl", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_retries2", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.ip_forward", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.rp_filter", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.accept_source_route", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_tw_recycle", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_tw_reuse", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_syncookies", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_established", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-ip6tables", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-iptables", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-arptables", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.ip_local_port_range", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_tw_buckets", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.netdev_max_backlog", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_orphans", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_timestamps", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_synack_retries", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_syn_retries", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_fin_timeout", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_mem", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_rmem", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_wmem", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.udp_mem", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_fastopen", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.wmem_default", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.rmem_default", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.rmem_max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.wmem_max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_close_wait", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_fin_wait", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_time_wait", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.forwarding", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_buckets", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_count", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.dev_weight", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.optmem_max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.netdev_budget", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.busy_read", "OS");
-INSERT INTO tuned_item(property, item) VALUES("net.core.busy_poll", "OS");
-INSERT INTO tuned_item(property, item) VALUES("ethtool", "OS");
-INSERT INTO tuned_item(property, item) VALUES("ifconfig", "OS");
-INSERT INTO tuned_item(property, item) VALUES("fs.file-max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("fs.nr_open", "OS");
-INSERT INTO tuned_item(property, item) VALUES("fs.suid_dumpable", "OS");
-INSERT INTO tuned_item(property, item) VALUES("fs.aio-max-nr", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.threads-max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sem", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.msgmnb", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.msgmax", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.shmmax", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.shmall", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.shmmni", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.pid_max", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.numa_balancing", "OS");
-INSERT INTO tuned_item(property, item) VALUES("{user}.hard.nofile", "OS");
-INSERT INTO tuned_item(property, item) VALUES("{user}.soft.nofile", "OS");
-INSERT INTO tuned_item(property, item) VALUES("{user}.soft.stack", "OS");
-INSERT INTO tuned_item(property, item) VALUES("{user}.hard.stack", "OS");
-INSERT INTO tuned_item(property, item) VALUES("swap", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.randomize_va_space", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_cfs_bandwidth_slice_us", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_migration_cost_ns", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_latency_ns", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_nr_migrate", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_min_granularity_ns", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_wakeup_granularity_ns", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sysrq", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.kstack_depth_to_print", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.panic_on_oops", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.panic", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.hung_task_timeout_secs", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.hung_task_panic", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.oom_dump_tasks", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.softlockup_panic", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.core_uses_pid", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.nmi_watchdog", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.sched_rt_runtime_us", "OS");
-INSERT INTO tuned_item(property, item) VALUES("vm.stat_interval", "OS");
-INSERT INTO tuned_item(property, item) VALUES("kernel.timer_migration", "OS");
+INSERT INTO tuned_item(property, item) VALUES("vm.nr_hugepages", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.swappiness", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.dirty_ratio", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.max_map_count", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.panic_on_oom", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.dirty_background_ratio", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.dirty_writeback_centisecs", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.dirty_expire_centisecs", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.overcommit_memory", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.zone_reclaim_mode", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.min_free_kbytes", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/defrag", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("kernel/mm/transparent_hugepage/enabled", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("kernel/debug/sched_features", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/scheduler", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/read_ahead_kb", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/nr_requests", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/device/queue_depth", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/write_cache", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/nomerges", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/iosched/slice_idle", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/iosched/low_latency", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/rq_affinity", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("block/{disk}/queue/max_sectors_kb", "Sysfs");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_syn_backlog", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.somaxconn", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_time", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_probes", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_keepalive_intvl", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_retries2", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.ip_forward", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.rp_filter", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.accept_source_route", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_tw_reuse", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_syncookies", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_low_latency", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_established", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-ip6tables", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-iptables", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.bridge.bridge-nf-call-arptables", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.ip_local_port_range", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_tw_buckets", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.netdev_max_backlog", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_max_orphans", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_timestamps", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_synack_retries", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_syn_retries", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_fin_timeout", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_mem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_rmem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_wmem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.udp_mem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_sack", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.tcp_fastopen", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.wmem_default", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.rmem_default", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.rmem_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.wmem_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_close_wait", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_fin_wait", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_tcp_timeout_time_wait", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.ipv4.conf.default.forwarding", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_buckets", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.netfilter.nf_conntrack_count", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.nf_conntrack_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.dev_weight", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.optmem_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.netdev_budget", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.busy_read", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.busy_poll", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("net.core.rps_sock_flow_entries", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("ethtool", "Script");
+INSERT INTO tuned_item(property, item) VALUES("ifconfig", "Script");
+INSERT INTO tuned_item(property, item) VALUES("fs.file-max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("fs.nr_open", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("fs.suid_dumpable", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("fs.aio-max-nr", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("fs.inotify.max_user_instances", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.threads-max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sem", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.msgmnb", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.msgmax", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.shmmax", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.shmall", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.shmmni", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.pid_max", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.numa_balancing", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("{user}.hard.nofile", "Ulimit");
+INSERT INTO tuned_item(property, item) VALUES("{user}.soft.nofile", "Ulimit");
+INSERT INTO tuned_item(property, item) VALUES("{user}.soft.stack", "Ulimit");
+INSERT INTO tuned_item(property, item) VALUES("{user}.hard.stack", "Ulimit");
+INSERT INTO tuned_item(property, item) VALUES("swap", "Script");
+INSERT INTO tuned_item(property, item) VALUES("kernel.randomize_va_space", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_cfs_bandwidth_slice_us", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_migration_cost_ns", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_latency_ns", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_nr_migrate", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_min_granularity_ns", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_wakeup_granularity_ns", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sysrq", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.kstack_depth_to_print", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.panic_on_oops", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.panic", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.hung_task_timeout_secs", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.hung_task_panic", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.oom_dump_tasks", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.softlockup_panic", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.core_uses_pid", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.nmi_watchdog", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_rt_runtime_us", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("vm.stat_interval", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.timer_migration", "Sysctl");
+INSERT INTO tuned_item(property, item) VALUES("kernel.sched_autogroup_enabled", "Sysctl");
 
-INSERT INTO tuned_item(property, item) VALUES("prefetch", "Chip");
+INSERT INTO tuned_item(property, item) VALUES("prefetch", "Script");
+INSERT INTO tuned_item(property, item) VALUES("logind", "Script");
+INSERT INTO tuned_item(property, item) VALUES("blockdev", "Script");
+INSERT INTO tuned_item(property, item) VALUES("hugepage", "Script");
+INSERT INTO tuned_item(property, item) VALUES("rps_cpus", "Script");
+INSERT INTO tuned_item(property, item) VALUES("sched_domain", "Script");
 
-INSERT INTO tuned_item(property, item) VALUES("sysmonitor", "Service");
-INSERT INTO tuned_item(property, item) VALUES("irqbalance", "Service");
-INSERT INTO tuned_item(property, item) VALUES("firewalld", "Service");
+INSERT INTO tuned_item(property, item) VALUES("sysmonitor", "Systemctl");
+INSERT INTO tuned_item(property, item) VALUES("irqbalance", "Systemctl");
+INSERT INTO tuned_item(property, item) VALUES("firewalld", "Systemctl");
+INSERT INTO tuned_item(property, item) VALUES("tuned", "Systemctl");
 
 INSERT INTO tuned_item(property, item) VALUES("compile_optimization", "Compiler");
 INSERT INTO tuned_item(property, item) VALUES("compile_security", "Compiler");
+
+INSERT INTO tuned_item(property, item) VALUES("/etc/profile", "Profile");
 
 -- collection table
 INSERT INTO collection(name, module, purpose, metrics) VALUES("cpu", "CPU", "STAT", "--interval=5; --fields=usr --fields=nice --fields=sys --fields=iowait --fields=irq --fields=soft --fields=steal --fields=guest --threshold=30 --fields=cutil"); 

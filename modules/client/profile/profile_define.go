@@ -28,14 +28,14 @@ import (
 
 var profileDefineCommand = cli.Command{
 	Name:      "define",
-	Usage:     "create a new workload type",
-	ArgsUsage: "WORKLOAD_TYPE PROFILE_NAME PROFILE_FILE",
+	Usage:     "create a new application profile",
+	ArgsUsage: "[service_type] [application_name] [scenario_name] [profile_path]",
 	Description: func() string {
 		desc := `
-	 create a new workload type which can not be already exist, for example
-	 below, create a new WORKLOAD_TYPE with name test_type, PROFILE_NAME with
-	 test_name, PROFILE_FILE with ./example.conf.
-	      example: atune-adm define test_type test_name ./example.conf
+	 create a new application profile which can not be already exist, for example
+	 below, create a new service_type with test_service, application_name with
+	 test_app, scenario_name with test_scenario, profile_path with ./example.conf.
+	      example: atune-adm define test_service test_app test_scenario ./example.conf
 	`
 		return desc
 	}(),
@@ -59,11 +59,11 @@ func newProfileDefine(ctx *cli.Context, opts ...interface{}) (interface{}, error
 }
 
 func profileDefineCheck(ctx *cli.Context) error {
-	if err := utils.CheckArgs(ctx, 3, utils.ConstExactArgs); err != nil {
+	if err := utils.CheckArgs(ctx, 4, utils.ConstExactArgs); err != nil {
 		return err
 	}
 
-	file := ctx.Args().Get(2)
+	file := ctx.Args().Get(3)
 	if !utils.IsInputStringValid(file) {
 		return fmt.Errorf("input:%s is invalid", file)
 	}
@@ -88,17 +88,20 @@ func profileDefined(ctx *cli.Context) error {
 	if err := profileDefineCheck(ctx); err != nil {
 		return err
 	}
-	workloadType := ctx.Args().Get(0)
-	if !utils.IsInputStringValid(workloadType) {
-		return fmt.Errorf("input:%s is invalid", workloadType)
+	serviceType := ctx.Args().Get(0)
+	if !utils.IsInputStringValid(serviceType) {
+		return fmt.Errorf("input:%s is invalid", serviceType)
+	}
+	applicationName := ctx.Args().Get(1)
+	if !utils.IsInputStringValid(applicationName) {
+		return fmt.Errorf("input:%s is invalid", applicationName)
+	}
+	scenarioName := ctx.Args().Get(2)
+	if !utils.IsInputStringValid(scenarioName) {
+		return fmt.Errorf("input:%s is invalid", scenarioName)
 	}
 
-	profileName := ctx.Args().Get(1)
-	if !utils.IsInputStringValid(profileName) {
-		return fmt.Errorf("input:%s is invalid", profileName)
-	}
-
-	data, err := ioutil.ReadFile(ctx.Args().Get(2))
+	data, err := ioutil.ReadFile(ctx.Args().Get(3))
 	if err != nil {
 		return err
 	}
@@ -111,9 +114,10 @@ func profileDefined(ctx *cli.Context) error {
 
 	svc := PB.NewProfileMgrClient(c.Connection())
 	reply, err := svc.Define(CTX.Background(), &PB.DefineMessage{
-		WorkloadType: workloadType,
-		ProfileName:  profileName,
-		Content:      data})
+		ServiceType:     serviceType,
+		ApplicationName: applicationName,
+		ScenarioName:    scenarioName,
+		Content:         data})
 	if err != nil {
 		return err
 	}
@@ -121,6 +125,6 @@ func profileDefined(ctx *cli.Context) error {
 		fmt.Println(reply.GetStatus())
 		return nil
 	}
-	fmt.Println("define a new workload type success")
+	fmt.Println("define a new application profile success")
 	return nil
 }

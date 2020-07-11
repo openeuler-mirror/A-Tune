@@ -21,7 +21,6 @@ import (
 	"atune/common/registry"
 	"atune/common/sqlstore"
 	"atune/common/utils"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -98,17 +97,19 @@ func (m *Monitor) Run() error {
 
 func activeProfile() error {
 	// Load Current Active Profile
-	profiles := &sqlstore.GetClass{Active: true}
-	err := sqlstore.GetClasses(profiles)
+	profileLogs, err := sqlstore.GetProfileLogs()
 	if err != nil {
 		return err
 	}
-	if len(profiles.Result) != 1 {
-		return fmt.Errorf("no active profile or more than 1 active profile")
+
+	if len(profileLogs) != 1 {
+		log.Warnln("no active profile or more than 1 active profile")
+		return nil
 	}
 
-	profileType := profiles.Result[0].Class
-	pro, _ := profile.LoadFromWorkloadType(profileType)
+	profileNames := strings.Split(profileLogs[0].ProfileID, ",")
+
+	pro, _ := profile.Load(profileNames)
 	if err = pro.RollbackActive(nil); err != nil {
 		return err
 	}

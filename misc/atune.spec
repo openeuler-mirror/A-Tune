@@ -70,17 +70,19 @@ cp -rf %{name} ../../A-Tune
 %attr(0750,root,root) %{_bindir}/atuned
 %attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
+%attr(0640,root,root) /usr/lib/atuned/profiles/*
 %exclude /usr/libexec/atuned/analysis/models/
 %attr(0750,root,root) /usr/libexec/atuned/collector/*
 %attr(0750,root,root) %dir /usr/lib/atuned
 %attr(0750,root,root) %dir /usr/lib/atuned/modules
+%attr(0640,root,root) %dir /usr/lib/atuned/profiles
 %attr(0750,root,root) %dir /usr/libexec/atuned
 %attr(0750,root,root) %dir /usr/libexec/atuned/scripts
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/libexec/atuned/collector
 %attr(0750,root,root) %dir /usr/share/atuned
-%attr(0750,root,root) %dir /etc/atuned
-%attr(0750,root,root) /etc/atuned/*
+%attr(0640,root,root) %dir /etc/atuned
+%attr(0640,root,root) /etc/atuned/*
 
 %files client
 %attr(0750,root,root) %{_bindir}/atune-adm
