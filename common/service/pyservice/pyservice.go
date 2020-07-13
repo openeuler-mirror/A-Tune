@@ -52,6 +52,7 @@ func (p *PyEngine) Run() error {
 	cmdSlice = append(cmdSlice, "python3")
 	cmdSlice = append(cmdSlice, path.Join(config.DefaultAnalysisPath, "app.py"))
 	cmdSlice = append(cmdSlice, path.Join(config.DefaultConfPath, "atuned.cnf"))
+	cmdSlice = append(cmdSlice, "rest")
 
 	cmdStr := strings.Join(cmdSlice, " ")
 	cmd := exec.Command("sh", "-c", cmdStr)

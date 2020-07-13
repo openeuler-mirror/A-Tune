@@ -63,7 +63,6 @@ const (
 // python service url
 const (
 	Protocol   string = "http"
-	LocalHost  string = "localhost"
 	APIVersion string = "v1"
 
 	ConfiguratorURI   string = "setting"
@@ -100,7 +99,10 @@ var (
 	Address           string
 	Connect           string
 	Port              string
+	LocalHost         string
 	RestPort          string
+	OptHost           string
+	OptPort           string
 	TLS               bool
 	TLSServerCertFile string
 	TLSServerKeyFile  string
@@ -143,7 +145,12 @@ func (c *Cfg) Load() error {
 	Address = section.Key("address").MustString(DefaultTgtAddr)
 	Connect = section.Key("connect").MustString("")
 	Port = section.Key("port").MustString(DefaultTgtPort)
+	LocalHost = section.Key("rest_host").MustString("localhost")
 	RestPort = section.Key("rest_port").MustString("8383")
+	OptHost = section.Key("opt_host").MustString("localhost")
+	OptPort = section.Key("opt_port").MustString("3838")
+	utils.RestHost = LocalHost
+	utils.RestPort = RestPort
 	TLS = section.Key("tls").MustBool(false)
 
 	if TLS {
@@ -184,6 +191,21 @@ func GetURL(uri string) string {
 	if TLS {
 		protocol = "https"
 	}
+	if IsOptPort(uri) {
+		return fmt.Sprintf("%s://%s:%s/%s/%s", protocol, OptHost, OptPort, APIVersion, uri)
+	}
+
 	url := fmt.Sprintf("%s://%s:%s/%s/%s", protocol, LocalHost, RestPort, APIVersion, uri)
 	return url
+}
+
+// IsOptPort return true if using opt port and host
+func IsOptPort(uri string) bool {
+	if strings.EqualFold(uri, OptimizerURI) {
+		return true
+	}
+	if strings.EqualFold(uri, ClassificationURI) {
+		return true
+	}
+	return false
 }

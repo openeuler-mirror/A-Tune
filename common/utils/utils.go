@@ -17,6 +17,7 @@ import (
 	PB "atune/api/profile"
 	"bufio"
 	"encoding/xml"
+	"encoding/csv"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -80,6 +81,9 @@ const (
 	FilePerm    os.FileMode	= 0600
 	MaxFileSize int64	= 100 * 1024 * 1024
 )
+
+var RestHost = "localhost"
+var RestPort = "8383"
 
 // CheckArgs method check command args num
 func CheckArgs(context *cli.Context, expected, checkType int) error {
@@ -249,10 +253,10 @@ func RemoveDuplicateElement(message []string) []string {
 }
 
 // WaitForPyservice method waiting for pyEngine service start success
-func WaitForPyservice(address string, port string) error {
+func WaitForPyservice() error {
 	ticker := time.NewTicker(time.Second * period)
 	timeout := time.After(time.Second * timeout)
-	addr := address + ":" + port
+	addr := RestHost + ":" + RestPort
 	for {
 		select {
 		case <-ticker.C:
@@ -383,4 +387,27 @@ func ReadAllFile(path string) string {
 		return ""
 	}
 	return string(content)
+}
+
+// read data from test.csv
+func ReadCSV(path string) ([][]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	lines, err := csv.NewReader(file).ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	data := make([][]string, len(lines))
+	for _, line := range lines {
+		if len(line) > 0 {
+			data = append(data, line)
+		}
+	}
+
+	return data, nil
 }

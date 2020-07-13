@@ -70,9 +70,9 @@ type RespCollectorPost struct {
 
 // ClassifyPostBody : the body send to classify service
 type ClassifyPostBody struct {
-	Data      string `json:"data"`
-	ModelPath string `json:"modelpath,omitempty"`
-	Model     string `json:"model,omitempty"`
+	Data      [][]string `json:"data"`
+	ModelPath string     `json:"modelpath,omitempty"`
+	Model     string     `json:"model,omitempty"`
 }
 
 // RespClassify : the response of classify model
@@ -388,9 +388,16 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		return err
 	}
 
+	data, err := utils.ReadCSV(respCollectPost.Path)
+	if err != nil {
+		log.Errorf("Failed to read data from CSV: %v", err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		return err
+	}
+
 	//2. send the collected data to the model for completion type identification
 	body := new(ClassifyPostBody)
-	body.Data = respCollectPost.Path
+	body.Data = data
 	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
 	if message.GetModel() != "" {
@@ -953,9 +960,16 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 		return err
 	}
 
+	data, err := utils.ReadCSV(respCollectPost.Path)
+	if err != nil {
+		log.Errorf("Failed to read data from CSV: %v", err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		return err
+	}
+
 	//2. send the collected data to the model for completion type identification
 	body := new(ClassifyPostBody)
-	body.Data = respCollectPost.Path
+	body.Data = data
 	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
 	respPostIns, err := body.Post()
