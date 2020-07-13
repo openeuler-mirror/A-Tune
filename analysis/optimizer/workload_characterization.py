@@ -18,15 +18,17 @@ This class is used to train models and characterize system workload.
 import os
 import glob
 from collections import Counter
+import numpy as np
 import pandas as pd
-from xgboost import XGBClassifier
 from sklearn import svm
-from sklearn.cluster import KMeans
 from sklearn.externals import joblib
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import train_test_split as tts
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.utils import class_weight
+from xgboost import XGBClassifier
 
 
 class WorkloadCharacterization:
@@ -35,12 +37,11 @@ class WorkloadCharacterization:
     def __init__(self, model_path):
         self.model_path = model_path
         self.scaler = StandardScaler()
-        self.encoder = LabelEncoder()
+        self.tencoder = LabelEncoder()
+        self.aencoder = LabelEncoder()
         self.dataset = None
-        self.x_axis = None
-        self.y_axis = None
 
-    def parsing(self, data_path):
+    def parsing(self, data_path, header=0, analysis=False):
         """
         parse the data from csv
         :param data_path:  the path of csv
@@ -49,279 +50,223 @@ class WorkloadCharacterization:
         df_content = []
         csvfiles = glob.glob(data_path)
         for csv in csvfiles:
-            data = pd.read_csv(csv, index_col=None, header=None)
+            data = pd.read_csv(csv, index_col=None, header=header)
             df_content.append(data)
-            dataset = pd.concat(df_content)
+            dataset = pd.concat(df_content, sort=False)
         self.dataset = dataset
+        if analysis:
+            status_content = []
+            for app, group in self.dataset.groupby('workload.appname'):
+                status = group.describe()
+                status['index'] = app
+                status_content.append(status)
+                total_status = pd.concat(status_content, sort=False)
+            total_status.to_csv('datastatics.csv')
         return dataset
 
-    def clustering(self, data_path):
+    def feature_selection(self, x_axis, y_axis, clfpath=None):
         """
-        clustering for the data from csv
-        :param data_path:  the path of csv
+        feature selection for classifiers
+        :param x_axis, y_axis:  orginal input and output data
+        :returns selected_x:  selected input data
         """
-        complete_path = os.path.join(data_path, "*.csv")
-        self.parsing(complete_path)
-        dataset = self.dataset.drop([28, 41, 42, 43, 44, 57, 58], axis=1)
-        cpu_util = pd.concat([dataset.iloc[:, 8], dataset.iloc[:, 45]], axis=1, join='inner')
-        io_util = pd.concat([dataset.iloc[:, 3], dataset.iloc[:, 19]], axis=1, join='inner')
-        net_util = dataset.iloc[:, 25]
-        mem_total = dataset.iloc[:, 29]
+        x_scaled = StandardScaler().fit_transform(x_axis)
+        x_train, x_test, y_train, y_test = tts(x_scaled, y_axis, test_size=0.3)
+        model = RandomForestClassifier(n_estimators=500, random_state=0)
+        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
+        class_weights = dict(zip(np.unique(y_train), weights))
+        w_array = np.ones(y_train.shape[0], dtype='float')
+        for i, val in enumerate(y_train):
+            w_array[i] = class_weights[val]
+        model.fit(x_train, y_train, sample_weight=w_array)
+        y_pred = model.predict(x_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        print("the accuracy of current model is %f" % accuracy)
+        importances = model.feature_importances_.tolist()
+        features = self.dataset.iloc[:, :-2].columns.tolist()
+        featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
 
-        cpu = KMeans(n_clusters=2).fit(cpu_util)
-        joblib.dump(cpu, os.path.join(self.model_path, 'cpu_clu.m'))
-        dataset.insert(0, 'cpu', cpu.predict(cpu_util))
+        thresholds = sorted(set(importances), reverse=True)
+        for thresh in thresholds:
+            smodel = SelectFromModel(model, threshold=thresh, prefit=True)
+            x_selected = smodel.transform(x_train)
+            xt_selected = smodel.transform(x_test)
 
-        io_data = KMeans(n_clusters=2).fit(io_util)
-        joblib.dump(io_data, os.path.join(self.model_path, 'io_clu.m'))
-        dataset.insert(1, 'io', io_data.predict(io_util))
+            feature_model = RandomForestClassifier(n_estimators=500, random_state=0)
+            feature_model.fit(x_selected, y_train, sample_weight=w_array)
+            y_pred = feature_model.predict(xt_selected)
+            print("Current threshold value:%.2f, number of selected features: %d, "
+                  "model accuracy:%.4f"
+                  % (thresh, x_selected.shape[1], accuracy_score(y_test, y_pred)))
+            if accuracy_score(y_test, y_pred) >= accuracy:
+                feature_result = featureimportance[0:x_selected.shape[1]]
+                print("The result of feature selection is:", feature_result)
+                label = [result[0] for result in feature_result]
+                selected_x = pd.DataFrame(x_axis, columns=label)
+                if clfpath is not None:
+                    joblib.dump(smodel, clfpath)
+                return selected_x
+        return x_axis
 
-        net_data = [[x] for x in net_util]
-        net = KMeans(n_clusters=2).fit(net_data)
-        joblib.dump(net, os.path.join(self.model_path, 'net_clu.m'))
-        dataset.insert(2, 'net', net.predict(net_data))
-
-        mem_data = [[x] for x in mem_total]
-        mem = KMeans(n_clusters=2).fit(mem_data)
-        joblib.dump(mem, os.path.join(self.model_path, 'mem_clu.m'))
-        dataset.insert(3, 'mem', mem.predict(mem_data))
-
-        dataset['cpu'] = dataset['cpu'].map(str)
-        dataset['io'] = dataset['io'].map(str)
-        dataset['net'] = dataset['net'].map(str)
-        dataset['mem'] = dataset['mem'].map(str)
-        result = dataset['cpu'].str.cat(dataset['io'])
-        result = result.str.cat(dataset['net'])
-        result = result.str.cat(dataset['mem'])
-        dataset.insert(0, 'label', result)
-        dataset.to_csv('clusteringresult.csv')
-
-    def labelling(self, data):
-        """
-        labelling the data from csv
-        :param data:  the data
-        """
-        cpu = joblib.load(os.path.join(self.model_path, 'cpu_clu.m'))
-        io_data = joblib.load(os.path.join(self.model_path, 'io_clu.m'))
-        net = joblib.load(os.path.join(self.model_path, 'net_clu.m'))
-        mem = joblib.load(os.path.join(self.model_path, 'mem_clu.m'))
-
-        data = pd.DataFrame(data)
-
-        cpu_util = pd.concat([data.iloc[:, 8], data.iloc[:, 45]], axis=1, join='inner')
-        io_util = pd.concat([data.iloc[:, 3], data.iloc[:, 19]], axis=1, join='inner')
-        net_util = [[x] for x in data.iloc[:, 25]]
-        mem_total = [[x] for x in data.iloc[:, 29]]
-
-        cpred = Counter(cpu.predict(cpu_util)).most_common(1)[0]
-        ipred = Counter(io_data.predict(io_util)).most_common(1)[0]
-        npred = Counter(net.predict(net_util)).most_common(1)[0]
-        mpred = Counter(mem.predict(mem_total)).most_common(1)[0]
-
-        print("The clustering result is", cpred[0], ipred[0], npred[0], mpred[0])
-        print("The accuracy of the label prediction are ", cpred[1] / len(data),
-              ipred[1] / len(data), npred[1] / len(data), mpred[1] / len(data))
-        return [cpred[0], ipred[0], npred[0], mpred[0]]
-
-    def svm_clf(self, clfpath, kernel):
+    @staticmethod
+    def svm_clf(x_axis, y_axis, clfpath=None, kernel='rbf'):
         """
         svm_clf: support vector machine classifier
         """
-        x_train, x_test, y_train, y_test = tts(self.x_axis, self.y_axis, test_size=0.3)
+        x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.5)
 
-        rbf = svm.SVC(kernel=kernel, C=200)
+        rbf = svm.SVC(kernel=kernel, C=100, class_weight='balanced', gamma='auto')
         rbf.fit(x_train, y_train)
         rbf_score = rbf.score(x_test, y_test)
-        print("the accuracy of rbf classification is %f" % rbf_score)
-        joblib.dump(rbf, clfpath)
+        print("the accuracy of svc is %f" % rbf_score)
+        if clfpath is not None:
+            joblib.dump(rbf, clfpath)
+        return rbf
 
-    def ada_clf(self, clfpath):
+    @staticmethod
+    def rf_clf(x_axis, y_axis, clfpath=None):
         """
         ada_clf: Adaptive Boosting classifier
         """
-        x_train, x_test, y_train, y_test = tts(self.x_axis, self.y_axis, test_size=0.3)
-        adaboost = AdaBoostClassifier(n_estimators=1000, learning_rate=0.05)
-        adaboost.fit(x_train, y_train)
-        adaboost_score = adaboost.score(x_test, y_test)
-        print("the accuracy of adaboost is %f" % adaboost_score)
-        print("the feature importances of this classifier are", adaboost.feature_importances_)
-        joblib.dump(adaboost, clfpath)
+        x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
+        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
+        class_weights = dict(zip(np.unique(y_train), weights))
+        w_array = np.ones(y_train.shape[0], dtype='float')
+        for i, val in enumerate(y_train):
+            w_array[i] = class_weights[val]
+        model = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=0)
+        model.fit(x_train, y_train, sample_weight=w_array)
+        y_pred = model.predict(x_test)
+        print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
+        if clfpath is not None:
+            joblib.dump(model, clfpath)
+        return model
 
-    def xgb_clf(self, clfpath):
+    @staticmethod
+    def xgb_clf(x_axis, y_axis, clfpath=None):
         """
-        xgb_clf: XGBoost classifier
+        XGb_clf: XGBoost classifier
         """
-        x_train, x_test, y_train, y_test = tts(self.x_axis, self.y_axis, test_size=0.3)
+        x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
+        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
+        class_weights = dict(zip(np.unique(y_train), weights))
+        w_array = np.ones(y_train.shape[0], dtype='float')
+        for i, val in enumerate(y_train):
+            w_array[i] = class_weights[val]
         model = XGBClassifier(learning_rate=0.1, n_estimators=400, max_depth=6,
                               min_child_weight=0.5, gamma=0.01, subsample=1, colsample_btree=1,
                               scale_pos_weight=1, random_state=27, slient=0, alpha=100)
-        model.fit(x_train, y_train)
+        model.fit(x_train, y_train, sample_weight=w_array)
         y_pred = model.predict(x_test)
-        print("the accuracy of xgboost is %f" % accuracy_score(y_test, y_pred))
-        print("the feature importances of this classifier are", model.feature_importances_)
-        joblib.dump(model, clfpath)
+        print("the accuracy of xgboost classifier is %f" % accuracy_score(y_test, y_pred))
+        if clfpath is not None:
+            joblib.dump(model, clfpath)
+        return model
 
-    def train(self, data_path):
+    def train(self, data_path, feature_selection=False):
         """
         train the data from csv
         :param data:  the data path
         """
-        self.parsing(os.path.join(data_path, "*.csv"))
-        self.y_axis = self.encoder.fit_transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.encoder, os.path.join(self.model_path, "encoder.pkl"))
+        tencoder_path = os.path.join(self.model_path, "tencoder.pkl")
+        aencoder_path = os.path.join(self.model_path, "aencoder.pkl")
+        scaler_path = os.path.join(self.model_path, "scaler.pkl")
+        data_path = os.path.join(data_path, "*.csv")
 
-        self.parsing(os.path.join(data_path, "*0100.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "io_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "io_clf.m"), 'sigmoid')
+        type_clf = os.path.join(self.model_path, "total_clf.m")
+        type_feature = os.path.join(self.model_path, "total_feature.m")
 
-        self.parsing(os.path.join(data_path, "*0010.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "net_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "net_clf.m"), 'sigmoid')
+        self.parsing(data_path)
 
-        self.parsing(os.path.join(data_path, "*1000.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpu_scaler.pkl"))
-        self.xgb_clf(os.path.join(self.model_path, "cpu_clf.m"))
+        x_type = self.dataset.iloc[:, :-2]
+        self.scaler.fit(x_type)
+        y_type = self.tencoder.fit_transform(self.dataset.iloc[:, -2])
+        y_app = self.aencoder.fit_transform(self.dataset.iloc[:, -1])
+        joblib.dump(self.tencoder, tencoder_path)
+        joblib.dump(self.aencoder, aencoder_path)
+        joblib.dump(self.scaler, scaler_path)
 
-        self.parsing(os.path.join(data_path, "*1001.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpumem_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "cpumem_clf.m"), 'rbf')
+        if feature_selection:
+            selected_x = StandardScaler().fit_transform(
+                self.feature_selection(x_type, y_type, type_feature))
+        else:
+            selected_x = StandardScaler().fit_transform(x_type)
+        self.rf_clf(selected_x, y_type, clfpath=type_clf)
+        print("The overall classifier has been generated.")
 
-        self.parsing(os.path.join(data_path, "*1100.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpuio_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "cpuio_clf.m"), 'rbf')
+        for workload, group in self.dataset.groupby('workload.type'):
+            x_app = group.iloc[:, :-2]
+            y_app = self.aencoder.transform(group.iloc[:, -1])
 
-        self.parsing(os.path.join(data_path, "*1010.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpunet_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "cpunet_clf.m"), 'rbf')
+            clf_name = workload + "_clf.m"
+            feature_name = workload + "_feature.m"
+            clf_path = os.path.join(self.model_path, clf_name)
+            feature_path = os.path.join(self.model_path, feature_name)
 
-        self.parsing(os.path.join(data_path, "*1101.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpuiomem_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "cpuiomem_clf.m"), 'rbf')
+            if feature_selection:
+                selected_x = StandardScaler().fit_transform(
+                    self.feature_selection(x_app, y_app, feature_path))
+            else:
+                selected_x = StandardScaler().fit_transform(x_app)
+            self.rf_clf(selected_x, y_app, clf_path)
+            print("The application classifiers have been generated.")
 
-        self.parsing(os.path.join(data_path, "*1011.csv"))
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.transform(self.dataset.iloc[:, -1])
-        joblib.dump(self.scaler, os.path.join(self.model_path, "cpunetmem_scaler.pkl"))
-        self.svm_clf(os.path.join(self.model_path, "cpunetmem_clf.m"), 'rbf')
-
-    def identify(self, data):
+    def identify(self, data, feature_selection=False):
         """
         identify the workload_type according to input data
         :param data:  input data
         """
         data = pd.DataFrame(data)
-        data = data.drop([28, 41, 42, 43, 44, 57, 58], axis=1)
-        label = self.labelling(data)
+        tencoder_path = os.path.join(self.model_path, "tencoder.pkl")
+        aencoder_path = os.path.join(self.model_path, "aencoder.pkl")
+        scaler_path = os.path.join(self.model_path, "scaler.pkl")
 
-        encoder_path = os.path.join(self.model_path, 'encoder.pkl')
+        type_path = os.path.join(self.model_path, "total_clf.m")
+        df_path = os.path.join(self.model_path, "default_clf.m")
+        tp_path = os.path.join(self.model_path, "throughput_performance_clf.m")
 
-        io_scaler = os.path.join(self.model_path, 'io_scaler.pkl')
-        net_scaler = os.path.join(self.model_path, 'net_scaler.pkl')
-        cpu_scaler = os.path.join(self.model_path, 'cpu_scaler.pkl')
-        cpuio_scaler = os.path.join(self.model_path, 'cpuio_scaler.pkl')
-        cpuiomem_scaler = os.path.join(self.model_path, 'cpuiomem_scaler.pkl')
-        cpunet_scaler = os.path.join(self.model_path, 'cpunet_scaler.pkl')
-        cpumem_scaler = os.path.join(self.model_path, 'cpumem_scaler.pkl')
-        cpunetmem_scaler = os.path.join(self.model_path, 'cpunetmem_scaler.pkl')
+        self.scaler = joblib.load(scaler_path)
+        self.tencoder = joblib.load(tencoder_path)
+        self.aencoder = joblib.load(aencoder_path)
 
-        io_clf = os.path.join(self.model_path, 'io_clf.m')
-        net_clf = os.path.join(self.model_path, 'net_clf.m')
-        cpu_clf = os.path.join(self.model_path, 'cpu_clf.m')
-        cpumem_clf = os.path.join(self.model_path, 'cpumem_clf.m')
-        cpuio_clf = os.path.join(self.model_path, 'cpuio_clf.m')
-        cpunet_clf = os.path.join(self.model_path, 'cpunet_clf.m')
-        cpuiomem_clf = os.path.join(self.model_path, 'cpuiomem_clf.m')
-        cpunetmem_clf = os.path.join(self.model_path, 'cpunetmem_clf.m')
+        type_clf = joblib.load(type_path)
+        df_clf = joblib.load(df_path)
+        tp_clf = joblib.load(tp_path)
 
-        if label == [0, 0, 0, 0]:
-            resourcelimit = " "
-            print("The workload has been identified as non-intensive type")
-            return resourcelimit, "default", 1
-        if label == [0, 0, 0, 1]:
-            resourcelimit = "memory"
-            print("The workload has been identified as mem-intensive type")
-            return resourcelimit, "in-memory_computing", 1
-        if label == [0, 0, 1, 0]:
-            resourcelimit = "network"
-            scaler = joblib.load(net_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as network-intensive type")
-            model = joblib.load(net_clf)
-            result = model.predict(data)
-        elif label == [0, 1, 0, 0]:
-            resourcelimit = "io"
-            scaler = joblib.load(io_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as io-intensive type")
-            model = joblib.load(io_clf)
-            result = model.predict(data)
-        elif label == [1, 0, 0, 0]:
-            resourcelimit = "cpu"
-            scaler = joblib.load(cpu_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-intensive type")
-            model = joblib.load(cpu_clf)
-            result = model.predict(data)
-        elif label == [1, 0, 0, 1]:
-            resourcelimit = "cpu,memory"
-            scaler = joblib.load(cpumem_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-mem-intensive type")
-            model = joblib.load(cpumem_clf)
-            result = model.predict(data)
-        elif label == [1, 0, 1, 0]:
-            resourcelimit = "cpu,network"
-            scaler = joblib.load(cpunet_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-net-intensive type")
-            model = joblib.load(cpunet_clf)
-            result = model.predict(data)
-        elif label == [1, 0, 1, 1]:
-            resourcelimit = "cpu,network,memory"
-            scaler = joblib.load(cpunetmem_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-net-mem-intensive type")
-            model = joblib.load(cpunetmem_clf)
-            result = model.predict(data)
-        elif label == [1, 1, 0, 0]:
-            resourcelimit = "cpu,io"
-            scaler = joblib.load(cpuio_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-io-intensive type")
-            model = joblib.load(cpuio_clf)
-            result = model.predict(data)
-        elif label == [1, 1, 0, 1]:
-            resourcelimit = "cpu,io,memory"
-            scaler = joblib.load(cpuiomem_scaler)
-            data = scaler.transform(data)
-            print("The workload has been identified as cpu-io-mem-intensive type")
-            model = joblib.load(cpuiomem_clf)
-            result = model.predict(data)
-        elif label == [1, 1, 1, 1]:
-            resourcelimit = "cpu,io,network,memory"
-            print("The workload has been identified as cpu-io-net-mem-intensive type")
-            return resourcelimit, "big_database", 1
+        if feature_selection:
+            feature_path = os.path.join(self.model_path, "total_feature.m")
+            df_feature = os.path.join(self.model_path, "default_feature.m")
+            tp_feature = os.path.join(self.model_path, "throughput_performance_feature.m")
+
+            type_feat = joblib.load(feature_path)
+            df_feat = joblib.load(df_feature)
+            tp_feat = joblib.load(tp_feature)
+
+        data = self.scaler.transform(data)
+        if feature_selection:
+            df_data = df_feat.transform(data)
+            tp_data = tp_feat.transform(data)
+            data = type_feat.transform(data)
+        workload = type_clf.predict(data)
+        workload = self.tencoder.inverse_transform(workload)
+        print("Current workload:", workload)
+        prediction = Counter(workload).most_common(1)[0]
+        confidence = prediction[1] / len(workload)
+        if confidence < 0.5:
+            resourcelimit = 'default'
+            return resourcelimit, "default", confidence
+        if prediction[0] == 'throughput_performance':
+            resourcelimit = "throughput"
+            if feature_selection:
+                data = tp_data
+            result = tp_clf.predict(data)
         else:
-            resourcelimit = ""
-            print("Error: Unsupported classifier type")
-            return resourcelimit, "default", 0
+            resourcelimit = "default"
+            if feature_selection:
+                data = df_data
+            result = df_clf.predict(data)
 
-        encoder = joblib.load(encoder_path)
-        result = encoder.inverse_transform(result)
+        result = self.aencoder.inverse_transform(result)
         print(result)
         prediction = Counter(result).most_common(1)[0]
         confidence = prediction[1] / len(result)
@@ -340,16 +285,16 @@ class WorkloadCharacterization:
         encodername = modelname + '_encoder.pkl'
 
         data_path = os.path.join(data_path, "*.csv")
-        self.parsing(data_path)
-        self.x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
-        self.y_axis = self.encoder.fit_transform(self.dataset.iloc[:, -1])
+        self.parsing(data_path, header=None)
+        x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
+        y_axis = self.aencoder.fit_transform(self.dataset.iloc[:, -1])
         joblib.dump(self.scaler, os.path.join(dirname, scalername))
-        joblib.dump(self.encoder, os.path.join(dirname, encodername))
+        joblib.dump(self.aencoder, os.path.join(dirname, encodername))
 
-        class_num = len(self.encoder.classes_)
+        class_num = len(self.aencoder.classes_)
         if class_num == 1:
-            self.y_axis[-1] = self.y_axis[-1] + 1
-        self.svm_clf(custom_path, 'rbf')
+            y_axis[-1] = y_axis[-1] + 1
+        self.svm_clf(x_axis, y_axis, custom_path)
 
     @staticmethod
     def reidentify(data, custom_path):

@@ -103,7 +103,8 @@ class CpuStat(Monitor):
                    "guest": 9,
                    "gnice": 10,
                    "idle": 11,
-                   "cutil": 12}
+                   "util": 12,
+                   "cutil": 13}
 
         keys = []
         cpu = -1  # -1 means all
@@ -161,13 +162,13 @@ class CpuStat(Monitor):
             cutil_sum = 0
             cutil_num = 0
             for i in range(1, len(stats)):
-                if float(stats[i][keyword["cutil"]]) > threshold:
-                    cutil_sum += float(stats[i][keyword["cutil"]])
+                if float(stats[i][keyword["util"]]) > threshold:
+                    cutil_sum += float(stats[i][keyword["util"]])
                     cutil_num += 1
             if cutil_num == 0:
-                stats[0][keyword["cutil"]] = "{:.2f}".format(cutil_sum)
+                stats[0].append("{:.2f}".format(cutil_sum))
             else:
-                stats[0][keyword["cutil"]] = "{:.2f}".format(cutil_sum / cutil_num)
+                stats[0].append("{:.2f}".format(cutil_sum / cutil_num))
 
         for i in keys:
             ret = ret + " " + stats[cpu + 1][i]

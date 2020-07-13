@@ -84,6 +84,8 @@ def get_theory_memory_bandwidth():
     for dimm in info["memorys"][0]["children"]:
         if dimm.get("size") is None:
             continue
+        if dimm.get("vendor") == "QEMU":
+            continue
         locator = memtopo.table_get_locator(dimm["slot"])
         if dimms[locator[0]][locator[1]] == 0:
             dimms[locator[0]][locator[1]] = dimm["width"] * \
