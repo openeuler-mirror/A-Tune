@@ -18,7 +18,9 @@ import (
 	"atune/common/log"
 	"atune/common/sqlstore"
 	"fmt"
+	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -176,7 +178,6 @@ func LoadFromWorkloadType(workloadType string) (Profile, bool) {
 	profileNames := strings.Split(profileType, ",")
 
 	pro, exist := Load(profileNames)
-	pro.name = workloadType
 	return pro, exist
 }
 
@@ -208,22 +209,35 @@ func Load(profileNames []string) (Profile, bool) {
 	cfg, _ := ini.Load(defaultConfigFile)
 	finalProfile.inputs = cfg.Section("system")
 
+	finalProfile.name = strings.Join(profileNames, ",")
 	return finalProfile, true
 }
 
 func loadConfigData(name string) (*ini.File, error) {
-	context, err := sqlstore.GetContext(name)
+	var config *ini.File
+
+	err := filepath.Walk(CONF.DefaultProfilePath, func(absPath string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			absFilename := absPath[len(CONF.DefaultProfilePath)+1:]
+			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
+				path.Ext(info.Name()))
+			if filenameOnly == name {
+				config, err = ini.Load(absPath)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+		return nil
+	})
+
 	if err != nil {
-		fmt.Println("Canot find profile ", name)
 		return nil, err
 	}
-
-	config, err := ini.Load([]byte(context))
-	if err != nil {
-		fmt.Println("Failure to load context", name)
-		return nil, err
+	if config == nil {
+		return nil, fmt.Errorf("% profile is not found!")
 	}
-
 	dirName := CONF.DefaultScriptPath
 	for _, section := range config.Sections() {
 		if section.Name() == "script" {

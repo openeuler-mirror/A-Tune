@@ -12,7 +12,7 @@
 
 function perf_cpu () {
 	
-	if dmidecode -t processor | grep -q -E 'Kunpeng|Hisilicon' ; then
+	if dmidecode -t processor | grep -q -E 'Kunpeng|Hisilicon|QEMU' ; then
 		L1DCA='r0004'
 		L1DCM='r0003'
 		L1ICA='r0014'
@@ -78,6 +78,18 @@ function perf_cpu () {
 		if(tcurr != tpre)
 		{
 			#printf("%1.3f %10.2f%% %10.2f %10.2f%% %10.2f%% %10.2f%% %10.2f%% %10.2f%% %10.2f%% %10.2f%% %10.2f%% %10.2f%%\n",insts/cycles,llcmiss/llcref*100,llcmiss/insts*1000, itlbmiss/itlbref*100,dtlbmiss/dtlbref*100,fetchbubbles/(4*cycles)*100,(decodedinsts-insts)/(4*cycles)*100,insts/(4*cycles)*100, (1-fetchbubbles/(4*cycles)-(decodedinsts-insts)/(4*cycles)-insts/(4*cycles))*100, (memstallload+memstallstore)/cycles*100, memstalll2miss/cycles*100, memstallstore/cycles*100);
+			if (insts == 0) {
+			  insts=-1
+			}
+			if (llcref == 0) {
+			  llcref=-1
+			}
+			if (itlbref == 0) {
+			  itlbref=-1
+			}
+			if (dtlbref == 0) {
+			  dtlbref=-1
+			}
 			printf("%1.3f %10.2f %10.2f%% %10.2f%% %10.2f%% %10.2f %10.2f %10.2f%% %10.2f%%\n",insts/cycles,llcmiss/insts*1000,llcmiss/llcref*100,itlbmiss/itlbref*100,dtlbmiss/dtlbref*100,stallbackend/insts, stallbackend/cycles, (memstallload+memstallstore)/cycles*100,memstallstore/cycles*100);
 
 			tpre=tcurr;

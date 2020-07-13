@@ -132,6 +132,9 @@ class MemBandwidth(Monitor):
                         raise err
                     continue
 
+        if self.__events == "":
+            return ""
+
         output = subprocess.check_output(
             "{cmd} {opt}".format(
                 cmd=self.__cmd,
@@ -152,6 +155,8 @@ class MemBandwidth(Monitor):
         dimms = [[0 for i in range(8)] for i in range(8)]
         for dimm in info["memorys"][0]["children"]:
             if dimm.get("size") is None:
+                continue
+            if dimm.get("vendor") == "QEMU":
                 continue
             locator = memtopo.table_get_locator(dimm["slot"])
             if dimms[locator[0]][locator[1]] == 0:
@@ -201,7 +206,8 @@ class MemBandwidth(Monitor):
                              self.__cnt["CPU1_Die1_R"] + self.__cnt["CPU1_Die1_W"]
         self.__cnt["Total"] = self.__cnt["CPU0"] + self.__cnt["CPU1"]
         self.__cnt["Total_Max"] = self.__cnt["CPU0_Max"] + self.__cnt["CPU1_Max"]
-        self.__cnt["Total_Util"] = self.__cnt["Total"] / self.__cnt["Total_Max"] * 100
+        self.__cnt["Total_Util"] = self.__cnt["Total"] / self.__cnt["Total_Max"] * 100 \
+            if self.__cnt["Total_Max"] != 0 else 0
 
     def decode(self, info, para):
         """

@@ -12,7 +12,7 @@
 
 function perf_Mem_bw() {
 	
-  if dmidecode -t processor | grep -q -E 'Kunpeng|Hisilicon' ; then
+  if dmidecode -t processor | grep -q -E 'Kunpeng|Hisilicon|QEMU' ; then
 
     CPU0_Die0_BW_R="hisi_sccl1_ddrc0/flux_rd/,hisi_sccl1_ddrc1/flux_rd/,hisi_sccl1_ddrc2/flux_rd/,hisi_sccl1_ddrc3/flux_rd/"
     CPU0_Die0_BW_W="hisi_sccl1_ddrc0/flux_wr/,hisi_sccl1_ddrc1/flux_wr/,hisi_sccl1_ddrc2/flux_wr/,hisi_sccl1_ddrc3/flux_wr/"

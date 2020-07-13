@@ -30,7 +30,7 @@ class PerfStat(Monitor):
     _purpose = "STAT"
     _option = "-a -e cycles,instructions,branches,branch-misses,cache-misses,cache-references," \
               "dTLB-load-misses,dTLB-loads,iTLB-load-misses,iTLB-loads,stalled-cycles-backend," \
-              "r7004,r7005 --interval-print {int} --interval-count 1"
+              "r7004,r7005,migrations --interval-print {int} --interval-count 1"
 
     def __init__(self, user=None):
         Monitor.__init__(self, user)
@@ -60,7 +60,8 @@ class PerfStat(Monitor):
             "SBPI": 0,
             "SBPC": 0,
             "MEMORY-BOUND": 0,
-            "STORE-BOUND": 0}
+            "STORE-BOUND": 0,
+            "migrations": 0}
 
         help_info = "--fields="
         for stat in self.__stat:

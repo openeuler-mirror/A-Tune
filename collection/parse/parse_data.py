@@ -107,7 +107,7 @@ def generate_csv(input_dir, output_dir, **kwargs):
                 {
                     'name': 'mpstat',
                     'data_to_collect': ['%usr', '%nice', '%sys', '%iowait', '%irq', '%soft',
-                                        '%steal', '%guest', '%cutil'],
+                                        '%steal', '%guest', "%util", '%cutil'],
                     'threshold': 30.0,
                     'dev_list': 'all',
                     'alias': 'cpu'
@@ -132,26 +132,20 @@ def generate_csv(input_dir, output_dir, **kwargs):
                     'alias': 'sar-net_err'
                 },
                 {
-                    'name': 'meminfo',
-                    'data_to_collect': ['Util'],
-                    'alias': 'mem'
-                },
-                {
                     'name': 'perf-mem',
-                    'data_to_collect': ['MEM_Total', 'MEM_BW_Util'],
+                    'data_to_collect': ['MEM_BW_Util'],
                     'interval': kwargs.get('interval', 1),
                     'alias': 'perf-memBW',
                 },
                 {
                     'name': 'perf-cpu',
                     'data_to_collect': ['IPC', 'LLC', 'MPKI', 'ITLB', 'DTLB', 'StallBackend/Insts',
-                                        'StallBackend/cycles', 'Memory_Bound', 'Store_Bound'],
+                                        'StallBackend/cycles'],
                     'alias': 'perf-cpu',
                 },
                 {
                     'name': 'vmstat',
-                    'data_to_collect': ['b', 'swpd', 'free', 'buff', 'cache', 'bi', 'bo', 'in',
-                                        'cs', 'mem_sat', 'cpu_util', 'cpu_sat'],
+                    'data_to_collect': ['b', 'swpd', 'bo', 'in', 'cs', 'mem_sat', 'cpu_util', 'cpu_sat'],
                     'skip_first': True,
                     'alias': 'vmstat',
                 },
@@ -162,12 +156,12 @@ def generate_csv(input_dir, output_dir, **kwargs):
                 },
                 {
                     'name': 'sar',
-                    'data_to_collect': ['runq-sz', 'plist-sz', 'ldavg-1', 'ldavg-5', 'ldavg-15'],
+                    'data_to_collect': ['runq-sz', 'plist-sz', 'ldavg-1', 'ldavg-5'],
                     'alias': 'sar-load'
                 },
                 {
                     'name': 'sysctl',
-                    'data_to_collect': ['task-util', 'file-util'],
+                    'data_to_collect': ['file-util'],
                     'alias': 'sysctl'
                 }
             ]

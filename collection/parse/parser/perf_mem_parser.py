@@ -64,5 +64,6 @@ class PerfMemParser(base.Parser):
                           .format(self._raw_data_file, row_num))
                     break
                 data = dict(zip(attrs, line_data))
-                data["MEM_BW_Util"] = data["MEM_Total"] / self._mem_bw * 100
+                data["MEM_BW_Util"] = data["MEM_Total"] / self._mem_bw * 100 \
+                    if self._mem_bw != 0 else 0
                 yield [data[attr] for attr in self._data_to_collect]
