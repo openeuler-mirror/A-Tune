@@ -74,7 +74,7 @@ COLLECTOR_POST_PARSER.add_argument('pipe', required=True,
 
 CLASSIFICATION_POST_PARSER = reqparse.RequestParser()
 CLASSIFICATION_POST_PARSER.add_argument('modelpath', required=True, help="The modelfile to be used")
-CLASSIFICATION_POST_PARSER.add_argument('data', help="The data path to be used")
+CLASSIFICATION_POST_PARSER.add_argument('data', type=list, location='json', help="The data to be used")
 CLASSIFICATION_POST_PARSER.add_argument('model', help="The model self trained to be used")
 
 PROFILE_GET_PARSER = reqparse.RequestParser()

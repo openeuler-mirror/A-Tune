@@ -47,7 +47,7 @@ func (m *Monitor) Set(cfg *config.Cfg) {
 
 // Run method start the monitor service
 func (m *Monitor) Run() error {
-	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
+	if err := utils.WaitForPyservice(); err != nil {
 		log.Errorf("waiting for pyservice failed: %v", err)
 		return err
 	}

@@ -31,7 +31,14 @@ address = /var/run/atuned/atuned.sock
 
 # the rest service listening port, default is 8383
 # the port can be set between 0 to 65535 which not be used
+rest_host = localhost
 rest_port = 8383
+
+# the tuning optimizer host and port, start by opt.service
+# if opt_host is same as rest_host, two ports cannot be same
+# the port can be set between 0 to 65535 which not be used
+opt_host = localhost
+opt_port = 3838
 
 # when run analysis command, the numbers of collected data.
 # default is 20

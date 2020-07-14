@@ -32,7 +32,7 @@ LOGGER = logging.getLogger(__name__)
 class Classification(Resource):
     """restful api for classification, in order to provide the method of post"""
     model_path = "modelpath"
-    data_path = "data"
+    csv_data = "data"
     model = "model"
 
     @marshal_with_field(CLASSIFICATION_POST_FIELD)
@@ -42,11 +42,13 @@ class Classification(Resource):
         current_app.logger.info(args)
 
         model_path = args.get(self.model_path)
-        data_path = args.get(self.data_path)
         model = args.get(self.model, None)
-        data = utils.read_from_csv(data_path)
+        data = []
+        for each in args.get(self.csv_data):
+            if each is not None:
+                data.append(each)
         if not data:
-            abort("data path may be not exist")
+            abort("data may be not exist")
 
         classification = WorkloadCharacterization(model_path)
         resource_limit = ""

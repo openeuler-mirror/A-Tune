@@ -34,14 +34,6 @@ LOG.setLevel(logging.ERROR)
 APP = Flask(__name__)
 API = Api(APP)
 
-API.add_resource(configurator.Configurator, '/v1/setting', '/setting')
-API.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
-API.add_resource(optimizer.Optimizer, '/v1/optimizer', '/v1/optimizer/<string:task_id>')
-API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
-API.add_resource(classification.Classification, '/v1/classification', '/v1/classification')
-API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
-API.add_resource(train.Training, '/v1/training', '/v1/training')
-
 
 def config_log(level):
     """app config log"""
@@ -55,7 +47,7 @@ def config_log(level):
     root_logger.addHandler(syslog_handler)
 
 
-def main(filename):
+def main(filename, port):
     """app main function"""
     if not os.path.exists(filename):
         return
@@ -68,6 +60,16 @@ def main(filename):
                       SESSION_COOKIE_HTTPONLY=True,
                       SESSION_COOKIE_SAMESITE='Lax')
 
+    if port == 'rest':
+        API.add_resource(configurator.Configurator, '/v1/setting', '/setting')
+        API.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
+        API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
+        API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
+        API.add_resource(train.Training, '/v1/training', '/v1/training')
+    else:
+        API.add_resource(optimizer.Optimizer, '/v1/optimizer', '/v1/optimizer/<string:task_id>')
+        API.add_resource(classification.Classification, '/v1/classification', '/v1/classification')
+
     if config.has_option("server", "tls") and config.get("server", "tls") == "true":
         cert_file = config.get("server", "tlshttpcertfile")
         key_file = config.get("server", "tlshttpkeyfile")
@@ -76,13 +78,20 @@ def main(filename):
         context.load_cert_chain(certfile=cert_file, keyfile=key_file)
         context.load_verify_locations(ca_file)
         context.verify_mode = ssl.CERT_REQUIRED
-        APP.run(host="localhost", port=config.get("server", "rest_port"),
-                ssl_context=context)
+        if port == 'rest':
+            APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"),
+                    ssl_context=context)
+        else:
+            APP.run(host=config.get("server", "opt_host"), port=config.get("server", "opt_port"),
+                    ssl_context=context)
     else:
-        APP.run(host="localhost", port=config.get("server", "rest_port"))
+        if port == 'rest':
+            APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"))
+        else:
+            APP.run(host=config.get("server", "opt_host"), port=config.get("server", "opt_port"))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         sys.exit(-1)
-    main(sys.argv[1])
+    main(sys.argv[1], sys.argv[2])

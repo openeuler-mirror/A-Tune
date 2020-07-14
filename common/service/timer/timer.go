@@ -53,7 +53,7 @@ func (t *Timer) Set(cfg *config.Cfg) {
 //Run method start the ticker, auto-tuning the system
 func (t *Timer) Run() error {
 	/* Static & Dynamic judge */
-	if err := utils.WaitForPyservice(config.LocalHost, config.RestPort); err != nil {
+	if err := utils.WaitForPyservice(); err != nil {
 		log.Errorf("waiting for pyservice failed: %v", err)
 		return err
 	}
