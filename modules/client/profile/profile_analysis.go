@@ -32,7 +32,7 @@ var profileAnalysisCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "model, m",
-			Usage: "specified the the self traind model to analysis",
+			Usage: "specified the self trained model to analysis",
 			Value: "",
 		},
 	},
@@ -41,9 +41,9 @@ var profileAnalysisCommand = cli.Command{
 	 analysis the system's workload type and optimization performance.
 	 you can specified the app name, but it's just for reference only.
 	     example: atune-adm analysis mysql
-	 you can also specify the self traind model to analysis, which only
+	 you can also specify the self trained model to analysis, which only
 	 can be end with .m.
-	     example: atune-adm analysis --model ./self_traind.m`
+	     example: atune-adm analysis --model ./self_trained.m`
 		return desc
 	}(),
 	Action: profileAnalysis,
