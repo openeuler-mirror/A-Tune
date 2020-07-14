@@ -17,7 +17,7 @@ Temporary tool to generate the api help info, will be replaced by Sphinx.
 
 import sys
 
-sys.path.insert(0, "./../analysis/")
+sys.path.insert(0, "./../")
 from analysis.plugin.plugin import CPI, MPI
 
 print("The CPI & MPI api manual")

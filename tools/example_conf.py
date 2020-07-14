@@ -17,7 +17,7 @@ Tool to generate an example of profile configuration.
 
 import sys
 
-sys.path.insert(0, "./../analysis/")
+sys.path.insert(0, "./../")
 from analysis.plugin.plugin import CPI
 
 print("#")
