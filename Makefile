@@ -43,6 +43,7 @@ install:
 	mkdir -p $(DESTDIR)/etc/atuned/tuning
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/profiles
+	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/training
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
@@ -55,7 +56,7 @@ install:
 	install -m 750 pkg/atuned $(BINDIR)
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
-	install -m 640 misc/opt.service $(SYSTEMDDIR)
+	install -m 640 misc/atune-engine.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
 	\cp -rf scripts/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/

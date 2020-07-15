@@ -62,6 +62,7 @@ make install
 ```bash
 systemctl daemon-reload
 systemctl start atuned
+systemctl start atune-engine
 ```
 
 #### 查看atuned服务状态

@@ -62,6 +62,7 @@ II. Quick Guide
 ```bash
 systemctl daemon-reload
 systemctl start atuned
+systemctl start atune-engine
 ```
 
 #### Check the atuned service status.
