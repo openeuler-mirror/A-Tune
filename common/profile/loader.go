@@ -14,9 +14,9 @@
 package profile
 
 import (
-	CONF "atune/common/config"
-	"atune/common/log"
-	"atune/common/sqlstore"
+	CONF "gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"fmt"
 	"os"
 	"path"

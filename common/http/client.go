@@ -14,7 +14,7 @@
 package http
 
 import (
-	"atune/common/config"
+	"gitee.com/openeuler/A-Tune/common/config"
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"

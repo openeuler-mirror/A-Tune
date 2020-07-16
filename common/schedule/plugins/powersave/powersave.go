@@ -14,9 +14,9 @@
 package powersave
 
 import (
-	"atune/common/log"
-	"atune/common/schedule/framework"
-	"atune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/schedule/framework"
+	"gitee.com/openeuler/A-Tune/common/topology"
 )
 
 // PowerSave pick node concerning NUMA topology

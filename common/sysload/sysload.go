@@ -14,7 +14,7 @@
 package sysload
 
 import (
-	"atune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/topology"
 	"bufio"
 	"container/list"
 	"fmt"
@@ -24,8 +24,8 @@ import (
 	"strings"
 	"time"
 
-	"atune/common/log"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // #include <unistd.h>

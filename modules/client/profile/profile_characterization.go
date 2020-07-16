@@ -14,9 +14,9 @@
 package profile
 
 import (
-	PB "atune/api/profile"
-	"atune/common/client"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"io"
 
 	"github.com/urfave/cli"

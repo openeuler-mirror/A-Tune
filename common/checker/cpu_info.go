@@ -14,11 +14,11 @@
 package checker
 
 import (
-	PB "atune/api/profile"
-	"atune/common/config"
-	"atune/common/models"
-	"atune/common/registry"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"

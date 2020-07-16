@@ -14,14 +14,14 @@
 package schedule
 
 import (
-	PB "atune/api/profile"
-	"atune/common/log"
-	"atune/common/sched"
-	"atune/common/schedule/framework"
-	"atune/common/schedule/plugins"
-	"atune/common/sysload"
-	"atune/common/topology"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/sched"
+	"gitee.com/openeuler/A-Tune/common/schedule/framework"
+	"gitee.com/openeuler/A-Tune/common/schedule/plugins"
+	"gitee.com/openeuler/A-Tune/common/sysload"
+	"gitee.com/openeuler/A-Tune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"context"
 	"fmt"
 	"strconv"

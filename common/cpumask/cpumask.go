@@ -14,7 +14,7 @@
 package cpumask
 
 import (
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"strconv"
 )
 

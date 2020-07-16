@@ -14,5 +14,5 @@
 package main
 
 import (
-	_ "atune/modules/client/profile"
+	_ "gitee.com/openeuler/A-Tune/modules/client/profile"
 )

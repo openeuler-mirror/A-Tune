@@ -14,9 +14,9 @@
 package pyservice
 
 import (
-	"atune/common/config"
-	"atune/common/log"
-	"atune/common/registry"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/registry"
 	"bufio"
 	"io"
 	"os"

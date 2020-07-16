@@ -14,7 +14,7 @@
 package utils
 
 import (
-	PB "atune/api/profile"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"bufio"
 	"encoding/xml"
 	"encoding/csv"

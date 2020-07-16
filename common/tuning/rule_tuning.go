@@ -14,11 +14,11 @@
 package tuning
 
 import (
-	"atune/common/config"
-	"atune/common/http"
-	"atune/common/log"
-	"atune/common/profile"
-	"atune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/profile"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

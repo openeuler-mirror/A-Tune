@@ -14,13 +14,13 @@
 package schedule
 
 import (
-	PB "atune/api/profile"
-	"atune/common/config"
-	"atune/common/http"
-	"atune/common/log"
-	"atune/common/registry"
-	"atune/common/sqlstore"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

@@ -14,7 +14,7 @@
 package client
 
 import (
-	"atune/common/config"
+	"gitee.com/openeuler/A-Tune/common/config"
 	"fmt"
 	"net"
 	"os"

@@ -14,7 +14,7 @@
 package numaaware
 
 import (
-	"atune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/topology"
 )
 
 type lighterLoadCallback struct {

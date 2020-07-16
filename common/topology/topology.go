@@ -14,8 +14,8 @@
 package topology
 
 import (
-	"atune/common/cpumask"
-	"atune/common/log"
+	"gitee.com/openeuler/A-Tune/common/cpumask"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"container/list"
 	"fmt"
 	"io/ioutil"
@@ -24,7 +24,7 @@ import (
 	"strconv"
 	"strings"
 
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // GetNodeCpus get nodeX cpu list.

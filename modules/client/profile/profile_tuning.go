@@ -14,11 +14,11 @@
 package profile
 
 import (
-	PB "atune/api/profile"
-	"atune/common/client"
-	"atune/common/project"
-	SVC "atune/common/service"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/project"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"io"
 	"strconv"

@@ -14,14 +14,14 @@
 package tuning
 
 import (
-	PB "atune/api/profile"
-	"atune/common/client"
-	"atune/common/config"
-	"atune/common/http"
-	"atune/common/log"
-	"atune/common/models"
-	"atune/common/project"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/project"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"golang.org/x/net/context"
 	"io"

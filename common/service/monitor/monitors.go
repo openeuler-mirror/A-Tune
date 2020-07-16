@@ -14,13 +14,13 @@
 package monitors
 
 import (
-	"atune/common/config"
-	"atune/common/log"
-	"atune/common/models"
-	"atune/common/profile"
-	"atune/common/registry"
-	"atune/common/sqlstore"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/profile"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"os"
 	"path"
 	"strings"

@@ -14,8 +14,8 @@
 package profile
 
 import (
-	"atune/common/config"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"io/ioutil"
 	"os"
 	"path"

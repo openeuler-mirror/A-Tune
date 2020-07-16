@@ -14,7 +14,7 @@
 package project
 
 import (
-	"atune/common/log"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"fmt"
 	"os/exec"
 	"strconv"

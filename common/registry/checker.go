@@ -14,7 +14,7 @@
 package registry
 
 import (
-	PB "atune/api/profile"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
 )
 
 // CheckerInstance :interface for init service

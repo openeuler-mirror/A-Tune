@@ -14,7 +14,7 @@
 package framework
 
 import (
-	"atune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/topology"
 )
 
 // BindTaskInfo used for plugins to set nodes for processes

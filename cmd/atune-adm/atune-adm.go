@@ -14,9 +14,9 @@
 package main
 
 import (
-	"atune/common/config"
-	SVC "atune/common/service"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"os"
 	"sort"

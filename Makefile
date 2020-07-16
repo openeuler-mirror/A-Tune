@@ -10,19 +10,19 @@ SYSTEMDDIR = $(DESTDIR)$(PREFIX)/lib/systemd/system
 SRCVERSION = $(shell git rev-parse --short HEAD 2>/dev/null)
 ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
 
-GOLDFLAGS += -X atune/common/config.Version=$(ATUNEVERSION)
+GOLDFLAGS += -X gitee.com/openeuler/A-Tune/common/config.Version=$(ATUNEVERSION)
 GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
 all: modules atune-adm atuned db
 
 atune-adm:
-	export GOPATH=`cd ../../;pwd` && go build -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
+	go build -mod=vendor -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
 
 atuned:
-	export GOPATH=`cd ../../;pwd` && go build -v $(GOFLAGS) -o $(PKGPATH)/atuned cmd/atuned/*.go
+	go build -mod=vendor -v $(GOFLAGS) -o $(PKGPATH)/atuned cmd/atuned/*.go
 
 modules:
-	export GOPATH=`cd ../../;pwd` && cd ${CURDIR}/modules/server/profile/ && go build -buildmode=plugin -o ${CURDIR}/pkg/daemon_profile_server.so *.go
+	cd ${CURDIR}/modules/server/profile/ && go build -mod=vendor -buildmode=plugin -o ${CURDIR}/pkg/daemon_profile_server.so *.go
 
 clean:
 	rm -rf $(PKGPATH)/*

@@ -14,7 +14,7 @@
 package schedule
 
 import (
-	"atune/common/schedule/filters"
+	"gitee.com/openeuler/A-Tune/common/schedule/filters"
 )
 
 // Filter :schedule filters interface
