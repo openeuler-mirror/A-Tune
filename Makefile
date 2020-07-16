@@ -68,3 +68,8 @@ install:
 	\cp -rf profiles/* $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	chmod -R 640 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	@echo "END INSTALL A-Tune"
+
+rpm:
+	git archive --format=tar --prefix=A-Tune/ HEAD | gzip -9 > openeuler-A-Tune-v$(VERSION).tar.gz
+	mv openeuler-A-Tune-v$(VERSION).tar.gz ~/rpmbuild/SOURCES
+	rpmbuild -ba misc/atune.spec
