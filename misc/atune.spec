@@ -67,7 +67,7 @@ cp -rf %{name} ../../A-Tune
 %defattr(0640,root,root,-)
 %attr(0640,root,root) /usr/lib/atuned/modules/daemon_profile_server.so
 %attr(0640,root,root) %{_unitdir}/atuned.service
-%attr(0640,root,root) %{_unitdir}/opt.service
+%attr(0640,root,root) %{_unitdir}/atune-engine.service
 %attr(0750,root,root) %{_bindir}/atuned
 %attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
