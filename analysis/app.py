@@ -82,13 +82,13 @@ def main(filename, port):
             APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"),
                     ssl_context=context)
         else:
-            APP.run(host=config.get("server", "opt_host"), port=config.get("server", "opt_port"),
+            APP.run(host=config.get("server", "engine_host"), port=config.get("server", "engine_port"),
                     ssl_context=context)
     else:
         if port == 'rest':
             APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"))
         else:
-            APP.run(host=config.get("server", "opt_host"), port=config.get("server", "opt_port"))
+            APP.run(host=config.get("server", "engine_host"), port=config.get("server", "engine_port"))
 
 
 if __name__ == '__main__':
