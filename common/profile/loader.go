@@ -14,10 +14,10 @@
 package profile
 
 import (
+	"fmt"
 	CONF "gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -236,7 +236,7 @@ func loadConfigData(name string) (*ini.File, error) {
 		return nil, err
 	}
 	if config == nil {
-		return nil, fmt.Errorf("% profile is not found!")
+		return nil, fmt.Errorf("%s profile is not found!", name)
 	}
 	dirName := CONF.DefaultScriptPath
 	for _, section := range config.Sections() {

@@ -14,11 +14,11 @@
 package profile
 
 import (
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
 	"io"
 
 	"github.com/urfave/cli"
@@ -53,11 +53,13 @@ func newProfileCheckCmd(ctx *cli.Context, opts ...interface{}) (interface{}, err
 }
 
 func profileCheck(ctx *cli.Context) error {
-	if err := utils.CheckArgs(ctx, 0, utils.ConstExactArgs); err != nil {
+	var err error
+	if err = utils.CheckArgs(ctx, 0, utils.ConstExactArgs); err != nil {
 		return err
 	}
 
-	c, err := client.NewClientFromContext(ctx)
+	var c *client.Client
+	c, err = client.NewClientFromContext(ctx)
 	if err != nil {
 		return err
 	}

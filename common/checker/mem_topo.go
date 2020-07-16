@@ -14,14 +14,14 @@
 package checker
 
 import (
+	"encoding/xml"
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/models"
 	"gitee.com/openeuler/A-Tune/common/registry"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"encoding/xml"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -107,8 +107,8 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 		return err
 	}
 
-	topology := topology{}
-	err = xml.Unmarshal(data, &topology)
+	topo := topology{}
+	err = xml.Unmarshal(data, &topo)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 	maxChannel := 0
 	maxSlot := 0
 
-	for _, memory := range topology.Memorys {
+	for _, memory := range topo.Memorys {
 		for _, child := range memory.Childrens {
 			if params := reg.FindStringSubmatch(child.Slot); params != nil {
 				socket, _ := strconv.Atoi(params[1])
@@ -142,7 +142,7 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 	memTotal := (maxSocket + 1) * (maxChannel + 1) * (maxSlot + 1)
 	memLocation := make([]bool, memTotal)
 
-	for _, memory := range topology.Memorys {
+	for _, memory := range topo.Memorys {
 		for _, child := range memory.Childrens {
 			if child.Size != 0 {
 				if params := reg.FindStringSubmatch(child.Slot); params != nil {
