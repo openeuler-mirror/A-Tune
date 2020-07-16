@@ -52,7 +52,6 @@ mkdir -p gopath/src/
 rm -rf gopath/src/%{name}
 mv A-Tune gopath/src/%{name}
 cd gopath/src/%{name}
-export GO111MODULE=off
 make
 cd ../
 cp -rf %{name} ../../A-Tune
