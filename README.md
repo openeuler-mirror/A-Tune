@@ -36,15 +36,12 @@ pip3 install dict2xml Flask-RESTful pandas scikit-optimize==0.5.2 xgboost==0.90 
 
 #### 3. Download the source code.
 ```bash
-mkdir -p /home/gopath/src
-cd /home/gopath/src
-git clone https://gitee.com/openeuler/A-Tune.git atune
+git clone https://gitee.com/openeuler/A-Tune.git
 ```
 
 #### 4. Compile.
 ```bash
-cd atune
-export GO111MODULE=off
+cd A-Tune
 make
 ```
 
