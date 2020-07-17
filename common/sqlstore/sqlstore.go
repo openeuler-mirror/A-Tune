@@ -14,8 +14,8 @@
 package sqlstore
 
 import (
-	"atune/common/config"
-	"atune/common/log"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"fmt"
 	"os"
 	"path"

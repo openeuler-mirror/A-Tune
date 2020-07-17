@@ -14,7 +14,7 @@
 package main
 
 import (
-	_ "atune/common/service/monitor"
-	_ "atune/common/service/pyservice"
-	_ "atune/common/service/timer"
+	_ "gitee.com/openeuler/A-Tune/common/service/monitor"
+	_ "gitee.com/openeuler/A-Tune/common/service/pyservice"
+	_ "gitee.com/openeuler/A-Tune/common/service/timer"
 )

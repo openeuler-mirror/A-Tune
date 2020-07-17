@@ -14,12 +14,12 @@
 package main
 
 import (
-	"atune/common/config"
-	"atune/common/log"
-	"atune/common/registry"
-	SVC "atune/common/service"
-	"atune/common/sqlstore"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"net"
 	"os"

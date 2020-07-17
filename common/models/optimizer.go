@@ -14,8 +14,8 @@
 package models
 
 import (
-	"atune/common/config"
-	"atune/common/http"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

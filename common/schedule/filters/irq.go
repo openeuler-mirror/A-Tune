@@ -14,8 +14,8 @@
 package filters
 
 import (
-	"atune/common/log"
-	"atune/common/system"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/system"
 	"errors"
 )
 

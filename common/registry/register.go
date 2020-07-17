@@ -14,7 +14,7 @@
 package registry
 
 import (
-	"atune/common/config"
+	"gitee.com/openeuler/A-Tune/common/config"
 )
 
 // DaemonInstance :interface for Daemon service

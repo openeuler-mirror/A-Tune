@@ -14,7 +14,7 @@
 package sqlstore
 
 import (
-	"atune/common/log"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"errors"
 	"strings"
 )

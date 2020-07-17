@@ -14,8 +14,8 @@
 package config
 
 import (
-	"atune/common/log"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"path"
 	"strings"

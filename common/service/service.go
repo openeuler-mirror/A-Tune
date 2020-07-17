@@ -14,7 +14,7 @@
 package module
 
 import (
-	"atune/common/config"
+	"gitee.com/openeuler/A-Tune/common/config"
 	"context"
 	"fmt"
 	"google.golang.org/grpc/peer"

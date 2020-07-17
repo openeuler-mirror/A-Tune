@@ -14,13 +14,13 @@
 package numaaware
 
 import (
-	"atune/common/config"
-	"atune/common/log"
-	"atune/common/schedule/framework"
-	"atune/common/sysload"
-	"atune/common/system"
-	"atune/common/topology"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/schedule/framework"
+	"gitee.com/openeuler/A-Tune/common/sysload"
+	"gitee.com/openeuler/A-Tune/common/system"
+	"gitee.com/openeuler/A-Tune/common/topology"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"io/ioutil"
 	"strconv"

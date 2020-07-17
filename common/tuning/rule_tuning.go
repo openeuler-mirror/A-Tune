@@ -14,13 +14,13 @@
 package tuning
 
 import (
-	"atune/common/config"
-	"atune/common/http"
-	"atune/common/log"
-	"atune/common/profile"
-	"atune/common/sqlstore"
 	"encoding/json"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/profile"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"io/ioutil"
 	"strings"
 
@@ -89,13 +89,16 @@ func RuleTuned(workloadType string) error {
 		rulePostBody.Purpose = monitors[1]
 		rulePostBody.Field = rule.Field
 
-		respPostIns, err := rulePostBody.Post()
+		var respPostIns *map[string]interface{}
+		var err error
+		respPostIns, err = rulePostBody.Post()
 		if err != nil {
 			return err
 		}
 
 		if rule.Name == "hpre" {
-			support, err := IsSupportHpre()
+			var support bool
+			support, err = IsSupportHpre()
 			if err != nil {
 				continue
 			}

@@ -14,9 +14,9 @@
 package plugins
 
 import (
-	"atune/common/schedule/framework"
-	"atune/common/schedule/plugins/numaaware"
-	"atune/common/schedule/plugins/powersave"
+	"gitee.com/openeuler/A-Tune/common/schedule/framework"
+	"gitee.com/openeuler/A-Tune/common/schedule/plugins/numaaware"
+	"gitee.com/openeuler/A-Tune/common/schedule/plugins/powersave"
 )
 
 // PluginFactory used to create new plugin

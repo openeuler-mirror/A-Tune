@@ -14,10 +14,10 @@
 package system
 
 import (
-	"atune/common/config"
-	"atune/common/log"
-	"atune/common/models"
-	"atune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"bufio"
 	"encoding/xml"
 	"fmt"

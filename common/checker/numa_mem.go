@@ -14,7 +14,7 @@
 package checker
 
 import (
-	PB "atune/api/profile"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"bufio"
 	"os"
 	"strconv"

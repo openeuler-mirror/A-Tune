@@ -14,11 +14,11 @@
 package profile
 
 import (
-	PB "atune/api/profile"
-	"atune/common/log"
-	"atune/common/models"
-	"atune/common/sqlstore"
-	"atune/common/utils"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"os"
 	"sort"
