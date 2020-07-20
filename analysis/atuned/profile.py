@@ -18,7 +18,7 @@ Restful api for profile, in order to provide the method of get and put.
 from flask import abort
 from flask import current_app
 from flask_restful import Resource
-from analysis.resources.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
+from analysis.atuned.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
 from analysis.plugin.plugin import CPI
 
 

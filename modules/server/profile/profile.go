@@ -28,11 +28,14 @@ import (
 	"gitee.com/openeuler/A-Tune/common/tuning"
 	"gitee.com/openeuler/A-Tune/common/utils"
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
+	HTTP "net/http"
 	"os"
 	"os/exec"
 	"path"
@@ -70,9 +73,9 @@ type RespCollectorPost struct {
 
 // ClassifyPostBody : the body send to classify service
 type ClassifyPostBody struct {
-	Data      [][]string `json:"data"`
-	ModelPath string     `json:"modelpath,omitempty"`
-	Model     string     `json:"model,omitempty"`
+	Data      string `json:"data"`
+	ModelPath string `json:"modelpath,omitempty"`
+	Model     string `json:"model,omitempty"`
 }
 
 // RespClassify : the response of classify model
@@ -186,6 +189,58 @@ func (c *CollectorPost) Post() (*RespCollectorPost, error) {
 		return nil, err
 	}
 	return resPostIns, nil
+}
+
+// Post method send POST to start transfer file
+func Post(serviceType, paramName, path string) (string, error) {
+	url := config.GetURL(config.TransferURI)
+	file, err := os.Open(path)
+	if err != nil {
+		return "", fmt.Errorf("Path Error")
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+	if err != nil {
+		return "", fmt.Errorf("writer error")
+	}
+	_, err = io.Copy(part, file)
+	extraParams := map[string]string{
+		"service":  serviceType,
+		"savepath": "/etc/atuned/" + serviceType + "/" + filepath.Base(path),
+	}
+
+	for key, val := range extraParams {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return "", fmt.Errorf("writer close error")
+	}
+
+	request, err := HTTP.NewRequest("POST", url, body)
+	if err != nil {
+		return "", fmt.Errorf("newRequest failed")
+	}
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	client := &HTTP.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("do request error")
+	} else {
+		defer resp.Body.Close()
+
+		body := &bytes.Buffer{}
+		_, err := body.ReadFrom(resp.Body)
+		if err != nil {
+			return "", fmt.Errorf("body read form error")
+		}
+		res := body.String()
+		res = res[1 : len(res)-2]
+		return res, nil
+	}
 }
 
 // Profile method set the workload type to effective manual
@@ -388,16 +443,17 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		return err
 	}
 
-	data, err := utils.ReadCSV(respCollectPost.Path)
+	dataPath, err := Post("classification", "file", respCollectPost.Path)
 	if err != nil {
-		log.Errorf("Failed to read data from CSV: %v", err)
+		log.Errorf("Failed transfer file to server: %v", err)
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
+	defer os.Remove(dataPath)
 
 	//2. send the collected data to the model for completion type identification
 	body := new(ClassifyPostBody)
-	body.Data = data
+	body.Data = dataPath
 	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
 	if message.GetModel() != "" {
@@ -879,8 +935,23 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 	DataPath := message.GetDataPath()
 	OutputPath := message.GetOutputPath()
 
+	compressPath, err := utils.CreateCompressFile(DataPath)
+	if err != nil {
+		log.Debugf("Failed to compress %s: %v", DataPath, err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		return err
+	}
+	defer os.Remove(compressPath)
+
+	trainPath, err := Post("training", "file", compressPath)
+	if err != nil {
+		log.Debugf("Failed to transfer file: %v", err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		return err
+	}
+
 	trainBody := new(models.Training)
-	trainBody.DataPath = DataPath
+	trainBody.DataPath = trainPath
 	trainBody.OutputPath = OutputPath
 	trainBody.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
@@ -960,16 +1031,17 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 		return err
 	}
 
-	data, err := utils.ReadCSV(respCollectPost.Path)
+	dataPath, err := Post("classification", "file", respCollectPost.Path)
 	if err != nil {
-		log.Errorf("Failed to read data from CSV: %v", err)
+		log.Errorf("Failed transfer file to server: %v", err)
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
+	defer os.Remove(dataPath)
 
 	//2. send the collected data to the model for completion type identification
 	body := new(ClassifyPostBody)
-	body.Data = data
+	body.Data = dataPath
 	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
 	respPostIns, err := body.Post()

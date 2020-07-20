@@ -41,6 +41,8 @@ install:
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
 	mkdir -p $(DESTDIR)/etc/atuned/tuning
+	mkdir -p $(DESTDIR)/etc/atuned/training
+	mkdir -p $(DESTDIR)/etc/atuned/classification
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/profiles
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/training

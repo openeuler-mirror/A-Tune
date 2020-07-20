@@ -14,9 +14,9 @@
 package config
 
 import (
+	"fmt"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
 	"path"
 	"strings"
 
@@ -72,6 +72,7 @@ const (
 	ClassificationURI string = "classification"
 	ProfileURI        string = "profile"
 	TrainingURI       string = "training"
+	TransferURI       string = "transfer"
 )
 
 // database config
@@ -88,9 +89,9 @@ const (
 
 //tuning config
 const (
-	TuningFile          string      = DefaultTempPath + "/tuning.log"
-	TuningRestoreConfig string      = "-tuning-restore.conf"
-	DefaultTimeFormat   string      = "2006-01-02 15:04:05"
+	TuningFile          string = DefaultTempPath + "/tuning.log"
+	TuningRestoreConfig string = "-tuning-restore.conf"
+	DefaultTimeFormat   string = "2006-01-02 15:04:05"
 )
 
 // the grpc server config
@@ -147,8 +148,8 @@ func (c *Cfg) Load() error {
 	Port = section.Key("port").MustString(DefaultTgtPort)
 	LocalHost = section.Key("rest_host").MustString("localhost")
 	RestPort = section.Key("rest_port").MustString("8383")
-	EngineHost = section.Key("Engine_host").MustString("localhost")
-	EnginePort = section.Key("Engine_port").MustString("3838")
+	EngineHost = section.Key("engine_host").MustString("localhost")
+	EnginePort = section.Key("engine_port").MustString("3838")
 	utils.RestHost = LocalHost
 	utils.RestPort = RestPort
 	TLS = section.Key("tls").MustBool(false)
@@ -207,5 +208,12 @@ func IsEnginePort(uri string) bool {
 	if strings.EqualFold(uri, ClassificationURI) {
 		return true
 	}
+	if strings.EqualFold(uri, TransferURI) {
+		return true
+	}
+	if strings.EqualFold(uri, TrainingURI) {
+		return true
+	}
+
 	return false
 }

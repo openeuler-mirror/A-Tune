@@ -14,10 +14,13 @@
 package utils
 
 import (
+	"archive/tar"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"bufio"
-	"encoding/xml"
+	"compress/gzip"
 	"encoding/csv"
+	"encoding/xml"
 	"fmt"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -389,7 +392,7 @@ func ReadAllFile(path string) string {
 	return string(content)
 }
 
-// read data from test.csv
+// ReadCSV read data from test.csv
 func ReadCSV(path string) ([][]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -410,4 +413,91 @@ func ReadCSV(path string) ([][]string, error) {
 	}
 
 	return data, nil
+}
+
+// CreateCompressFile create a .tar.gz file as target of compress
+func CreateCompressFile(path string) (string, error) {
+	temp := strings.Split(path, "/")
+	compressName := temp[len(temp)-1] + "-" + time.Now().Format("20060101") + ".tar.gz"
+
+	zipFile, _ := os.Create(compressName)
+	defer zipFile.Close()
+
+	gzipWrt := gzip.NewWriter(zipFile)
+	defer gzipWrt.Close()
+
+	tarWrt := tar.NewWriter(gzipWrt)
+	defer tarWrt.Close()
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Errorf("Open file error: %v", err)
+		os.Remove(compressName)
+		return "", err
+	}
+
+	err = Compress(file, "", tarWrt)
+	if err != nil {
+		log.Errorf("Compress error : %v", err)
+		os.Remove(compressName)
+		return "", err
+	}
+
+	absPath, _ := filepath.Abs(compressName)
+	return absPath, nil
+}
+
+// Compress recursionly compress all files under given path
+func Compress(file *os.File, prefix string, tarWrt *tar.Writer) error {
+	info, err := file.Stat()
+	if err != nil {
+		log.Errorf("%v", err)
+		return err
+	}
+
+	if info.IsDir() {
+		if strings.EqualFold(prefix, "") {
+			prefix = info.Name()
+		} else {
+			prefix = prefix + "/" + info.Name()
+		}
+		subfiles, err := file.Readdir(-1)
+		if err != nil {
+			log.Errorf("%v", err)
+			return err
+		}
+
+		for _, subfile := range subfiles {
+			f, err := os.Open(file.Name() + "/" + subfile.Name())
+			if err != nil {
+				log.Errorf("%v", err)
+				return err
+			}
+			err = Compress(f, prefix, tarWrt)
+			if err != nil {
+				log.Errorf("%v", err)
+				return err
+			}
+		}
+	} else {
+		header, err := tar.FileInfoHeader(info, "")
+		if !strings.EqualFold(prefix, "") {
+			header.Name = prefix + "/" + header.Name
+		} else {
+			header.Name = header.Name
+		}
+		if err != nil {
+			return err
+		}
+		err = tarWrt.WriteHeader(header)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(tarWrt, file)
+		file.Close()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
