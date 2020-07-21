@@ -33,11 +33,3 @@ CONFIGURATOR_PUT_FIELD = fields.Nested(PARAM_FIELD)
 OPTIMIZER_FIELD = {
     'status': fields.String
 }
-
-CLASSIFICATION_FIELD = {
-    'resource_limit': fields.String,
-    'workload_type': fields.String,
-    'percentage': fields.Float,
-}
-
-CLASSIFICATION_POST_FIELD = fields.Nested(CLASSIFICATION_FIELD)

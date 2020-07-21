@@ -20,8 +20,8 @@ from multiprocessing import Pipe
 from flask import abort
 from flask_restful import reqparse, Resource
 
-from analysis.resources.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
-from analysis.utils import task_cache
+from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
+from analysis.engine.utils import task_cache
 from optimizer import optimizer
 
 LOGGER = logging.getLogger(__name__)

@@ -19,10 +19,10 @@ from flask import abort
 from flask import current_app
 from flask_restful import Resource
 from flask_restful import marshal_with_field
-from analysis.resources.parser import PROPERTY_PUT_PARSER
-from analysis.resources.parser import CONFIGURATOR_GET_PARSER
-from analysis.resources.parser import CONFIGURATOR_POST_PARSER
-from analysis.resources.field import CONFIGURATOR_PUT_FIELD
+from analysis.atuned.parser import PROPERTY_PUT_PARSER
+from analysis.atuned.parser import CONFIGURATOR_GET_PARSER
+from analysis.atuned.parser import CONFIGURATOR_POST_PARSER
+from analysis.atuned.field import CONFIGURATOR_PUT_FIELD
 from analysis.plugin.plugin import CPI
 
 

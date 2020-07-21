@@ -14,12 +14,14 @@
 """
 Restful api for training, in order to provide the method of post.
 """
+import os
 import logging
+import shutil
 from flask import abort
 from flask_restful import Resource
 
 from analysis.optimizer.workload_characterization import WorkloadCharacterization
-from analysis.resources.parser import TRAIN_POST_PARSER
+from analysis.engine.parser import TRAIN_POST_PARSER
 
 LOGGER = logging.getLogger(__name__)
 
@@ -48,4 +50,8 @@ class Training(Resource):
             LOGGER.error(err)
             abort(500)
 
+        if os.path.isdir(data_path):
+            shutil.rmtree(data_path)
+        else:
+            os.remove(data_path)
         return {}, 200

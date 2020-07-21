@@ -16,8 +16,6 @@ Requires: atune-db
 Requires: python3-dict2xml
 Requires: python3-flask-restful
 Requires: python3-pandas
-Requires: python3-scikit-optimize
-Requires: python3-xgboost
 Requires: prefetch_tuning
 Requires: perf
 Requires: sysstat
@@ -43,6 +41,17 @@ License: MuLan PSL v2
 %description db
 Database and AI model used by atuned AI tuning system.
 
+%package engine
+Summary: engine tool for auto tuning system
+License: MuLan PSL v1
+Requires: python3-scikit-optimize
+Requires: python3-xgboost
+Requires: python3-flask-restful
+Requires: python3-pandas
+
+%description engine
+atune engine tool for manage atuned AI tuning system.
+
 %prep
 %setup -n A-Tune -q
 
@@ -66,13 +75,15 @@ cp -rf %{name} ../../A-Tune
 %defattr(0640,root,root,-)
 %attr(0640,root,root) /usr/lib/atuned/modules/daemon_profile_server.so
 %attr(0640,root,root) %{_unitdir}/atuned.service
-%attr(0640,root,root) %{_unitdir}/atune-engine.service
 %attr(0750,root,root) %{_bindir}/atuned
 %attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0640,root,root) /usr/lib/atuned/profiles/*
-%exclude /usr/libexec/atuned/analysis/models/
 %attr(0750,root,root) /usr/libexec/atuned/collector/*
+%exclude /usr/libexec/atuned/analysis/app-engine.py
+%exclude /usr/libexec/atuned/analysis/models/
+%exclude /usr/libexec/atuned/analysis/optimizer/
+%exclude /usr/libexec/atuned/analysis/engine/
 %attr(0750,root,root) %dir /usr/lib/atuned
 %attr(0750,root,root) %dir /usr/lib/atuned/modules
 %attr(0640,root,root) %dir /usr/lib/atuned/profiles
@@ -96,6 +107,18 @@ cp -rf %{name} ../../A-Tune
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis/models
 %attr(0750,root,root) /usr/libexec/atuned/analysis/models/*
+
+%files engine
+%license License/LICENSE
+%defattr(0640,root,root,-)
+%attr(0640,root,root) %{_unitdir}/atune-engine.service
+%attr(0750,root,root) /usr/libexec/atuned/analysis/*
+%attr(0750,root,root) /etc/atuned/*
+%exclude /usr/libexec/atuned/analysis/app.py
+%exclude /usr/libexec/atuned/plugin/
+%exclude /usr/libexec/atuned/atuned/
+%attr(0750,root,root) %dir /usr/libexec/atuned/analysis
+%attr(0640,root,root) %dir /etc/atuned
 
 %post
 %systemd_post atuned.service

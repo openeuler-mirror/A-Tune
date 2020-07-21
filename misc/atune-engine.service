@@ -4,7 +4,7 @@ After=network.target
 Requires=polkit.service
 
 [Service]
-ExecStart=python3 /usr/libexec/atuned/analysis/app.py /etc/atuned/atuned.cnf engine
+ExecStart=python3 /usr/libexec/atuned/analysis/app-engine.py /etc/atuned/atuned.cnf
 
 [Install]
 WantedBy=multi-user.target

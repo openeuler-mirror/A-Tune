@@ -53,17 +53,6 @@ MONITOR_POST_PARSER.add_argument('module', required=True, help="The module to be
 MONITOR_POST_PARSER.add_argument('purpose', required=True, help="The purpose of the module")
 MONITOR_POST_PARSER.add_argument('field', required=True, help="The field of the monitor")
 
-OPTIMIZER_POST_PARSER = reqparse.RequestParser()
-OPTIMIZER_POST_PARSER.add_argument('max_eval', type=int, required=True,
-                                   help="max_eval cannot be null")
-OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
-                                   help="knobs list cannot be null")
-
-OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
-OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,
-                                  help="iterations cannot be null")
-OPTIMIZER_PUT_PARSER.add_argument('value', type=str, required=True, help="value cannot be null")
-
 COLLECTOR_POST_PARSER = reqparse.RequestParser()
 COLLECTOR_POST_PARSER.add_argument('sample_num', type=int, required=True,
                                    help="the numbers to be collections")
@@ -71,11 +60,6 @@ COLLECTOR_POST_PARSER.add_argument('monitors', type=list, location='json',
                                    help="knobs list cannot be null")
 COLLECTOR_POST_PARSER.add_argument('pipe', required=True,
                                    help="The pipe name to send process status")
-
-CLASSIFICATION_POST_PARSER = reqparse.RequestParser()
-CLASSIFICATION_POST_PARSER.add_argument('modelpath', required=True, help="The modelfile to be used")
-CLASSIFICATION_POST_PARSER.add_argument('data', type=list, location='json', help="The data to be used")
-CLASSIFICATION_POST_PARSER.add_argument('model', help="The model self trained to be used")
 
 PROFILE_GET_PARSER = reqparse.RequestParser()
 PROFILE_GET_PARSER.add_argument('section', required=True, help="The section to be configured")
@@ -85,8 +69,3 @@ PROFILE_GET_PARSER.add_argument('path', required=True, help="The path to backup 
 PROFILE_PUT_PARSER = reqparse.RequestParser()
 PROFILE_PUT_PARSER.add_argument('section', required=True, help="The section to be configured")
 PROFILE_PUT_PARSER.add_argument('config', required=True, help="The config to be get")
-
-TRAIN_POST_PARSER = reqparse.RequestParser()
-TRAIN_POST_PARSER.add_argument('datapath', required=True, help="The datapath can not be null")
-TRAIN_POST_PARSER.add_argument('outputpath', required=True, help="The output path can not be null")
-TRAIN_POST_PARSER.add_argument('modelpath', required=True, help="The model path can not be null")

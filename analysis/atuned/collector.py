@@ -20,10 +20,10 @@ from flask import current_app, abort
 from flask_restful import reqparse, Resource
 from flask_restful import marshal_with_field
 import pandas as pd
-from analysis.resources.field import PROFILE_GET_FIELD
-from analysis.resources.parser import COLLECTOR_POST_PARSER
+from analysis.atuned.field import PROFILE_GET_FIELD
+from analysis.atuned.parser import COLLECTOR_POST_PARSER
 from analysis.plugin.plugin import MPI
-from analysis.utils.npipe import get_npipe
+from analysis.atuned.utils.npipe import get_npipe
 
 PARSER = reqparse.RequestParser()
 

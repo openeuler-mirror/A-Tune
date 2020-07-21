@@ -9,26 +9,10 @@
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
-# Create: 2019-10-29
+# Create: 2020-07-17
 
 """
-Provide an interface to read data from csv.
+Init files
 """
 
-import os
-import pandas as pd
-import numpy as np
-
-
-def read_from_csv(path):
-    """read data from csv"""
-    if not os.path.exists(path):
-        return None
-    if not path.endswith('.csv'):
-        return None
-
-    with open(path, 'r') as file:
-        data = pd.read_csv(file, header=None)
-        data = np.array(data).tolist()
-
-    return data
+import analysis.atuned.utils

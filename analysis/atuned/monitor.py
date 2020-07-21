@@ -19,8 +19,8 @@ import getopt
 from flask import abort
 from flask import current_app
 from flask_restful import reqparse, Resource
-from analysis.resources.parser import MONITOR_GET_PARSER
-from analysis.resources.parser import MONITOR_POST_PARSER
+from analysis.atuned.parser import MONITOR_GET_PARSER
+from analysis.atuned.parser import MONITOR_POST_PARSER
 from analysis.plugin.plugin import MPI
 
 PARSER = reqparse.RequestParser()
