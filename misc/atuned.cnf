@@ -44,6 +44,9 @@ engine_port = 3838
 # default is 20
 sample_num = 20
 
+# interval for collecting data, default is 5s
+interval = 5
+
 # enable gRPC and http server authentication SSL/TLS
 # default is false
 # tls = true

@@ -79,7 +79,6 @@ cp -rf %{name} ../../A-Tune
 %attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0640,root,root) /usr/lib/atuned/profiles/*
-%attr(0750,root,root) /usr/libexec/atuned/collector/*
 %exclude /usr/libexec/atuned/analysis/app-engine.py
 %exclude /usr/libexec/atuned/analysis/models/
 %exclude /usr/libexec/atuned/analysis/optimizer/
@@ -90,7 +89,6 @@ cp -rf %{name} ../../A-Tune
 %attr(0750,root,root) %dir /usr/libexec/atuned
 %attr(0750,root,root) %dir /usr/libexec/atuned/scripts
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
-%attr(0750,root,root) %dir /usr/libexec/atuned/collector
 %attr(0750,root,root) %dir /usr/share/atuned
 %attr(0640,root,root) %dir /etc/atuned
 %attr(0640,root,root) /etc/atuned/*
