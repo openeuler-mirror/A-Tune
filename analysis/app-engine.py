@@ -46,12 +46,6 @@ def config_log(level):
     root_logger.setLevel(level)
     root_logger.addHandler(syslog_handler)
 
-    log_file = os.path.join("/var/log", "atune.log")
-    common_file_handler = logging.FileHandler(log_file, 'a')
-    common_file_handler.setLevel(logging.DEBUG)
-    common_file_handler.setFormatter(logging_format)
-    root_logger.addHandler(common_file_handler)
-
 
 def main(filename):
     """app main function"""
