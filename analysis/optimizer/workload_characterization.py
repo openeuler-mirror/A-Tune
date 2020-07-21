@@ -134,7 +134,7 @@ class WorkloadCharacterization:
         w_array = np.ones(y_train.shape[0], dtype='float')
         for i, val in enumerate(y_train):
             w_array[i] = class_weights[val]
-        model = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=0)
+        model = RandomForestClassifier(n_estimators=200, oob_score=True, random_state=0)
         model.fit(x_train, y_train, sample_weight=w_array)
         y_pred = model.predict(x_test)
         print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
