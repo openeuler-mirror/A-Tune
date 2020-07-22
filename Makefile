@@ -49,7 +49,6 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
-	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/collector
 	mkdir -p $(DESTDIR)/var/lib/atuned
 	mkdir -p $(DESTDIR)/var/run/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/share/bash-completion/completions
@@ -65,8 +64,6 @@ install:
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
 	\cp -rf analysis/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
-	\cp -rf collection/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/collector/
-	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/collector/
 	\cp -rf profiles/* $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	chmod -R 640 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	@echo "END INSTALL A-Tune"

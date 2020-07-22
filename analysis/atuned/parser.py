@@ -60,6 +60,9 @@ COLLECTOR_POST_PARSER.add_argument('monitors', type=list, location='json',
                                    help="knobs list cannot be null")
 COLLECTOR_POST_PARSER.add_argument('pipe', required=True,
                                    help="The pipe name to send process status")
+COLLECTOR_POST_PARSER.add_argument('file', required=True,
+                                   help="The file for storing collected data")
+COLLECTOR_POST_PARSER.add_argument('data_type', help="The type of collected data")
 
 PROFILE_GET_PARSER = reqparse.RequestParser()
 PROFILE_GET_PARSER.add_argument('section', required=True, help="The section to be configured")

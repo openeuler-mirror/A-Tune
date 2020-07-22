@@ -53,7 +53,7 @@ class Collector(Resource):
         current_app.logger.info(monitors)
 
         data = []
-
+        data_type = args.get("data_type")
         for _ in range(collect_num):
             raw_data = MPI.get_monitors_data(monitors, mpis)
             current_app.logger.info(raw_data)
@@ -62,14 +62,16 @@ class Collector(Resource):
             for num in raw_data:
                 float_data.append(float(num))
 
-            data.append(float_data)
-
             str_data = [str(round(data, 3)) for data in float_data]
             n_pipe.write(" ".join(str_data) + "\n")
 
+            if data_type != "":
+                float_data.append(data_type)
+            data.append(float_data)
+
         n_pipe.close()
 
-        path = "/run/atuned/test.csv"
+        path = args.get("file")
         save_file(path, data)
         result = {}
         result["path"] = path

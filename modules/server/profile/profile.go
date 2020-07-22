@@ -14,6 +14,11 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	_ "gitee.com/openeuler/A-Tune/common/checker"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -27,24 +32,17 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/tuning"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"bufio"
-	"bytes"
-	"context"
-	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
 	HTTP "net/http"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/go-ini/ini"
@@ -64,6 +62,8 @@ type CollectorPost struct {
 	Monitors  []Monitor `json:"monitors"`
 	SampleNum int       `json:"sample_num"`
 	Pipe      string    `json:"pipe"`
+	File      string    `json:"file"`
+	DataType  string    `json:"data_type"`
 }
 
 // RespCollectorPost : the response of collection servie
@@ -419,10 +419,15 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 				if len(match) < 2 {
 					continue
 				}
-				if !s.Raw.Section("system").Haskey(match[1]) {
-					return fmt.Errorf("%s is not exist in the system section", match[1])
+				var value string
+				if s.Raw.Section("system").Haskey(match[1]) {
+					value = s.Raw.Section("system").Key(match[1]).Value()
+				} else if s.Raw.Section("server").Haskey(match[1]) {
+					value = s.Raw.Section("server").Key(match[1]).Value()
+				} else {
+					return fmt.Errorf("%s is not exist in the system or server section", match[1])
 				}
-				value := s.Raw.Section("system").Key(match[1]).Value()
+				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
 				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
 			}
 		}
@@ -436,6 +441,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
 	collectorBody.Pipe = npipe
+	collectorBody.File = "/run/atuned/test.csv"
 
 	respCollectPost, err := collectorBody.Post()
 	if err != nil {
@@ -861,62 +867,77 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return err
 	}
 
-	collector := path.Join(config.DefaultCollectorPath, "collect_training_data.sh")
-	script := make([]string, 0)
-
-	script = append(script, collector)
-	script = append(script, message.GetWorkload())
-	script = append(script, strconv.FormatInt(message.GetDuration(), 10))
-	script = append(script, strconv.FormatInt(message.GetInterval(), 10))
-	script = append(script, message.GetOutputPath())
-	script = append(script, message.GetBlock())
-	script = append(script, message.GetNetwork())
-	script = append(script, message.GetType())
-
-	newScript := strings.Join(script, " ")
-	cmd := exec.Command("sh", "-c", newScript)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-	stdout, _ := cmd.StdoutPipe()
-	stderr, _ := cmd.StderrPipe()
-
-	ctx := stream.Context()
-	go func() {
-		for range ctx.Done() {
-			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-			return
-		}
-	}()
-
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		for scanner.Scan() {
-			line := scanner.Text()
-			_ = stream.Send(&PB.AckCheck{Name: line})
-		}
-	}()
-
-	go func() {
-		scanner := bufio.NewScanner(stderr)
-		for scanner.Scan() {
-			line := scanner.Text()
-			_ = stream.Send(&PB.AckCheck{Name: line})
-		}
-	}()
-
-	err = cmd.Start()
+	npipe, err := utils.CreateNamedPipe()
 	if err != nil {
-		log.Error(err)
+		return fmt.Errorf("create named pipe failed")
+	}
+
+	defer os.Remove(npipe)
+
+	go func() {
+		file, _ := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
+		reader := bufio.NewReader(file)
+
+		scanner := bufio.NewScanner(reader)
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+		}
+	}()
+
+	collections, err := sqlstore.GetCollections()
+	if err != nil {
+		log.Errorf("inquery collection tables error: %v", err)
 		return err
 	}
 
-	err = cmd.Wait()
+	monitors := make([]Monitor, 0)
+	for _, collection := range collections {
+		re := regexp.MustCompile(`\{([^}]+)\}`)
+		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
+		if len(matches) > 0 {
+			for _, match := range matches {
+				if len(match) < 2 {
+					continue
+				}
 
+				var value string
+				if match[1] == "disk" {
+					value = message.GetBlock()
+				} else if match[1] == "network" {
+					value = message.GetNetwork()
+				} else if match[1] == "interval" {
+					value = strconv.FormatInt(message.GetInterval(), 10)
+				} else {
+					log.Warnf("%s is not recognized", match[1])
+					continue
+				}
+				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
+				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
+			}
+		}
+
+		monitor := Monitor{Module: collection.Module, Purpose: collection.Purpose, Field: collection.Metrics}
+		monitors = append(monitors, monitor)
+	}
+
+	collectorBody := new(CollectorPost)
+	collectorBody.SampleNum = int(message.GetDuration() / message.GetInterval())
+	collectorBody.Monitors = monitors
+	collectorBody.Pipe = npipe
+	nowTime := time.Now().Format("20200721-194550")
+	fileName := fmt.Sprintf("%s-%s.csv", message.GetWorkload(), nowTime)
+	collectorBody.File = path.Join(message.GetOutputPath(), fileName)
+	collectorBody.DataType = message.GetType()
+
+	_, err = collectorBody.Post()
 	if err != nil {
-		log.Error(err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
 
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("generate %s successfully", collectorBody.File)})
 	return nil
 }
 
@@ -1007,10 +1028,15 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 				if len(match) < 2 {
 					continue
 				}
-				if !s.Raw.Section("system").Haskey(match[1]) {
-					return fmt.Errorf("%s is not exist in the system section", match[1])
+				var value string
+				if s.Raw.Section("system").Haskey(match[1]) {
+					value = s.Raw.Section("system").Key(match[1]).Value()
+				} else if s.Raw.Section("server").Haskey(match[1]) {
+					value = s.Raw.Section("server").Key(match[1]).Value()
+				} else {
+					return fmt.Errorf("%s is not exist in the system or server section", match[1])
 				}
-				value := s.Raw.Section("system").Key(match[1]).Value()
+				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
 				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
 			}
 		}
@@ -1024,6 +1050,7 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
 	collectorBody.Pipe = npipe
+	collectorBody.File = "/run/atuned/test.csv"
 
 	respCollectPost, err := collectorBody.Post()
 	if err != nil {

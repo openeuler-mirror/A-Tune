@@ -315,16 +315,16 @@ INSERT INTO tuned_item(property, item) VALUES("compile_security", "Compiler");
 INSERT INTO tuned_item(property, item) VALUES("/etc/profile", "Profile");
 
 -- collection table
-INSERT INTO collection(name, module, purpose, metrics) VALUES("cpu", "CPU", "STAT", "--interval=5; --fields=usr --fields=nice --fields=sys --fields=iowait --fields=irq --fields=soft --fields=steal --fields=guest --threshold=30 --fields=util --fields=cutil");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("storage", "STORAGE", "STAT", "--interval=5;--device={disk} --fields=rs --fields=ws --fields=rMBs --fields=wMBs --fields=rrqm --fields=wrqm --fields=rareq-sz --fields=wareq-sz --fields=r_await --fields=w_await --fields=util --fields=aqu-sz"); 
-INSERT INTO collection(name, module, purpose, metrics) VALUES("network", "NET", "STAT", "--interval=5;--nic={network} --fields=rxkBs --fields=txkBs --fields=rxpcks --fields=txpcks --fields=ifutil");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("network-err", "NET", "ESTAT", "--interval=5;--nic={network} --fields=errs --fields=util");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("mem.band", "MEM", "BANDWIDTH", "--interval=2;--fields=Total_Util");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("perf", "PERF", "STAT", "--interval=5;--fields=IPC --fields=CACHE-MISS-RATIO --fields=MPKI --fields=ITLB-LOAD-MISS-RATIO --fields=DTLB-LOAD-MISS-RATIO --fields=SBPI --fields=SBPC");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("vmstat", "MEM", "VMSTAT", "--interval=5;--fields=procs.b --fields=memory.swpd --fields=io.bo --fields=system.in --fields=system.cs --fields=util.swap --fields=util.cpu --fields=procs.r");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.task", "SYS", "TASKS", "--interval=5;--fields=procs --fields=cswchs");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.ldavg", "SYS", "LDAVG", "--interval=5;--fields=runq-sz --fields=plist-sz --fields=ldavg-1 --fields=ldavg-5");
-INSERT INTO collection(name, module, purpose, metrics) VALUES("file.util", "SYS", "FDUTIL", "--interval=5;--fields=fd-util");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("cpu", "CPU", "STAT", "--interval={interval}; --fields=usr --fields=nice --fields=sys --fields=iowait --fields=irq --fields=soft --fields=steal --fields=guest --threshold=30 --fields=util --fields=cutil");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("storage", "STORAGE", "STAT", "--interval={interval};--device={disk} --fields=rs --fields=ws --fields=rMBs --fields=wMBs --fields=rrqm --fields=wrqm --fields=rareq-sz --fields=wareq-sz --fields=r_await --fields=w_await --fields=util --fields=aqu-sz");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("network", "NET", "STAT", "--interval={interval};--nic={network} --fields=rxkBs --fields=txkBs --fields=rxpcks --fields=txpcks --fields=ifutil");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("network-err", "NET", "ESTAT", "--interval={interval};--nic={network} --fields=errs --fields=util");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("mem.band", "MEM", "BANDWIDTH", "--interval={interval};--fields=Total_Util");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("perf", "PERF", "STAT", "--interval={interval};--fields=IPC --fields=CACHE-MISS-RATIO --fields=MPKI --fields=ITLB-LOAD-MISS-RATIO --fields=DTLB-LOAD-MISS-RATIO --fields=SBPI --fields=SBPC");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("vmstat", "MEM", "VMSTAT", "--interval={interval};--fields=procs.b --fields=memory.swpd --fields=io.bo --fields=system.in --fields=system.cs --fields=util.swap --fields=util.cpu --fields=procs.r");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.task", "SYS", "TASKS", "--interval={interval};--fields=procs --fields=cswchs");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("sys.ldavg", "SYS", "LDAVG", "--interval={interval};--fields=runq-sz --fields=plist-sz --fields=ldavg-1 --fields=ldavg-5");
+INSERT INTO collection(name, module, purpose, metrics) VALUES("file.util", "SYS", "FDUTIL", "--interval={interval};--fields=fd-util");
 
 -- Dynamic_tuned table
 INSERT INTO rule_tuned(name, class, expression, action, opposite_action, monitor, field) VALUES("hpre", "webserver", "object in ('libssl', 'libcrypto')", "openssl_hpre=1", "openssl_hpre=0","PERF.TOP", ";--fields=overhead --fields=object --fields=symbol --addr-merge=0x3f");
