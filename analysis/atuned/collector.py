@@ -38,14 +38,22 @@ class Collector(Resource):
         args = COLLECTOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
         n_pipe = get_npipe(args.get("pipe"))
-        if n_pipe is None:
-            abort(404)
-
         monitors = []
         mpis = []
+        field_name = []
         for monitor in args.get(self.monitors):
             monitors.append([monitor["module"], monitor["purpose"], monitor["field"]])
             mpis.append(MPI.get_monitor(monitor["module"], monitor["purpose"]))
+            opts = monitor["field"].split(";")[1].split()
+            for opt in opts:
+                if opt.split("=")[0] in "--fields":
+                    field_name.append("%s.%s.%s" % (monitor["module"], monitor["purpose"],
+                                                    opt.split("=")[1]))
+        data_type = args.get("data_type")
+        if data_type != "":
+            field_name.append("workload.type")
+            field_name.append("workload.appname")
+
         collect_num = args.get("sample_num")
         if int(collect_num) < 1:
             abort("sample_num must be greater than 0")
@@ -53,7 +61,6 @@ class Collector(Resource):
         current_app.logger.info(monitors)
 
         data = []
-        data_type = args.get("data_type")
         for _ in range(collect_num):
             raw_data = MPI.get_monitors_data(monitors, mpis)
             current_app.logger.info(raw_data)
@@ -63,25 +70,28 @@ class Collector(Resource):
                 float_data.append(float(num))
 
             str_data = [str(round(data, 3)) for data in float_data]
-            n_pipe.write(" ".join(str_data) + "\n")
+            if n_pipe is not None:
+                n_pipe.write(" ".join(str_data) + "\n")
 
             if data_type != "":
-                float_data.append(data_type)
+                for type_name in data_type.split(":"):
+                    float_data.append(type_name)
             data.append(float_data)
 
-        n_pipe.close()
+        if n_pipe is not None:
+            n_pipe.close()
 
         path = args.get("file")
-        save_file(path, data)
+        save_file(path, data, field_name)
         result = {}
         result["path"] = path
         return result, 200
 
 
-def save_file(file_name, datas):
+def save_file(file_name, datas, field):
     """save file"""
     path = os.path.dirname(file_name.strip())
     if not os.path.exists(path):
         os.makedirs(path, 0o750)
-    writer = pd.DataFrame(columns=None, data=datas)
-    writer.to_csv(file_name, encoding='utf-8', header=0, index=False)
+    writer = pd.DataFrame(columns=field, data=datas)
+    writer.to_csv(file_name, encoding='utf-8', index=False)

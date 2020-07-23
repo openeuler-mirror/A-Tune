@@ -40,6 +40,24 @@ class WorkloadCharacterization:
         self.tencoder = LabelEncoder()
         self.aencoder = LabelEncoder()
         self.dataset = None
+        self.data_features = ['CPU.STAT.usr', 'CPU.STAT.nice', 'CPU.STAT.sys', 'CPU.STAT.iowait',
+                              'CPU.STAT.irq', 'CPU.STAT.soft', 'CPU.STAT.steal', 'CPU.STAT.guest',
+                              'CPU.STAT.util', 'CPU.STAT.cutil', 'STORAGE.STAT.rs',
+                              'STORAGE.STAT.ws', 'STORAGE.STAT.rMBs', 'STORAGE.STAT.wMBs',
+                              'STORAGE.STAT.rrqm', 'STORAGE.STAT.wrqm', 'STORAGE.STAT.rareq-sz',
+                              'STORAGE.STAT.wareq-sz', 'STORAGE.STAT.r_await',
+                              'STORAGE.STAT.w_await', 'STORAGE.STAT.util', 'STORAGE.STAT.aqu-sz',
+                              'NET.STAT.rxkBs', 'NET.STAT.txkBs', 'NET.STAT.rxpcks',
+                              'NET.STAT.txpcks', 'NET.STAT.ifutil', 'NET.ESTAT.errs',
+                              'NET.ESTAT.util', 'MEM.BANDWIDTH.Total_Util', 'PERF.STAT.IPC',
+                              'PERF.STAT.CACHE-MISS-RATIO', 'PERF.STAT.MPKI',
+                              'PERF.STAT.ITLB-LOAD-MISS-RATIO', 'PERF.STAT.DTLB-LOAD-MISS-RATIO',
+                              'PERF.STAT.SBPI', 'PERF.STAT.SBPC', 'MEM.VMSTAT.procs.b',
+                              'MEM.VMSTAT.io.bo', 'MEM.VMSTAT.system.in', 'MEM.VMSTAT.system.cs',
+                              'MEM.VMSTAT.util.swap', 'MEM.VMSTAT.util.cpu', 'MEM.VMSTAT.procs.r',
+                              'SYS.TASKS.procs', 'SYS.TASKS.cswchs', 'SYS.LDAVG.runq-sz',
+                              'SYS.LDAVG.plist-sz', 'SYS.LDAVG.ldavg-1', 'SYS.LDAVG.ldavg-5',
+                              'SYS.FDUTIL.fd-util']
 
     def parsing(self, data_path, header=0, analysis=False):
         """
@@ -49,8 +67,12 @@ class WorkloadCharacterization:
         """
         df_content = []
         csvfiles = glob.glob(data_path)
+        selected_cols = self.data_features
+        selected_cols.append('workload.type')
+        selected_cols.append('workload.appname')
+
         for csv in csvfiles:
-            data = pd.read_csv(csv, index_col=None, header=header)
+            data = pd.read_csv(csv, index_col=None, header=header, usecols=selected_cols)
             df_content.append(data)
             dataset = pd.concat(df_content, sort=False)
         self.dataset = dataset
@@ -134,7 +156,7 @@ class WorkloadCharacterization:
         w_array = np.ones(y_train.shape[0], dtype='float')
         for i, val in enumerate(y_train):
             w_array[i] = class_weights[val]
-        model = RandomForestClassifier(n_estimators=200, oob_score=True, random_state=0)
+        model = RandomForestClassifier(n_estimators=150, oob_score=True, random_state=0)
         model.fit(x_train, y_train, sample_weight=w_array)
         y_pred = model.predict(x_test)
         print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
@@ -216,7 +238,7 @@ class WorkloadCharacterization:
         identify the workload_type according to input data
         :param data:  input data
         """
-        data = pd.DataFrame(data)
+        data = data[self.data_features]
         tencoder_path = os.path.join(self.model_path, "tencoder.pkl")
         aencoder_path = os.path.join(self.model_path, "aencoder.pkl")
         scaler_path = os.path.join(self.model_path, "scaler.pkl")
@@ -285,8 +307,8 @@ class WorkloadCharacterization:
         encodername = modelname + '_encoder.pkl'
 
         data_path = os.path.join(data_path, "*.csv")
-        self.parsing(data_path, header=None)
-        x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-1])
+        self.parsing(data_path)
+        x_axis = self.scaler.fit_transform(self.dataset.iloc[:, :-2])
         y_axis = self.aencoder.fit_transform(self.dataset.iloc[:, -1])
         joblib.dump(self.scaler, os.path.join(dirname, scalername))
         joblib.dump(self.aencoder, os.path.join(dirname, encodername))

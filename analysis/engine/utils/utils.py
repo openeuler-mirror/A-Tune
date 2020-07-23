@@ -30,8 +30,7 @@ def read_from_csv(path):
         return None
 
     with open(path, 'r') as file:
-        data = pd.read_csv(file, header=None)
-        data = np.array(data).tolist()
+        data = pd.read_csv(file, header=0)
 
     return data
 
