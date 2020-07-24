@@ -44,6 +44,7 @@ const (
 	DefaultProfilePath      = DefaultPath + "profiles"
 	DefaultConfPath         = "/etc/atuned/"
 	DefaultTuningPath       = DefaultConfPath + "tuning/"
+	DefaultRulePath         = DefaultConfPath + "rules/"
 	DefaultScriptPath       = "/usr/libexec/atuned/scripts"
 	DefaultCollectorPath    = "/usr/libexec/atuned/collector"
 	DefaultAnalysisPath     = "/usr/libexec/atuned/analysis"
@@ -90,6 +91,7 @@ const (
 //tuning config
 const (
 	TuningFile          string = DefaultTempPath + "/tuning.log"
+	TuningRuleFile      string = "tuning_rules.grl"
 	TuningRestoreConfig string = "-tuning-restore.conf"
 	DefaultTimeFormat   string = "2006-01-02 15:04:05"
 )

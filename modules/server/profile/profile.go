@@ -46,6 +46,7 @@ import (
 	"time"
 
 	"github.com/go-ini/ini"
+	"github.com/mitchellh/mapstructure"
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 )
@@ -68,7 +69,8 @@ type CollectorPost struct {
 
 // RespCollectorPost : the response of collection servie
 type RespCollectorPost struct {
-	Path string `json:"path"`
+	Path string                 `json:"path"`
+	Data map[string]interface{} `json:"data"`
 }
 
 // ClassifyPostBody : the body send to classify service
@@ -573,6 +575,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 	}()
 
 	var optimizer = tuning.Optimizer{}
+
 	for {
 		reply, err := stream.Recv()
 		if err == io.EOF {
@@ -606,7 +609,6 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		if err = tuning.CheckServerPrj(data, &optimizer); err != nil {
 			return err
 		}
-
 		//content == nil means in restore config
 		if content == nil {
 			if err = optimizer.RestoreConfigTuned(ch); err != nil {
@@ -1235,5 +1237,157 @@ func (s *ProfileServer) Schedule(message *PB.ScheduleMessage,
 	}
 
 	_ = stream.Send(&PB.AckCheck{Name: "schedule finished"})
+	return nil
+}
+
+func (s *ProfileServer) collection() (*RespCollectorPost, error) {
+	//1. get the dimension structure of the system data to be collected
+	collections, err := sqlstore.GetCollections()
+	if err != nil {
+		log.Errorf("inquery collection tables error: %v", err)
+		return nil, err
+	}
+
+	// 1.1 send the collect data command to the monitor service
+	monitors := make([]Monitor, 0)
+	for _, collection := range collections {
+		re := regexp.MustCompile(`\{([^}]+)\}`)
+		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
+		if len(matches) > 0 {
+			for _, match := range matches {
+				if len(match) < 2 {
+					continue
+				}
+				var value string
+				if s.Raw.Section("system").Haskey(match[1]) {
+					value = s.Raw.Section("system").Key(match[1]).Value()
+				} else if s.Raw.Section("server").Haskey(match[1]) {
+					value = s.Raw.Section("server").Key(match[1]).Value()
+				} else {
+					return nil, fmt.Errorf("%s is not exist in the system or server section", match[1])
+				}
+				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
+				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
+			}
+		}
+
+		monitor := Monitor{Module: collection.Module, Purpose: collection.Purpose, Field: collection.Metrics}
+		monitors = append(monitors, monitor)
+	}
+
+	sampleNum := s.Raw.Section("server").Key("sample_num").MustInt(20)
+	collectorBody := new(CollectorPost)
+	collectorBody.SampleNum = sampleNum
+	collectorBody.Monitors = monitors
+	collectorBody.File = "/run/atuned/test.csv"
+
+	log.Infof("tuning collector body is:", collectorBody)
+	respCollectPost, err := collectorBody.Post()
+	if err != nil {
+		return nil, err
+	}
+	return respCollectPost, nil
+}
+
+func (s *ProfileServer) classify(dataPath string) (string, string, error) {
+	//2. send the collected data to the model for completion type identification
+	var resourceLimit string
+	var workloadType string
+	dataPath, err := Post("classification", "file", dataPath)
+	if err != nil {
+		log.Errorf("Failed transfer file to server: %v", err)
+		return workloadType, resourceLimit, err
+	}
+	body := new(ClassifyPostBody)
+	body.Data = dataPath
+	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
+
+	respPostIns, err := body.Post()
+	if err != nil {
+		return workloadType, resourceLimit, err
+	}
+
+	log.Infof("workload %s, cluster result resource limit: %s",
+		respPostIns.WorkloadType, respPostIns.ResourceLimit)
+	resourceLimit = respPostIns.ResourceLimit
+	workloadType = respPostIns.WorkloadType
+	return workloadType, resourceLimit, nil
+}
+
+func (s *ProfileServer) Getworkload() (string, error) {
+	respCollectPost, err := s.collection()
+	if err != nil {
+		return "", err
+	}
+
+	workload, _, err := s.classify(respCollectPost.Path)
+	if err != nil {
+		return "", err
+	}
+	if len(workload) == 0 {
+		return "", fmt.Errorf("workload is empty")
+	}
+	return workload, nil
+}
+
+// Generate method generate the yaml file for tuning
+func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_GenerateServer) error {
+	ch := make(chan *PB.AckCheck)
+	defer close(ch)
+	go func() {
+		for value := range ch {
+			_ = stream.Send(value)
+		}
+	}()
+
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("1.Start to analysis the system bottleneck")})
+	respCollectPost, err := s.collection()
+	if err != nil {
+		return err
+	}
+	log.Infof("collect data response body is: %+v", respCollectPost)
+	collectData := respCollectPost.Data
+	projectName := message.GetName()
+
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("2.Finding potential tuning parameters")})
+
+	var tuningData tuning.TuningData
+	err = mapstructure.Decode(collectData, &tuningData)
+	if err != nil {
+		return err
+	}
+	log.Infof("decode to structure is: %+v", tuningData)
+
+	ruleFile := path.Join(config.DefaultRulePath, config.TuningRuleFile)
+	engine := tuning.NewRuleEngine(ruleFile)
+	if engine == nil {
+		fmt.Errorf("create rules engine failed")
+	}
+
+	tuningFile := tuning.NewTuningFile(projectName, ch)
+	err = tuningFile.Load()
+	if err != nil {
+		return err
+	}
+	engine.AddContext("TuningData", &tuningData)
+	engine.AddContext("TuningFile", tuningFile)
+	err = engine.Execute()
+	if err != nil {
+		return err
+	}
+
+	if len(tuningFile.PrjSrv.Object) <= 0 {
+		_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("   No tuning parameters founed")})
+		return nil
+	}
+	dstFile := path.Join(config.DefaultTuningPath, fmt.Sprintf("%s.yaml", projectName))
+	log.Infof("generate tuning file: %s", dstFile)
+
+	err = tuningFile.Save(dstFile)
+	if err != nil {
+		return err
+	}
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("3. Generate tuning project: %s\n    project name: %s", dstFile, projectName)})
+
 	return nil
 }

@@ -1,0 +1,27 @@
+rule MemUtil "When the Memory Total_Util is greater than 15 append the prefetcher object." salience 10 {
+    when
+        TuningData.TotalUtil > 10
+    then
+	TuningFile.AppendObject("prefetcher");
+}
+
+rule CpuBind "When sys is greater than usr append the cpu.band object."  {
+    when
+        TuningData.Sys / TuningData.User > 1
+    then
+	TuningFile.AppendObject("cpu.bind");
+}
+
+rule CutilCpu "When cutil is greater than  util.cpu append the kernel.numa_balancing object."  {
+    when
+        TuningData.Cutil / TuningData.UtilCpu > 1.05
+    then
+	TuningFile.AppendObject("kernel.numa_balancing");
+}
+
+rule Migrations "When perf stat migrations item is greater than 40000 append the kernel.sched_migration_cost_ns."  {
+    when
+        TuningData.Migrations > 40000
+    then
+	TuningFile.AppendObject("kernel.sched_migration_cost_ns");
+}

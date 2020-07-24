@@ -41,6 +41,7 @@ install:
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
 	mkdir -p $(DESTDIR)/etc/atuned/tuning
+	mkdir -p $(DESTDIR)/etc/atuned/rules
 	mkdir -p $(DESTDIR)/etc/atuned/training
 	mkdir -p $(DESTDIR)/etc/atuned/classification
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/modules
@@ -57,6 +58,7 @@ install:
 	install -m 750 pkg/atuned $(BINDIR)
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
+	install -m 640 rules/tuning/tuning_rules.grl $(DESTDIR)/etc/atuned/rules
 	install -m 640 misc/atune-engine.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
