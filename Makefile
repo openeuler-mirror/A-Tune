@@ -71,6 +71,7 @@ install:
 	@echo "END INSTALL A-Tune"
 
 rpm:
-	git archive --format=tar --prefix=A-Tune/ HEAD | gzip -9 > openeuler-A-Tune-v$(VERSION).tar.gz
-	mv openeuler-A-Tune-v$(VERSION).tar.gz ~/rpmbuild/SOURCES
+	cd .. && tar -zcvf openeuler-A-Tune-v$(VERSION).tar.gz A-Tune
+	mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+	mv ../openeuler-A-Tune-v$(VERSION).tar.gz ~/rpmbuild/SOURCES
 	rpmbuild -ba misc/atune.spec

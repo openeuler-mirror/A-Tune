@@ -53,17 +53,10 @@ Requires: python3-pandas
 atune engine tool for manage atuned AI tuning system.
 
 %prep
-%setup -n A-Tune -q
+%autosetup -n A-Tune -p1
 
 %build
-cd ../
-mkdir -p gopath/src/
-rm -rf gopath/src/%{name}
-mv A-Tune gopath/src/%{name}
-cd gopath/src/%{name}
-make
-cd ../
-cp -rf %{name} ../../A-Tune
+%make_build
 
 %install
 %make_install
@@ -113,8 +106,8 @@ cp -rf %{name} ../../A-Tune
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0750,root,root) /etc/atuned/*
 %exclude /usr/libexec/atuned/analysis/app.py
-%exclude /usr/libexec/atuned/plugin/
-%exclude /usr/libexec/atuned/atuned/
+%exclude /usr/libexec/atuned/analysis/plugin/
+%exclude /usr/libexec/atuned/analysis/atuned/
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0640,root,root) %dir /etc/atuned
 
