@@ -78,6 +78,10 @@ class Collector(Resource):
                     float_data.append(type_name)
             data.append(float_data)
 
+        data_average = [sum(elem)/len(elem) for elem in zip(*data)]
+        data_result = {}
+        for index, _ in enumerate(data_average):
+            data_result[field_name[index]] = data_average[index]
         if n_pipe is not None:
             n_pipe.close()
 
@@ -85,6 +89,7 @@ class Collector(Resource):
         save_file(path, data, field_name)
         result = {}
         result["path"] = path
+        result["data"] = data_result
         return result, 200
 
 

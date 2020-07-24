@@ -33,6 +33,7 @@ service ProfileMgr {
 	rpc Delete(ProfileInfo) returns (Ack) {}
 	rpc Update(ProfileInfo) returns (Ack) {}
 	rpc Schedule(ScheduleMessage) returns (stream AckCheck) {}
+	rpc Generate(ProfileInfo) returns (stream AckCheck) {}
 }
 
 message ListMessage {
