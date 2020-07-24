@@ -62,8 +62,8 @@ var collectionCommand = cli.Command{
 			Value: "",
 		},
 		cli.StringFlag{
-			Name:  "workload_type,t",
-			Usage: "the workload type of the collected data",
+			Name:  "app_type,t",
+			Usage: "the app type of the collected data",
 			Value: "",
 		},
 	},
@@ -71,7 +71,7 @@ var collectionCommand = cli.Command{
 		desc := `
 	 collect data for train machine learning model, you must set the command options
 	 which has no default value, the output_path must be a absolute path.
-	     example: atune-adm collection -f mysql -i 5 -d 1200 -o /home -b sda -n eth0 -t idle`
+	     example: atune-adm collection -f mysql -i 5 -d 1200 -o /home -b sda -n eth0 -t mysql`
 		return desc
 	}(),
 	Action: collection,
@@ -112,9 +112,9 @@ func checkCollectionCtx(ctx *cli.Context) error {
 		return fmt.Errorf("error: network must be specified")
 	}
 
-	if ctx.String("workload_type") == "" {
+	if ctx.String("app_type") == "" {
 		_ = cli.ShowCommandHelp(ctx, "collection")
-		return fmt.Errorf("error: workload type must be specified")
+		return fmt.Errorf("error: app type must be specified")
 	}
 
 	if ctx.String("output_path") == "" {
@@ -160,7 +160,7 @@ func collection(ctx *cli.Context) error {
 		OutputPath: outputPath,
 		Block:      ctx.String("disk"),
 		Network:    ctx.String("network"),
-		Type:       ctx.String("workload_type"),
+		Type:       ctx.String("app_type"),
 	}
 
 	svc := PB.NewProfileMgrClient(c.Connection())

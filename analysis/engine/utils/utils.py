@@ -19,7 +19,6 @@ import os
 import logging
 import tarfile
 import pandas as pd
-import numpy as np
 
 
 def read_from_csv(path):
@@ -30,16 +29,16 @@ def read_from_csv(path):
         return None
 
     with open(path, 'r') as file:
-        data = pd.read_csv(file, header=None)
-        data = np.array(data).tolist()
+        data = pd.read_csv(file, header=0)
 
     return data
 
 
 def extract_file(file_path, target_path):
+    """extract file"""
     tar = tarfile.open(file_path)
     logging.debug("%s", tar.getnames())
     tar.extractall(path=target_path)
     tar.close()
     res_path = file_path.rpartition('-')[0]
-    return res_path            
+    return res_path

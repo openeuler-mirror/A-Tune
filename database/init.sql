@@ -81,24 +81,46 @@ INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default",
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("ceph", "ceph", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_hdd", "hadoop-hdfs", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_ssd", "hadoop-hdfs", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("spark", "spark", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mongodb", "mongodb", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb", "mariadb", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mysql", "mysql", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("postgresql", "postgresql", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx", "nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("apache", "apache-traffic-server", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("redis", "redis", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("speccpu", "speccpu", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("specjbb", "specjbb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("dubbo", "dubbo", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("robox", "robox", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("kvm", "kvm", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hpc", "gatk4", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("olc", "consumer-cloud", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_kvm", "mariadb_kvm", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_docker", "mariadb_docker", "", 0);
 
 -- class_profile:
 INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default-default", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("ceph", "storage-ceph-vdbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_hdd", "big-data-hadoop-hdfs-dfsio-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_ssd", "big-data-hadoop-hdfs-dfsio-ssd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("spark", "big-data-hadoop-spark-hibench", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("mongodb", "database-mongodb-2p-sysbench", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb", "database-mariadb-2p-tpcc-c3", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mysql", "database-mysql-2p-sysbench-hdd", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("postgresql", "database-postgresql-2p-sysbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("nginx", "web-nginx-https-short-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("apache", "web-apache-traffic-server-spirent-pingpo", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("redis", "in-memory-database-redis-redis-benchmark", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("speccpu", "basic-test-suite-speccpu-speccpu2006", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("specjbb", "basic-test-suite-specjbb-specjbb2015", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("dubbo", "middleware-dubbo-dubbo-benchmark", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("robox", "arm-native-android-container-robox", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("kvm", "cloud-compute-kvm-host", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("hpc", "hpc-gatk4-human-genome", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("olc", "virtualization-consumer-cloud-olc", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb_kvm", "virtualization-mariadb-2p-tpcc-c3", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb_docker", "docker-mariadb-2p-tpcc-c3", 0);
 
 -- Performance Point
 INSERT INTO tuned_item(property, item) VALUES("check_environment", "Check");

@@ -843,12 +843,18 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return fmt.Errorf("input:%s is invalid", message.GetNetwork())
 	}
 
-	classApps := &sqlstore.GetClassApp{Class: message.GetType()}
-	if err = sqlstore.GetClassApps(classApps); err != nil {
+	classProfile := &sqlstore.GetClass{Class: message.GetType()}
+	if err = sqlstore.GetClasses(classProfile); err != nil {
 		return err
 	}
-	if len(classApps.Result) == 0 {
-		return fmt.Errorf("workload type %s is not exist, please use define command first", message.GetType())
+	if len(classProfile.Result) == 0 {
+		return fmt.Errorf("app type %s is not exist, use define command first", message.GetType())
+	}
+
+	profileType := classProfile.Result[0].ProfileType
+	include, err := profile.GetProfileInclude(profileType)
+	if err != nil {
+		return err
 	}
 
 	exist, err := utils.PathExist(message.GetOutputPath())
@@ -866,25 +872,6 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	if err = utils.DiskByName(message.GetBlock()); err != nil {
 		return err
 	}
-
-	npipe, err := utils.CreateNamedPipe()
-	if err != nil {
-		return fmt.Errorf("create named pipe failed")
-	}
-
-	defer os.Remove(npipe)
-
-	go func() {
-		file, _ := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
-		reader := bufio.NewReader(file)
-
-		scanner := bufio.NewScanner(reader)
-
-		for scanner.Scan() {
-			line := scanner.Text()
-			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
-		}
-	}()
 
 	collections, err := sqlstore.GetCollections()
 	if err != nil {
@@ -925,11 +912,15 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = int(message.GetDuration() / message.GetInterval())
 	collectorBody.Monitors = monitors
-	collectorBody.Pipe = npipe
-	nowTime := time.Now().Format("20200721-194550")
+	nowTime := time.Now().Format("20060702-150405")
 	fileName := fmt.Sprintf("%s-%s.csv", message.GetWorkload(), nowTime)
 	collectorBody.File = path.Join(message.GetOutputPath(), fileName)
-	collectorBody.DataType = message.GetType()
+	if include == "" {
+		include = "default"
+	}
+	collectorBody.DataType = fmt.Sprintf("%s:%s", include, message.GetType())
+
+	_ = stream.Send(&PB.AckCheck{Name: "start to collect data"})
 
 	_, err = collectorBody.Post()
 	if err != nil {

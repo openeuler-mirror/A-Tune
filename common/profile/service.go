@@ -14,8 +14,10 @@
 package profile
 
 import (
+	"fmt"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/utils"
+	"github.com/go-ini/ini"
 	"io/ioutil"
 	"os"
 	"path"
@@ -103,4 +105,53 @@ func UpdateProfile(profileName string, data string) error {
 	}
 
 	return nil
+}
+
+// GetProfileInclude method get include info in profile
+func GetProfileInclude(name string) (string, error) {
+	var file *ini.File
+	err := filepath.Walk(config.DefaultProfilePath, func(absPath string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			absFilename := absPath[len(config.DefaultProfilePath)+1:]
+			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
+				path.Ext(info.Name()))
+			if filenameOnly == name {
+				file, err = ini.Load(absPath)
+				if err != nil {
+					return err
+				}
+				return nil
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if file == nil {
+		return "", fmt.Errorf("%s profile is not found", name)
+	}
+
+	for _, section := range file.Sections() {
+		if section.Name() == "main" {
+			if section.HasKey("include") {
+				key, _ := section.GetKey("include")
+				values := make([]string, 0)
+				for _, includeValue := range strings.Split(key.Value(), ",") {
+					segValue := strings.SplitN(includeValue, "-", 2)
+					value := segValue[0]
+					if len(segValue) >= 2 {
+						value = segValue[1]
+					}
+					values = append(values, value)
+				}
+
+				return strings.Join(values, "-"), nil
+			}
+		}
+	}
+
+	return "", nil
 }

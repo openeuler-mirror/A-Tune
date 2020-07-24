@@ -47,7 +47,7 @@ class Classification(Resource):
         model = args.get(self.model, None)
         data = utils.read_from_csv(data_path)
         os.remove(data_path)
-        if not data:
+        if data.empty:
             abort("data may be not exist")
 
         classification = WorkloadCharacterization(model_path)
