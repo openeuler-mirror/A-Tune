@@ -14,17 +14,19 @@
 package models
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/http"
 	"encoding/json"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
 	"io/ioutil"
 )
 
 // OptimizerPostBody send to the service to create a optimizer task
 type OptimizerPostBody struct {
-	MaxEval int    `json:"max_eval"`
-	Knobs   []Knob `json:"knobs"`
+	MaxEval      int32  `json:"max_eval"`
+	Knobs        []Knob `json:"knobs"`
+	Engine       string `json:"engine"`
+	RandomStarts int32  `json:"random_starts"`
 }
 
 // Knob body store the tuning properties
@@ -35,7 +37,7 @@ type Knob struct {
 	Type    string   `json:"type"`
 	Range   []int64  `json:"range"`
 	Items   []int64  `json:"items"`
-	Step    int64    `json:"step"`
+	Step    float32  `json:"step"`
 	Ref     string   `json:"ref"`
 }
 
@@ -54,8 +56,10 @@ type OptimizerPutBody struct {
 
 // RespPutBody :the body returned of each optimizer iteration
 type RespPutBody struct {
-	Param   string `json:"param"`
-	Message string `json:"message"`
+	Param    string `json:"param"`
+	Message  string `json:"message"`
+	Rank     string `json:"rank"`
+	Finished bool   `json:"finished"`
 }
 
 // Post method create a optimizer task
@@ -73,15 +77,15 @@ func (o *OptimizerPostBody) Post() (*RespPostBody, error) {
 		return nil, err
 	}
 
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf(string(respBody))
+	}
+
 	respPostIns := new(RespPostBody)
 
 	err = json.Unmarshal(respBody, respPostIns)
 	if err != nil {
 		return nil, err
-	}
-
-	if res.StatusCode != 200 {
-		return nil, fmt.Errorf(respPostIns.Message)
 	}
 
 	return respPostIns, nil

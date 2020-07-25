@@ -19,8 +19,8 @@ package profile;
 service ProfileMgr {
 	rpc Profile(ProfileInfo) returns (stream AckCheck) {}
 	rpc CheckInitProfile(ProfileInfo) returns (stream AckCheck) {}
-    	rpc Analysis(AnalysisMessage) returns (stream AckCheck) {}
-	rpc Tuning(stream ProfileInfo) returns (stream AckCheck) {}
+	rpc Analysis(AnalysisMessage) returns (stream AckCheck) {}
+	rpc Tuning(stream TuningMessage) returns (stream TuningMessage) {}
 	rpc ListWorkload(ProfileInfo) returns (stream ListMessage) {}
 	rpc UpgradeProfile(ProfileInfo) returns (stream AckCheck) {}
 	rpc InfoProfile(ProfileInfo) returns (stream ProfileInfo) {}
@@ -38,18 +38,18 @@ service ProfileMgr {
 
 message ListMessage {
 	string WorkloadType = 1;
-    	string ProfileNames = 2;
-    	string Active = 3;
+	string ProfileNames = 2;
+	string Active = 3;
 }
 
 message ProfileInfo {
 	string Name = 1;
-    	bytes Content = 2;
+	bytes Content = 2;
 }
 
 message AnalysisMessage {
 	string Name = 1;
-    	string Model = 2;
+	string Model = 2;
 }
 
 message Ack {
@@ -94,4 +94,26 @@ message ScheduleMessage {
     string App = 1;
     string Type = 2;
     string Strategy = 3;
+}
+
+message TuningMessage {
+    string name = 1;
+    string engine = 2;
+    bytes content = 3;
+    enum status {
+		JobInit = 0;
+		JobRestart = 1;
+		BenchMark= 2;
+		Restore = 3;
+		Ending = 4;
+		Display = 5;
+		SyncConfig = 6;
+		Detail = 7;
+		Threshold = 8;
+    }
+    status state = 4;
+    int32 RandomStarts = 6;
+    string FeatureFilterEngine = 7;
+    int32 FeatureFilterCycle = 8;
+    int32 FeatureFilterIters = 9;
 }

@@ -1,5 +1,10 @@
 project: "example"
-iterations : 10
+engine: "bayes"
+random_starts: 10
+iterations : 15
+feature_filter_engine: "random"
+feature_filter_cycle: 0
+feature_filter_iters: 20
 benchmark : "sh /home/Benchmarks/mysql/tunning_mysql.sh"
 evaluations :
   -

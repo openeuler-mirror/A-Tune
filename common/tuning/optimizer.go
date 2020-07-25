@@ -14,6 +14,7 @@
 package tuning
 
 import (
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -22,13 +23,13 @@ import (
 	"gitee.com/openeuler/A-Tune/common/models"
 	"gitee.com/openeuler/A-Tune/common/project"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
 	"golang.org/x/net/context"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -36,33 +37,43 @@ import (
 
 // Optimizer : the type implement the bayes serch service
 type Optimizer struct {
-	Prj             *project.YamlPrjSvr
-	Content         []byte
-	Iter            int
-	MaxIter         int
-	OptimizerPutURL string
-	FinalEval       string
-	MinEvalSum      float64
-	RespPutIns      *models.RespPutBody
-	StartIterTime   string
+	Prj                 *project.YamlPrjSvr
+	Content             []byte
+	Iter                int
+	MaxIter             int32
+	FeatureFilterIters  int32
+	RandomStarts        int32
+	OptimizerPutURL     string
+	FinalEval           string
+	Engine              string
+	FeatureFilterEngine string
+	TuningFile          string
+	MinEvalSum          float64
+	EvalBase            string
+	RespPutIns          *models.RespPutBody
+	StartIterTime       string
+	Percentage          float64
+	BackupFlag          bool
+	FeatureFilter       bool
 }
 
-// InitTuned method for init tuning
-func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
+// InitTuned method for iniit tuning
+func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error {
+	o.FeatureFilter = false
 	clientIter, err := strconv.Atoi(string(o.Content))
 	if err != nil {
 		return err
 	}
 
 	log.Infof("begin to dynamic optimizer search, client ask iterations:%d", clientIter)
-	ch <- &PB.AckCheck{Name: fmt.Sprintf("begin to dynamic optimizer search")}
 
 	//dynamic profle setting
-	o.MaxIter = clientIter
+	o.MaxIter = int32(clientIter)
 	if o.MaxIter > o.Prj.Maxiterations {
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
-		ch <- &PB.AckCheck{Name: fmt.Sprintf("server project %s max iterations %d\n",
-			o.Prj.Project, o.Prj.Maxiterations)}
+		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(fmt.Sprintf("server project %s max iterations %d\n",
+			o.Prj.Project, o.Prj.Maxiterations))}
+
 	}
 
 	if err := utils.CreateDir(config.DefaultTempPath, 0750); err != nil {
@@ -77,11 +88,33 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 		return err
 	}
 
-	initConfigure := make([]string, 0)
+	if !o.BackupFlag {
+		err = o.Backup(ch)
+		if err != nil {
+			return err
+		}
+	}
+	if err := o.createOptimizerTask(ch, o.MaxIter, o.Engine); err != nil {
+		return err
+	}
+
+	o.Content = nil
+	if err := o.DynamicTuned(ch, stopCh); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
 	optimizerBody := new(models.OptimizerPostBody)
-	optimizerBody.MaxEval = o.MaxIter
+	optimizerBody.MaxEval = iters
+	optimizerBody.Engine = engine
+	optimizerBody.RandomStarts = o.RandomStarts
 	optimizerBody.Knobs = make([]models.Knob, 0)
 	for _, item := range o.Prj.Object {
+		if item.Info.Skip {
+			continue
+		}
 		knob := new(models.Knob)
 		knob.Dtype = item.Info.Dtype
 		knob.Name = item.Name
@@ -92,22 +125,9 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 		knob.Step = item.Info.Step
 		knob.Options = item.Info.Options
 		optimizerBody.Knobs = append(optimizerBody.Knobs, *knob)
-
-		out, err := project.ExecCommand(item.Info.GetScript)
-		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
-		}
-		initConfigure = append(initConfigure, strings.TrimSpace(knob.Name+"="+string(out)))
 	}
 
-	err = utils.WriteFile(path.Join(config.DefaultTempPath,
-		o.Prj.Project+config.TuningRestoreConfig), strings.Join(initConfigure, ","),
-		utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
+	log.Infof("optimizer post body is: %+v", optimizerBody)
 	respPostIns, err := optimizerBody.Post()
 	if err != nil {
 		return err
@@ -122,18 +142,13 @@ func (o *Optimizer) InitTuned(ch chan *PB.AckCheck) error {
 	o.OptimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
 	log.Infof("optimizer put url is: %s", o.OptimizerPutURL)
 
-	o.Content = nil
-	if err := o.DynamicTuned(ch); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 /*
 DynamicTuned method using bayes algorithm to search the best performance parameters
 */
-func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
+func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) error {
 	var evalValue string
 	var err error
 	if o.Content != nil {
@@ -148,13 +163,14 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = o.Iter
 	optPutBody.Value = evalValue
+	log.Infof("optimizer put body is: %+v", optPutBody)
 	o.RespPutIns, err = optPutBody.Put(o.OptimizerPutURL)
 	if err != nil {
 		log.Errorf("get setting parameter error: %v", err)
 		return err
 	}
 
-	log.Infof("setting params is: %s", o.RespPutIns.Param)
+	log.Infof("optimizer put response body: %+v", o.RespPutIns)
 	err, scripts := o.Prj.RunSet(o.RespPutIns.Param)
 	if err != nil {
 		log.Error(err)
@@ -181,26 +197,89 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.AckCheck) error {
 
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
 
-	if o.Iter == o.MaxIter {
+	if o.RespPutIns.Finished {
 		finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
 		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s", o.RespPutIns.Param, finalEval)
+			" The final evaluation value is: %s\n", o.RespPutIns.Param, finalEval)
 		log.Info(optimizationTerm)
-		ch <- &PB.AckCheck{Name: optimizationTerm}
+		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(optimizationTerm)}
 
+		remainParams := o.filterParams()
+		if o.FeatureFilter {
+			message := fmt.Sprintf(" The selected most important parameters is:\n"+
+				" %s\n", remainParams)
+			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+		}
+
+		stopCh <- 1
+		o.Iter = 0
 		if err = deleteTask(o.OptimizerPutURL); err != nil {
 			log.Error(err)
 		}
+		return nil
 	}
 
 	o.Iter++
-	ch <- &PB.AckCheck{Status: utils.SUCCESS}
-
+	if int32(o.Iter) <= o.MaxIter {
+		message := fmt.Sprintf("Current Tuning Progress.....(%d/%d)", o.Iter, o.MaxIter)
+		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+	}
+	content := make([]string, 0)
+	content = append(content, o.EvalBase)
+	evalMinSum := fmt.Sprintf("%s=%.2f", project.MIN_BENCHMARK_VALUE, o.MinEvalSum)
+	content = append(content, evalMinSum)
+	log.Infof("send back to client to start benchmark: %s", strings.Join(content, ","))
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(o.RespPutIns.Param)}
 	return nil
 }
 
+func (o *Optimizer) filterParams()  string {
+	log.Infof("params importance weight is: %s", o.RespPutIns.Rank)
+	sortedParams := make(utils.SortedPair, 0)
+	paramList := strings.Split(o.RespPutIns.Rank, ",")
+
+	if len(paramList) == 0 {
+		return ""
+	}
+
+	for _, param := range paramList {
+		paramPair := strings.Split(param, ":")
+		if len(paramPair) != 2 {
+			continue
+		}
+		name := strings.TrimSpace(paramPair[0])
+		score, _ := strconv.ParseFloat(strings.TrimSpace(paramPair[1]), 64)
+		sortedParams = append(sortedParams, utils.Pair{Name: name, Score: score})
+	}
+	sort.Sort(sortedParams)
+	log.Infof("sorted params: %+v", sortedParams)
+
+	var skipIndex int
+	skipIndex = int(float64(len(sortedParams))*o.Percentage)
+	if len(sortedParams) <= 10 {
+		skipIndex = len(sortedParams)
+	}
+	skipParams := sortedParams[skipIndex:]
+	remaindParams := sortedParams[:skipIndex]
+
+	skipMap := make(map[string]struct{})
+	for _, param := range skipParams {
+		skipMap[param.Name] = struct{}{}
+	}
+	for _, item := range o.Prj.Object {
+		if _, ok := skipMap[item.Name]; ok {
+			item.Info.Skip = true
+		}
+	}
+	tuningParams := make([]string, 0)
+	for _, param := range remaindParams {
+		tuningParams = append(tuningParams, fmt.Sprintf("%s:%.2f", param.Name, param.Score))
+	}
+	return strings.Join(tuningParams, ",")
+}
+
 //restore tuning config
-func (o *Optimizer) RestoreConfigTuned(ch chan *PB.AckCheck) error {
+func (o *Optimizer) RestoreConfigTuned(ch chan *PB.TuningMessage) error {
 	tuningRestoreConf := path.Join(config.DefaultTempPath, o.Prj.Project+config.TuningRestoreConfig)
 	exist, err := utils.PathExist(tuningRestoreConf)
 	if err != nil {
@@ -231,23 +310,18 @@ func (o *Optimizer) RestoreConfigTuned(ch chan *PB.AckCheck) error {
 	}
 
 	result := fmt.Sprintf("restore %s project params success", o.Prj.Project)
-	ch <- &PB.AckCheck{Name: result, Status: utils.SUCCESS}
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_Ending, Content: []byte(result)}
 	log.Infof(result)
 	return nil
 }
 
-func (o *Optimizer) evalParsing(ch chan *PB.AckCheck) (string, error) {
+func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 	eval := string(o.Content)
-	positiveEval := strings.Replace(eval, "=-", "=", -1)
-	optimizationTerm := fmt.Sprintf("The %dth optimization result is: %s\n"+
-		" The %dth evaluation value is: %s", o.Iter, o.RespPutIns.Param, o.Iter, positiveEval)
-	ch <- &PB.AckCheck{Name: optimizationTerm}
-	log.Info(optimizationTerm)
 
 	endIterTime := time.Now().Format(config.DefaultTimeFormat)
 	iterInfo := make([]string, 0)
 	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
-		positiveEval, o.RespPutIns.Param)
+		eval, o.RespPutIns.Param)
 	output := strings.Join(iterInfo, "|")
 	err := utils.WriteFile(config.TuningFile, output+"\n", utils.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
@@ -293,6 +367,15 @@ func deleteTask(url string) error {
 
 //check server prj
 func CheckServerPrj(data string, optimizer *Optimizer) error {
+	projects := strings.Split(data, ",")
+
+	log.Infof("client ask project: %s", data)
+	var requireProject map[string]struct{}
+	requireProject = make(map[string]struct{})
+	for _, project := range projects {
+		requireProject[strings.TrimSpace(project)] = struct{}{}
+	}
+
 	var prjs []*project.YamlPrjSvr
 	err := filepath.Walk(config.DefaultTuningPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -311,18 +394,29 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	}
 
 	for _, prj := range prjs {
-		if data == prj.Project {
-			log.Infof("find Project:%s", prj.Project)
-			optimizer.Prj = prj
-			return nil
+		if _, ok := requireProject[prj.Project]; !ok {
+			continue
 		}
+
+		log.Infof("find Project:%s", prj.Project)
+		if optimizer.Prj == nil {
+			optimizer.Prj = prj
+			continue
+		}
+		optimizer.Prj.MergeProject(prj)
 	}
 
-	return fmt.Errorf("project:%s not found", data)
+	if optimizer.Prj == nil {
+		return fmt.Errorf("project:%s not found", data)
+	}
+
+	log.Debugf("optimizer objects: %+v", optimizer.Prj)
+	optimizer.Percentage = config.Percent
+	return nil
 }
 
 //sync tuned node
-func (o *Optimizer) SyncTunedNode(ch chan *PB.AckCheck) error {
+func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 	log.Infof("setting params is: %s", string(o.Content))
 	commands := strings.Split(string(o.Content), ",")
 	for _, command := range commands {
@@ -333,7 +427,7 @@ func (o *Optimizer) SyncTunedNode(ch chan *PB.AckCheck) error {
 	}
 
 	log.Info("set the parameter success")
-	ch <- &PB.AckCheck{Status: utils.SUCCESS}
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_Ending}
 
 	return nil
 }
@@ -374,7 +468,7 @@ func syncConfigToNode(server string, scripts string) error {
 	}
 
 	defer stream.CloseSend()
-	content := &PB.ProfileInfo{Name: "sync-config", Content: []byte(scripts)}
+	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scripts)}
 	if err := stream.Send(content); err != nil {
 		return fmt.Errorf("sends failure, error: %v", err)
 	}
@@ -389,11 +483,64 @@ func syncConfigToNode(server string, scripts string) error {
 			return err
 		}
 
-		if reply.Status == utils.SUCCESS {
+		state := reply.GetState()
+		if state == PB.TuningMessage_Ending {
 			log.Infof("server %s reply status success", server)
 			break
 		}
 	}
 
+	return nil
+}
+
+// InitFeatureSel method for init feature selection tuning
+func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) error {
+	o.FeatureFilter = true
+	if err := utils.CreateDir(config.DefaultTempPath, 0750); err != nil {
+		return err
+	}
+
+	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
+	err := utils.WriteFile(config.TuningFile, projectName, utils.FilePerm,
+		os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	err = o.Backup(ch)
+	if err != nil {
+		return err
+	}
+	if err := o.createOptimizerTask(ch, o.FeatureFilterIters, o.FeatureFilterEngine); err != nil {
+		return err
+	}
+
+	o.Content = nil
+	if err := o.DynamicTuned(ch, stopCh); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Backup method for backup the init config of tuning params
+func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
+	o.BackupFlag = true
+	initConfigure := make([]string, 0)
+	for _, item := range o.Prj.Object {
+		out, err := project.ExecCommand(item.Info.GetScript)
+		if err != nil {
+			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
+		}
+		initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+string(out)))
+	}
+
+	err := utils.WriteFile(path.Join(config.DefaultTempPath,
+		o.Prj.Project+config.TuningRestoreConfig), strings.Join(initConfigure, ","),
+		utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 	return nil
 }

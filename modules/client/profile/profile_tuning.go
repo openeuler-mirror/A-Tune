@@ -14,15 +14,17 @@
 package profile
 
 import (
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/project"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
 	"io"
+	"math"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
@@ -41,6 +43,11 @@ var profileTunningCommand = cli.Command{
 			Name:  "project,p",
 			Usage: "the project name of the yaml file",
 			Value: "",
+		},
+		cli.BoolFlag{
+			Name:   "detail,d",
+			Hidden: false,
+			Usage:  "display the detail info of tuning message",
 		},
 	},
 	Description: func() string {
@@ -84,21 +91,30 @@ func profileTunning(ctx *cli.Context) error {
 		return fmt.Errorf("error: %s is not ends with yaml or yml", yamlPath)
 	}
 
-	prj := project.YamlPrjCli{}
+	prj := project.YamlPrjCli{StartsTime: time.Now(), StartIters: 1}
 	if err := utils.ParseFile(yamlPath, "yaml", &prj); err != nil {
 		return err
 	}
 	if err := checkTuningPrjYaml(prj); err != nil {
 		return err
 	}
-
 	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
-		content := &PB.ProfileInfo{Name: prj.Project, Content: []byte(strconv.Itoa(prj.Iterations))}
+		var state PB.TuningMessageStatus = PB.TuningMessage_JobInit
+
+		content := &PB.TuningMessage{
+			Name:                ctx.String("project"),
+			RandomStarts:        prj.RandomStarts,
+			Engine:              prj.Engine,
+			State:               state,
+			Content:             []byte(strconv.Itoa(int(prj.Iterations))),
+			FeatureFilterEngine: prj.FeatureFilterEngine,
+			FeatureFilterCycle:  prj.FeatureFilterCycle,
+			FeatureFilterIters:  prj.FeatureFilterIters,
+		}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
 		}
 
-		iter := 0
 		for {
 			reply, err := stream.Recv()
 			if err == io.EOF {
@@ -107,23 +123,50 @@ func profileTunning(ctx *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			if reply.Status != utils.SUCCESS {
-				utils.Print(reply)
-				continue
-			}
-			if iter >= prj.Iterations {
-				break
+			state := reply.GetState()
+			switch state {
+			case PB.TuningMessage_JobInit:
+				fmt.Println("send to restart job")
+				prj.StartIters = 1
+				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart, Content: []byte(strconv.Itoa(int(prj.Iterations)))}); err != nil {
+					return fmt.Errorf("client sends failure, error: %v", err)
+				}
+			case PB.TuningMessage_BenchMark:
+				prj.SetHistoryEvalBase(string(reply.GetContent()))
+				prj.Params = string(reply.GetContent())
+				benchmarkByte, err := prj.BenchMark()
+				if err != nil {
+					fmt.Println("benchmark result:", benchmarkByte)
+					return err
+				}
+
+				currentTime := time.Now()
+				fmt.Printf(" Used time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
+					currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
+					math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
+				if ctx.Bool("detail") {
+					fmt.Printf(" The %dth recommand parameters is: %s\n"+
+						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, strings.Replace(benchmarkByte, "-", "", -1), prj.ImproveRateString(prj.EvalCurrent))
+				}
+				prj.StartIters++
+				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(benchmarkByte)}); err != nil {
+					return fmt.Errorf("client sends failure, error: %v", err)
+				}
+			case PB.TuningMessage_Display:
+				fmt.Printf(" %s\n", string(reply.GetContent()))
+			case PB.TuningMessage_Detail:
+				if ctx.Bool("detail") {
+					fmt.Printf(" %s\n", string(reply.GetContent()))
+				}
+			case PB.TuningMessage_Ending:
+				fmt.Printf(" Baseline Performance is: %.2f\n", math.Abs(prj.EvalBase))
+				fmt.Printf(" %s\n", string(reply.GetContent()))
+				fmt.Printf(" tuning finished\n")
+				goto End
 			}
 
-			benchmarkByte, err := prj.BenchMark()
-			if err != nil {
-				return err
-			}
-			if err := stream.Send(&PB.ProfileInfo{Content: []byte(benchmarkByte)}); err != nil {
-				return fmt.Errorf("client sends failure, error: %v", err)
-			}
-			iter++
 		}
+	End:
 		return nil
 	})
 
@@ -139,7 +182,7 @@ func checkRestoreConfig(ctx *cli.Context) error {
 	}
 
 	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
-		content := &PB.ProfileInfo{Name: ctx.String("project")}
+		content := &PB.TuningMessage{Name: ctx.String("project"), State: PB.TuningMessage_Restore}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
 		}
@@ -152,12 +195,16 @@ func checkRestoreConfig(ctx *cli.Context) error {
 			if err != nil {
 				return err
 			}
-			utils.Print(reply)
-
-			if reply.Status == utils.SUCCESS {
-				break
+			state := reply.GetState()
+			switch state {
+			case PB.TuningMessage_Display:
+				fmt.Printf(" %s\n", string(reply.GetContent()))
+			case PB.TuningMessage_Ending:
+				fmt.Printf("tuning finished\n")
+				goto End
 			}
 		}
+	End:
 		return nil
 	})
 
@@ -196,8 +243,22 @@ func checkTuningPrjYaml(prj project.YamlPrjCli) error {
 			"in project %s", prj.Project)
 	}
 
-	if prj.Iterations < 11 {
-		return fmt.Errorf("error: iterations must be greater than 10 "+
+	if prj.RandomStarts < 0 {
+		return fmt.Errorf("error: random_starts must be >= 0 "+
+			"in project %s", prj.Project)
+	}
+
+	if prj.Iterations < prj.RandomStarts {
+		return fmt.Errorf("error: iterations must be greater than random_starts "+
+			"in project %s", prj.Project)
+	}
+
+	if prj.FeatureFilterCycle < 0 {
+		return fmt.Errorf("error: feature_filter_cycle must be >= 0 "+
+			"in project %s", prj.Project)
+	}
+	if prj.FeatureFilterCycle > 0 && prj.FeatureFilterIters < 0 {
+		return fmt.Errorf("error: feature_filter_iters must be > 0 "+
 			"in project %s", prj.Project)
 	}
 	return nil
@@ -226,4 +287,3 @@ func runTuningRPC(ctx *cli.Context, sendTask func(stream PB.ProfileMgr_TuningCli
 
 	return nil
 }
-

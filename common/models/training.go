@@ -14,9 +14,9 @@
 package models
 
 import (
+	"fmt"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
-	"fmt"
 )
 
 // Training : The data that send to http service for training

@@ -15,16 +15,17 @@ package utils
 
 import (
 	"archive/tar"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/log"
 	"bufio"
 	"compress/gzip"
 	"encoding/csv"
 	"encoding/xml"
 	"fmt"
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
+	"math"
 	"net"
 	"os"
 	"os/exec"
@@ -72,6 +73,8 @@ const (
 	UNKNOWN = "UNKNOWN"
 )
 
+var accurency = 0.0001
+
 // config for waiting rest service
 const (
 	period  = 2
@@ -80,9 +83,9 @@ const (
 
 //file attribute
 const (
-	PipeMode    uint32	= 0600
-	FilePerm    os.FileMode	= 0600
-	MaxFileSize int64	= 100 * 1024 * 1024
+	PipeMode    uint32      = 0600
+	FilePerm    os.FileMode = 0600
+	MaxFileSize int64       = 100 * 1024 * 1024
 )
 
 var RestHost = "localhost"
@@ -405,7 +408,7 @@ func ReadCSV(path string) ([][]string, error) {
 		return nil, err
 	}
 
-	data := make([][]string, len(lines))
+	data := make([][]string, 0)
 	for _, line := range lines {
 		if len(line) > 0 {
 			data = append(data, line)
@@ -500,4 +503,52 @@ func Compress(file *os.File, prefix string, tarWrt *tar.Writer) error {
 		}
 	}
 	return nil
+}
+
+type Pair struct {
+	Name  string
+	Score float64
+}
+
+type SortedPair []Pair
+
+func (p SortedPair) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p SortedPair) Len() int {
+	return len(p)
+}
+
+func (p SortedPair) Less(i, j int) bool {
+	if math.Abs(p[i].Score)-math.Abs(p[j].Score) < accurency {
+		return true
+	}
+	return false
+}
+
+func IsEquals(a, b float64) bool {
+	if math.Abs(a-b) < accurency {
+		return true
+	}
+
+	return false
+}
+
+func CalculateBenchMark(eval string) (float64, error) {
+	evalSum := 0.0
+	for _, benchStr := range strings.Split(eval, ",") {
+		kvs := strings.Split(benchStr, "=")
+		if len(kvs) < 2 {
+			continue
+		}
+
+		floatEval, err := strconv.ParseFloat(kvs[1], 64)
+		if err != nil {
+			return 0.0, err
+		}
+
+		evalSum += floatEval
+	}
+	return evalSum, nil
 }

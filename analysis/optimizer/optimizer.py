@@ -16,25 +16,27 @@ This class is used to find optimal settings and generate optimized profile.
 """
 
 import logging
-from multiprocessing import Process
+import multiprocessing
 import numpy as np
-from skopt.optimizer import gp_minimize
+import sys
+from skopt.optimizer import gp_minimize, dummy_minimize
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
 LOGGER = logging.getLogger(__name__)
 
 
-class Optimizer(Process):
+class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50):
+    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, n_random_starts=20):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
         self.ref = []
+        self._n_random_starts = 10 if n_random_starts is None else n_random_starts
 
     def build_space(self):
         """build space"""
@@ -115,13 +117,18 @@ class Optimizer(Process):
         return rank
 
     def run(self):
+        """start the tuning process"""
         def objective(var):
+            """objective method receive the benchmark result and send the next parameters"""
+            iterResult = {}
             for i, knob in enumerate(self.knobs):
                 if knob['dtype'] == 'string':
                     params[knob['name']] = knob['options'][var[i]]
                 else:
                     params[knob['name']] = var[i]
-            self.child_conn.send(params)
+            
+            iterResult["param"] = params
+            self.child_conn.send(iterResult)
             result = self.child_conn.recv()
             x_num = 0.0
             eval_list = result.split(',')
@@ -137,12 +144,25 @@ class Optimizer(Process):
         performance = []
         labels = []
         try:
+            params_space = self.build_space()
             LOGGER.info("Running performance evaluation.......")
-            ret = gp_minimize(objective, self.build_space(), n_calls=self.max_eval, x0=self.ref)
+            if self.engine == 'random':
+                ret = dummy_minimize(objective, params_space, n_calls=self.max_eval)
+            elif self.engine == 'bayes':
+                ret = gp_minimize(objective, params_space, n_calls=self.max_eval, \
+                                   n_random_starts=self._n_random_starts)
             LOGGER.info("Minimization procedure has been completed.")
-        except Exception as value_error:
-            LOGGER.error('Value Error: %s', value_error)
+        except ValueError as value_error:
+            LOGGER.error('Value Error: %s', repr(value_error))
             self.child_conn.send(value_error)
+            return None
+        except RuntimeError as runtime_error:
+            LOGGER.error('Runtime Error: %s', repr(runtime_error))
+            self.child_conn.send(runtime_error)
+            return None
+        except Exception as e:
+            LOGGER.error('Unexpected Error: %s', repr(e))
+            self.child_conn.send(Exception("Unexpected Error:", repr(e))
             return None
 
         for i, knob in enumerate(self.knobs):
@@ -151,11 +171,16 @@ class Optimizer(Process):
             else:
                 params[knob['name']] = ret.x[i]
             labels.append(knob['name'])
-        self.child_conn.send(params)
+        
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
-
+        finalParam = {}
         rank = self.feature_importance(options, performance, labels)
+
+        finalParam["param"] = params
+        finalParam["rank"] = rank
+        finalParam["finished"] = True
+        self.child_conn.send(finalParam)
         LOGGER.info("The feature importances of current evaluation are: %s", rank)
         return params
 
