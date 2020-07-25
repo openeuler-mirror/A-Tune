@@ -14,10 +14,10 @@
 package models
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/http"
 	"encoding/json"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
 	"io/ioutil"
 )
 

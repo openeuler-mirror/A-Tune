@@ -14,11 +14,19 @@
 package project
 
 import (
-	"gitee.com/openeuler/A-Tune/common/log"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/utils"
+	"math"
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
+)
+
+const (
+	BASE_BENCHMARK_VALUE = "baseValue"
+	MIN_BENCHMARK_VALUE  = "minValue"
 )
 
 // Evaluate :store the evaluate object
@@ -37,19 +45,30 @@ type EvalInfo struct {
 
 // YamlPrjCli :store the client yaml project
 type YamlPrjCli struct {
-	Project     string     `yaml:"project"`
-	Iterations  int        `yaml:"iterations"`
-	Benchmark   string     `yaml:"benchmark"`
-	Evaluations []Evaluate `yaml:"evaluations"`
+	Project             string     `yaml:"project"`
+	Iterations          int32      `yaml:"iterations"`
+	RandomStarts        int32      `yaml:"random_starts"`
+	Benchmark           string     `yaml:"benchmark"`
+	Engine              string     `yaml:"engine"`
+	FeatureFilterEngine string     `yaml:"feature_filter_engine"`
+	FeatureFilterCycle  int32      `yaml:"feature_filter_cycle"`
+	FeatureFilterIters  int32      `yaml:"feature_filter_iters"`
+	Evaluations         []Evaluate `yaml:"evaluations"`
+	StartsTime          time.Time  `yaml:"-"`
+	EvalMin             float64    `yaml:"-"`
+	EvalBase            float64    `yaml:"-"`
+	EvalCurrent         float64    `yaml:"-"`
+	StartIters          int32      `yaml:"-"`
+	Params              string     `yaml:"-"`
 }
 
 // YamlPrjSvr :store the server yaml project
 type YamlPrjSvr struct {
-	Project       string       `yaml:"project"`
-	Object        []YamlPrjObj `yaml:"object"`
-	Maxiterations int          `yaml:"maxiterations"`
-	Startworkload string       `yaml:"startworkload"`
-	Stopworkload  string       `yaml:"stopworkload"`
+	Project       string        `yaml:"project"`
+	Object        []*YamlPrjObj `yaml:"object"`
+	Maxiterations int32         `yaml:"maxiterations"`
+	Startworkload string        `yaml:"startworkload"`
+	Stopworkload  string        `yaml:"stopworkload"`
 }
 
 // YamlObj :yaml Object
@@ -59,8 +78,9 @@ type YamlObj struct {
 	GetScript   string   `yaml:"get"`
 	SetScript   string   `yaml:"set"`
 	Needrestart string   `yaml:"needrestart"`
+	Skip        bool     `yaml:"skip"`
 	Type        string   `yaml:"type"`
-	Step        int64    `yaml:"step"`
+	Step        float32  `yaml:"step,omitempty"`
 	Items       []int64  `yaml:"items"`
 	Options     []string `yaml:"options"`
 	Scope       []int64  `yaml:"scope,flow"`
@@ -80,9 +100,11 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 
 	benchOutByte, err := ExecCommand(y.Benchmark)
 	if err != nil {
+		fmt.Println(string(benchOutByte))
 		return "", fmt.Errorf("failed to run benchmark, err: %v", err)
 	}
 
+	var sum float64
 	for _, evaluation := range y.Evaluations {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)
 		bout, err := ExecCommand(newScript)
@@ -100,11 +122,57 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 		out := strconv.FormatFloat(floatOut*float64(evaluation.Info.Weight)/100, 'f', -1, 64)
 		if evaluation.Info.Type == "negative" {
 			out = "-" + out
+			sum += -floatOut
+		} else {
+			sum += floatOut
 		}
 		benchStr = append(benchStr, evaluation.Name+"="+out)
 	}
 
+	if sum < y.EvalMin {
+		y.EvalMin = sum
+	}
+
+	if utils.IsEquals(y.EvalBase, 0.0) {
+		y.EvalBase = sum
+		y.EvalMin = sum
+	}
+	y.EvalCurrent = sum
 	return strings.Join(benchStr, ","), nil
+}
+
+// SetHistoryEvalBase method call the set the current EvalBase to history baseline
+func (y *YamlPrjCli) SetHistoryEvalBase(evalBase string) {
+	if !utils.IsEquals(y.EvalBase, 0.0) {
+		return
+	}
+	kv := strings.Split(evalBase, ",")
+
+	for _, value := range kv {
+		evaluation := strings.Split(value, "=")
+		if len(evaluation) != 2 {
+			continue
+		}
+		floatOut, _ := strconv.ParseFloat(evaluation[1], 64)
+		if evaluation[0] == BASE_BENCHMARK_VALUE {
+			y.EvalBase = floatOut
+			continue
+		}
+		if evaluation[0] == MIN_BENCHMARK_VALUE {
+			y.EvalMin = floatOut
+			continue
+		}
+
+	}
+}
+
+// ImproveRateString method return the string format of performance improve rate
+func (y *YamlPrjCli) ImproveRateString(current float64) string {
+	if y.EvalBase < 0 {
+		return fmt.Sprintf("%.2f", (current-y.EvalBase)/math.Abs(y.EvalBase)*100)
+	}
+
+	return fmt.Sprintf("%.2f", (y.EvalBase-current)/current*100)
 }
 
 // RunSet method call the set script to set the value
@@ -120,6 +188,11 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 	}
 	scripts := make([]string, 0)
 	for _, obj := range y.Object {
+		if obj.Info.Skip {
+			log.Infof("item %s is skiped", obj.Name)
+			continue
+		}
+
 		out, err := ExecCommand(obj.Info.GetScript)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", obj.Info.GetScript, err), ""
@@ -130,7 +203,12 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 			continue
 		}
 		script := obj.Info.SetScript
-		newScript := strings.Replace(script, "$value", "\""+paraMap[obj.Name]+"\"", -1)
+		var newScript string
+		if len(strings.Fields(paraMap[obj.Name])) > 1 {
+			newScript = strings.Replace(script, "$value", "\""+paraMap[obj.Name]+"\"", -1)
+		} else {
+			newScript = strings.Replace(script, "$value", paraMap[obj.Name], -1)
+		}
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
@@ -164,6 +242,7 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 		log.Debug(string(out))
 		scripts = append(scripts, stopWorkload)
 
+		log.Debugf("start workload script is: %s", startWorkload)
 		out, err = ExecCommand(startWorkload)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", startWorkload, err), ""
@@ -174,6 +253,14 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 	}
 
 	return nil, strings.Join(scripts, ",")
+}
+
+// MergeProject two yaml project to one object
+func (y *YamlPrjSvr) MergeProject(prj *YamlPrjSvr) error {
+	for _, obj := range prj.Object {
+		y.Object = append(y.Object, obj)
+	}
+	return nil
 }
 
 //exec command and get result

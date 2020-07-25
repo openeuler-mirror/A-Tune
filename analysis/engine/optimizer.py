@@ -52,15 +52,12 @@ class Optimizer(Resource):
         """provide the method of post"""
         args = OPTIMIZER_POST_PARSER.parse_args()
         LOGGER.info(args)
-        if args["max_eval"] < 11:
-            LOGGER.error("the max iterations %s must be greater than 10", args["max_eval"])
-            abort(400, "the max iterations {} must be greater than 10".format(args["max_eval"]))
         task_id = str(uuid.uuid1())
 
         parent_conn, child_conn = Pipe()
         result = {}
-        engine = optimizer.Optimizer(task_id, args["knobs"], child_conn,
-                                     max_eval=args.get("max_eval"))
+        engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, engine=args.get("engine"),
+                                     max_eval=args.get("max_eval"), n_random_starts=args.get("random_starts"))
         engine.start()
 
         value = {}
@@ -87,11 +84,13 @@ class Optimizer(Resource):
             out_queue.send(args.get("value"))
 
         result = {}
-        values = out_queue.recv()
-        if isinstance(values, Exception):
-            abort(404, "failed to get optimization results, err: {}".format(values))
-        params = ["%s=%s" % (k, v) for k, v in values.items()]
+        opt_params = out_queue.recv()
+        if isinstance(opt_params, Exception):
+            abort(404, "failed to get optimization results, err: {}".format(opt_params))
+        params = ["%s=%s" % (k, v) for k, v in opt_params["param"].items()]
         result["param"] = ",".join(params)
+        result["rank"] = opt_params.get("rank", None)
+        result["finished"] = opt_params.get("finished", None)
 
         return result, 200
 

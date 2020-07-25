@@ -566,7 +566,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 	}
 	defer s.Unlock()
 
-	ch := make(chan *PB.AckCheck)
+	ch := make(chan *PB.TuningMessage)
 	defer close(ch)
 	go func() {
 		for value := range ch {
@@ -576,7 +576,25 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 
 	var optimizer = tuning.Optimizer{}
 
+	stopCh := make(chan int, 1)
+	var cycles int32 = 0
+	var message string
+	var step int32 = 1
+
 	for {
+		select {
+		case <-stopCh:
+			if cycles > 0 {
+				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobInit})
+			} else {
+				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_Ending})
+			}
+			cycles--
+		default:
+		}
+		if cycles < 0 {
+			break
+		}
 		reply, err := stream.Recv()
 		if err == io.EOF {
 			break
@@ -585,41 +603,98 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			return err
 		}
 
-		data := reply.Name
-		content := reply.Content
-
-		//sync config with other server
-		if data == "sync-config" {
-			optimizer.Content = content
-			if err = optimizer.SyncTunedNode(ch); err != nil {
+		state := reply.GetState()
+		switch state {
+		case PB.TuningMessage_SyncConfig:
+			optimizer.Content = reply.GetContent()
+			err = optimizer.SyncTunedNode(ch)
+			if err != nil {
 				return err
 			}
-			continue
-		}
+		case PB.TuningMessage_JobRestart:
+			log.Infof("restart cycles is: %d", cycles)
+			optimizer.Content = reply.GetContent()
+			if cycles > 0 {
+				message = fmt.Sprintf("%d、Starting the next cycle of parameter selection......", step)
+				step += 1
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+				if err = optimizer.InitFeatureSel(ch, stopCh); err != nil {
+					return err
+				}
+			} else {
+				message = fmt.Sprintf("%d、Start to tuning the system......", step)
+				step += 1
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+				if err = optimizer.InitTuned(ch, stopCh); err != nil {
+					return err
+				}
+			}
+		case PB.TuningMessage_JobInit:
+			project := reply.GetName()
+			if len(strings.TrimSpace(project)) == 0 {
+				if err != nil {
+					return err
+				}
+				message = fmt.Sprintf("%d.Begin to Analysis the system......", step)
+				step += 1
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+				project, err = s.Getworkload()
+				if err != nil {
+					return err
+				}
+				message = fmt.Sprintf("%d.Current runing application is: %s", step, project)
+				step += 1
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+			}
 
-		// data == "" means in tuning process
-		if data == "" {
-			optimizer.Content = content
-			if err = optimizer.DynamicTuned(ch); err != nil {
+			message = fmt.Sprintf("%d.Loading its corresponding tuning project: %s", step, project)
+			step += 1
+			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+
+			if err := tuning.CheckServerPrj(project, &optimizer); err != nil {
 				return err
 			}
-			continue
-		}
 
-		if err = tuning.CheckServerPrj(data, &optimizer); err != nil {
-			return err
-		}
-		//content == nil means in restore config
-		if content == nil {
-			if err = optimizer.RestoreConfigTuned(ch); err != nil {
+			optimizer.Engine = reply.GetEngine()
+			optimizer.Content = reply.GetContent()
+			optimizer.RandomStarts = reply.GetRandomStarts()
+			optimizer.FeatureFilterEngine = reply.GetFeatureFilterEngine()
+			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
+			cycles = reply.GetFeatureFilterCycle()
+
+			if cycles == 0 {
+				message = fmt.Sprintf("%d.Start to tuning the system......", step)
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+				step += 1
+				if err = optimizer.InitTuned(ch, stopCh); err != nil {
+					return err
+				}
+			} else {
+				message = fmt.Sprintf("%d.Starting to select the important parameters......", step)
+				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+				step += 1
+				if err = optimizer.InitFeatureSel(ch, stopCh); err != nil {
+					return err
+				}
+			}
+		case PB.TuningMessage_Restore:
+			project := reply.GetName()
+			log.Infof("begin to restore project: %s", project)
+			if err := tuning.CheckServerPrj(project, &optimizer); err != nil {
 				return err
 			}
-			continue
-		}
+			if err := optimizer.RestoreConfigTuned(ch); err != nil {
+				return err
+			}
+			log.Infof("restore project %s success", project)
+			return nil
+		case PB.TuningMessage_BenchMark:
+			optimizer.Content = reply.GetContent()
+			err := optimizer.DynamicTuned(ch, stopCh)
+			if err != nil {
+				return err
+			}
 
-		optimizer.Content = content
-		if err = optimizer.InitTuned(ch); err != nil {
-			return err
 		}
 	}
 
@@ -1307,7 +1382,7 @@ func (s *ProfileServer) classify(dataPath string) (string, string, error) {
 		return workloadType, resourceLimit, err
 	}
 
-	log.Infof("workload %s, cluster result resource limit: %s",
+	log.Infof("workload: %s, cluster result resource limit: %s",
 		respPostIns.WorkloadType, respPostIns.ResourceLimit)
 	resourceLimit = respPostIns.ResourceLimit
 	workloadType = respPostIns.WorkloadType

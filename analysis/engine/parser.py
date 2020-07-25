@@ -25,8 +25,6 @@ OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
 OPTIMIZER_POST_PARSER.add_argument('engine', \
     choices=('random', 'forest', 'gbrt', 'bayes', 'whitebox', 'lhs'), \
     help='engine choice: {error_msg}')
-OPTIMIZER_POST_PARSER.add_argument('x_ref', type=list, location='json', help="the reference of x0 list")
-OPTIMIZER_POST_PARSER.add_argument('y_ref', type=list, location='json', help="the reference of y0 list")
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json', help="random_starts cannot be null")
 
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
