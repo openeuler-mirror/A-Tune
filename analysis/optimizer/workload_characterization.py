@@ -60,7 +60,12 @@ class WorkloadCharacterization:
                               'SYS.FDUTIL.fd-util']
     @staticmethod
     def abnormal_detection(x_axis):
-        bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & (x_axis <=x_axis.mean() + 3 * x_axis.std())
+        """
+        detect abnormal data points
+        :param x_axis: the input data
+        :returns x_axis: filtered data
+        """
+        bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & (x_axis <= x_axis.mean() + 3 * x_axis.std())
         result = x_axis[bool_normal].dropna(axis=0, how='any')
         return x_axis
 
