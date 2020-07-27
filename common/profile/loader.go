@@ -64,7 +64,9 @@ func loadProfile(profileNames []string, profiles []Profile,
 			if profile.options.HasKey("include") {
 				include, _ := profile.options.GetKey("include")
 				names := make([]string, 0)
-				names = append(names, strings.Trim(include.Value(), ""))
+				for _, includeValue := range strings.Split(include.Value(), ",") {
+					names = append(names, includeValue)
+				}
 				profiles, processedProfiles = loadProfile(names, profiles, processedProfiles, true)
 			}
 		}

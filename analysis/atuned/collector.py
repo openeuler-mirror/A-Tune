@@ -61,6 +61,7 @@ class Collector(Resource):
         current_app.logger.info(monitors)
 
         data = []
+        data_field = []
         for _ in range(collect_num):
             raw_data = MPI.get_monitors_data(monitors, mpis)
             current_app.logger.info(raw_data)
@@ -73,12 +74,13 @@ class Collector(Resource):
             if n_pipe is not None:
                 n_pipe.write(" ".join(str_data) + "\n")
 
+            data_field.append(float_data.copy())
             if data_type != "":
                 for type_name in data_type.split(":"):
                     float_data.append(type_name)
             data.append(float_data)
 
-        data_average = [sum(elem)/len(elem) for elem in zip(*data)]
+        data_average = [sum(elem)/len(elem) for elem in zip(*data_field)]
         data_result = {}
         for index, _ in enumerate(data_average):
             data_result[field_name[index]] = data_average[index]
