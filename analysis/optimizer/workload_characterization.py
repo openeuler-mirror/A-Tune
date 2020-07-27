@@ -58,6 +58,11 @@ class WorkloadCharacterization:
                               'SYS.TASKS.procs', 'SYS.TASKS.cswchs', 'SYS.LDAVG.runq-sz',
                               'SYS.LDAVG.plist-sz', 'SYS.LDAVG.ldavg-1', 'SYS.LDAVG.ldavg-5',
                               'SYS.FDUTIL.fd-util']
+    @staticmethod
+    def abnormal_detection(x_axis):
+        bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & (x_axis <=x_axis.mean() + 3 * x_axis.std())
+        result = x_axis[bool_normal].dropna(axis=0, how='any')
+        return x_axis
 
     def parsing(self, data_path, header=0, analysis=False):
         """
@@ -73,6 +78,7 @@ class WorkloadCharacterization:
 
         for csv in csvfiles:
             data = pd.read_csv(csv, index_col=None, header=header, usecols=selected_cols)
+            data = self.abnormal_detection(data) 
             df_content.append(data)
             dataset = pd.concat(df_content, sort=False)
         self.dataset = dataset
