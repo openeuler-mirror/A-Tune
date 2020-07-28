@@ -575,6 +575,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 	}()
 
 	var optimizer = tuning.Optimizer{}
+	defer optimizer.DeleteTask()
 
 	stopCh := make(chan int, 1)
 	var cycles int32 = 0
@@ -657,13 +658,18 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 
 			optimizer.Engine = reply.GetEngine()
 			optimizer.Content = reply.GetContent()
+			optimizer.Restart = reply.GetRestart()
 			optimizer.RandomStarts = reply.GetRandomStarts()
 			optimizer.FeatureFilterEngine = reply.GetFeatureFilterEngine()
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			cycles = reply.GetFeatureFilterCycle()
 
 			if cycles == 0 {
-				message = fmt.Sprintf("%d.Start to tuning the system......", step)
+				if optimizer.Restart {
+					message = fmt.Sprintf("%d.Continue to tuning the system......", step)
+				} else {
+					message = fmt.Sprintf("%d.Start to tuning the system......", step)
+				}
 				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 				step += 1
 				if err = optimizer.InitTuned(ch, stopCh); err != nil {

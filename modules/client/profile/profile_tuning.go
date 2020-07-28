@@ -39,6 +39,11 @@ var profileTunningCommand = cli.Command{
 			Name:  "restore,r",
 			Usage: "restore pre-optimized initial configuration",
 		},
+		cli.BoolFlag{
+			Name:   "restart,c",
+			Hidden: false,
+			Usage:  "restart the tuning base on the history",
+		},
 		cli.StringFlag{
 			Name:  "project,p",
 			Usage: "the project name of the yaml file",
@@ -103,6 +108,7 @@ func profileTunning(ctx *cli.Context) error {
 
 		content := &PB.TuningMessage{
 			Name:                ctx.String("project"),
+			Restart:             ctx.Bool("restart"),
 			RandomStarts:        prj.RandomStarts,
 			Engine:              prj.Engine,
 			State:               state,
@@ -132,7 +138,9 @@ func profileTunning(ctx *cli.Context) error {
 					return fmt.Errorf("client sends failure, error: %v", err)
 				}
 			case PB.TuningMessage_BenchMark:
-				prj.SetHistoryEvalBase(string(reply.GetContent()))
+				if ctx.Bool("restart") {
+					prj.SetHistoryEvalBase(reply.GetTuningLog())
+				}
 				prj.Params = string(reply.GetContent())
 				benchmarkByte, err := prj.BenchMark()
 				if err != nil {
@@ -141,8 +149,9 @@ func profileTunning(ctx *cli.Context) error {
 				}
 
 				currentTime := time.Now()
-				fmt.Printf(" Used time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
+				fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
 					currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
+					time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
 					math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
 				if ctx.Bool("detail") {
 					fmt.Printf(" The %dth recommand parameters is: %s\n"+
