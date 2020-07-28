@@ -162,7 +162,7 @@ class Optimizer(multiprocessing.Process):
             return None
         except Exception as e:
             LOGGER.error('Unexpected Error: %s', repr(e))
-            self.child_conn.send(Exception("Unexpected Error:", repr(e))
+            self.child_conn.send(Exception("Unexpected Error:", repr(e)))
             return None
 
         for i, knob in enumerate(self.knobs):
