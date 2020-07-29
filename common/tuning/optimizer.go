@@ -224,6 +224,12 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 
 	log.Infof("optimizer put response body: %+v", o.RespPutIns)
+
+	if !o.matchRelations(o.RespPutIns.Param) && !o.RespPutIns.Finished {
+		ch <- &PB.TuningMessage{State: PB.TuningMessage_Threshold}
+		return nil
+	}
+
 	err, scripts := o.Prj.RunSet(o.RespPutIns.Param)
 	if err != nil {
 		log.Error(err)
@@ -260,7 +266,8 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		remainParams := o.filterParams()
 		if o.FeatureFilter {
 			message := fmt.Sprintf(" The selected most important parameters is:\n"+
-				" %s\n", remainParams)
+				" %s(%d->%d)\n", remainParams,
+				len(strings.Split(o.RespPutIns.Param, ",")), len(strings.Split(remainParams, ",")))
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 		}
 
@@ -283,6 +290,10 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		Content:   []byte(o.RespPutIns.Param),
 		TuningLog: &PB.TuningHistory{BaseEval: o.EvalBase, MinEval: evalMinSum, TotalTime: int64(o.TotalTime), Starts: int32(o.Iter)}}
 	return nil
+}
+
+func (o *Optimizer) matchRelations(optStr string) bool {
+	return o.Prj.MatchRelations(optStr)
 }
 
 func (o *Optimizer) filterParams() string {

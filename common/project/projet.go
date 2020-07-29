@@ -18,11 +18,18 @@ import (
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"math"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+)
+
+const (
+	LESS      = "less"
+	GREATER   = "greater"
+	DEPEND_ON = "depend_on"
+	RELY_ON   = "rely_on"
+	MULTIPLE  = "multiple"
 )
 
 const (
@@ -92,8 +99,16 @@ type YamlObj struct {
 
 // YamlPrjObj :store the yaml object
 type YamlPrjObj struct {
-	Name string  `yaml:"name"`
-	Info YamlObj `yaml:"info"`
+	Name      string          `yaml:"name"`
+	Info      YamlObj         `yaml:"info"`
+	Relations []*RelationShip `yaml:"relationships"`
+}
+
+type RelationShip struct {
+	Type    string `yaml:"type"`
+	Target  string `yaml:"target"`
+	Value   string `yaml:"value"`
+	SrcName string `yaml:"src_name"`
 }
 
 // BenchMark method call the benchmark script
@@ -143,6 +158,20 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 	return strings.Join(benchStr, ","), nil
 }
 
+// Threshold return the threshold, which replace with the benchmark result.
+// it is used when the parameters is not match with the relations
+func (y *YamlPrjCli) Threshold() (string, error) {
+	benchStr := make([]string, 0)
+	for _, evaluation := range y.Evaluations {
+		out := strconv.FormatFloat(float64(evaluation.Info.Threshold)*float64(evaluation.Info.Weight)/100, 'f', -1, 64)
+		if evaluation.Info.Type == "negative" {
+			out = "-" + out
+		}
+		benchStr = append(benchStr, evaluation.Name+"="+out)
+	}
+	return strings.Join(benchStr, ","), nil
+}
+
 // SetHistoryEvalBase method call the set the current EvalBase to history baseline
 func (y *YamlPrjCli) SetHistoryEvalBase(tuningHistory *PB.TuningHistory) {
 	if !utils.IsEquals(y.EvalBase, 0.0) {
@@ -171,7 +200,7 @@ func (y *YamlPrjCli) SetHistoryEvalBase(tuningHistory *PB.TuningHistory) {
 // ImproveRateString method return the string format of performance improve rate
 func (y *YamlPrjCli) ImproveRateString(current float64) string {
 	if y.EvalBase < 0 {
-		return fmt.Sprintf("%.2f", (current-y.EvalBase)/math.Abs(y.EvalBase)*100)
+		return fmt.Sprintf("%.2f", (current-y.EvalBase)/y.EvalBase*100)
 	}
 
 	return fmt.Sprintf("%.2f", (y.EvalBase-current)/current*100)
@@ -188,10 +217,39 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		}
 		paraMap[kvs[0]] = kvs[1]
 	}
+	log.Infof("before change paraMap: %+v\n", paraMap)
 	scripts := make([]string, 0)
 	for _, obj := range y.Object {
 		if obj.Info.Skip {
 			log.Infof("item %s is skiped", obj.Name)
+			continue
+		}
+
+		var objName string
+		active := true
+		for _, relation := range obj.Relations {
+			if relation.Type == RELY_ON && paraMap[relation.Target] != relation.Value {
+				active = false
+				break
+			}
+			if relation.Type == DEPEND_ON && paraMap[relation.Target] != relation.Value {
+				continue
+			}
+
+			if relation.Type == DEPEND_ON {
+				objName = relation.SrcName
+			}
+
+			if relation.Type == MULTIPLE {
+				targetValue, _ := strconv.ParseFloat(paraMap[relation.Target], 32)
+				objValue, _ := strconv.ParseFloat(paraMap[obj.Name], 32)
+				paraMap[obj.Name] = strconv.Itoa(int(targetValue * objValue))
+				continue
+			}
+		}
+
+		if !active {
+			log.Infof("%s value is not match the relations", obj.Name)
 			continue
 		}
 
@@ -204,6 +262,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 			log.Infof("%s need not be set, value is %s", obj.Name, paraMap[obj.Name])
 			continue
 		}
+
 		script := obj.Info.SetScript
 		var newScript string
 		if len(strings.Fields(paraMap[obj.Name])) > 1 {
@@ -211,6 +270,8 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		} else {
 			newScript = strings.Replace(script, "$value", paraMap[obj.Name], -1)
 		}
+
+		newScript = strings.Replace(newScript, "$name", objName, -1)
 		log.Info("set script:", newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
@@ -218,6 +279,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		}
 		scripts = append(scripts, newScript)
 	}
+	log.Infof("after change paraMap: %+v\n", paraMap)
 	return nil, strings.Join(scripts, ",")
 }
 
@@ -263,6 +325,44 @@ func (y *YamlPrjSvr) MergeProject(prj *YamlPrjSvr) error {
 		y.Object = append(y.Object, obj)
 	}
 	return nil
+}
+
+// MatchRelations method check if the params match the relations
+// if less or greater is not match, return false, else return true
+func (y *YamlPrjSvr) MatchRelations(optStr string) bool {
+	paraMap := make(map[string]string)
+	paraSlice := strings.Split(optStr, ",")
+	for _, para := range paraSlice {
+		kvs := strings.Split(para, "=")
+		if len(kvs) < 2 {
+			continue
+		}
+		paraMap[kvs[0]] = kvs[1]
+	}
+
+	for _, obj := range y.Object {
+		if obj.Info.Skip {
+			log.Infof("item %s is skiped", obj.Name)
+			continue
+		}
+		for _, relation := range obj.Relations {
+			if relation.Type != LESS && relation.Type != GREATER {
+				continue
+			}
+
+			targetValue, _ := strconv.Atoi(paraMap[relation.Target])
+			objValue, _ := strconv.Atoi(paraMap[obj.Name])
+
+			if relation.Type == LESS && objValue > targetValue {
+				return false
+			}
+
+			if relation.Type == GREATER && objValue < targetValue {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 //exec command and get result

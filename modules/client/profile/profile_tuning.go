@@ -121,6 +121,16 @@ func profileTunning(ctx *cli.Context) error {
 			return fmt.Errorf("client sends failure, error: %v", err)
 		}
 
+		if prj.FeatureFilterCycle > 0 {
+			fmt.Printf(" Start to benchmark the base performance......\n")
+			benchmarkByte, err := prj.BenchMark()
+			if err != nil {
+				fmt.Println("benchmark result:", benchmarkByte)
+				return err
+			}
+			fmt.Printf(" Base Performance is: %.2f\n", math.Abs(prj.EvalBase))
+		}
+
 		for {
 			reply, err := stream.Recv()
 			if err == io.EOF {
@@ -132,7 +142,6 @@ func profileTunning(ctx *cli.Context) error {
 			state := reply.GetState()
 			switch state {
 			case PB.TuningMessage_JobInit:
-				fmt.Println("send to restart job")
 				prj.StartIters = 1
 				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart, Content: []byte(strconv.Itoa(int(prj.Iterations)))}); err != nil {
 					return fmt.Errorf("client sends failure, error: %v", err)
@@ -158,6 +167,15 @@ func profileTunning(ctx *cli.Context) error {
 						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, strings.Replace(benchmarkByte, "-", "", -1), prj.ImproveRateString(prj.EvalCurrent))
 				}
 				prj.StartIters++
+				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(benchmarkByte)}); err != nil {
+					return fmt.Errorf("client sends failure, error: %v", err)
+				}
+			case PB.TuningMessage_Threshold:
+				benchmarkByte, err := prj.Threshold()
+				if err != nil {
+					fmt.Println("benchmark result:", benchmarkByte)
+					return err
+				}
 				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(benchmarkByte)}); err != nil {
 					return fmt.Errorf("client sends failure, error: %v", err)
 				}

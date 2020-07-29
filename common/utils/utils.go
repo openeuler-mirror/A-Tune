@@ -521,10 +521,10 @@ func (p SortedPair) Len() int {
 }
 
 func (p SortedPair) Less(i, j int) bool {
-	if math.Abs(p[i].Score)-math.Abs(p[j].Score) < accurency {
-		return true
+	if math.Abs(p[i].Score) < math.Abs(p[j].Score) {
+		return false
 	}
-	return false
+	return true
 }
 
 func IsEquals(a, b float64) bool {
