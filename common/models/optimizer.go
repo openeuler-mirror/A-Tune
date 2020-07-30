@@ -33,14 +33,14 @@ type OptimizerPostBody struct {
 
 // Knob body store the tuning properties
 type Knob struct {
-	Dtype   string   `json:"dtype"`
-	Name    string   `json:"name"`
-	Options []string `json:"options"`
-	Type    string   `json:"type"`
-	Range   []int64  `json:"range"`
-	Items   []int64  `json:"items"`
-	Step    float32  `json:"step"`
-	Ref     string   `json:"ref"`
+	Dtype   string    `json:"dtype"`
+	Name    string    `json:"name"`
+	Options []string  `json:"options"`
+	Type    string    `json:"type"`
+	Range   []float32 `json:"range"`
+	Items   []float32 `json:"items"`
+	Step    float32   `json:"step"`
+	Ref     string    `json:"ref"`
 }
 
 // RespPostBody :the body returned of create optimizer task

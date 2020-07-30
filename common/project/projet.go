@@ -82,19 +82,19 @@ type YamlPrjSvr struct {
 
 // YamlObj :yaml Object
 type YamlObj struct {
-	Name        string   `yaml:"name"`
-	Desc        string   `yaml:"desc"`
-	GetScript   string   `yaml:"get"`
-	SetScript   string   `yaml:"set"`
-	Needrestart string   `yaml:"needrestart"`
-	Skip        bool     `yaml:"skip"`
-	Type        string   `yaml:"type"`
-	Step        float32  `yaml:"step,omitempty"`
-	Items       []int64  `yaml:"items"`
-	Options     []string `yaml:"options"`
-	Scope       []int64  `yaml:"scope,flow"`
-	Dtype       string   `yaml:"dtype"`
-	Ref         string   `yaml:"ref"`
+	Name        string    `yaml:"name"`
+	Desc        string    `yaml:"desc"`
+	GetScript   string    `yaml:"get"`
+	SetScript   string    `yaml:"set"`
+	Needrestart string    `yaml:"needrestart"`
+	Skip        bool      `yaml:"skip"`
+	Type        string    `yaml:"type"`
+	Step        float32   `yaml:"step,omitempty"`
+	Items       []float32 `yaml:"items"`
+	Options     []string  `yaml:"options"`
+	Scope       []float32 `yaml:"scope,flow"`
+	Dtype       string    `yaml:"dtype"`
+	Ref         string    `yaml:"ref"`
 }
 
 // YamlPrjObj :store the yaml object
