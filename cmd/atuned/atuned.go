@@ -153,6 +153,10 @@ func runatuned(ctx *cli.Context) error {
 	if config.TransProtocol == "tcp" {
 		lis, err = net.Listen("tcp", config.Address+":"+config.Port)
 	} else if config.TransProtocol == "unix" {
+		err = utils.CreateDir(config.DefaultTempPath, 0750)
+		if err != nil {
+			return err
+		}
 		os.Remove(config.DefaultTgtAddr)
 		lis, err = net.Listen("unix", config.Address)
 		if err != nil {
