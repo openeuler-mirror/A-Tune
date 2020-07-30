@@ -117,7 +117,8 @@ message TuningMessage {
     int32 FeatureFilterCycle = 7;
     int32 FeatureFilterIters = 8;
     bool Restart = 9;
-    TuningHistory TuningLog = 10;
+    bool FeatureFilter = 10;
+    TuningHistory TuningLog = 11;
 }
 
 message TuningHistory {

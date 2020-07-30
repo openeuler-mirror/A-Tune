@@ -204,6 +204,7 @@ DynamicTuned method using bayes algorithm to search the best performance paramet
 func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) error {
 	var evalValue string
 	var err error
+	var message string
 	if o.Content != nil {
 		evalValue, err = o.evalParsing(ch)
 		if err != nil {
@@ -257,17 +258,18 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
 
 	if o.RespPutIns.Finished {
-		finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
-		optimizationTerm := fmt.Sprintf("\n The final optimization result is: %s\n"+
-			" The final evaluation value is: %s\n", o.RespPutIns.Param, finalEval)
-		log.Info(optimizationTerm)
-		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(optimizationTerm)}
-
 		remainParams := o.filterParams()
-		if o.FeatureFilter {
-			message := fmt.Sprintf(" The selected most important parameters is:\n"+
-				" %s(%d->%d)\n", remainParams,
+		if !o.FeatureFilter {
+			finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
+			message = fmt.Sprintf("\n The final optimization result is: %s\n"+
+				" The final evaluation value is: %s\n", o.RespPutIns.Param, finalEval)
+			log.Info(message)
+			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+		} else {
+			message = fmt.Sprintf("\n Parameters reduced from %d to %d.",
 				len(strings.Split(o.RespPutIns.Param, ",")), len(strings.Split(remainParams, ",")))
+			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
+			message = fmt.Sprintf("The selected most important parameters is:\n %s\n", remainParams)
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 		}
 
@@ -287,8 +289,9 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	evalMinSum := fmt.Sprintf("%s=%.2f", project.MIN_BENCHMARK_VALUE, o.MinEvalSum)
 	log.Infof("send back to client to start benchmark")
 	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark,
-		Content:   []byte(o.RespPutIns.Param),
-		TuningLog: &PB.TuningHistory{BaseEval: o.EvalBase, MinEval: evalMinSum, TotalTime: int64(o.TotalTime), Starts: int32(o.Iter)}}
+		Content:       []byte(o.RespPutIns.Param),
+		FeatureFilter: o.FeatureFilter,
+		TuningLog:     &PB.TuningHistory{BaseEval: o.EvalBase, MinEval: evalMinSum, TotalTime: int64(o.TotalTime), Starts: int32(o.Iter)}}
 	return nil
 }
 
