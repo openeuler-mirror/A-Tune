@@ -475,7 +475,6 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 
 	workloadType := respPostIns.WorkloadType
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
 
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
@@ -505,6 +504,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		return fmt.Errorf("class %s is not exist in the tables", workloadType)
 	}
 	apps := classApps.Result[0].Apps
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", apps)})
 	log.Infof("workload %s support app: %s", workloadType, apps)
 	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
 		workloadType, apps, respPostIns.ResourceLimit)
@@ -1180,6 +1180,7 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 	if !workloadTypeExist {
 		if err = sqlstore.InsertClassApps(&sqlstore.ClassApps{
 			Class:     profileName,
+			Apps:      profileName,
 			Deletable: true}); err != nil {
 			return &PB.Ack{}, err
 		}

@@ -77,27 +77,28 @@ CREATE TABLE IF NOT EXISTS schedule(
 
 
 -- class_apps:
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default", "", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("ceph", "ceph", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_hdd", "hadoop-hdfs", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_ssd", "hadoop-hdfs", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("spark", "spark", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mongodb", "mongodb", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb", "mariadb", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mysql", "mysql", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("postgresql", "postgresql", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx", "nginx", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("apache", "apache-traffic-server", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("redis", "redis", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("speccpu", "speccpu", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("specjbb", "specjbb", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("dubbo", "dubbo", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("robox", "robox", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("kvm", "kvm", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hpc", "gatk4", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("olc", "consumer-cloud", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_kvm", "mariadb_kvm", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_docker", "mariadb_docker", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default", "default", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("ceph", "storage-ceph", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_hdd", "big-data-hadoop-hdfs", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_ssd", "big-data-hadoop-hdfs", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("spark", "big-data-hadoop-spark", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mongodb", "database-mongodb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb", "database-mariadb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mysql", "database-mysql", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("postgresql", "database-postgresql", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_http", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("apache", "web-apache-traffic-server", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("redis", "in-memory-database-redis", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("speccpu", "basic-test-suite-speccpu", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("specjbb", "basic-test-suite-specjbb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("dubbo", "middleware-dubbo", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("robox", "arm-native-android-container", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("kvm", "cloud-compute-kvm", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hpc", "hpc-gatk4", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("olc", "virtualization-consumer-cloud", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_kvm", "virtualization-mariadb", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_docker", "docker-mariadb", "", 0);
 
 -- class_profile:
 INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default-default", 0);
@@ -110,6 +111,7 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb", "databa
 INSERT INTO class_profile(class, profile_type, active) VALUES("mysql", "database-mysql-2p-sysbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("postgresql", "database-postgresql-2p-sysbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("nginx", "web-nginx-https-short-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_http", "web-nginx-http-long-connection", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("apache", "web-apache-traffic-server-spirent-pingpo", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("redis", "in-memory-database-redis-redis-benchmark", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("speccpu", "basic-test-suite-speccpu-speccpu2006", 0);
