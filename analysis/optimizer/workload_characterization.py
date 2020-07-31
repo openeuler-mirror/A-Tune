@@ -21,7 +21,7 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 from sklearn import svm
-from sklearn.externals import joblib
+import joblib
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
