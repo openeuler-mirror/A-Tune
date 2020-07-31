@@ -94,7 +94,7 @@ class WorkloadCharacterization:
                 status['index'] = app
                 status_content.append(status)
                 total_status = pd.concat(status_content, sort=False)
-            total_status.to_csv('datastatics.csv')
+            total_status.to_csv('statistics.csv')
         return dataset
 
     def feature_selection(self, x_axis, y_axis, clfpath=None):
@@ -105,7 +105,7 @@ class WorkloadCharacterization:
         """
         x_scaled = StandardScaler().fit_transform(x_axis)
         x_train, x_test, y_train, y_test = tts(x_scaled, y_axis, test_size=0.3)
-        model = RandomForestClassifier(n_estimators=500, random_state=0)
+        model = RandomForestClassifier(n_estimators=500, random_state=0, n_jobs=-1)
         weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
         class_weights = dict(zip(np.unique(y_train), weights))
         w_array = np.ones(y_train.shape[0], dtype='float')
@@ -118,6 +118,8 @@ class WorkloadCharacterization:
         importances = model.feature_importances_.tolist()
         features = self.dataset.iloc[:, :-2].columns.tolist()
         featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
+        result = ",".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
+        print("Overall feature importances:", result)
 
         thresholds = sorted(set(importances), reverse=True)
         for thresh in thresholds:
@@ -125,16 +127,18 @@ class WorkloadCharacterization:
             x_selected = smodel.transform(x_train)
             xt_selected = smodel.transform(x_test)
 
-            feature_model = RandomForestClassifier(n_estimators=500, random_state=0)
+            feature_model = RandomForestClassifier(n_estimators=500, random_state=0, n_jobs=-1)
             feature_model.fit(x_selected, y_train, sample_weight=w_array)
             y_pred = feature_model.predict(xt_selected)
             print("Current threshold value:%.2f, number of selected features: %d, "
                   "model accuracy:%.4f"
                   % (thresh, x_selected.shape[1], accuracy_score(y_test, y_pred)))
             if accuracy_score(y_test, y_pred) >= accuracy:
-                feature_result = featureimportance[0:x_selected.shape[1]]
-                print("The result of feature selection is:", feature_result)
-                label = [result[0] for result in feature_result]
+                importances = feature_model.feature_importances_.tolist()
+                featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
+                result = ",".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
+                print("Feature importances of final model in feature selection:", result)
+                label = [result[0] for result in featureimportance]
                 selected_x = pd.DataFrame(x_axis, columns=label)
                 if clfpath is not None:
                     joblib.dump(smodel, clfpath)
@@ -167,7 +171,7 @@ class WorkloadCharacterization:
         w_array = np.ones(y_train.shape[0], dtype='float')
         for i, val in enumerate(y_train):
             w_array[i] = class_weights[val]
-        model = RandomForestClassifier(n_estimators=150, oob_score=True, random_state=0)
+        model = RandomForestClassifier(n_estimators=150, oob_score=True, random_state=0, n_jobs=-1)
         model.fit(x_train, y_train, sample_weight=w_array)
         y_pred = model.predict(x_test)
         print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
@@ -241,7 +245,10 @@ class WorkloadCharacterization:
                     self.feature_selection(x_app, y_app, feature_path))
             else:
                 selected_x = StandardScaler().fit_transform(x_app)
-            self.rf_clf(selected_x, y_app, clf_path)
+            if workload == "default":
+                self.rf_clf(selected_x, y_app, clf_path)
+            elif workload == "throughput_performance":
+                self.svm_clf(selected_x, y_app, clf_path)
             print("The application classifiers have been generated.")
 
     def identify(self, data, feature_selection=False):
