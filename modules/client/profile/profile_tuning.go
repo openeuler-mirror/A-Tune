@@ -104,8 +104,23 @@ func profileTunning(ctx *cli.Context) error {
 		return err
 	}
 	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
+		finished := make(chan bool)
+		errors := make(chan error)
+		var init bool = false
+		go func() {
+			if !ctx.Bool("restart") {
+				fmt.Println("Start to benchmark baseline...")
+				benchmarkByte, err := prj.BenchMark(true)
+				if err != nil {
+					fmt.Println("benchmark result:", benchmarkByte)
+					errors <- err
+				}
+				finished <- true
+				return
+			}
+			finished <- true
+		}()
 		var state PB.TuningMessageStatus = PB.TuningMessage_JobInit
-
 		content := &PB.TuningMessage{
 			Name:                ctx.String("project"),
 			Restart:             ctx.Bool("restart"),
@@ -119,16 +134,6 @@ func profileTunning(ctx *cli.Context) error {
 		}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
-		}
-
-		if prj.FeatureFilterCycle > 0 {
-			fmt.Printf(" Start to benchmark the base performance......\n")
-			benchmarkByte, err := prj.BenchMark()
-			if err != nil {
-				fmt.Println("benchmark result:", benchmarkByte)
-				return err
-			}
-			fmt.Printf(" Base Performance is: %.2f\n", math.Abs(prj.EvalBase))
 		}
 
 		for {
@@ -147,22 +152,38 @@ func profileTunning(ctx *cli.Context) error {
 					return fmt.Errorf("client sends failure, error: %v", err)
 				}
 			case PB.TuningMessage_BenchMark:
+				if !init {
+					select {
+					case err := <-errors:
+						return err
+					case <-finished:
+						break
+					}
+					init = true
+				}
 				if ctx.Bool("restart") {
 					prj.SetHistoryEvalBase(reply.GetTuningLog())
 				}
 				prj.Params = string(reply.GetContent())
-				benchmarkByte, err := prj.BenchMark()
+				benchmarkByte, err := prj.BenchMark(reply.GetFeatureFilter())
 				if err != nil {
 					fmt.Println("benchmark result:", benchmarkByte)
 					return err
 				}
 
 				currentTime := time.Now()
-				fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
-					currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
-					time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
-					math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
-				if ctx.Bool("detail") {
+				if reply.GetFeatureFilter() {
+					fmt.Printf(" Used time: %s, Total Time: %s, Current Progress......(%d/%d)\n",
+						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
+						time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
+						prj.StartIters, prj.FeatureFilterIters)
+				} else {
+					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
+						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
+						time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
+						math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
+				}
+				if ctx.Bool("detail") && !reply.GetFeatureFilter() {
 					fmt.Printf(" The %dth recommand parameters is: %s\n"+
 						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, strings.Replace(benchmarkByte, "-", "", -1), prj.ImproveRateString(prj.EvalCurrent))
 				}

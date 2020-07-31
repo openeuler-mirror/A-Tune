@@ -112,7 +112,7 @@ type RelationShip struct {
 }
 
 // BenchMark method call the benchmark script
-func (y *YamlPrjCli) BenchMark() (string, error) {
+func (y *YamlPrjCli) BenchMark(featureFilter bool) (string, error) {
 	benchStr := make([]string, 0)
 
 	benchOutByte, err := ExecCommand(y.Benchmark)
@@ -146,10 +146,11 @@ func (y *YamlPrjCli) BenchMark() (string, error) {
 		benchStr = append(benchStr, evaluation.Name+"="+out)
 	}
 
-	if sum < y.EvalMin {
-		y.EvalMin = sum
+	if !featureFilter {
+		if sum < y.EvalMin {
+			y.EvalMin = sum
+		}
 	}
-
 	if utils.IsEquals(y.EvalBase, 0.0) {
 		y.EvalBase = sum
 		y.EvalMin = sum
