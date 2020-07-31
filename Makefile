@@ -75,3 +75,7 @@ rpm:
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 	mv ../openeuler-A-Tune-v$(VERSION).tar.gz ~/rpmbuild/SOURCES
 	rpmbuild -ba misc/atune.spec
+
+models:
+	rm -rf ${CURDIR}/analysis/models/*
+	cd ${CURDIR}/tools/ && python3 generate_models.py
