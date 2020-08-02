@@ -24,6 +24,7 @@ from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
+from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
 
 LOGGER = logging.getLogger(__name__)
 
@@ -217,6 +218,11 @@ class Optimizer(multiprocessing.Process):
                 options, performance = abtuning_manager.do_abtest_tuning_abtest()
                 params = abtuning_manager.get_best_params()
                 options = abtuning_manager.get_options_index(options) # convert string option into index
+            elif self.engine == 'lhs':
+                knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn, self.max_eval, self.split_count)
+                options = knobsampling_manager.get_knob_samples()
+                performance = knobsampling_manager.do_knob_sampling_test(options)
+                params = knobsampling_manager.get_best_params(options, performance)
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', repr(value_error))
