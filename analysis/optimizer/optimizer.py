@@ -23,6 +23,8 @@ from skopt.optimizer import gp_minimize, dummy_minimize
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
+from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -35,6 +37,7 @@ class Optimizer(multiprocessing.Process):
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
+        self.split_count = 5 #should be set by YAML client
         self.ref = []
         self.x0 = x0
         self.y0 = y0
@@ -209,6 +212,11 @@ class Optimizer(multiprocessing.Process):
             elif self.engine == 'bayes':
                 ret = gp_minimize(objective, params_space, n_calls=self.max_eval, \
                                    n_random_starts=self._n_random_starts, x0=ref_x, y0=ref_y)
+            elif self.engine == 'abtest':
+                abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn, self.split_count)
+                options, performance = abtuning_manager.do_abtest_tuning_abtest()
+                params = abtuning_manager.get_best_params()
+                options = abtuning_manager.get_options_index(options) # convert string option into index
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', repr(value_error))
