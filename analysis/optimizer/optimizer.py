@@ -26,6 +26,7 @@ from sklearn.preprocessing import StandardScaler
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
 from analysis.optimizer.tpe_optimizer import TPEOptimizer
+from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 
 LOGGER = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ class Optimizer(multiprocessing.Process):
                 raise ValueError("the ref value of {} is not an integer value"
                                  .format(p_nob['name']))
             if ref_value not in items:
-                raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+                items.append(ref_value)
             self.ref.append(ref_value)
             return items
         if p_nob['dtype'] == 'float':
@@ -125,7 +126,7 @@ class Optimizer(multiprocessing.Process):
                 raise ValueError("the ref value of {} is not a float value"
                                  .format(p_nob['name']))
             if ref_value not in items:
-                raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+                items.append(ref_value)
             self.ref.append(ref_value)
             return items
         if p_nob['dtype'] == 'string':
@@ -290,7 +291,8 @@ class Optimizer(multiprocessing.Process):
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
         finalParam = {}
-        rank = self.feature_importance(options, performance, labels)
+        wefs = WeightedEnsembleFeatureSelector()
+        rank = wefs.get_ensemble_feature_importance(options, performance, labels)
 
         finalParam["param"] = params
         finalParam["rank"] = rank
