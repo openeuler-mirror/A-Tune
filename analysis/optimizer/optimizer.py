@@ -16,12 +16,15 @@ This class is used to find optimal settings and generate optimized profile.
 """
 
 import logging
+import numbers
 import multiprocessing
 import numpy as np
-import sys
-from skopt.optimizer import gp_minimize, dummy_minimize
+import collections
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
+
+from skopt import Optimizer as baseOpt
+from skopt.utils import normalize_dimensions
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
@@ -34,13 +37,14 @@ LOGGER = logging.getLogger(__name__)
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, x0=None, y0=None, n_random_starts=20):
+    def __init__(self, name, params, child_conn, engine="bayes",\
+            max_eval=50, x0=None, y0=None, n_random_starts=20):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
-        self.split_count = 5 #should be set by YAML client
+        self.split_count = 5    #should be set by YAML client
         self.ref = []
         self.x0 = x0
         self.y0 = y0
@@ -226,29 +230,73 @@ class Optimizer(multiprocessing.Process):
         options = []
         performance = []
         labels = []
+        estimator = 'DIY'
         try:
-            params_space = self.build_space()
-            ref_x, ref_y = self.transfer()
-            if len(ref_x) == 0:
-                ref_x = self.ref
-                ref_y = None
-            if not isinstance(ref_x[0], (list, tuple)):
-                ref_x = [ref_x]
+            if self.engine == 'random' or self.engine == 'forest' or \
+                    self.engine == 'gbrt' or self.engine == 'bayes':
+                params_space = self.build_space()
+                ref_x, ref_y = self.transfer()
+                if len(ref_x) == 0:
+                    ref_x = self.ref
+                    ref_y = None
+                if not isinstance(ref_x[0], (list, tuple)):
+                    ref_x = [ref_x]
 
-            LOGGER.info('x0: %s', ref_x)
-            LOGGER.info('y0: %s', ref_y)
+                LOGGER.info('x0: %s', ref_x)
+                LOGGER.info('y0: %s', ref_y)
 
-            if ref_x is not None and isinstance(ref_x[0], (list, tuple)):
-                self._n_random_starts = 0 if len(ref_x) >= self._n_random_starts \
-                        else self._n_random_starts - len(ref_x) + 1
+                if ref_x is not None and isinstance(ref_x[0], (list, tuple)):
+                    self._n_random_starts = 0 if len(ref_x) >= self._n_random_starts \
+                            else self._n_random_starts - len(ref_x) + 1
 
-            LOGGER.info('n_random_starts parameter is: %d', self._n_random_starts)
-            LOGGER.info("Running performance evaluation.......")
-            if self.engine == 'random':
-                ret = dummy_minimize(objective, params_space, n_calls=self.max_eval)
-            elif self.engine == 'bayes':
-                ret = gp_minimize(objective, params_space, n_calls=self.max_eval, \
-                                   n_random_starts=self._n_random_starts, x0=ref_x, y0=ref_y)
+                LOGGER.info('n_random_starts parameter is: %d', self._n_random_starts)
+                LOGGER.info("Running performance evaluation.......")
+                if self.engine == 'random':
+                    estimator = 'dummy'
+                elif self.engine == 'forest':
+                    estimator = 'RF'
+                elif self.engine == 'gbrt':
+                    estimator = 'GBRT'
+                elif self.engine == 'bayes':
+                    estimator = 'GP'
+                    params_space = normalize_dimensions(params_space)
+
+                LOGGER.info("base_estimator is: %s", estimator)
+                optimizer = baseOpt(
+                    dimensions=params_space,
+                    n_random_starts=self._n_random_starts,
+                    random_state=1,
+                    base_estimator=estimator
+                )
+                n_calls = self.max_eval
+
+                if not isinstance(ref_x[0], (list, tuple)):
+                    ref_x = [ref_x]
+
+                # User suggested points at which to evaluate the objective first
+                if ref_x and ref_y is None:
+                    ref_y = list(map(objective, ref_x))
+                    n_calls -= len(ref_y)
+
+                # Pass user suggested initialisation points to the optimizer
+                if ref_x:
+                    if not (isinstance(ref_y, collections.Iterable) or isinstance(ref_y, numbers.Number)):
+                        raise ValueError(
+                            "`ref_y` should be an iterable or a scalar, got %s" % type(ref_y))
+                    if len(ref_x) != len(ref_y):
+                        raise ValueError("`ref_x` and `ref_y` should have the same length")
+                    LOGGER.info("ref_x: %s", ref_x)
+                    LOGGER.info("ref_y: %s", ref_y)
+                    ret = optimizer.tell(ref_x, ref_y)
+
+                for i in range(n_calls):
+                    next_x = optimizer.ask()
+                    LOGGER.info("next_x: %s", next_x)
+                    LOGGER.info("Running perfddormance evaluation.......")
+                    next_y = objective(next_x)
+                    LOGGER.info("next_y: %s", next_y)
+                    ret = optimizer.tell(next_x, next_y)
+                    LOGGER.info("finish (ref_x, ref_y) tell")
             elif self.engine == 'abtest':
                 abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn, self.split_count)
                 options, performance = abtuning_manager.do_abtest_tuning_abtest()
@@ -262,10 +310,10 @@ class Optimizer(multiprocessing.Process):
             elif self.engine == 'tpe':
                 tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
                 best_params = tpe_opt.tpe_minimize_tuning()
-                finalParam = {}
-                finalParam["finished"] = True
-                finalParam["param"] = best_params
-                self.child_conn.send(finalParam)
+                final_param = {}
+                final_param["finished"] = True
+                final_param["param"] = best_params
+                self.child_conn.send(final_param)
                 return best_params
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
@@ -287,17 +335,17 @@ class Optimizer(multiprocessing.Process):
             else:
                 params[knob['name']] = ret.x[i]
             labels.append(knob['name'])
-        
+
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
-        finalParam = {}
+        final_param = {}
         wefs = WeightedEnsembleFeatureSelector()
         rank = wefs.get_ensemble_feature_importance(options, performance, labels)
 
-        finalParam["param"] = params
-        finalParam["rank"] = rank
-        finalParam["finished"] = True
-        self.child_conn.send(finalParam)
+        final_param["param"] = params
+        final_param["rank"] = rank
+        final_param["finished"] = True
+        self.child_conn.send(final_param)
         LOGGER.info("The feature importances of current evaluation are: %s", rank)
         return params
 
