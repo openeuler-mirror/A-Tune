@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
+	"net"
 	"path"
 	"strings"
 
@@ -147,15 +148,23 @@ func (c *Cfg) Load() error {
 	section := cfg.Section("server")
 	TransProtocol = section.Key("protocol").MustString(DefaultProtocol)
 	Address = section.Key("address").MustString(DefaultTgtAddr)
-	Connect = section.Key("connect").MustString("")
-	Port = section.Key("port").MustString(DefaultTgtPort)
+	if section.HasKey("connect") {
+		Connect = section.Key("connect").MustString("")
+	}
+
+	if section.HasKey("port") {
+		Port = section.Key("port").MustString(DefaultTgtPort)
+	}
 	LocalHost = section.Key("rest_host").MustString("localhost")
 	RestPort = section.Key("rest_port").MustString("8383")
 	EngineHost = section.Key("engine_host").MustString("localhost")
 	EnginePort = section.Key("engine_port").MustString("3838")
 	utils.RestHost = LocalHost
 	utils.RestPort = RestPort
-	TLS = section.Key("tls").MustBool(false)
+
+	if section.HasKey("tls") {
+		TLS = section.Key("tls").MustBool(false)
+	}
 
 	if TLS {
 		TLSServerCertFile = section.Key("tlsservercertfile").MustString("")
@@ -167,6 +176,17 @@ func (c *Cfg) Load() error {
 
 	section = cfg.Section("system")
 	Network = section.Key("network").MustString("")
+
+	net, err := getValidNetwork(Network)
+	if err != nil {
+		return err
+	}
+
+	if Network != net {
+		section.Key("network").SetValue(net)
+		cfg.SaveTo(defaultConfigFile)
+		Network = net
+	}
 
 	if err := initLogging(cfg); err != nil {
 		return err
@@ -219,4 +239,35 @@ func IsEnginePort(uri string) bool {
 	}
 
 	return false
+}
+
+func getValidNetwork(network string) (string, error) {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	validNetwork := make([]string, 0)
+	for i := 0; i < len(interfaces); i++ {
+		if interfaces[i].Flags&net.FlagUp != 0 {
+			address, err := interfaces[i].Addrs()
+			if err != nil {
+				return "", err
+			}
+			for _, addr := range address {
+				if ip, ok := addr.(*net.IPNet); ok && !ip.IP.IsLoopback() && ip.IP.To4() != nil {
+					if network == interfaces[i].Name {
+						log.Infof("valid network : %s", network)
+						return network, nil
+					}
+					validNetwork = append(validNetwork, interfaces[i].Name)
+				}
+			}
+		}
+	}
+	if len(validNetwork) == 1 {
+		log.Infof("valid network : %s", validNetwork[0])
+		return validNetwork[0], nil
+	}
+
+	return "", fmt.Errorf("please provide the valid network config in atuned.cnf")
 }
