@@ -25,6 +25,7 @@ from sklearn.preprocessing import StandardScaler
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
+from analysis.optimizer.tpe_optimizer import TPEOptimizer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -56,11 +57,23 @@ class Optimizer(multiprocessing.Process):
                 if r_range is None or len(r_range) != 2:
                     raise ValueError("the item of the scope value of {} must be 2"
                                      .format(p_nob['name']))
-                try:
-                    ref_value = int(p_nob['ref'])
-                except ValueError:
-                    raise ValueError("the ref value of {} is not an integer value"
-                                     .format(p_nob['name']))
+                if p_nob['dtype'] == 'int':
+                    try:
+                        ref_value = int(p_nob['ref'])
+                        r_range[0] = int(r_range[0])
+                        r_range[1] = int(r_range[1])
+                    except ValueError:
+                        raise ValueError("the ref value of {} is not an integer value"
+                                 .format(p_nob['name']))
+                elif p_nob['dtype'] == 'float':
+                    try:
+                        ref_value = float(p_nob['ref'])
+                        r_range[0] = float(r_range[0])
+                        r_range[1] = float(r_range[1])
+                    except ValueError:
+                        raise ValueError("the ref value of {} is not an integer value"
+                                 .format(p_nob['name']))
+
                 if ref_value < r_range[0] or ref_value > r_range[1]:
                     raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
                 self.ref.append(ref_value)
@@ -88,6 +101,28 @@ class Optimizer(multiprocessing.Process):
                 ref_value = int(p_nob['ref'])
             except ValueError:
                 raise ValueError("the ref value of {} is not an integer value"
+                                 .format(p_nob['name']))
+            if ref_value not in items:
+                raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+            self.ref.append(ref_value)
+            return items
+        if p_nob['dtype'] == 'float':
+            items = p_nob['items']
+            if items is None:
+                items = []
+            r_range = p_nob['range']
+            step = 0.1
+            if 'step' in p_nob.keys():
+                step = 0.1 if p_nob['step'] <= 0 else p_nob['step']
+            if r_range is not None:
+                length = len(r_range) if len(r_range) % 2 == 0 else len(r_range) - 1
+                for i in range(0, length, 2):
+                    items.extend(list(np.arange(r_range[i], r_range[i + 1], step=step)))
+            items = list(set(items))
+            try:
+                ref_value = float(p_nob['ref'])
+            except ValueError:
+                raise ValueError("the ref value of {} is not a float value"
                                  .format(p_nob['name']))
             if ref_value not in items:
                 raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
@@ -223,6 +258,14 @@ class Optimizer(multiprocessing.Process):
                 options = knobsampling_manager.get_knob_samples()
                 performance = knobsampling_manager.do_knob_sampling_test(options)
                 params = knobsampling_manager.get_best_params(options, performance)
+            elif self.engine == 'tpe':
+                tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
+                best_params = tpe_opt.tpe_minimize_tuning()
+                finalParam = {}
+                finalParam["finished"] = True
+                finalParam["param"] = best_params
+                self.child_conn.send(finalParam)
+                return best_params
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', repr(value_error))
