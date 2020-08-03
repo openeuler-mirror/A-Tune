@@ -46,7 +46,7 @@ class MemTopo(Monitor):
     def table_get_locator(self, bank):
         """get locator in table"""
         pattern = re.compile(
-            r"DIMM.*?(\d)(\d)(\d)\s.*",
+            r"DIMM.*?(\d)(\d)(\d).*",
             re.ASCII | re.MULTILINE)
         scd = pattern.findall(bank)
         if len(scd) == 0:

@@ -65,8 +65,9 @@ class WorkloadCharacterization:
         :param x_axis: the input data
         :returns x_axis: filtered data
         """
-        bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & (x_axis <= x_axis.mean() + 3 * x_axis.std())
-        result = x_axis[bool_normal].dropna(axis=0, how='any')
+        bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & \
+                      (x_axis <= x_axis.mean() + 3 * x_axis.std())
+        x_axis[bool_normal].dropna(axis=0, how='any')
         return x_axis
 
     def parsing(self, data_path, header=0, analysis=False):
@@ -336,11 +337,11 @@ class WorkloadCharacterization:
             y_axis[-1] = y_axis[-1] + 1
         self.svm_clf(x_axis, y_axis, custom_path)
 
-    @staticmethod
-    def reidentify(data, custom_path):
+    def reidentify(self, data, custom_path):
         """
         for user: predict workload type
         """
+        data = data[self.data_features]
         custom_path = os.path.abspath(custom_path)
         (dirname, filename) = os.path.split(custom_path)
         (modelname, _) = os.path.splitext(filename)
