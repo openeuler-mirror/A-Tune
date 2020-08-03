@@ -28,6 +28,8 @@ OPTIMIZER_POST_PARSER.add_argument('engine', \
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json', help="random_starts cannot be null")
 OPTIMIZER_POST_PARSER.add_argument('x_ref', type=list, location='json', help="the reference of x0 list")
 OPTIMIZER_POST_PARSER.add_argument('y_ref', type=list, location='json', help="the reference of y0 list")
+OPTIMIZER_POST_PARSER.add_argument('feature_filter', type=bool, location='json', help="the feature_filter enabled")
+OPTIMIZER_POST_PARSER.add_argument('split_count', type=int, location='json', help="split_count cannot be null")
 
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,

@@ -119,6 +119,7 @@ message TuningMessage {
     bool Restart = 9;
     bool FeatureFilter = 10;
     TuningHistory TuningLog = 11;
+    int32 SplitCount = 12;
 }
 
 message TuningHistory {

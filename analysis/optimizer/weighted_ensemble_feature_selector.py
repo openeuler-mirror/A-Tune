@@ -127,4 +127,4 @@ class WeightedEnsembleFeatureSelector(object):
         LOGGER.info('ensemble rank: %s', rank)
         LOGGER.info('ensemble sorted_index: %s', sorted_index)
 
-        return rank, sorted_index
+        return rank
