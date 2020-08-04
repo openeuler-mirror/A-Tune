@@ -175,12 +175,12 @@ func profileTunning(ctx *cli.Context) error {
 				if reply.GetFeatureFilter() {
 					fmt.Printf(" Used time: %s, Total Time: %s, Current Progress......(%d/%d)\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
-						time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
+						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
 						prj.StartIters, prj.FeatureFilterIters)
 				} else {
 					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
-						time.Duration(int64(currentTime.Sub(prj.StartsTime).Seconds())+prj.TotalTime)*time.Second,
+						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
 						math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
 				}
 				if ctx.Bool("detail") && !reply.GetFeatureFilter() {
