@@ -405,76 +405,18 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		}
 	}()
 
-	//1. get the dimension structure of the system data to be collected
-	collections, err := sqlstore.GetCollections()
+	respCollectPost, err := s.collection(npipe)
 	if err != nil {
-		log.Errorf("inquery collection tables error: %v", err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		log.Errorf("collection system data error: %v", err)
 		return err
 	}
-	// 1.1 send the collect data command to the monitor service
-	monitors := make([]Monitor, 0)
-	for _, collection := range collections {
-		re := regexp.MustCompile(`\{([^}]+)\}`)
-		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
-		if len(matches) > 0 {
-			for _, match := range matches {
-				if len(match) < 2 {
-					continue
-				}
-				var value string
-				if s.Raw.Section("system").Haskey(match[1]) {
-					value = s.Raw.Section("system").Key(match[1]).Value()
-				} else if s.Raw.Section("server").Haskey(match[1]) {
-					value = s.Raw.Section("server").Key(match[1]).Value()
-				} else {
-					return fmt.Errorf("%s is not exist in the system or server section", match[1])
-				}
-				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
-				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
-			}
-		}
 
-		monitor := Monitor{Module: collection.Module, Purpose: collection.Purpose, Field: collection.Metrics}
-		monitors = append(monitors, monitor)
-	}
-
-	sampleNum := s.Raw.Section("server").Key("sample_num").MustInt(20)
-	collectorBody := new(CollectorPost)
-	collectorBody.SampleNum = sampleNum
-	collectorBody.Monitors = monitors
-	collectorBody.Pipe = npipe
-	collectorBody.File = "/run/atuned/test.csv"
-
-	respCollectPost, err := collectorBody.Post()
+	workloadType, resourceLimit, err := s.classify(respCollectPost.Path, message.GetModel())
 	if err != nil {
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
-
-	dataPath, err := Post("classification", "file", respCollectPost.Path)
-	if err != nil {
-		log.Errorf("Failed transfer file to server: %v", err)
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		return err
-	}
-	defer os.Remove(dataPath)
-
-	//2. send the collected data to the model for completion type identification
-	body := new(ClassifyPostBody)
-	body.Data = dataPath
-	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
-
-	if message.GetModel() != "" {
-		body.Model = message.GetModel()
-	}
-	respPostIns, err := body.Post()
-
-	if err != nil {
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		return err
-	}
-
-	workloadType := respPostIns.WorkloadType
 
 	//3. judge the workload type is exist in the database
 	classProfile := &sqlstore.GetClass{Class: workloadType}
@@ -507,7 +449,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", apps)})
 	log.Infof("workload %s support app: %s", workloadType, apps)
 	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
-		workloadType, apps, respPostIns.ResourceLimit)
+		workloadType, apps, resourceLimit)
 
 	_ = stream.Send(&PB.AckCheck{Name: "\n 3. Build the best resource model..."})
 
@@ -652,7 +594,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			step += 1
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 
-			if err := tuning.CheckServerPrj(project, &optimizer); err != nil {
+			if err = tuning.CheckServerPrj(project, &optimizer); err != nil {
 				return err
 			}
 
@@ -1077,7 +1019,6 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 	go func() {
 		file, _ := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
 		reader := bufio.NewReader(file)
-
 		scanner := bufio.NewScanner(reader)
 
 		for scanner.Scan() {
@@ -1086,73 +1027,19 @@ func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.P
 		}
 	}()
 
-	//1. get the dimension structure of the system data to be collected
-	collections, err := sqlstore.GetCollections()
+	respCollectPost, err := s.collection(npipe)
 	if err != nil {
-		log.Errorf("inquery collection tables error: %v", err)
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		log.Errorf("collection system data error: %v", err)
 		return err
 	}
-	// 1.1 send the collect data command to the monitor service
-	monitors := make([]Monitor, 0)
-	for _, collection := range collections {
-		re := regexp.MustCompile(`\{([^}]+)\}`)
-		matches := re.FindAllStringSubmatch(collection.Metrics, -1)
-		if len(matches) > 0 {
-			for _, match := range matches {
-				if len(match) < 2 {
-					continue
-				}
-				var value string
-				if s.Raw.Section("system").Haskey(match[1]) {
-					value = s.Raw.Section("system").Key(match[1]).Value()
-				} else if s.Raw.Section("server").Haskey(match[1]) {
-					value = s.Raw.Section("server").Key(match[1]).Value()
-				} else {
-					return fmt.Errorf("%s is not exist in the system or server section", match[1])
-				}
-				re = regexp.MustCompile(`\{(` + match[1] + `)\}`)
-				collection.Metrics = re.ReplaceAllString(collection.Metrics, value)
-			}
-		}
 
-		monitor := Monitor{Module: collection.Module, Purpose: collection.Purpose, Field: collection.Metrics}
-		monitors = append(monitors, monitor)
-	}
-
-	sampleNum := s.Raw.Section("server").Key("sample_num").MustInt(20)
-	collectorBody := new(CollectorPost)
-	collectorBody.SampleNum = sampleNum
-	collectorBody.Monitors = monitors
-	collectorBody.Pipe = npipe
-	collectorBody.File = "/run/atuned/test.csv"
-
-	respCollectPost, err := collectorBody.Post()
+	var customeModel string
+	workloadType, _, err := s.classify(respCollectPost.Path, customeModel)
 	if err != nil {
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
 	}
-
-	dataPath, err := Post("classification", "file", respCollectPost.Path)
-	if err != nil {
-		log.Errorf("Failed transfer file to server: %v", err)
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		return err
-	}
-	defer os.Remove(dataPath)
-
-	//2. send the collected data to the model for completion type identification
-	body := new(ClassifyPostBody)
-	body.Data = dataPath
-	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
-
-	respPostIns, err := body.Post()
-
-	if err != nil {
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		return err
-	}
-
-	workloadType := respPostIns.WorkloadType
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
 	return nil
 }
@@ -1322,7 +1209,7 @@ func (s *ProfileServer) Schedule(message *PB.ScheduleMessage,
 	return nil
 }
 
-func (s *ProfileServer) collection() (*RespCollectorPost, error) {
+func (s *ProfileServer) collection(npipe string) (*RespCollectorPost, error) {
 	//1. get the dimension structure of the system data to be collected
 	collections, err := sqlstore.GetCollections()
 	if err != nil {
@@ -1362,6 +1249,9 @@ func (s *ProfileServer) collection() (*RespCollectorPost, error) {
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
 	collectorBody.File = "/run/atuned/test.csv"
+	if npipe != "" {
+		collectorBody.Pipe = npipe
+	}
 
 	log.Infof("tuning collector body is:", collectorBody)
 	respCollectPost, err := collectorBody.Post()
@@ -1371,7 +1261,7 @@ func (s *ProfileServer) collection() (*RespCollectorPost, error) {
 	return respCollectPost, nil
 }
 
-func (s *ProfileServer) classify(dataPath string) (string, string, error) {
+func (s *ProfileServer) classify(dataPath string, customeModel string) (string, string, error) {
 	//2. send the collected data to the model for completion type identification
 	var resourceLimit string
 	var workloadType string
@@ -1380,10 +1270,15 @@ func (s *ProfileServer) classify(dataPath string) (string, string, error) {
 		log.Errorf("Failed transfer file to server: %v", err)
 		return workloadType, resourceLimit, err
 	}
+	defer os.Remove(dataPath)
+
 	body := new(ClassifyPostBody)
 	body.Data = dataPath
 	body.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
+	if customeModel != "" {
+		body.Model = customeModel
+	}
 	respPostIns, err := body.Post()
 	if err != nil {
 		return workloadType, resourceLimit, err
@@ -1397,12 +1292,14 @@ func (s *ProfileServer) classify(dataPath string) (string, string, error) {
 }
 
 func (s *ProfileServer) Getworkload() (string, error) {
-	respCollectPost, err := s.collection()
+	var npipe string
+	var customeModel string
+	respCollectPost, err := s.collection(npipe)
 	if err != nil {
 		return "", err
 	}
 
-	workload, _, err := s.classify(respCollectPost.Path)
+	workload, _, err := s.classify(respCollectPost.Path, customeModel)
 	if err != nil {
 		return "", err
 	}
@@ -1423,7 +1320,8 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	}()
 
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("1.Start to analysis the system bottleneck")})
-	respCollectPost, err := s.collection()
+	var npipe string
+	respCollectPost, err := s.collection(npipe)
 	if err != nil {
 		return err
 	}
