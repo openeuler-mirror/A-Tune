@@ -61,6 +61,7 @@ type YamlPrjCli struct {
 	FeatureFilterEngine string     `yaml:"feature_filter_engine"`
 	FeatureFilterCycle  int32      `yaml:"feature_filter_cycle"`
 	FeatureFilterIters  int32      `yaml:"feature_filter_iters"`
+	SplitCount          int32      `yaml:"split_count"`
 	Evaluations         []Evaluate `yaml:"evaluations"`
 	StartsTime          time.Time  `yaml:"-"`
 	TotalTime           int64      `yaml:"-"`

@@ -38,13 +38,13 @@ class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
     def __init__(self, name, params, child_conn, engine="bayes",\
-            max_eval=50, x0=None, y0=None, n_random_starts=20):
+            max_eval=50, x0=None, y0=None, n_random_starts=20, split_count=5):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.engine = engine
         self.max_eval = int(max_eval)
-        self.split_count = 5    #should be set by YAML client
+        self.split_count = split_count
         self.ref = []
         self.x0 = x0
         self.y0 = y0
@@ -307,6 +307,7 @@ class Optimizer(multiprocessing.Process):
                 options = knobsampling_manager.get_knob_samples()
                 performance = knobsampling_manager.do_knob_sampling_test(options)
                 params = knobsampling_manager.get_best_params(options, performance)
+                options = knobsampling_manager.get_options_index(options)
             elif self.engine == 'tpe':
                 tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
                 best_params = tpe_opt.tpe_minimize_tuning()
@@ -330,10 +331,11 @@ class Optimizer(multiprocessing.Process):
             return None
 
         for i, knob in enumerate(self.knobs):
-            if knob['dtype'] == 'string':
-                params[knob['name']] = knob['options'][ret.x[i]]
-            else:
-                params[knob['name']] = ret.x[i]
+            if estimator != "DIY":
+                if knob['dtype'] == 'string':
+                    params[knob['name']] = knob['options'][ret.x[i]]
+                else:
+                    params[knob['name']] = ret.x[i]
             labels.append(knob['name'])
 
         LOGGER.info("Optimized result: %s", params)

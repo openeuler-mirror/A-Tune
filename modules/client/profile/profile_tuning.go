@@ -131,6 +131,7 @@ func profileTunning(ctx *cli.Context) error {
 			FeatureFilterEngine: prj.FeatureFilterEngine,
 			FeatureFilterCycle:  prj.FeatureFilterCycle,
 			FeatureFilterIters:  prj.FeatureFilterIters,
+			SplitCount:          prj.SplitCount,
 		}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
@@ -307,6 +308,12 @@ func checkTuningPrjYaml(prj project.YamlPrjCli) error {
 	}
 	if prj.FeatureFilterCycle > 0 && prj.FeatureFilterIters < 0 {
 		return fmt.Errorf("error: feature_filter_iters must be > 0 "+
+			"in project %s", prj.Project)
+	}
+
+	if (prj.FeatureFilterEngine == "abtest" || prj.FeatureFilterEngine == "lhs" ||
+		prj.Engine == "abtest" || prj.Engine == "lhs") && prj.SplitCount <= 0 {
+		return fmt.Errorf("error: split_count must be > 0 "+
 			"in project %s", prj.Project)
 	}
 	return nil

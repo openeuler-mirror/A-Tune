@@ -5,6 +5,7 @@ iterations : 15
 feature_filter_engine: "random"
 feature_filter_cycle: 0
 feature_filter_iters: 20
+split_count: 5
 benchmark : "sh /home/Benchmarks/mysql/tunning_mysql.sh"
 evaluations :
   -

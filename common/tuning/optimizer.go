@@ -43,6 +43,7 @@ type Optimizer struct {
 	Iter                int
 	MaxIter             int32
 	FeatureFilterIters  int32
+	SplitCount          int32
 	RandomStarts        int32
 	OptimizerPutURL     string
 	FinalEval           string
@@ -121,6 +122,8 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optimizerBody.MaxEval = iters - int32(len(optimizerBody.Xref))
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
+	optimizerBody.FeatureFilter = o.FeatureFilter
+	optimizerBody.SplitCount = o.SplitCount
 	optimizerBody.Knobs = make([]models.Knob, 0)
 	for _, item := range o.Prj.Object {
 		if item.Info.Skip {
