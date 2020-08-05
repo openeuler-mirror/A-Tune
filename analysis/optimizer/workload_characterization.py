@@ -17,7 +17,7 @@ This class is used to train models and characterize system workload.
 
 import os
 import glob
-from collections import Counter
+import collections
 import numpy as np
 import pandas as pd
 from sklearn import svm
@@ -31,7 +31,7 @@ from sklearn.utils import class_weight
 from xgboost import XGBClassifier
 
 
-class WorkloadCharacterization:
+class WorkloadCharacterization(object):
     """train models and characterize system workload"""
 
     def __init__(self, model_path):
@@ -291,7 +291,7 @@ class WorkloadCharacterization:
         workload = type_clf.predict(data)
         workload = self.tencoder.inverse_transform(workload)
         print("Current workload:", workload)
-        prediction = Counter(workload).most_common(1)[0]
+        prediction = collections.Counter(workload).most_common(1)[0]
         confidence = prediction[1] / len(workload)
         if confidence < 0.5:
             resourcelimit = 'default'
@@ -309,7 +309,7 @@ class WorkloadCharacterization:
 
         result = self.aencoder.inverse_transform(result)
         print(result)
-        prediction = Counter(result).most_common(1)[0]
+        prediction = collections.Counter(result).most_common(1)[0]
         confidence = prediction[1] / len(result)
         if confidence > 0.5:
             return resourcelimit, prediction[0], confidence
@@ -357,7 +357,7 @@ class WorkloadCharacterization:
         result = encoder.inverse_transform(result)
         print(result)
 
-        prediction = Counter(result).most_common(1)[0]
+        prediction = collections.Counter(result).most_common(1)[0]
         confidence = prediction[1] / len(result)
         if confidence > 0.5:
             return prediction[0], confidence
