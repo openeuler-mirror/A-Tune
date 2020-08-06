@@ -528,7 +528,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		select {
 		case <-stopCh:
 			if cycles > 0 {
-				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobInit})
+				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart})
 			} else {
 				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_Ending})
 			}

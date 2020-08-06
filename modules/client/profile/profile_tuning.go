@@ -110,7 +110,7 @@ func profileTunning(ctx *cli.Context) error {
 		go func() {
 			if !ctx.Bool("restart") {
 				fmt.Println("Start to benchmark baseline...")
-				benchmarkByte, err := prj.BenchMark(true)
+				benchmarkByte, err := prj.BenchMark()
 				if err != nil {
 					fmt.Println("benchmark result:", benchmarkByte)
 					errors <- err
@@ -148,6 +148,13 @@ func profileTunning(ctx *cli.Context) error {
 			state := reply.GetState()
 			switch state {
 			case PB.TuningMessage_JobInit:
+				prj.FeatureFilter = reply.GetFeatureFilter()
+				iterations, err := strconv.Atoi(string(reply.GetContent()))
+				if err != nil {
+					return err
+				}
+				prj.Iterations = int32(iterations)
+			case PB.TuningMessage_JobRestart:
 				prj.StartIters = 1
 				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart, Content: []byte(strconv.Itoa(int(prj.Iterations)))}); err != nil {
 					return fmt.Errorf("client sends failure, error: %v", err)
@@ -166,25 +173,26 @@ func profileTunning(ctx *cli.Context) error {
 					prj.SetHistoryEvalBase(reply.GetTuningLog())
 				}
 				prj.Params = string(reply.GetContent())
-				benchmarkByte, err := prj.BenchMark(reply.GetFeatureFilter())
+				benchmarkByte, err := prj.BenchMark()
 				if err != nil {
 					fmt.Println("benchmark result:", benchmarkByte)
 					return err
 				}
 
 				currentTime := time.Now()
-				if reply.GetFeatureFilter() {
+				if prj.FeatureFilter {
 					fmt.Printf(" Used time: %s, Total Time: %s, Current Progress......(%d/%d)\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
 						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
-						prj.StartIters, prj.FeatureFilterIters)
+						prj.StartIters, prj.Iterations)
 				} else {
+					fmt.Printf(" Current Tuning Progress......(%d/%d)\n", prj.StartIters, prj.Iterations)
 					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
 						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
 						math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
 				}
-				if ctx.Bool("detail") && !reply.GetFeatureFilter() {
+				if ctx.Bool("detail") && !prj.FeatureFilter {
 					fmt.Printf(" The %dth recommand parameters is: %s\n"+
 						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, strings.Replace(benchmarkByte, "-", "", -1), prj.ImproveRateString(prj.EvalCurrent))
 				}
@@ -210,7 +218,7 @@ func profileTunning(ctx *cli.Context) error {
 			case PB.TuningMessage_Ending:
 				fmt.Printf(" Baseline Performance is: %.2f\n", math.Abs(prj.EvalBase))
 				fmt.Printf(" %s\n", string(reply.GetContent()))
-				fmt.Printf(" tuning finished\n")
+				fmt.Printf(" Tuning Finished\n")
 				goto End
 			}
 

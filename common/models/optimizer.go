@@ -50,6 +50,7 @@ type RespPostBody struct {
 	TaskID  string `json:"task_id"`
 	Status  string `json:"status"`
 	Message string `json:"message"`
+	Iters   int    `json:"iters"`
 }
 
 // OptimizerPutBody send to the optimizer service when iterations
