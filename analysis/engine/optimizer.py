@@ -69,8 +69,12 @@ class Optimizer(Resource):
         value[self.pipe] = parent_conn
         task_cache.TasksCache.get_instance().set(task_id, value)
 
+        iters = args.get("max_eval")
+        if args.get("engine") == "abtest":
+            iters = parent_conn.recv()
         result["task_id"] = task_id
         result["status"] = "OK"
+        result["iters"] = iters
         return result, 200
 
     def put(self, task_id):

@@ -146,12 +146,18 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	if err != nil {
 		return err
 	}
+	log.Infof("create optimizer task response body is: %+v", respPostIns)
 	if respPostIns.Status != "OK" {
 		err := fmt.Errorf("create task failed: %s", respPostIns.Status)
 		log.Errorf(err.Error())
 		return err
 	}
 
+	ch <- &PB.TuningMessage{
+		State:         PB.TuningMessage_JobInit,
+		FeatureFilter: o.FeatureFilter,
+		Content:       []byte(strconv.Itoa(respPostIns.Iters)),
+	}
 	url := config.GetURL(config.OptimizerURI)
 	o.OptimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
 	log.Infof("optimizer put url is: %s", o.OptimizerPutURL)
@@ -285,10 +291,6 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 
 	o.Iter++
-	if int32(o.Iter) <= o.MaxIter {
-		message := fmt.Sprintf("Current Tuning Progress.....(%d/%d)", o.Iter, o.MaxIter)
-		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
-	}
 	evalMinSum := fmt.Sprintf("%s=%.2f", project.MIN_BENCHMARK_VALUE, o.MinEvalSum)
 	log.Infof("send back to client to start benchmark")
 	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark,

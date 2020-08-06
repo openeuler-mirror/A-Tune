@@ -70,6 +70,7 @@ type YamlPrjCli struct {
 	EvalCurrent         float64    `yaml:"-"`
 	StartIters          int32      `yaml:"-"`
 	Params              string     `yaml:"-"`
+	FeatureFilter       bool       `yaml:"-"`
 }
 
 // YamlPrjSvr :store the server yaml project
@@ -113,7 +114,7 @@ type RelationShip struct {
 }
 
 // BenchMark method call the benchmark script
-func (y *YamlPrjCli) BenchMark(featureFilter bool) (string, error) {
+func (y *YamlPrjCli) BenchMark() (string, error) {
 	benchStr := make([]string, 0)
 
 	benchOutByte, err := ExecCommand(y.Benchmark)
@@ -147,13 +148,11 @@ func (y *YamlPrjCli) BenchMark(featureFilter bool) (string, error) {
 		benchStr = append(benchStr, evaluation.Name+"="+out)
 	}
 
-	if !featureFilter {
-		if sum < y.EvalMin {
-			y.EvalMin = sum
-		}
-	}
 	if utils.IsEquals(y.EvalBase, 0.0) {
 		y.EvalBase = sum
+		y.EvalMin = sum
+	}
+	if !y.FeatureFilter && sum < y.EvalMin {
 		y.EvalMin = sum
 	}
 	y.EvalCurrent = sum

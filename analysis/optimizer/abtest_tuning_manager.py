@@ -64,9 +64,12 @@ class ABtestTuningManager:
         self._best_val_vec = []
         self._performance = []
         self._options = []
+        self._max_eval = 0
         for i in range(self._abtuning_num):
+            self._max_eval += len(self._abtuning_list[i].items)
             self._default_val_vec.append(self._abtuning_list[i].items[0])
             self._best_val_vec.append(self._abtuning_list[i].items[0])
+        self._child_conn.send(self._max_eval)
 
     def construct_set_knob_val_vec(self, item):
         """construct set knob val vec"""
