@@ -28,11 +28,6 @@ class TPEDiscreteKnob(object):
         option_range = []
         if p_nob['dtype'] == 'string':
             option_range.extend(p_nob['options'])
-            ref_val = str(p_nob['ref'])
-            for i in range(len(option_range)):
-                if option_range[i] == ref_val and i != 0:
-                    option_range[i] = option_range[0]
-                    option_range[0] = ref_val
         elif p_nob['dtype'] == 'int' or p_nob['dtype'] == 'float':
             items = p_nob['items']
             if items is not None:
@@ -49,8 +44,6 @@ class TPEDiscreteKnob(object):
             if p_nob['range'] is not None:
                 for val in np.arange(p_nob['range'][0], p_nob['range'][1], step):
                     option_range.append(val)
-            if p_nob['ref'] not in option_range:
-                option_range.append(p_nob['ref'])
         self.option_choice = hp.choice(p_nob['name'], option_range)
 
 

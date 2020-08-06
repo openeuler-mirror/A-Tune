@@ -23,18 +23,11 @@ LOGGER = logging.getLogger(__name__)
 
 class ABtestTuning:
     """abtest tuning"""
-    # always put the ref val at the first place of items list
     def __init__(self, p_nob, split_count=5):
         items = []
         if p_nob['dtype'] == 'string':
             items.extend(p_nob['options'])
-            ref_val = str(p_nob['ref'])
-            for i in range(len(items)):
-                if items[i] == ref_val and i != 0:
-                    items[i] = items[0]
-                    items[0] = ref_val
         elif p_nob['dtype'] == 'int' or p_nob['dtype'] == 'float':
-            items.append(str(p_nob['ref']))
             p_items = p_nob['items']
             if p_items is not None:
                 for item in p_items:
