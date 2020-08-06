@@ -45,17 +45,21 @@ class Optimizer(multiprocessing.Process):
         self.engine = engine
         self.max_eval = int(max_eval)
         self.split_count = split_count
-        self.ref = []
         self.x0 = x0
         self.y0 = y0
+        if self.x0 is not None and len(self.x0) == 1:
+            ref_x, ref_y = self.transfer()
+            self.ref = ref_x[0]
+        else:
+            self.ref = []
         self._n_random_starts = 20 if n_random_starts is None else n_random_starts
 
     def build_space(self):
         """build space"""
         objective_params_list = []
-        for p_nob in self.knobs:
+        for i, p_nob in enumerate(self.knobs):
             if p_nob['type'] == 'discrete':
-                items = self.handle_discrete_data(p_nob)
+                items = self.handle_discrete_data(p_nob, i)
                 objective_params_list.append(items)
             elif p_nob['type'] == 'continuous':
                 r_range = p_nob['range']
@@ -64,30 +68,28 @@ class Optimizer(multiprocessing.Process):
                                      .format(p_nob['name']))
                 if p_nob['dtype'] == 'int':
                     try:
-                        ref_value = int(p_nob['ref'])
                         r_range[0] = int(r_range[0])
                         r_range[1] = int(r_range[1])
                     except ValueError:
-                        raise ValueError("the ref value of {} is not an integer value"
+                        raise ValueError("the range value of {} is not an integer value"
                                  .format(p_nob['name']))
                 elif p_nob['dtype'] == 'float':
                     try:
-                        ref_value = float(p_nob['ref'])
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
                     except ValueError:
-                        raise ValueError("the ref value of {} is not an integer value"
+                        raise ValueError("the range value of {} is not an float value"
                                  .format(p_nob['name']))
 
-                if ref_value < r_range[0] or ref_value > r_range[1]:
-                    raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
-                self.ref.append(ref_value)
+                if len(self.ref) > 0:
+                    if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
+                        raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
                 objective_params_list.append((r_range[0], r_range[1]))
             else:
                 raise ValueError("the type of {} is not supported".format(p_nob['name']))
         return objective_params_list
 
-    def handle_discrete_data(self, p_nob):
+    def handle_discrete_data(self, p_nob, index):
         """handle discrete data"""
         if p_nob['dtype'] == 'int':
             items = p_nob['items']
@@ -102,14 +104,14 @@ class Optimizer(multiprocessing.Process):
                 for i in range(0, length, 2):
                     items.extend(list(np.arange(r_range[i], r_range[i + 1] + 1, step=step)))
             items = list(set(items))
-            try:
-                ref_value = int(p_nob['ref'])
-            except ValueError:
-                raise ValueError("the ref value of {} is not an integer value"
-                                 .format(p_nob['name']))
-            if ref_value not in items:
-                items.append(ref_value)
-            self.ref.append(ref_value)
+            if len(self.ref) > 0:
+                try:
+                    ref_value = int(self.ref[index])
+                except ValueError:
+                    raise ValueError("the ref value of {} is not an integer value"
+                                     .format(p_nob['name']))
+                if ref_value not in items:
+                    items.append(ref_value)
             return items
         if p_nob['dtype'] == 'float':
             items = p_nob['items']
@@ -124,27 +126,26 @@ class Optimizer(multiprocessing.Process):
                 for i in range(0, length, 2):
                     items.extend(list(np.arange(r_range[i], r_range[i + 1], step=step)))
             items = list(set(items))
-            try:
-                ref_value = float(p_nob['ref'])
-            except ValueError:
-                raise ValueError("the ref value of {} is not a float value"
-                                 .format(p_nob['name']))
-            if ref_value not in items:
-                items.append(ref_value)
-            self.ref.append(ref_value)
+            if len(self.ref) > 0:
+                try:
+                    ref_value = float(self.ref[index])
+                except ValueError:
+                    raise ValueError("the ref value of {} is not a float value"
+                                     .format(p_nob['name']))
+                if ref_value not in items:
+                    items.append(ref_value)
             return items
         if p_nob['dtype'] == 'string':
             items = p_nob['options']
-            keys = []
-            length = len(self.ref)
-            for key, value in enumerate(items):
-                keys.append(key)
-                if p_nob['ref'] == value:
-                    self.ref.append(key)
-            if len(self.ref) == length:
-                raise ValueError("the ref value of {} is out of range"
-                                 .format(p_nob['name']))
-            return keys
+            if len(self.ref) > 0:
+                try:
+                    ref_value = str(self.ref[index])
+                except ValueError:
+                    raise ValueError("the ref value of {} is not a string value"
+                                     .format(p_nob['name']))
+                if ref_value not in items:
+                    items.append(ref_value)
+            return items
         raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
 
     @staticmethod
@@ -162,20 +163,17 @@ class Optimizer(multiprocessing.Process):
                          for coef, label in result)
         return rank
 
-    def _get_intvalue_from_knobs(self, kv):
-        """get the int value from knobs if dtype if string"""
+    def _get_value_from_knobs(self, kv):
         x_each = []
         for p_nob in self.knobs:
             if p_nob['name'] not in kv.keys():
                 raise ValueError("the param {} is not in the x0 ref".format(p_nob['name']))
-            if p_nob['dtype'] != 'string':
+            if p_nob['dtype'] == 'int':
                 x_each.append(int(kv[p_nob['name']]))
-                continue
-            options = p_nob['options']
-            for key, value in enumerate(options):
-                if value != kv[p_nob['name']]:
-                    continue
-                x_each.append(key)
+            elif p_nob['dtype'] == 'float':
+                x_each.append(float(kv[p_nob['name']]))
+            else:
+                x_each.append(kv[p_nob['name']])
         return x_each
 
     def transfer(self):
@@ -196,7 +194,7 @@ class Optimizer(multiprocessing.Process):
                     raise ValueError("the param format of {} is not correct".format(params))
                 kv[params[0]] = params[1]
 
-            ref_x = self._get_intvalue_from_knobs(kv)
+            ref_x = self._get_value_from_knobs(kv)
             if len(ref_x) != len(self.knobs):
                 raise ValueError("tuning parameter is not the same length with knobs")
             list_ref_x.append(ref_x)
@@ -208,11 +206,13 @@ class Optimizer(multiprocessing.Process):
         def objective(var):
             """objective method receive the benchmark result and send the next parameters"""
             iterResult = {}
+            option = []
             for i, knob in enumerate(self.knobs):
+                params[knob['name']] = var[i]
                 if knob['dtype'] == 'string':
-                    params[knob['name']] = knob['options'][var[i]]
+                    option.append(knob['options'].index(var[i]))
                 else:
-                    params[knob['name']] = var[i]
+                    option.append(var[i])
             
             iterResult["param"] = params
             self.child_conn.send(iterResult)
@@ -222,7 +222,7 @@ class Optimizer(multiprocessing.Process):
             for value in eval_list:
                 num = float(value)
                 x_num = x_num + num
-            options.append(var)
+            options.append(option)
             performance.append(x_num)
             return x_num
 
@@ -237,11 +237,13 @@ class Optimizer(multiprocessing.Process):
                 params_space = self.build_space()
                 ref_x, ref_y = self.transfer()
                 if len(ref_x) == 0:
-                    ref_x = self.ref
+                    if len(self.ref) == 0:
+                        ref_x = None
+                    else:
+                        ref_x = self.ref
                     ref_y = None
-                if not isinstance(ref_x[0], (list, tuple)):
+                if ref_x is not None and not isinstance(ref_x[0], (list, tuple)):
                     ref_x = [ref_x]
-
                 LOGGER.info('x0: %s', ref_x)
                 LOGGER.info('y0: %s', ref_y)
 
@@ -269,13 +271,10 @@ class Optimizer(multiprocessing.Process):
                     base_estimator=estimator
                 )
                 n_calls = self.max_eval
-
-                if not isinstance(ref_x[0], (list, tuple)):
-                    ref_x = [ref_x]
-
                 # User suggested points at which to evaluate the objective first
                 if ref_x and ref_y is None:
                     ref_y = list(map(objective, ref_x))
+                    LOGGER.info("ref_y is: %s", ref_y)
                     n_calls -= len(ref_y)
 
                 # Pass user suggested initialisation points to the optimizer
@@ -292,7 +291,7 @@ class Optimizer(multiprocessing.Process):
                 for i in range(n_calls):
                     next_x = optimizer.ask()
                     LOGGER.info("next_x: %s", next_x)
-                    LOGGER.info("Running perfddormance evaluation.......")
+                    LOGGER.info("Running performance evaluation.......")
                     next_y = objective(next_x)
                     LOGGER.info("next_y: %s", next_y)
                     ret = optimizer.tell(next_x, next_y)
@@ -332,10 +331,7 @@ class Optimizer(multiprocessing.Process):
 
         for i, knob in enumerate(self.knobs):
             if estimator != "DIY":
-                if knob['dtype'] == 'string':
-                    params[knob['name']] = knob['options'][ret.x[i]]
-                else:
-                    params[knob['name']] = ret.x[i]
+                params[knob['name']] = ret.x[i]
             labels.append(knob['name'])
 
         LOGGER.info("Optimized result: %s", params)

@@ -30,11 +30,6 @@ class KnobSampling(object):
         option_range = []
         if p_nob['dtype'] == 'string':
             option_range.extend(p_nob['options'])
-            ref_val = str(p_nob['ref'])
-            for i in range(len(option_range)):
-                if option_range[i] == ref_val and i != 0:
-                    option_range[i] = option_range[0]
-                    option_range[0] = ref_val
         elif p_nob['dtype'] == 'int' or p_nob['dtype'] == 'float':
             items = p_nob['items']
             if items is not None:
@@ -52,8 +47,6 @@ class KnobSampling(object):
                     option_range.append(str(item_val))
                     item_val += step 
 
-            if str(p_nob['ref']) not in option_range:
-                option_range.append(str(p_nob['ref'])) 
         self.option_range = option_range
 
 
