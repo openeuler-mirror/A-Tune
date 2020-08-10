@@ -84,6 +84,7 @@ atune engine tool for manage atuned AI tuning system.
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/share/atuned
 %attr(0640,root,root) %dir /etc/atuned
+%attr(0640,root,root) %dir /var/atuned
 %attr(0640,root,root) /etc/atuned/*
 
 %files client

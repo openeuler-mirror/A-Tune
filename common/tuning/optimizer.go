@@ -59,6 +59,7 @@ type Optimizer struct {
 	BackupFlag          bool
 	FeatureFilter       bool
 	Restart             bool
+	FeatureFilterEnable bool
 }
 
 // InitTuned method for iniit tuning
@@ -81,11 +82,11 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 
 	}
 
-	if err := utils.CreateDir(config.DefaultTempPath, 0750); err != nil {
+	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
 		return err
 	}
 
-	o.TuningFile = path.Join(config.DefaultTempPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
+	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
 	err = utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
 		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
@@ -113,13 +114,16 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 
 func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
 	optimizerBody := new(models.OptimizerPostBody)
-	if o.Restart {
+	if o.Restart || (o.FeatureFilterEnable && !o.FeatureFilter) {
 		o.readTuningLog(optimizerBody)
 	}
-	if iters <= int32(len(optimizerBody.Xref)) {
+	if o.Restart && iters <= int32(len(optimizerBody.Xref)) {
 		return fmt.Errorf("create task failed for client ask iters less than tuning history")
 	}
-	optimizerBody.MaxEval = iters - int32(len(optimizerBody.Xref))
+	if o.Restart {
+		iters = iters - int32(len(optimizerBody.Xref))
+	}
+	optimizerBody.MaxEval = iters
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
 	optimizerBody.FeatureFilter = o.FeatureFilter
@@ -198,11 +202,31 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
 		}
 		xPara := strings.Split(items[4], ",")
 		xValue := make([]string, 0)
-		xValue = append(xValue, xPara...)
+		for _, para := range xPara {
+			if !o.active(strings.Split(para, "=")[0]) {
+				continue
+			}
+			xValue = append(xValue, para)
+		}
 
 		body.Xref = append(body.Xref, xValue)
 		body.Yref = append(body.Yref, strconv.FormatFloat(yFloat, 'f', -1, 64))
 	}
+}
+
+func (o *Optimizer) active(paraName string) bool {
+	active := false
+	for _, item := range o.Prj.Object {
+		if strings.TrimSpace(paraName) != item.Name {
+			continue
+		}
+		if item.Info.Skip {
+			break
+		}
+		active = true
+		break
+	}
+	return active
 }
 
 /*
@@ -349,7 +373,7 @@ func (o *Optimizer) filterParams() string {
 
 //restore tuning config
 func (o *Optimizer) RestoreConfigTuned(ch chan *PB.TuningMessage) error {
-	tuningRestoreConf := path.Join(config.DefaultTempPath, o.Prj.Project+config.TuningRestoreConfig)
+	tuningRestoreConf := path.Join(config.DefaultTuningLogPath, o.Prj.Project+config.TuningRestoreConfig)
 	exist, err := utils.PathExist(tuningRestoreConf)
 	if err != nil {
 		return err
@@ -564,11 +588,12 @@ func syncConfigToNode(server string, scripts string) error {
 // InitFeatureSel method for init feature selection tuning
 func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) error {
 	o.FeatureFilter = true
-	if err := utils.CreateDir(config.DefaultTempPath, 0750); err != nil {
+	o.FeatureFilterEnable = true
+	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
 		return err
 	}
 
-	o.TuningFile = path.Join(config.DefaultTempPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
+	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
 	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
 	err := utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
 		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
@@ -604,7 +629,7 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 		initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+string(out)))
 	}
 
-	err := utils.WriteFile(path.Join(config.DefaultTempPath,
+	err := utils.WriteFile(path.Join(config.DefaultTuningLogPath,
 		o.Prj.Project+config.TuningRestoreConfig), strings.Join(initConfigure, ","),
 		utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 	if err != nil {

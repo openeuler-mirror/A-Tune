@@ -52,6 +52,7 @@ const (
 	DefaultTempPath         = "/run/atuned"
 	DefaultCheckerPath      = "/usr/share/atuned/checker/"
 	DefaultBackupPath       = "/usr/share/atuned/backup/"
+	DefaultTuningLogPath    = "/var/atuned"
 )
 
 // log config

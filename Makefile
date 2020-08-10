@@ -40,6 +40,7 @@ install:
 	rm -rf $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
+	rm -rf $(DESTDIR)/var/atuned/
 	mkdir -p $(DESTDIR)/etc/atuned/tuning
 	mkdir -p $(DESTDIR)/etc/atuned/rules
 	mkdir -p $(DESTDIR)/etc/atuned/training
@@ -52,6 +53,7 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
 	mkdir -p $(DESTDIR)/var/lib/atuned
 	mkdir -p $(DESTDIR)/var/run/atuned
+	mkdir -p $(DESTDIR)/var/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/share/bash-completion/completions
 	install -m 640 pkg/daemon_profile_server.so $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	install -m 750 pkg/atune-adm $(BINDIR)
