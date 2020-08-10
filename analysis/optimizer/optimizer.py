@@ -25,6 +25,7 @@ from sklearn.preprocessing import StandardScaler
 
 from skopt import Optimizer as baseOpt
 from skopt.utils import normalize_dimensions
+from skopt.utils import cook_estimator
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
@@ -38,11 +39,12 @@ class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
     def __init__(self, name, params, child_conn, engine="bayes",\
-            max_eval=50, x0=None, y0=None, n_random_starts=20, split_count=5):
+            max_eval=50, x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.engine = engine
+        self.noise = noise
         self.max_eval = int(max_eval)
         self.split_count = split_count
         self.x0 = x0
@@ -230,7 +232,7 @@ class Optimizer(multiprocessing.Process):
         options = []
         performance = []
         labels = []
-        estimator = 'DIY'
+        estimator = None
         try:
             if self.engine == 'random' or self.engine == 'forest' or \
                     self.engine == 'gbrt' or self.engine == 'bayes':
@@ -260,8 +262,8 @@ class Optimizer(multiprocessing.Process):
                 elif self.engine == 'gbrt':
                     estimator = 'GBRT'
                 elif self.engine == 'bayes':
-                    estimator = 'GP'
                     params_space = normalize_dimensions(params_space)
+                    estimator = cook_estimator("GP", space=params_space, noise=self.noise)
 
                 LOGGER.info("base_estimator is: %s", estimator)
                 optimizer = baseOpt(
@@ -330,7 +332,7 @@ class Optimizer(multiprocessing.Process):
             return None
 
         for i, knob in enumerate(self.knobs):
-            if estimator != "DIY":
+            if estimator is not None:
                 params[knob['name']] = ret.x[i]
             labels.append(knob['name'])
 
