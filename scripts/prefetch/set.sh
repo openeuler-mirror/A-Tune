@@ -43,7 +43,7 @@ case "$1" in
 esac
 
 if [ ${uninstall} != 0 ]; then
-  modprobe prefetch_tuning
+  insmod /lib/modules/prefetch_tuning/prefetch_tuning.ko
   [ $? != 0 ] && exit 3
 fi
 
