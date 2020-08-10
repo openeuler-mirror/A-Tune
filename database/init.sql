@@ -327,6 +327,7 @@ INSERT INTO tuned_item(property, item) VALUES("blockdev", "Script");
 INSERT INTO tuned_item(property, item) VALUES("hugepage", "Script");
 INSERT INTO tuned_item(property, item) VALUES("rps_cpus", "Script");
 INSERT INTO tuned_item(property, item) VALUES("sched_domain", "Script");
+INSERT INTO tuned_item(property, item) VALUES("hdparm", "Script");
 
 INSERT INTO tuned_item(property, item) VALUES("sysmonitor", "Systemctl");
 INSERT INTO tuned_item(property, item) VALUES("irqbalance", "Systemctl");
