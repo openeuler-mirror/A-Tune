@@ -321,11 +321,8 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 }
 
 // MergeProject two yaml project to one object
-func (y *YamlPrjSvr) MergeProject(prj *YamlPrjSvr) error {
-	for _, obj := range prj.Object {
-		y.Object = append(y.Object, obj)
-	}
-	return nil
+func (y *YamlPrjSvr) MergeProject(prj *YamlPrjSvr) {
+	y.Object = append(y.Object, prj.Object...)
 }
 
 // MatchRelations method check if the params match the relations

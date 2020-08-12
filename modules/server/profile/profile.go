@@ -209,6 +209,10 @@ func Post(serviceType, paramName, path string) (string, error) {
 		return "", fmt.Errorf("writer error")
 	}
 	_, err = io.Copy(part, file)
+	if err != nil {
+		return "", fmt.Errorf("copy error")
+	}
+
 	extraParams := map[string]string{
 		"service":  serviceType,
 		"savepath": "/etc/atuned/" + serviceType + "/" + filepath.Base(path),
@@ -1342,7 +1346,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	ruleFile := path.Join(config.DefaultRulePath, config.TuningRuleFile)
 	engine := tuning.NewRuleEngine(ruleFile)
 	if engine == nil {
-		fmt.Errorf("create rules engine failed")
+		return fmt.Errorf("create rules engine failed")
 	}
 
 	tuningFile := tuning.NewTuningFile(projectName, ch)
@@ -1350,8 +1354,16 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	if err != nil {
 		return err
 	}
-	engine.AddContext("TuningData", &tuningData)
-	engine.AddContext("TuningFile", tuningFile)
+	err = engine.AddContext("TuningData", &tuningData)
+	if err != nil {
+		return err
+	}
+
+	err = engine.AddContext("TuningFile", tuningFile)
+	if err != nil {
+		return err
+	}
+	
 	err = engine.Execute()
 	if err != nil {
 		return err

@@ -19,7 +19,6 @@ import os
 import ssl
 import sys
 import logging
-import socket
 from configparser import ConfigParser
 from logging import handlers
 from flask import Flask

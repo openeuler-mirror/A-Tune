@@ -18,8 +18,8 @@ This class is used to find optimal settings and generate optimized profile.
 import logging
 import numbers
 import multiprocessing
-import numpy as np
 import collections
+import numpy as np
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
@@ -38,8 +38,8 @@ LOGGER = logging.getLogger(__name__)
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes",\
-            max_eval=50, x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
+    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50,
+                 x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
@@ -47,9 +47,9 @@ class Optimizer(multiprocessing.Process):
         self.noise = noise
         self.max_eval = int(max_eval)
         self.split_count = split_count
-        self.x0 = x0
-        self.y0 = y0
-        if self.x0 is not None and len(self.x0) == 1:
+        self.x_ref = x0
+        self.y_ref = y0
+        if self.x_ref is not None and len(self.x_ref) == 1:
             ref_x, ref_y = self.transfer()
             self.ref = ref_x[0]
         else:
@@ -74,18 +74,19 @@ class Optimizer(multiprocessing.Process):
                         r_range[1] = int(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an integer value"
-                                 .format(p_nob['name']))
+                                         .format(p_nob['name']))
                 elif p_nob['dtype'] == 'float':
                     try:
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an float value"
-                                 .format(p_nob['name']))
+                                         .format(p_nob['name']))
 
                 if len(self.ref) > 0:
                     if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
-                        raise ValueError("the ref value of {} is out of range".format(p_nob['name']))
+                        raise ValueError("the ref value of {} is out of range"
+                                         .format(p_nob['name']))
                 objective_params_list.append((r_range[0], r_range[1]))
             else:
                 raise ValueError("the type of {} is not supported".format(p_nob['name']))
@@ -182,15 +183,15 @@ class Optimizer(multiprocessing.Process):
         """transfer ref x0 to int, y0 to float"""
         list_ref_x = []
         list_ref_y = []
-        if self.x0 is None or self.y0 is None:
+        if self.x_ref is None or self.y_ref is None:
             return (list_ref_x, list_ref_y)
 
-        for xValue in self.x0:
+        for x_value in self.x_ref:
             kv = {}
-            if len(xValue) != len(self.knobs):
+            if len(x_value) != len(self.knobs):
                 raise ValueError("x0 is not the same length with knobs")
 
-            for i, val in enumerate(xValue):
+            for val in x_value:
                 params = val.split("=")
                 if len(params) != 2:
                     raise ValueError("the param format of {} is not correct".format(params))
@@ -200,14 +201,15 @@ class Optimizer(multiprocessing.Process):
             if len(ref_x) != len(self.knobs):
                 raise ValueError("tuning parameter is not the same length with knobs")
             list_ref_x.append(ref_x)
-        list_ref_y = [float(y) for y in self.y0]
+        list_ref_y = [float(y) for y in self.y_ref]
         return (list_ref_x, list_ref_y)
 
     def run(self):
         """start the tuning process"""
+
         def objective(var):
             """objective method receive the benchmark result and send the next parameters"""
-            iterResult = {}
+            iter_result = {}
             option = []
             for i, knob in enumerate(self.knobs):
                 params[knob['name']] = var[i]
@@ -215,9 +217,9 @@ class Optimizer(multiprocessing.Process):
                     option.append(knob['options'].index(var[i]))
                 else:
                     option.append(var[i])
-            
-            iterResult["param"] = params
-            self.child_conn.send(iterResult)
+
+            iter_result["param"] = params
+            self.child_conn.send(iter_result)
             result = self.child_conn.recv()
             x_num = 0.0
             eval_list = result.split(',')
@@ -251,7 +253,7 @@ class Optimizer(multiprocessing.Process):
 
                 if ref_x is not None and isinstance(ref_x[0], (list, tuple)):
                     self._n_random_starts = 0 if len(ref_x) >= self._n_random_starts \
-                            else self._n_random_starts - len(ref_x) + 1
+                        else self._n_random_starts - len(ref_x) + 1
 
                 LOGGER.info('n_random_starts parameter is: %d', self._n_random_starts)
                 LOGGER.info("Running performance evaluation.......")
@@ -281,11 +283,13 @@ class Optimizer(multiprocessing.Process):
 
                 # Pass user suggested initialisation points to the optimizer
                 if ref_x:
-                    if not (isinstance(ref_y, collections.Iterable) or isinstance(ref_y, numbers.Number)):
-                        raise ValueError(
-                            "`ref_y` should be an iterable or a scalar, got %s" % type(ref_y))
+                    if not (isinstance(ref_y, collections.Iterable)
+                            or isinstance(ref_y, numbers.Number)):
+                        raise ValueError("`ref_y` should be an iterable or a scalar, "
+                                         "got %s" % type(ref_y))
                     if len(ref_x) != len(ref_y):
-                        raise ValueError("`ref_x` and `ref_y` should have the same length")
+                        raise ValueError("`ref_x` and `ref_y` should "
+                                         "have the same length")
                     LOGGER.info("ref_x: %s", ref_x)
                     LOGGER.info("ref_y: %s", ref_y)
                     ret = optimizer.tell(ref_x, ref_y)
@@ -299,12 +303,15 @@ class Optimizer(multiprocessing.Process):
                     ret = optimizer.tell(next_x, next_y)
                     LOGGER.info("finish (ref_x, ref_y) tell")
             elif self.engine == 'abtest':
-                abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn, self.split_count)
+                abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn,
+                                                       self.split_count)
                 options, performance = abtuning_manager.do_abtest_tuning_abtest()
                 params = abtuning_manager.get_best_params()
-                options = abtuning_manager.get_options_index(options) # convert string option into index
+                # convert string option into index
+                options = abtuning_manager.get_options_index(options)
             elif self.engine == 'lhs':
-                knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn, self.max_eval, self.split_count)
+                knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn,
+                                                           self.max_eval, self.split_count)
                 options = knobsampling_manager.get_knob_samples()
                 performance = knobsampling_manager.do_knob_sampling_test(options)
                 params = knobsampling_manager.get_best_params(options, performance)
@@ -326,9 +333,9 @@ class Optimizer(multiprocessing.Process):
             LOGGER.error('Runtime Error: %s', repr(runtime_error))
             self.child_conn.send(runtime_error)
             return None
-        except Exception as e:
-            LOGGER.error('Unexpected Error: %s', repr(e))
-            self.child_conn.send(Exception("Unexpected Error:", repr(e)))
+        except Exception as err:
+            LOGGER.error('Unexpected Error: %s', repr(err))
+            self.child_conn.send(Exception("Unexpected Error:", repr(err)))
             return None
 
         for i, knob in enumerate(self.knobs):
@@ -353,4 +360,3 @@ class Optimizer(multiprocessing.Process):
         """stop process"""
         self.child_conn.close()
         self.terminate()
-

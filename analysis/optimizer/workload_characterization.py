@@ -20,8 +20,8 @@ import glob
 import collections
 import numpy as np
 import pandas as pd
-from sklearn import svm
 import joblib
+from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
@@ -31,7 +31,7 @@ from sklearn.utils import class_weight
 from xgboost import XGBClassifier
 
 
-class WorkloadCharacterization(object):
+class WorkloadCharacterization:
     """train models and characterize system workload"""
 
     def __init__(self, model_path):
@@ -58,6 +58,7 @@ class WorkloadCharacterization(object):
                               'SYS.TASKS.procs', 'SYS.TASKS.cswchs', 'SYS.LDAVG.runq-sz',
                               'SYS.LDAVG.plist-sz', 'SYS.LDAVG.ldavg-1', 'SYS.LDAVG.ldavg-5',
                               'SYS.FDUTIL.fd-util']
+
     @staticmethod
     def abnormal_detection(x_axis):
         """
@@ -84,7 +85,7 @@ class WorkloadCharacterization(object):
 
         for csv in csvfiles:
             data = pd.read_csv(csv, index_col=None, header=header, usecols=selected_cols)
-            data = self.abnormal_detection(data) 
+            data = self.abnormal_detection(data)
             df_content.append(data)
             dataset = pd.concat(df_content, sort=False)
         self.dataset = dataset
@@ -137,7 +138,8 @@ class WorkloadCharacterization(object):
             if accuracy_score(y_test, y_pred) >= accuracy:
                 importances = feature_model.feature_importances_.tolist()
                 featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
-                result = ",".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
+                result = ",".join("%s: %s" % (label, round(coef, 3))
+                                  for label, coef in featureimportance)
                 print("Feature importances of final model in feature selection:", result)
                 label = [result[0] for result in featureimportance]
                 selected_x = pd.DataFrame(x_axis, columns=label)

@@ -12,20 +12,20 @@
 # Create: 2020-07-30
 
 """
-This class is used to perform lhs(Latin hypercube sampling), to get 'balanced' sampling configuration and its performance
+This class is used to perform lhs(Latin hypercube sampling),
+to get 'balanced' sampling configuration and its performance
 """
 
 import logging
 import numpy as np
 import lhsmdu
-import sys
-import os
 
 LOGGER = logging.getLogger(__name__)
 
 
-class KnobSampling(object):
+class KnobSampling:
     """knob sampling"""
+
     def __init__(self, p_nob, split_count=5):
         option_range = []
         if p_nob['dtype'] == 'string':
@@ -39,19 +39,20 @@ class KnobSampling(object):
             if p_nob['range'] is not None:
                 if 'step' in p_nob.keys():
                     if p_nob['dtype'] == 'int':
-                        step = int((p_nob['range'][1]-p_nob['range'][0])/split_count)
+                        step = int((p_nob['range'][1] - p_nob['range'][0]) / split_count)
                     elif p_nob['dtype'] == 'float':
-                        step = float((p_nob['range'][1]-p_nob['range'][0])/split_count)
+                        step = float((p_nob['range'][1] - p_nob['range'][0]) / split_count)
                 item_val = p_nob['range'][0]
-                for i in range(split_count):
+                for _ in range(split_count):
                     option_range.append(str(item_val))
-                    item_val += step 
+                    item_val += step
 
         self.option_range = option_range
 
 
-class KnobSamplingManager(object):
+class KnobSamplingManager:
     """knob sample manager"""
+
     def __init__(self, knobs, child_conn, sample_count, split_count, algorithm='lhs'):
         option_range_list = []
         name_list = []
@@ -76,7 +77,7 @@ class KnobSamplingManager(object):
                 self._value_count.append(float(len(option_range)))
                 self._value_min.append(float(0))
             else:
-                assert(isinstance(option_range, tuple))
+                assert isinstance(option_range, tuple)
                 self._is_discrete.append(False)
                 self._value_count.append(float(option_range[1] - option_range[0]))
                 self._value_min = float(option_range[0])
@@ -85,25 +86,23 @@ class KnobSamplingManager(object):
         """
         Note: return type is matrix, access with rates[i, j] NOT rates[i][j]
         """
-        if self._algorithm == 'lhs': 
+        if self._algorithm == 'lhs':
             rates = lhsmdu.sample(len(self._option_range_list), self._sample_count)
             return rates
-        elif self._algorithm == 'mcs':
-            rates = lhsmdu.createRandomStandardUniformMatrix( \
-                    len(self._option_range_list), self._sample_count)
+        if self._algorithm == 'mcs':
+            rates = lhsmdu.createRandomStandardUniformMatrix(
+                len(self._option_range_list), self._sample_count)
             return rates
-        else:
-            rates = lhsmdu.sample(len(self._option_range_list), self._sample_count)
-            return rates
+        rates = lhsmdu.sample(len(self._option_range_list), self._sample_count)
+        return rates
 
     def get_sample_from_rate(self, dim, rate):
         """return the sample depend on rate"""
-        assert(dim < len(self._option_range_list))
-        if self._is_discrete[dim] == True:
+        assert dim < len(self._option_range_list)
+        if self._is_discrete[dim]:
             index = int(self._value_count[dim] * rate)
             return self._option_range_list[dim][index]
-        else:
-            return (self._value_min[dim] + self._value_count[dim] * rate)
+        return self._value_min[dim] + self._value_count[dim] * rate
 
     def get_knob_samples(self):
         """get knob samples"""
@@ -134,17 +133,18 @@ class KnobSamplingManager(object):
             knob_samples.append(knob_sample)
         return knob_samples
 
-    def construct_one_knob_sample(self, knob_samples, index):
+    @staticmethod
+    def construct_one_knob_sample(knob_samples, index):
         """construct one knob sample"""
         return knob_samples[index]
 
     def test_performance_one_knob_sample(self, knob_samples, index):
         """test performance of one knob sample"""
         set_knob_val_vec = self.construct_one_knob_sample(knob_samples, index)
-        iterResult = {}
+        iter_result = {}
         params = {}
-        for i in range(len(set_knob_val_vec)):
-            knob_val = set_knob_val_vec[i]
+        for i, val in enumerate(set_knob_val_vec):
+            knob_val = val
             knob_name = self._name_list[i]
             if self._knobs[i]['dtype'] == 'int':
                 params[knob_name] = int(knob_val)
@@ -152,8 +152,8 @@ class KnobSamplingManager(object):
                 params[knob_name] = float(knob_val)
             elif self._knobs[i]['dtype'] == 'string':
                 params[knob_name] = knob_val
-        iterResult["param"] = params
-        self._child_conn.send(iterResult)
+        iter_result["param"] = params
+        self._child_conn.send(iter_result)
         result = self._child_conn.recv()
         x_num = 0.0
         eval_list = result.split(',')
@@ -178,8 +178,8 @@ class KnobSamplingManager(object):
         best_index = np.argmin(np_results)
         set_knob_val_vec = self.construct_one_knob_sample(knob_samples, best_index)
         params = {}
-        for i in range(len(set_knob_val_vec)):
-            knob_val = set_knob_val_vec[i]
+        for i, val in enumerate(set_knob_val_vec):
+            knob_val = val
             knob_name = self._name_list[i]
             if self._knobs[i]['dtype'] == 'int':
                 params[knob_name] = int(knob_val)
@@ -193,8 +193,7 @@ class KnobSamplingManager(object):
         """return the index of the option"""
         option_range_list = self._option_range_list
         option_index = []
-        for i in range(len(option)):
-            val = option[i]
+        for i, val in enumerate(option):
             index = option_range_list[i].index(val)
             option_index.append(index)
         return option_index

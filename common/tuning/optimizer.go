@@ -198,9 +198,7 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
 		}
 		xPara := strings.Split(items[4], ",")
 		xValue := make([]string, 0)
-		for _, para := range xPara {
-			xValue = append(xValue, para)
-		}
+		xValue = append(xValue, xPara...)
 
 		body.Xref = append(body.Xref, xValue)
 		body.Yref = append(body.Yref, strconv.FormatFloat(yFloat, 'f', -1, 64))
@@ -441,8 +439,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	projects := strings.Split(data, ",")
 
 	log.Infof("client ask project: %s", data)
-	var requireProject map[string]struct{}
-	requireProject = make(map[string]struct{})
+	requireProject := make(map[string]struct{})
 	for _, project := range projects {
 		requireProject[strings.TrimSpace(project)] = struct{}{}
 	}

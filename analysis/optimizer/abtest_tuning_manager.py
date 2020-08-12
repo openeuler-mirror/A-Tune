@@ -16,13 +16,14 @@ This class is used to perform white box tuning and generate optimized profile
 """
 
 import logging
-import os
 import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
+
 class ABtestTuning:
     """abtest tuning"""
+
     def __init__(self, p_nob, split_count=5):
         items = []
         if p_nob['dtype'] == 'string':
@@ -36,17 +37,19 @@ class ABtestTuning:
             if p_nob['range'] is not None:
                 if 'step' in p_nob.keys():
                     if p_nob['dtype'] == 'int':
-                        step = int((p_nob['range'][1]-p_nob['range'][0])/split_count)
+                        step = int((p_nob['range'][1] - p_nob['range'][0]) / split_count)
                     elif p_nob['dtype'] == 'float':
-                        step = float((p_nob['range'][1]-p_nob['range'][0])/split_count)
+                        step = float((p_nob['range'][1] - p_nob['range'][0]) / split_count)
                 item_val = p_nob['range'][0]
-                for i in range(split_count):
+                for _ in range(split_count):
                     items.append(str(item_val))
                     item_val += step
         self.items = items
 
+
 class ABtestTuningManager:
     """abtest tuning manager"""
+
     def __init__(self, knobs, child_conn, split_count):
         abtuning_list = []
         name_list = []
@@ -86,10 +89,10 @@ class ABtestTuningManager:
         """test performance of one abtuning item"""
         set_knob_val_vec = self.construct_set_knob_val_vec(item)
         self._options.append(set_knob_val_vec)
-        iterResult = {}
+        iter_result = {}
         params = {}
-        for i in range(len(set_knob_val_vec)):
-            knob_val = set_knob_val_vec[i]
+        for i, val in enumerate(set_knob_val_vec):
+            knob_val = val
             knob_name = self._name_list[i]
             if self._knobs[i]['dtype'] == 'int':
                 params[knob_name] = int(knob_val)
@@ -97,8 +100,8 @@ class ABtestTuningManager:
                 params[knob_name] = float(knob_val)
             elif self._knobs[i]['dtype'] == 'string':
                 params[knob_name] = knob_val
-        iterResult["param"] = params
-        self._child_conn.send(iterResult)
+        iter_result["param"] = params
+        self._child_conn.send(iter_result)
         result = self._child_conn.recv()
         x_num = 0.0
         eval_list = result.split(',')
@@ -139,8 +142,8 @@ class ABtestTuningManager:
         params = {}
         best_index = np.argmin(self._performance)
         best_option = self._options[best_index]
-        for i in range(len(best_option)):
-            knob_val = best_option[i]
+        for i, val in enumerate(best_option):
+            knob_val = val
             knob_name = self._name_list[i]
             if self._knobs[i]['dtype'] == 'int':
                 params[knob_name] = int(knob_val)
@@ -154,8 +157,7 @@ class ABtestTuningManager:
         """return the index of the option list"""
         option_range_list = self._abtuning_list
         option_index = []
-        for i in range(len(option)):
-            val = option[i]
+        for i, val in enumerate(option):
             index = option_range_list[i].items.index(val)
             option_index.append(index)
         return option_index
@@ -167,4 +169,3 @@ class ABtestTuningManager:
             option_index = self.get_option_index(option)
             options_index.append(option_index)
         return options_index
-

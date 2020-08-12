@@ -72,7 +72,7 @@ atune engine tool for manage atuned AI tuning system.
 %attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0640,root,root) /usr/lib/atuned/profiles/*
-%exclude /usr/libexec/atuned/analysis/app-engine.py
+%exclude /usr/libexec/atuned/analysis/app_engine.py
 %exclude /usr/libexec/atuned/analysis/models/
 %exclude /usr/libexec/atuned/analysis/optimizer/
 %exclude /usr/libexec/atuned/analysis/engine/

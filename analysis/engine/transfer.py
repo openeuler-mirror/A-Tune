@@ -17,7 +17,6 @@ Restful api for transfer, in order to transfer file.
 
 import os
 import logging
-from flask import abort
 from flask import current_app
 from flask_restful import Resource
 from flask_restful import request
@@ -29,17 +28,18 @@ LOGGER = logging.getLogger(__name__)
 
 class Transfer(Resource):
     """restful api for transfer"""
+    file_path = "/etc/atuned/"
 
     def post(self):
         """provide the method of post"""
         current_app.logger.info(request.files)
-        save_path = request.form.get("savepath")        
-        file_obj = request.files.get('file')
+        save_path = request.form.get("savepath")
+        file_obj = request.files.get("file")
         file_obj.save(save_path)
         service = request.form.get("service")
         if service == "classification":
             return save_path, 200
-        target_path = "/etc/atuned/" + service
+        target_path = self.file_path + service
         res = utils.extract_file(save_path, target_path)
         os.remove(save_path)
         return res, 200

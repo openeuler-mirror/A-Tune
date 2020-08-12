@@ -42,7 +42,6 @@ var clockTicks uint64
 // ScaleShift is in order to avoid float compute
 const ScaleShift uint64 = 10
 const nsecPerSec uint64 = 1000000000
-const cpuNameIndex = 0
 const cpuIDIndex = 3
 
 type timeUsage struct {

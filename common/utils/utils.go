@@ -486,8 +486,6 @@ func Compress(file *os.File, prefix string, tarWrt *tar.Writer) error {
 		header, err := tar.FileInfoHeader(info, "")
 		if !strings.EqualFold(prefix, "") {
 			header.Name = prefix + "/" + header.Name
-		} else {
-			header.Name = header.Name
 		}
 		if err != nil {
 			return err
@@ -521,18 +519,11 @@ func (p SortedPair) Len() int {
 }
 
 func (p SortedPair) Less(i, j int) bool {
-	if math.Abs(p[i].Score) < math.Abs(p[j].Score) {
-		return false
-	}
-	return true
+	return math.Abs(p[i].Score) >= math.Abs(p[j].Score)
 }
 
 func IsEquals(a, b float64) bool {
-	if math.Abs(a-b) < accurency {
-		return true
-	}
-
-	return false
+	return math.Abs(a-b) < accurency
 }
 
 func CalculateBenchMark(eval string) (float64, error) {
