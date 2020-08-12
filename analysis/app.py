@@ -64,7 +64,7 @@ def main(filename):
     API.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
     API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
     API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
-    
+
     if config.has_option("server", "tls") and config.get("server", "tls") == "true":
         cert_file = config.get("server", "tlshttpcertfile")
         key_file = config.get("server", "tlshttpkeyfile")

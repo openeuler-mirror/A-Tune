@@ -34,6 +34,7 @@ class Optimizer(Resource):
     task_id_info = "taskid"
     pipe = "pipe"
     _feature_filter_engine = ['random', 'abtest', 'lhs']
+
     def get(self, task_id=None):
         """provide the method of get"""
         result = []
@@ -54,14 +55,16 @@ class Optimizer(Resource):
         LOGGER.info(args)
         task_id = str(uuid.uuid1())
         if args.get("feature_filter") and args.get("engine") not in self._feature_filter_engine:
-            abort(400, "feature_filter_engine is not a valid choice, only random, abtest and lhs enabled")
+            abort(400, "feature_filter_engine is not a valid choice, "
+                       "only random, abtest and lhs enabled")
         parent_conn, child_conn = Pipe()
-        x0 = args.get("x_ref")
-        y0 = args.get("y_ref")
+        x_ref = args.get("x_ref")
+        y_ref = args.get("y_ref")
         result = {}
         engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, engine=args.get("engine"),
-                                     max_eval=args.get("max_eval"), n_random_starts=args.get("random_starts"), 
-                                     x0=x0, y0=y0, split_count=args.get("split_count"))
+                                     max_eval=args.get("max_eval"),
+                                     n_random_starts=args.get("random_starts"),
+                                     x0=x_ref, y0=y_ref, split_count=args.get("split_count"))
         engine.start()
 
         value = {}

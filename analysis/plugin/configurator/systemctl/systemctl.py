@@ -64,4 +64,3 @@ class Systemctl(Configurator):
         else:
             val = "stop"
         return "{} = {}".format(cfg[0], val)
-

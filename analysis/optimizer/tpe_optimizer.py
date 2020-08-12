@@ -12,7 +12,8 @@
 # Create: 2020-8-02
 
 """
-This class is used to perform tpe tuning optimizer with hyperopt lib (install it: pip3 install hyperopt)
+This class is used to perform tpe tuning optimizer with hyperopt lib
+(install it: pip3 install hyperopt)
 """
 
 import logging
@@ -22,8 +23,9 @@ from hyperopt import fmin, tpe, space_eval, hp
 LOGGER = logging.getLogger(__name__)
 
 
-class TPEDiscreteKnob(object):
+class TPEDiscreteKnob:
     """tpe tuning space generator"""
+
     def __init__(self, p_nob):
         option_range = []
         if p_nob['dtype'] == 'string':
@@ -47,8 +49,9 @@ class TPEDiscreteKnob(object):
         self.option_choice = hp.choice(p_nob['name'], option_range)
 
 
-class TPEOptimizer(object):
+class TPEOptimizer:
     """tpe tuning manager"""
+
     def __init__(self, knobs, child_conn, max_eval=100):
         self._search_space = {}
         for p_nob in knobs:
@@ -56,16 +59,18 @@ class TPEOptimizer(object):
                 tpe_knob = TPEDiscreteKnob(p_nob)
                 self._search_space[p_nob['name']] = tpe_knob.option_choice
             elif p_nob['type'] == 'continuous':
-                self._search_space[p_nob['name']] = hp.uniform(p_nob['name'], p_nob['range'][0], p_nob['range'][1])
+                self._search_space[p_nob['name']] = hp.uniform(p_nob['name'], p_nob['range'][0],
+                                                               p_nob['range'][1])
         self._knobs = knobs
         self._child_conn = child_conn
         self._max_eval = max_eval
 
     def tpe_minimize_tuning(self):
         """runing the tpe tuning algorithm"""
+
         def test_performance(args):
             """generate the params and send to client to run benchmark"""
-            iterResult = {}
+            iter_result = {}
             params = {}
             for p_nob in self._knobs:
                 knob_name = p_nob['name']
@@ -74,8 +79,8 @@ class TPEOptimizer(object):
                     params[knob_name] = int(knob_val)
                 else:
                     params[knob_name] = knob_val
-            iterResult["param"] = params
-            self._child_conn.send(iterResult)
+            iter_result["param"] = params
+            self._child_conn.send(iter_result)
             result = self._child_conn.recv()
             x_num = 0.0
             eval_list = result.split(',')
@@ -85,12 +90,12 @@ class TPEOptimizer(object):
             performance = x_num
             LOGGER.info('tpe tuning: %s, result: %s', args, performance)
             return performance
-        best=fmin(
-                test_performance, 
-                self._search_space, 
-                algo=tpe.suggest, 
-                max_evals=self._max_eval
+
+        best = fmin(
+            test_performance,
+            self._search_space,
+            algo=tpe.suggest,
+            max_evals=self._max_eval
         )
         best_val = space_eval(self._search_space, best)
         return best_val
-

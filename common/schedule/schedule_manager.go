@@ -95,11 +95,12 @@ func (s *ScheduleManager) New(strategy string, pids string, opts ...Option) (*ge
 		opt(&options)
 	}
 
-	ctx, cancle := context.WithCancel(context.Background())
 	plugin, ok := s.plugins[strategy]
 	if !ok {
 		return nil, fmt.Errorf("strategy not support : %s", strategy)
 	}
+
+	ctx, cancle := context.WithCancel(context.Background())
 	scheduler := &generalScheduler{
 		strategy: strategy,
 		pids:     pids,
@@ -155,7 +156,7 @@ func (s *ScheduleManager) Submit(sched *generalScheduler) {
 	s.Lock()
 	defer s.Unlock()
 
-	if s.running == false {
+	if !s.running {
 		s.scheduler = sched
 		return
 	}
@@ -179,7 +180,7 @@ func (s *ScheduleManager) Submit(sched *generalScheduler) {
 func (s *ScheduleManager) Stop() {
 	s.Lock()
 	defer s.Unlock()
-	if s.running == false {
+	if !s.running {
 		return
 	}
 
