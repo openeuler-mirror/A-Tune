@@ -1,0 +1,13 @@
+Category,"name
+(Parameter to be adjusted)","desc
+(Parameter description)","get
+(Command for querying parameter values.)","set
+(Command for setting parameter values)",needrestart(Whether require restart or not),type (discrete/continuous),"options
+(For the discrete type, use"";""to split  different values.)","dtype
+(For discrete, the parameter value type can only be int or string.)","scope
+(Minimum value of the parameter)","scope
+(Maximum Value of the parameter)","step
+(Step of the parameter value)","items
+(Enumerated values out of parameter values. Use "";"" to split different values)",select (whether to select the parameter)
+nginx,nginx.access_log,Enabling or Disabling nginx access_log,"cat /etc/nginx/nginx.conf | grep ""access_log"" | awk -F ';' '{print $1}' | awk '{$1="""";print}'| awk '$1=$1'","sed -i ""s#access_log.*#access_log $value;#g"" /etc/nginx/nginx.conf",false,discrete,/var/log/nginx/access.log  main;off,string,,,,,yes
+,nginx.error_log,Enabling or Disabling nginx error_log,"cat /etc/nginx/nginx.conf | grep ""error_log"" | awk -F ';' '{print $1}' | awk '{$1="""";print}' | awk '$1=$1'","sed -i ""s#error_log.*#error_log $value;#g"" /etc/nginx/nginx.conf",false,discrete,/var/log/nginx/access.log  main;/dev/null,string,,,,,yes

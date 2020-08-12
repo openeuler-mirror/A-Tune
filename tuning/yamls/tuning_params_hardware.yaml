@@ -1,0 +1,543 @@
+project: "hardware"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "prefetcher"
+    info :
+        desc : "Hardware prefetch policy. The value 0 indicates that the policy is disabled, and the value 15 indicates that the policy is enabled."
+        get : "cat /sys/class/misc/prefetch/policy"
+        set : "echo $value > /sys/class/misc/prefetch/policy"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 15
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "read_unique"
+    info :
+        desc : "Whether to allow cross-numa access to cache. 0--allow 1--forbid."
+        get : "cat /sys/class/misc/prefetch/read_unique"
+        set : "echo $value > /sys/class/misc/prefetch/read_unique"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "iocapacity_limit"
+    info :
+        desc : "Whether to limit the io capacity of cache. 0--unlimiet 1--limit."
+        get : "cat /sys/class/misc/prefetch/iocapacity_limit"
+        set : "echo $value > /sys/class/misc/prefetch/iocapacity_limit"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "tag_rep_alg"
+    info :
+        desc : "Choose cache line algorithm. 0--random 1--drrip 2--plru 3--random."
+        get : "cat /sys/class/misc/prefetch/tag_rep_alg"
+        set : "echo $value > /sys/class/misc/prefetch/tag_rep_alg"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 3
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "ramswap"
+    info :
+        desc : "Full or partial when doing ramswap. 1--partial 0--Full."
+        get : "cat /sys/class/misc/prefetch/ramswap"
+        set : "echo $value > /sys/class/misc/prefetch/ramswap"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sqmerge"
+    info :
+        desc : "whether consecutive address access can occupy only one entry in the squeue to accelerate the merge process. 0--limit 1--merge."
+        get : "cat /sys/class/misc/prefetch/sqmerge"
+        set : "echo $value > /sys/class/misc/prefetch/sqmerge"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_drop_hha"
+    info :
+        desc : "Whether to merge a non-prefetch operation with the previous prefetch operation. 0--allow 1--limit."
+        get : "cat /sys/class/misc/prefetch/prefetch_drop_hha"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_drop_hha"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_drop_mask"
+    info :
+        desc : "Enable prefetch to retry randomly. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/prime_drop_mask"
+        set : "echo $value > /sys/class/misc/prefetch/prime_drop_mask"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sequence_opt"
+    info :
+        desc : "Whether change the L3T processing to serial mode when blocking. 0--limit 1--enable."
+        get : "cat /sys/class/misc/prefetch/sequence_opt"
+        set : "echo $value > /sys/class/misc/prefetch/sequence_opt"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_utl_ddr"
+    info :
+        desc : "The utilization of ddr that leads to the halving the threshold of prefetch. 0--less thean 1/2 1--1/2 2--3/4 3--almost full."
+        get : "cat /sys/class/misc/prefetch/prefetch_utl_ddr"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_utl_ddr"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 3
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_utl_ddr_en"
+    info :
+        desc : "Whether to allow the automatic threshold reduction according to the utilization of ddr. 0--forbid 1--allow."
+        get : "cat /sys/class/misc/prefetch/prefetch_utl_ddr_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_utl_ddr_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_utl_l3t"
+    info :
+        desc : "The utilization of l3t that leads to the halving the threshold of prefetch. 0--less thean 1/2 1--1/2 2--3/4 3--almost full."
+        get : "cat /sys/class/misc/prefetch/prefetch_utl_l3t"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_utl_l3t"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 3
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_utl_l3t_en"
+    info :
+        desc : "Whether to allow the automatic threshold reduction according to the utilization of l3t. 0--forbid 1--allow."
+        get : "cat /sys/class/misc/prefetch/prefetch_utl_l3t_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_utl_l3t_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_start_level"
+    info :
+        desc : "The number of missing addresses that leads to prefetch. 0--32 1--2 n-1--n, can be 0-31."
+        get : "cat /sys/class/misc/prefetch/prefetch_start_level"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_start_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 31
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "totem_dual"
+    info :
+        desc : "Assign the number of totems in each socket. 0--1, 1--2."
+        get : "cat /sys/class/misc/prefetch/totem_dual"
+        set : "echo $value > /sys/class/misc/prefetch/totem_dual"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "canum_sktvec"
+    info :
+        desc : "Vector configuration of chip, active high. Range form 0 to 255."
+        get : "cat /sys/class/misc/prefetch/canum_sktvec"
+        set : "echo $value > /sys/class/misc/prefetch/canum_sktvec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt1_tb_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket1 TotemB, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt1_tb_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt1_tb_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt1_ta_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket1 TotemA, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt1_ta_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt1_ta_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt0_tb_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket0 TotemB, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt0_tb_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt0_tb_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt0_ta_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket0 TotemA, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt0_ta_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt0_ta_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt3_tb_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket3 TotemB, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt3_tb_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt3_tb_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt3_ta_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket3 TotemA, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt3_ta_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt3_ta_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt2_tb_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket2 TotemB, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt2_tb_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt2_tb_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "skt2_ta_cavec"
+    info :
+        desc : "Vector configuration of L3T partition in Socket2 TotemA, active high. Range from 0 to 255."
+        get : "cat /sys/class/misc/prefetch/skt2_ta_cavec"
+        set : "echo $value > /sys/class/misc/prefetch/skt2_ta_cavec"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "rdmerge_upgrade_en"
+    info :
+        desc : "Whether to allow the RS to merge with the preceding ReadE. 0--disabl 1--allow."
+        get : "cat /sys/class/misc/prefetch/rdmerge_upgrade_en"
+        set : "echo $value > /sys/class/misc/prefetch/rdmerge_upgrade_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "ddr_compress_opt_en"
+    info :
+        desc : "Optimization switch of support HHA compression access. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/ddr_compress_opt_en"
+        set : "echo $value > /sys/class/misc/prefetch/ddr_compress_opt_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "snpsleep_en"
+    info :
+        desc : "Whether to enable snp sleep. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/snpsleep_en"
+        set : "echo $value > /sys/class/misc/prefetch/snpsleep_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetchtgt_en"
+    info :
+        desc : "Whether to enable the prefetchtgt. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/prefetchtgt_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetchtgt_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "bankintl_stagger"
+    info :
+        desc : "Simple interleave mode fine-tuning enable. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/bankintl_stagger"
+        set : "echo $value > /sys/class/misc/prefetch/bankintl_stagger"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "cpu_pf_lqos_en"
+    info :
+        desc : "Whether to enable the prefetch operation delivered by the CPU to be forcibly processed as the lqos operation. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/cpu_pf_lqos_en"
+        set : "echo $value > /sys/class/misc/prefetch/cpu_pf_lqos_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "refillsize_com_ada_en"
+    info :
+        desc : "Whether to enable the auto-sensing of the size of the request sent to the HHA. If the size of the continuously received requests is 128 bytes or 64 bytes, the size of the prefetched request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
+        get : "cat /sys/class/misc/prefetch/refillsize_com_ada_en"
+        set : "echo $value > /sys/class/misc/prefetch/refillsize_com_ada_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "refillsize_pre_ada_en"
+    info :
+        desc : "Whether to enable the adaptation of the size of the request sent to the HHA. If the size of the continuously received request is 128 bytes or 64 bytes, the size of the normal request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
+        get : "cat /sys/class/misc/prefetch/refillsize_pre_ada_en"
+        set : "echo $value > /sys/class/misc/prefetch/refillsize_pre_ada_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_overide_level"
+    info :
+        desc : "Initial coverage priority for an operation to enter the prefetch buffer. If the value is incorrect, the threshold is decreased by 1. If the value is correct, the threshold is increased by 1. If the value is 0, the prefetch rule needs to be replaced. range 0~15."
+        get : "cat /sys/class/misc/prefetch/prefetch_overide_level"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_overide_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 15
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_vague_en"
+    info :
+        desc : "Indicates whether to enable fuzzy match for prefetch. After the function is enabled, the prefetch summarizes the same 16 KB address rule. The four 4 KB address rules are the same and can be used together. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/prefetch_vague_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_vague_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_core_en"
+    info :
+        desc : "Core prefetch enable: Bit 1 indicates that the core request needs to be prefetched. range 0~15."
+        get : "cat /sys/class/misc/prefetch/prefetch_core_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_core_en"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 15
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_match_en"
+    info :
+        desc : "Whether to enable the prefetch operation after the prefetch hit. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/prefetch_match_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_match_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_prefetch_drop"
+    info :
+        desc : "Prefetch operation discard enable. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_prefetch_drop"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_prefetch_drop"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_dmcassign"
+    info :
+        desc : "DDR access address alignment enable. 0--The DDR read operation uses the wrap mode, and the address is 32-byte-aligned. The DDR write operation is always in INCR mode, and the address is aligned with the access boundary. 1--The DDR read operation is always in INCR mode, and the address is aligned with the access boundary. The DDR write operation is always in INCR mode, and the address is aligned with the access boundary."
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_dmcassign"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_dmcassign"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_rdatabyp"
+    info :
+        desc : "DDR read data bypass memory enable in the HHA. 0--disable 1--The internal data of the HHA is bypassed, and the DDR read data can be transmitted quickly."
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_rdatabyp"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_rdatabyp"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_dir_replace_alg"
+    info :
+        desc : "Directory replacement algorithm configuration. 0--EDIR random+SDIR random 1--EDIR random+SDIR polling 2--EDIR PLRU+SDIR random 3--EDIR PLRU+SDIR polling"
+        get : "cat /sys/class/misc/prefetch/reg_dir_replace_alg"
+        set : "echo $value > /sys/class/misc/prefetch/reg_dir_replace_alg"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 3
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_comb"
+    info :
+        desc : "Read operation and prefetchtgt merge enable. 0--The read operation can be merged with the fetchtgt operation. 1--The read operation and the fetchtgt merge operation are not allowed."
+        get : "cat /sys/class/misc/prefetch/prefetch_comb"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_comb"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_comb"
+    info :
+        desc : "Whether to merge write operations whose size is less than 128 bytes. 0--enable 1--disables the merge function of the write operation."
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_comb"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_comb"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
