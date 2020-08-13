@@ -153,7 +153,7 @@ func profileTunning(ctx *cli.Context) error {
 				if err != nil {
 					return err
 				}
-				prj.Iterations = int32(iterations)
+				prj.TotalIters = int32(iterations)
 			case PB.TuningMessage_JobRestart:
 				prj.StartIters = 1
 				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart, Content: []byte(strconv.Itoa(int(prj.Iterations)))}); err != nil {
@@ -184,9 +184,9 @@ func profileTunning(ctx *cli.Context) error {
 					fmt.Printf(" Used time: %s, Total Time: %s, Current Progress......(%d/%d)\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
 						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
-						prj.StartIters, prj.Iterations)
+						prj.StartIters, prj.TotalIters)
 				} else {
-					fmt.Printf(" Current Tuning Progress......(%d/%d)\n", prj.StartIters, prj.Iterations)
+					fmt.Printf(" Current Tuning Progress......(%d/%d)\n", prj.StartIters, prj.TotalIters)
 					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
 						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,

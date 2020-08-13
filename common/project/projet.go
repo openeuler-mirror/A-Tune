@@ -69,6 +69,7 @@ type YamlPrjCli struct {
 	EvalBase            float64    `yaml:"-"`
 	EvalCurrent         float64    `yaml:"-"`
 	StartIters          int32      `yaml:"-"`
+	TotalIters          int32      `yaml:"-"`
 	Params              string     `yaml:"-"`
 	FeatureFilter       bool       `yaml:"-"`
 }
