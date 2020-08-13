@@ -18,6 +18,7 @@ import (
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
+	"math"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -30,11 +31,6 @@ const (
 	DEPEND_ON = "depend_on"
 	RELY_ON   = "rely_on"
 	MULTIPLE  = "multiple"
-)
-
-const (
-	BASE_BENCHMARK_VALUE = "baseValue"
-	MIN_BENCHMARK_VALUE  = "minValue"
 )
 
 // Evaluate :store the evaluate object
@@ -66,12 +62,15 @@ type YamlPrjCli struct {
 	StartsTime          time.Time  `yaml:"-"`
 	TotalTime           int64      `yaml:"-"`
 	EvalMin             float64    `yaml:"-"`
-	EvalBase            float64    `yaml:"-"`
+	EvalMinArray        []float64  `yaml:"-"`
+	EvalBaseArray       []float64  `yaml:"-"`
 	EvalCurrent         float64    `yaml:"-"`
+	EvalCurrentArray    []float64  `yaml:"-"`
 	StartIters          int32      `yaml:"-"`
 	TotalIters          int32      `yaml:"-"`
 	Params              string     `yaml:"-"`
 	FeatureFilter       bool       `yaml:"-"`
+	Baseline            bool       `yaml:"-"`
 }
 
 // YamlPrjSvr :store the server yaml project
@@ -115,49 +114,105 @@ type RelationShip struct {
 }
 
 // BenchMark method call the benchmark script
-func (y *YamlPrjCli) BenchMark() (string, error) {
+func (y *YamlPrjCli) BenchMark() (string, string, error) {
 	benchStr := make([]string, 0)
-
 	benchOutByte, err := ExecCommand(y.Benchmark)
 	if err != nil {
 		fmt.Println(string(benchOutByte))
-		return "", fmt.Errorf("failed to run benchmark, err: %v", err)
+		return "", "", fmt.Errorf("failed to run benchmark, err: %v", err)
 	}
 
 	var sum float64
-	for _, evaluation := range y.Evaluations {
+	for index, evaluation := range y.Evaluations {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)
 		bout, err := ExecCommand(newScript)
 		if err != nil {
 			err = fmt.Errorf("failed to exec %s, err: %v", newScript, err)
-			return strings.Join(benchStr, ","), err
+			return "", "", err
 		}
 
 		floatOut, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
 		if err != nil {
 			err = fmt.Errorf("failed to parse float, err: %v", err)
-			return strings.Join(benchStr, ","), err
+			return "", "", err
 		}
 
-		out := strconv.FormatFloat(floatOut*float64(evaluation.Info.Weight)/100, 'f', -1, 64)
 		if evaluation.Info.Type == "negative" {
-			out = "-" + out
-			sum += -floatOut
-		} else {
-			sum += floatOut
+			floatOut = -floatOut
 		}
-		benchStr = append(benchStr, evaluation.Name+"="+out)
+		floatOut, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", floatOut), 64)
+		y.EvalCurrentArray[index] = floatOut
+		if y.Baseline {
+			y.EvalBaseArray[index] = floatOut
+			y.EvalMinArray[index] = floatOut
+		}
+		benchStr = append(benchStr, fmt.Sprintf("%s=%.2f", evaluation.Name, floatOut))
 	}
 
-	if utils.IsEquals(y.EvalBase, 0.0) {
-		y.EvalBase = sum
+	sum = y.calculateBenchMark()
+
+	if utils.IsEquals(y.EvalMin, 0.0) && len(y.Evaluations) == 1 {
 		y.EvalMin = sum
 	}
 	if !y.FeatureFilter && sum < y.EvalMin {
+		for index, eval := range y.EvalCurrentArray {
+			y.EvalMinArray[index] = eval
+		}
 		y.EvalMin = sum
 	}
 	y.EvalCurrent = sum
-	return strings.Join(benchStr, ","), nil
+	y.Baseline = false
+	return fmt.Sprintf("evaluations=%.2f", sum), strings.Join(benchStr, ","), nil
+}
+
+func (y *YamlPrjCli) BestPerformance() string {
+	bestPerformance := make([]string, 0)
+	for index, evaluation := range y.Evaluations {
+		bestPerformance = append(bestPerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalMinArray[index])))
+	}
+	return fmt.Sprintf("(%s)", strings.Join(bestPerformance, ","))
+}
+
+func (y *YamlPrjCli) CurrPerformance() string {
+	currPerformance := make([]string, 0)
+	for index, evaluation := range y.Evaluations {
+		currPerformance = append(currPerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalCurrentArray[index])))
+	}
+	return fmt.Sprintf("(%s)", strings.Join(currPerformance, ","))
+}
+
+func (y *YamlPrjCli) BasePerformance() string {
+	basePerformance := make([]string, 0)
+	for index, evaluation := range y.Evaluations {
+		basePerformance = append(basePerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalBaseArray[index])))
+	}
+	return fmt.Sprintf("(%s)", strings.Join(basePerformance, ","))
+}
+
+func (y *YamlPrjCli) calculateBenchMark() float64 {
+	if len(y.EvalCurrentArray) == 1 {
+		return y.EvalCurrentArray[0]
+	}
+
+	var sum float64
+	for index, evaluation := range y.Evaluations {
+		sum += y.improveRate(index) * float64(evaluation.Info.Weight) / 100
+	}
+
+	return -sum
+}
+
+func (y *YamlPrjCli) improveRate(index int) float64 {
+	if y.EvalBaseArray[index] > 0 {
+		if y.EvalCurrentArray[index] > y.EvalBaseArray[index] {
+			return (y.EvalBaseArray[index] - y.EvalCurrentArray[index]) / y.EvalBaseArray[index] * 100
+		}
+		return (y.EvalBaseArray[index] - y.EvalCurrentArray[index]) / y.EvalCurrentArray[index] * 100
+	}
+	if y.EvalCurrentArray[index] > y.EvalBaseArray[index] {
+		return (y.EvalCurrentArray[index] - y.EvalBaseArray[index]) / y.EvalCurrentArray[index] * 100
+	}
+	return (y.EvalCurrentArray[index] - y.EvalBaseArray[index]) / y.EvalBaseArray[index] * 100
 }
 
 // Threshold return the threshold, which replace with the benchmark result.
@@ -176,36 +231,51 @@ func (y *YamlPrjCli) Threshold() (string, error) {
 
 // SetHistoryEvalBase method call the set the current EvalBase to history baseline
 func (y *YamlPrjCli) SetHistoryEvalBase(tuningHistory *PB.TuningHistory) {
-	if !utils.IsEquals(y.EvalBase, 0.0) {
+	if !y.Baseline {
 		return
 	}
 
-	evaluation := strings.Split(tuningHistory.BaseEval, "=")
-	if len(evaluation) != 2 {
-		return
+	for index, eval := range strings.Split(tuningHistory.BaseEval, ",") {
+		evalStr := strings.Split(eval, "=")
+		if len(evalStr) != 2 {
+			continue
+		}
+		evalFloat, err := strconv.ParseFloat(evalStr[1], 64)
+		if err != nil {
+			return
+		}
+		y.EvalBaseArray[index] = evalFloat
 	}
 
-	evalBase, _ := strconv.ParseFloat(evaluation[1], 64)
-	y.EvalBase = evalBase
-
-	minEval := strings.Split(tuningHistory.MinEval, "=")
-	if len(minEval) != 2 {
-		return
+	for index, eval := range strings.Split(tuningHistory.MinEval, ",") {
+		evalStr := strings.Split(eval, "=")
+		if len(evalStr) != 2 {
+			continue
+		}
+		evalFloat, err := strconv.ParseFloat(evalStr[1], 64)
+		if err != nil {
+			return
+		}
+		y.EvalMinArray[index] = evalFloat
 	}
 
-	y.EvalMin, _ = strconv.ParseFloat(minEval[1], 64)
+	y.EvalMin, _ = strconv.ParseFloat(tuningHistory.SumEval, 64)
 
 	y.TotalTime = tuningHistory.TotalTime
 	y.StartIters = tuningHistory.Starts
+	y.Baseline = false
 }
 
 // ImproveRateString method return the string format of performance improve rate
 func (y *YamlPrjCli) ImproveRateString(current float64) string {
-	if y.EvalBase < 0 {
-		return fmt.Sprintf("%.2f", (current-y.EvalBase)/y.EvalBase*100)
+	if len(y.Evaluations) > 1 {
+		return fmt.Sprintf("%.2f", -current)
 	}
 
-	return fmt.Sprintf("%.2f", (y.EvalBase-current)/current*100)
+	if y.EvalBaseArray[0] < 0 {
+		return fmt.Sprintf("%.2f", (current-y.EvalBaseArray[0])/y.EvalBaseArray[0]*100)
+	}
+	return fmt.Sprintf("%.2f", (y.EvalBaseArray[0]-current)/math.Abs(current)*100)
 }
 
 // RunSet method call the set script to set the value

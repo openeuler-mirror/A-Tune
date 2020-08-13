@@ -653,6 +653,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			return nil
 		case PB.TuningMessage_BenchMark:
 			optimizer.Content = reply.GetContent()
+			optimizer.Evaluations = reply.GetTuningLog().GetSumEval()
 			err := optimizer.DynamicTuned(ch, stopCh)
 			if err != nil {
 				return err
@@ -1334,7 +1335,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	if err != nil {
 		return err
 	}
-	
+
 	err = engine.Execute()
 	if err != nil {
 		return err

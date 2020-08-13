@@ -527,19 +527,14 @@ func IsEquals(a, b float64) bool {
 }
 
 func CalculateBenchMark(eval string) (float64, error) {
-	evalSum := 0.0
-	for _, benchStr := range strings.Split(eval, ",") {
-		kvs := strings.Split(benchStr, "=")
-		if len(kvs) < 2 {
-			continue
-		}
-
-		floatEval, err := strconv.ParseFloat(kvs[1], 64)
-		if err != nil {
-			return 0.0, err
-		}
-
-		evalSum += floatEval
+	kvs := strings.Split(eval, "=")
+	if len(kvs) != 2 {
+		return 0.0, fmt.Errorf("evaluation format error")
 	}
-	return evalSum, nil
+	floatEval, err := strconv.ParseFloat(kvs[1], 64)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return floatEval, nil
 }
