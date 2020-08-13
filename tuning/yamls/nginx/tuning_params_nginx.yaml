@@ -1,0 +1,29 @@
+project: "nginx"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "nginx.access_log"
+    info :
+        desc : "Enabling or Disabling nginx access_log"
+        get : "cat /etc/nginx/nginx.conf | grep "access_log" | awk -F ';' '{print $1}' | awk '{$1="";print}'| awk '$1=$1'"
+        set : "sed -i "s#access_log.*#access_log $value;#g" /etc/nginx/nginx.conf"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "/var/log/nginx/access.log  main"
+          - "off"
+        dtype : "string"
+  -
+    name : "nginx.error_log"
+    info :
+        desc : "Enabling or Disabling nginx error_log"
+        get : "cat /etc/nginx/nginx.conf | grep "error_log" | awk -F ';' '{print $1}' | awk '{$1="";print}' | awk '$1=$1'"
+        set : "sed -i "s#error_log.*#error_log $value;#g" /etc/nginx/nginx.conf"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "/var/log/nginx/access.log  main"
+          - "/dev/null"
+        dtype : "string"

@@ -1,0 +1,16 @@
+Category,"name
+(Parameter to be adjusted)","desc
+(Parameter description)","get
+(Command for querying parameter values.)","set
+(Command for setting parameter values)",needrestart(Whether require restart or not),type (discrete/continuous),"options
+(For the discrete type, use"";""to split  different values.)","dtype
+(For discrete, the parameter value type can only be int or string.)","scope
+(Minimum value of the parameter)","scope
+(Maximum Value of the parameter)","step
+(Step of the parameter value)","items
+(Enumerated values out of parameter values. Use "";"" to split different values)",select (whether to select the parameter),Remarks
+redis,redis.tcp-backlog,tcp backlog,cat /etc/redis.conf | grep tcp-backlog | awk '{print $2}',sed -i 's/tcp-backlog.*/tcp-backlog $value/g' /etc/redis.conf,false,continuous,,int,16,65536,,,yes,
+,redis.tcp-keepalive,closes the connection after holding for a few seconds,cat /etc/redis.conf | grep tcp-keepalive | awk '{print $2}',sed -i 's/tcp-keepalive.*/tcp-keepalive $value/g' /etc/redis.conf,false,continuous,,int,0,3600,,,yes,
+,redis.supervised ,service supervise,cat /etc/redis.conf | grep supervised  | awk '{print $2}',sed -i 's/supervised .*/supervised  $value/g' /etc/redis.conf,false,discrete,no;upstart;systemd;auto,string,,,,,yes,
+,redis.databases,number of databases,cat /etc/redis.conf | grep databases | awk '{print $2}',sed -i 's/databases.*/databases $value/g' /etc/redis.conf,false,continuous,,int,0,100,,,yes,
+,redis.rdbcompression,whether to compress character strings using LZF when backing up .rdb files,cat /etc/redis.conf | grep rdbcompression  | awk '{print $2}',sed -i 's/rdbcompression .*/rdbcompression  $value/g' /etc/redis.conf,false,discrete,yes;no,string,,,,,yes,
