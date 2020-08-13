@@ -124,7 +124,9 @@ func (s *ScheduleManager) Start() {
 
 	s.setRunning(true)
 	go func() {
-		s.scheduler.Run()
+		if err := s.scheduler.Run(); err != nil {
+			log.Errorf("the scheduler %s run failed, error: %v", s.scheduler.Name(), err)
+		}
 	}()
 	<-s.scheduler.Context().Done()
 	s.setRunning(false)
@@ -190,17 +192,23 @@ func (s *ScheduleManager) Stop() {
 
 	s.scheduler.Stop()
 	s.running = false
-	log.Info("stop the scheduler %s success", s.scheduler.Name())
+	log.Infof("stop the scheduler %s success", s.scheduler.Name())
 	s.scheduler = nil
 }
 
 // GetScheduleManager return the schedule manager instance
-func GetScheduleManager() *ScheduleManager {
+func GetScheduleManager() (*ScheduleManager, error) {
+	var err error
 	once.Do(func() {
 		scheduleManager = &ScheduleManager{}
-		scheduleManager.Init()
+		err = scheduleManager.Init()
 	})
-	return scheduleManager
+
+	if err != nil {
+		return nil, err
+	}
+
+	return scheduleManager, nil
 }
 
 type generalScheduler struct {
@@ -276,8 +284,6 @@ func (g *generalScheduler) Run() error {
 			sendChanToAdm(g.ch, "Postprocessing", utils.SUCCESS, "")
 		}
 	}
-	return nil
-
 }
 
 // Stop the general scheduler service

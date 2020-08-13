@@ -175,7 +175,7 @@ func (m *MemTopo) Check(ch chan *PB.AckCheck) error {
 	for i := 0; i < memHalf; i++ {
 		if memLocation[i] != memLocation[i+memHalf] {
 			sendChanToAdm(ch, "memory", utils.SUGGEST,
-				fmt.Sprintf("memory location is not balanced, recommand to balance memory location"))
+				"memory location is not balanced, recommand to balance memory location")
 			return nil
 		}
 	}

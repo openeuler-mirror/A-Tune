@@ -127,7 +127,7 @@ func LoadPlugins(path string) error {
 		return err
 	}
 
-	pattern := filepath.Join(abs, fmt.Sprintf("*"))
+	pattern := filepath.Join(abs, "*")
 	libs, err := filepath.Glob(pattern)
 	if err != nil {
 		return err

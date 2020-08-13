@@ -86,8 +86,8 @@ class WeightedEnsembleFeatureSelector:
         train_datas = []
         for i in range(len(list_sample_x)):
             train_data = []
-            for j in range(len(predictions)):
-                train_data.append(predictions[j][i])
+            for _, val in enumerate(predictions):
+                train_data.append(val[i])
             train_datas.append(train_data)
         return train_datas
 
@@ -102,7 +102,7 @@ class WeightedEnsembleFeatureSelector:
 
     def get_ensemble_feature_importance(self, list_sample_x, list_sample_y, labels):
         """Make sure the input list_sample_x is preprocessed with StandardScaler"""
-        index = (i for i in range(len(labels)))
+        index = list(range(len(labels)))
         native_feature_importances = self.get_native_feature_importances(
             list_sample_x, list_sample_y, labels, index)
         LOGGER.info('Get feature importances for each model: %s', native_feature_importances)
