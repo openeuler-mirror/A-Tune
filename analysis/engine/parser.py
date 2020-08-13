@@ -23,7 +23,7 @@ OPTIMIZER_POST_PARSER.add_argument('max_eval', type=int, required=True,
 OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
                                    help="knobs list cannot be null")
 OPTIMIZER_POST_PARSER.add_argument('engine',
-                                   choices=('random', 'forest', 'gbrt',
+                                   choices=('random', 'forest', 'gbrt', 'extraTrees',
                                             'bayes', 'abtest', 'lhs', 'tpe'),
                                    help='engine choice: {error_msg}')
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json',
