@@ -222,6 +222,7 @@ func loadConfigData(name string) (*ini.File, error) {
 			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
 				path.Ext(info.Name()))
 			if filenameOnly == name {
+				var err error
 				config, err = ini.Load(absPath)
 				if err != nil {
 					return err

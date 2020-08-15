@@ -115,7 +115,9 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
 	optimizerBody := new(models.OptimizerPostBody)
 	if o.Restart || (o.FeatureFilterEnable && !o.FeatureFilter) {
-		o.readTuningLog(optimizerBody)
+		if err := o.readTuningLog(optimizerBody); err != nil {
+			return err
+		}
 	}
 	if o.Restart && iters <= int32(len(optimizerBody.Xref)) {
 		return fmt.Errorf("create task failed for client ask iters less than tuning history")
@@ -169,11 +171,10 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	return nil
 }
 
-func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
+func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 	file, err := os.Open(o.TuningFile)
 	if err != nil {
-		log.Error(err)
-		return
+		return err
 	}
 	defer file.Close()
 
@@ -187,14 +188,28 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
 		if len(items) != 5 {
 			continue
 		}
-		o.Iter, _ = strconv.Atoi(items[0])
-		yFloat, _ := utils.CalculateBenchMark(items[3])
+
+		if o.Iter, err = strconv.Atoi(items[0]); err != nil {
+			return err
+		}
+
+		yFloat, err := utils.CalculateBenchMark(items[3])
+		if err != nil {
+			return err
+		}
+
 		if o.Iter == 1 {
 			o.EvalBase = fmt.Sprintf("%s=%.2f", project.BASE_BENCHMARK_VALUE, yFloat)
 			o.MinEvalSum = yFloat
 		}
-		startTime, _ = time.Parse(config.DefaultTimeFormat, items[1])
-		endTime, _ = time.Parse(config.DefaultTimeFormat, items[2])
+
+		if startTime, err = time.Parse(config.DefaultTimeFormat, items[1]); err != nil {
+			return err
+		}
+
+		if endTime, err = time.Parse(config.DefaultTimeFormat, items[2]); err != nil {
+			return err
+		}
 		o.TotalTime = o.TotalTime + endTime.Sub(startTime).Seconds()
 
 		if yFloat < o.MinEvalSum {
@@ -212,6 +227,8 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) {
 		body.Xref = append(body.Xref, xValue)
 		body.Yref = append(body.Yref, strconv.FormatFloat(yFloat, 'f', -1, 64))
 	}
+
+	return nil
 }
 
 func (o *Optimizer) active(paraName string) bool {
@@ -243,7 +260,9 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		}
 	}
 
-	os.Setenv("ITERATION", strconv.Itoa(o.Iter))
+	if err := os.Setenv("ITERATION", strconv.Itoa(o.Iter)); err != nil {
+		return err
+	}
 
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = o.Iter
@@ -289,7 +308,11 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
 
 	if o.RespPutIns.Finished {
-		remainParams := o.filterParams()
+		remainParams, err := o.filterParams()
+		if err != nil {
+			return err
+		}
+
 		if !o.FeatureFilter {
 			finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
 			message = fmt.Sprintf("\n The final optimization result is: %s\n"+
@@ -307,7 +330,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		stopCh <- 1
 		o.Iter = 0
 		if err = deleteTask(o.OptimizerPutURL); err != nil {
-			log.Error(err)
+			return err
 		}
 		return nil
 	}
@@ -326,13 +349,13 @@ func (o *Optimizer) matchRelations(optStr string) bool {
 	return o.Prj.MatchRelations(optStr)
 }
 
-func (o *Optimizer) filterParams() string {
+func (o *Optimizer) filterParams() (string, error) {
 	log.Infof("params importance weight is: %s", o.RespPutIns.Rank)
 	sortedParams := make(utils.SortedPair, 0)
 	paramList := strings.Split(o.RespPutIns.Rank, ",")
 
 	if len(paramList) == 0 {
-		return ""
+		return "", nil
 	}
 
 	for _, param := range paramList {
@@ -341,7 +364,10 @@ func (o *Optimizer) filterParams() string {
 			continue
 		}
 		name := strings.TrimSpace(paramPair[0])
-		score, _ := strconv.ParseFloat(strings.TrimSpace(paramPair[1]), 64)
+		score, err := strconv.ParseFloat(strings.TrimSpace(paramPair[1]), 64)
+		if err != nil {
+			return "", err
+		}
 		sortedParams = append(sortedParams, utils.Pair{Name: name, Score: score})
 	}
 	sort.Sort(sortedParams)
@@ -368,7 +394,7 @@ func (o *Optimizer) filterParams() string {
 	for _, param := range remaindParams {
 		tuningParams = append(tuningParams, fmt.Sprintf("%s:%.2f", param.Name, param.Score))
 	}
-	return strings.Join(tuningParams, ",")
+	return strings.Join(tuningParams, ","), nil
 }
 
 //restore tuning config
@@ -559,7 +585,11 @@ func syncConfigToNode(server string, scripts string) error {
 		return err
 	}
 
-	defer stream.CloseSend()
+	defer func() {
+		if err := stream.CloseSend(); err != nil {
+			log.Errorf("close stream failed, error: %v", err)
+		}
+	}()
 	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scripts)}
 	if err := stream.Send(content); err != nil {
 		return fmt.Errorf("sends failure, error: %v", err)

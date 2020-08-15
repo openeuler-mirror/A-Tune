@@ -47,7 +47,6 @@ const (
 	DefaultTuningPath       = DefaultConfPath + "tuning/"
 	DefaultRulePath         = DefaultConfPath + "rules/"
 	DefaultScriptPath       = "/usr/libexec/atuned/scripts"
-	DefaultCollectorPath    = "/usr/libexec/atuned/collector"
 	DefaultAnalysisPath     = "/usr/libexec/atuned/analysis"
 	DefaultTempPath         = "/run/atuned"
 	DefaultCheckerPath      = "/usr/share/atuned/checker/"
@@ -57,10 +56,8 @@ const (
 
 // log config
 const (
-	LogPath     = "/var/log/atuned"
-	LogFileName = "atuned.log"
-	Formatter   = "text"
-	Modes       = "syslog"
+	Formatter = "text"
+	Modes     = "syslog"
 )
 
 // python service url
@@ -185,7 +182,9 @@ func (c *Cfg) Load() error {
 
 	if Network != net {
 		section.Key("network").SetValue(net)
-		cfg.SaveTo(defaultConfigFile)
+		if err := cfg.SaveTo(defaultConfigFile); err != nil {
+			return err
+		}
 		Network = net
 	}
 

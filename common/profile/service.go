@@ -91,7 +91,7 @@ func UpdateProfile(profileName string, data string) error {
 			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
 				path.Ext(info.Name()))
 			if filenameOnly == profileName {
-				err = utils.WriteFile(absPath, data, utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
+				err := utils.WriteFile(absPath, data, utils.FilePerm, os.O_WRONLY|os.O_CREATE|os.O_TRUNC)
 				if err != nil {
 					return err
 				}
@@ -116,6 +116,7 @@ func GetProfileInclude(name string) (string, error) {
 			filenameOnly := strings.TrimSuffix(strings.ReplaceAll(absFilename, "/", "-"),
 				path.Ext(info.Name()))
 			if filenameOnly == name {
+				var err error
 				file, err = ini.Load(absPath)
 				if err != nil {
 					return err

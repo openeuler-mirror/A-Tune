@@ -137,10 +137,6 @@ type TaskLoad struct {
 	usage timeUsage
 }
 
-func (load *TaskLoad) set(id uint64) {
-	load.id = id
-}
-
 // Init of TaskLoad init load with timestamp
 func (load *TaskLoad) Init(now *time.Time, user uint64, system uint64) {
 	load.usage.init(now, user, system)

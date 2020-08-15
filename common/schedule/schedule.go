@@ -116,7 +116,10 @@ func (s *Scheduler) Init() error {
 
 // Schedule :update database and do schedule
 func (s *Scheduler) Schedule(pids string, strategy string, save bool, ch chan *PB.AckCheck) error {
-	schedManager := GetScheduleManager()
+	schedManager, err := GetScheduleManager()
+	if err != nil {
+		return err
+	}
 
 	scheduler, err := schedManager.New(strategy,
 		pids,

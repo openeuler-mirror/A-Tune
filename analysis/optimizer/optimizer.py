@@ -50,7 +50,7 @@ class Optimizer(multiprocessing.Process):
         self.x_ref = x0
         self.y_ref = y0
         if self.x_ref is not None and len(self.x_ref) == 1:
-            ref_x, ref_y = self.transfer()
+            ref_x, _ = self.transfer()
             self.ref = ref_x[0]
         else:
             self.ref = []
@@ -283,8 +283,7 @@ class Optimizer(multiprocessing.Process):
 
                 # Pass user suggested initialisation points to the optimizer
                 if ref_x:
-                    if not (isinstance(ref_y, collections.Iterable)
-                            or isinstance(ref_y, numbers.Number)):
+                    if not isinstance(ref_y, (collections.Iterable, numbers.Number)):
                         raise ValueError("`ref_y` should be an iterable or a scalar, "
                                          "got %s" % type(ref_y))
                     if len(ref_x) != len(ref_y):

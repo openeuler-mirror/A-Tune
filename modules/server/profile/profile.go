@@ -471,7 +471,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	pro, _ := profile.Load(profileNames)
 	pro.SetWorkloadType(workloadType)
 
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 5. bengin to set static profile")})
+	_ = stream.Send(&PB.AckCheck{Name: "\n 5. bengin to set static profile"})
 	log.Infof("bengin to set static profile")
 
 	//static profile setting
@@ -490,18 +490,18 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 
 	if len(rules.Result) < 1 {
-		_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
+		_ = stream.Send(&PB.AckCheck{Name: "Completed optimization, please restart application!"})
 		log.Info("no rules to tuned")
 		return nil
 	}
 
 	log.Info("begin to dynamic tuning depending on rules")
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 6. bengin to set dynamic profile")})
+	_ = stream.Send(&PB.AckCheck{Name: "\n 6. bengin to set dynamic profile"})
 	if err := tuning.RuleTuned(workloadType); err != nil {
 		return err
 	}
 
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("Completed optimization, please restart application!")})
+	_ = stream.Send(&PB.AckCheck{Name: "Completed optimization, please restart application!"})
 	return nil
 }
 
@@ -521,7 +521,11 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 	}()
 
 	var optimizer = tuning.Optimizer{}
-	defer optimizer.DeleteTask()
+	defer func() {
+		if err := optimizer.DeleteTask(); err != nil {
+			log.Errorf("delete optimizer task failed, error: %v", err)
+		}
+	}()
 
 	stopCh := make(chan int, 1)
 	var cycles int32 = 0
@@ -697,7 +701,7 @@ func (s *ProfileServer) UpgradeProfile(profileInfo *PB.ProfileInfo, stream PB.Pr
 		return nil
 	}
 
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("upgrade success"), Status: utils.SUCCESS})
+	_ = stream.Send(&PB.AckCheck{Name: "upgrade success", Status: utils.SUCCESS})
 	return nil
 }
 
@@ -1253,12 +1257,12 @@ func (s *ProfileServer) collection(npipe string) (*RespCollectorPost, error) {
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
-	collectorBody.File = "/run/atuned/test.csv"
+	collectorBody.File = path.Join(config.DefaultTempPath, "test.csv")
 	if npipe != "" {
 		collectorBody.Pipe = npipe
 	}
 
-	log.Infof("tuning collector body is:", collectorBody)
+	log.Infof("tuning collector body is %v", collectorBody)
 	respCollectPost, err := collectorBody.Post()
 	if err != nil {
 		return nil, err
@@ -1324,7 +1328,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 		}
 	}()
 
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("1.Start to analysis the system bottleneck")})
+	_ = stream.Send(&PB.AckCheck{Name: "1.Start to analysis the system bottleneck"})
 	var npipe string
 	respCollectPost, err := s.collection(npipe)
 	if err != nil {
@@ -1334,7 +1338,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	collectData := respCollectPost.Data
 	projectName := message.GetName()
 
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("2.Finding potential tuning parameters")})
+	_ = stream.Send(&PB.AckCheck{Name: "2.Finding potential tuning parameters"})
 
 	var tuningData tuning.TuningData
 	err = mapstructure.Decode(collectData, &tuningData)
@@ -1370,7 +1374,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 	}
 
 	if len(tuningFile.PrjSrv.Object) <= 0 {
-		_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("   No tuning parameters founed")})
+		_ = stream.Send(&PB.AckCheck{Name: "   No tuning parameters founed"})
 		return nil
 	}
 	dstFile := path.Join(config.DefaultTuningPath, fmt.Sprintf("%s.yaml", projectName))
