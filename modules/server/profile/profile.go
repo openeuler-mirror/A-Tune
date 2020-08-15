@@ -383,10 +383,12 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 
 // Analysis method analysis the system traffic load
 func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileMgr_AnalysisServer) error {
-	if !s.TryLock() {
-		return fmt.Errorf("dynamic optimizer search or analysis has been in running")
+	if !message.Characterization {
+		if !s.TryLock() {
+			return fmt.Errorf("dynamic optimizer search or analysis has been in running")
+		}
+		defer s.Unlock()
 	}
-	defer s.Unlock()
 
 	_ = stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
 
@@ -454,6 +456,10 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	log.Infof("workload %s support app: %s", workloadType, apps)
 	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
 		workloadType, apps, resourceLimit)
+
+	if message.Characterization {
+		return nil
+	}
 
 	_ = stream.Send(&PB.AckCheck{Name: "\n 3. Build the best resource model..."})
 
@@ -1011,45 +1017,6 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 	}
 
 	_ = stream.Send(&PB.AckCheck{Name: "training the self collect data failed"})
-	return nil
-}
-
-// Charaterization method will be deprecate in the future
-func (s *ProfileServer) Charaterization(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_CharaterizationServer) error {
-	_ = stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
-
-	npipe, err := utils.CreateNamedPipe()
-	if err != nil {
-		return fmt.Errorf("create named pipe failed")
-	}
-
-	defer os.Remove(npipe)
-
-	go func() {
-		file, _ := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
-		reader := bufio.NewReader(file)
-		scanner := bufio.NewScanner(reader)
-
-		for scanner.Scan() {
-			line := scanner.Text()
-			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
-		}
-	}()
-
-	respCollectPost, err := s.collection(npipe)
-	if err != nil {
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		log.Errorf("collection system data error: %v", err)
-		return err
-	}
-
-	var customeModel string
-	workloadType, _, err := s.classify(respCollectPost.Path, customeModel)
-	if err != nil {
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		return err
-	}
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", workloadType)})
 	return nil
 }
 

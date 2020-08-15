@@ -35,15 +35,21 @@ var profileAnalysisCommand = cli.Command{
 			Usage: "specified the self trained model to analysis",
 			Value: "",
 		},
+		cli.BoolFlag{
+			Name:  "characterization, c",
+			Usage: "only analysis the workload type",
+		},
 	},
 	Description: func() string {
 		desc := `
 	 analysis the system's workload type and optimization performance.
 	 you can specified the app name, but it's just for reference only.
 	     example: atune-adm analysis mysql
-	 you can also specify the self trained model to analysis, which only
+	 you can specify the self trained model to analysis, which only
 	 can be end with .m.
-	     example: atune-adm analysis --model ./self_trained.m`
+	     example: atune-adm analysis --model ./self_trained.m
+	 you can only analysis the workload type.
+	     example: atune-adm analysis --characterization`
 		return desc
 	}(),
 	Action: profileAnalysis,
@@ -89,7 +95,8 @@ func profileAnalysis(ctx *cli.Context) error {
 	}
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile})
+	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname,
+		Model: modelFile, Characterization: ctx.Bool("characterization")})
 
 	for {
 		reply, err := stream.Recv()

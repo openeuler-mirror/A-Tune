@@ -26,7 +26,6 @@ service ProfileMgr {
 	rpc InfoProfile(ProfileInfo) returns (stream ProfileInfo) {}
 	rpc CheckActiveProfile(ProfileInfo) returns (stream AckCheck) {}
 	rpc ProfileRollback(ProfileInfo) returns (stream AckCheck) {}
-	rpc Charaterization(ProfileInfo) returns (stream AckCheck) {}
 	rpc Collection(CollectFlag) returns (stream AckCheck) {}
 	rpc Training(TrainMessage) returns (stream AckCheck) {}
 	rpc Define(DefineMessage) returns (Ack) {}
@@ -50,6 +49,7 @@ message ProfileInfo {
 message AnalysisMessage {
 	string Name = 1;
 	string Model = 2;
+	bool Characterization = 3;
 }
 
 message Ack {
