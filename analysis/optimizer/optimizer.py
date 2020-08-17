@@ -237,7 +237,7 @@ class Optimizer(multiprocessing.Process):
         estimator = None
         try:
             if self.engine == 'random' or self.engine == 'forest' or \
-                    self.engine == 'gbrt' or self.engine == 'bayes':
+                    self.engine == 'gbrt' or self.engine == 'bayes' or self.engine == 'extraTrees':
                 params_space = self.build_space()
                 ref_x, ref_y = self.transfer()
                 if len(ref_x) == 0:
@@ -261,6 +261,8 @@ class Optimizer(multiprocessing.Process):
                     estimator = 'dummy'
                 elif self.engine == 'forest':
                     estimator = 'RF'
+                elif self.engine == 'extraTrees':
+                    estimator = 'ET'
                 elif self.engine == 'gbrt':
                     estimator = 'GBRT'
                 elif self.engine == 'bayes':
