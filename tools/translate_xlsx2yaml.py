@@ -16,12 +16,8 @@ The tool to translate .excel file to .yaml files
 Usage: python3 translate_xlsx2yaml.py [-h] [-i] [-o] [-t] [-p]
 """
 
-import csv
-import codecs
 import argparse
 import os
-import sys
-import getopt
 import subprocess
 import string
 from enum import Enum
@@ -29,6 +25,7 @@ from io import StringIO
 import io
 import openpyxl
 import glob
+import shlex
 
 
 class CsvAttr(Enum):
@@ -45,8 +42,7 @@ class CsvAttr(Enum):
     scope_max = 9
     step = 10
     items = 11
-    ref = 12
-    select = 13
+    select = 12
 
 
 class TuningObject:
@@ -64,7 +60,6 @@ class TuningObject:
         self.scope_max = obj_list[CsvAttr.scope_max.value].strip()
         self.step = obj_list[CsvAttr.step.value].strip()
         self.items = obj_list[CsvAttr.items.value].strip()
-        self.ref = obj_list[CsvAttr.ref.value].strip()
         self.block_device = block_dev
         self.network_device = network_dev
 
@@ -92,7 +87,27 @@ class TuningObject:
         :param value: the value used in the command
         :return: True or False, the results of the execution
         """
-        result = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True).decode().strip()
+
+        if 'echo' in self.set:
+            cmd1, cmd2 = cmd.split('>')
+            try:
+                file = open(cmd2.strip(), "w")
+            except PermissionError:
+                return False
+            process = subprocess.Popen(shlex.split(cmd1), stdout=file, shell=False)
+            process.wait()
+            result = str(process.returncode)
+        elif 'ifconfig' in self.set:
+            process = subprocess.Popen(shlex.split(cmd), shell=False)
+            process.wait()
+            result = str(process.returncode)
+        elif 'sysctl' in self.set:
+            result = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT, shell=False).decode().strip()
+        else:
+            process = subprocess.Popen(shlex.split(cmd), shell=False)
+            process.wait()
+            result = str(process.returncode)
+
         cmd_fail = False
         if 'sysctl' in self.set:
             if 'Invalid argument' in result:
@@ -120,49 +135,10 @@ class TuningObject:
         if value == orig_value:
             return True
 
-        if 'sysctl' in self.set:
-            cmd = self.set.replace('$value', value)
-        else:
-            cmd = 'sh -c \'' + self.set.replace('$value', value) + '\' > /dev/null 2>&1; echo $?'
-
+        cmd = self.set.replace('$value', value)
         result = self.exec_cmd(cmd, value)
         return result
 
-    def valid_test_refvalue(self):
-        """
-        Test the reference values including options, scope, step and ref.
-        :return: True or False, The check result.
-        """
-        if self.type == 'continuous':
-            return True
-
-        if self.dtype == 'int':
-            val_min = int(self.scope_min)
-            val_max = int(self.scope_max)
-            val_step = int(self.step)
-            val_ref = int(self.ref)
-            if val_ref < val_min or val_ref > val_max:
-                print('Invalid ref value of ', self.name, ':', self.ref, ', exceed the scope [', self.scope_min, ',',
-                      self.scope_max, ')')
-                return False
-            if (val_ref - val_min) % val_step != 0:
-                index = (val_ref - val_min) // val_step
-                near_val = val_min + index * val_step
-                print('Invalid ref value of ', self.name, ':', self.ref, ', not reachable with steps, do you mean ',
-                      near_val, '?')
-                return False
-        elif self.dtype == 'string':
-            dis_options = self.options.split(';')
-            ref_match = False
-            for option in dis_options:
-                if self.ref in option.strip():
-                    ref_match = True
-                    break
-
-            if not ref_match:
-                print('Invalid ref value of ', self.name, ':', self.ref, ', not in enum options')
-                return False
-        return True
 
     def valid_test_good(self):
         """
@@ -173,17 +149,30 @@ class TuningObject:
             return True
 
         get_cmd = self.get
-        try:
-            result = subprocess.check_output(get_cmd, shell=True)
-        except subprocess.CalledProcessError:
-            print("invalid get command of", self.name)
-            return False
-        orig_value = result.decode().strip()
+        count = get_cmd.count('|')
+        if count > 0:
+            get_cmds = get_cmd.split('|')
+            i = 0
+            for cmds in get_cmds:
+                if i == 0:
+                    child = subprocess.Popen(shlex.split(cmds), shell=False, stdout=subprocess.PIPE)
+                elif i == count:
+                    process = subprocess.Popen(shlex.split(cmds), stdin=child.stdout,
+                                               stdout=subprocess.PIPE, shell=False)
+                    result = process.communicate()
+                else:
+                    child = subprocess.Popen(shlex.split(cmds), shell=False, stdin=child.stdout, stdout=subprocess.PIPE)
+                i += 1
+        else:
+            process = subprocess.Popen(shlex.split(get_cmd), shell=False, stdout=subprocess.PIPE)
+            result = process.communicate()
+
+        orig_value = str(result)
 
         if self.dtype == 'int':
             result_min = self.valid_test_command(self.scope_min, orig_value)
             result_max = self.valid_test_command(self.scope_max, orig_value)
-            if result_min == False or result_max == False:
+            if not result_min or not result_max:
                 return False
         elif self.dtype == 'string':
             dis_options = self.options.split(';')
@@ -196,8 +185,6 @@ class TuningObject:
             print("Invalid dtype of ", self.name, ":", self.dtype, ". Only support int and string")
             return False
 
-        if not self.valid_test_refvalue():
-            return False
         return True
 
     def __repr__(self):
@@ -215,6 +202,10 @@ class TuningObject:
             fstr.write('        scope :\n')
             fstr.write('          - ' + self.scope_min + '\n')
             fstr.write('          - ' + self.scope_max + '\n')
+            if self.dtype == 'string':
+                fstr.write('        dtype : \"string\"\n')
+            else:
+                fstr.write('        dtype : \"int\"\n')
         elif self.type == 'discrete':
             if self.dtype == 'string':
                 fstr.write('        options :\n')
@@ -237,10 +228,6 @@ class TuningObject:
                 pass
         else:
             pass
-        if self.dtype == 'int':
-            fstr.write('        ref : ' + self.ref + '\n')
-        else:
-            fstr.write('        ref : \"' + self.ref + '\"\n')
 
         return fstr.getvalue()
 
@@ -294,9 +281,12 @@ class XLSX2YAML:
 
         return obj_list
 
-    def translate(self, block_dev, network_dev):
+    def translate(self, block_dev, network_dev, test):
         """
         Translate excel to yaml.
+        :param block_dev: the name of block device.
+        :param network_dev: the name of network device.
+        :param test: whether test the commands in file or not.
         :return: True or False, translation result.
         """
         self.out_file.write(self.get_head())
@@ -312,9 +302,10 @@ class XLSX2YAML:
             is_select = obj_list[CsvAttr.select.value].strip()
             if is_select == 'yes':
                 tun_obj = TuningObject(obj_list, block_dev, network_dev)
-                valid = tun_obj.valid_test_good()
-                if not valid:
-                    return False
+                if test == 'True':
+                    valid = tun_obj.valid_test_good()
+                    if not valid:
+                        return False
 
                 if tun_obj.name != '':
                     self.out_file.write(str(tun_obj))
@@ -324,7 +315,7 @@ class XLSX2YAML:
         return True
 
 
-def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev):
+def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev, test):
     """
     Translate .xlsx files to .yaml files.
     :param in_dir: the folder of input excel files.
@@ -333,6 +324,7 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev):
     :param project_name: the name of the configuration project.
     :param block_dev: the name of block device.
     :param network_dev: the name of network device.
+    :param test: whether test the commands in file or not.
     :return: None
     """
     if iterations <= 10:
@@ -355,9 +347,9 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev):
         out_file_name = file.replace(".xlsx", ".yaml")
         if os.path.exists(str(out_dir) + out_file_name):
             print("Warning: The output yaml file is already exist, overwrite it!--", out_file_name)
-            pass
+
         xlsx2yaml = XLSX2YAML((in_dir + in_file_name), (out_dir + out_file_name), project_name, iterations)
-        result = xlsx2yaml.translate(block_dev, network_dev)
+        result = xlsx2yaml.translate(block_dev, network_dev, test)
         if result:
             print('Translation of ' + str(file) + ' SUCCEEDED!\n')
         else:
@@ -374,11 +366,14 @@ if __name__ == '__main__':
                             default="./", help='The folder of output yaml files')
     ARG_PARSER.add_argument('-t', '--iteration', metavar='ITERATIONS', type=int,
                             default="100", help='Iterations of the project (> 10)')
-    ARG_PARSER.add_argument('-p', '--project_name', metavar='NAME',
+    ARG_PARSER.add_argument('-p', '--prj_name', metavar='NAME',
                             default="example", help='The name of the project')
     ARG_PARSER.add_argument('-bd', '--block_device', metavar='BLOCK DEVICE',
                             default="sda", help='The name of block device')
     ARG_PARSER.add_argument('-nd', '--network_device', metavar='NETWORK DEVICE',
                             default="enp189s0f0", help='The name of network device')
+    ARG_PARSER.add_argument('-f', '--test', metavar='TEST COMMAND',
+                            default="True", help='Whether test the command or not')
+
     ARGS = ARG_PARSER.parse_args()
-    main(ARGS.in_dir, ARGS.out_dir, ARGS.iteration, ARGS.project_name, ARGS.block_device, ARGS.network_device)
+    main(ARGS.in_dir, ARGS.out_dir, ARGS.iteration, ARGS.prj_name, ARGS.block_device, ARGS.network_device, ARGS.test)
