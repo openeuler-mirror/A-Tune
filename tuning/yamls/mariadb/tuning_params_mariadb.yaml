@@ -12,9 +12,9 @@ object :
         needrestart : "false"
         type : "discrete"
         scope :
-          - 1,048,576‬
+          - 1048576
           - 536870912
-        step : 1,048,576‬
+        step : 1048576
         items : 
         dtype : "int"
   -
@@ -26,9 +26,9 @@ object :
         needrestart : "false"
         type : "discrete"
         scope :
-          - 1,048,576‬
-          - 1,048,576‬00
-        step : 1,048,576‬
+          - 1048576
+          - 104857600
+        step : 1048576
         items : 
         dtype : "int"
   -
@@ -67,7 +67,7 @@ object :
         type : "discrete"
         scope :
           - 256
-          - 1,048,576‬00
+          - 104857600
         step : 1024
         items : 
         dtype : "int"
@@ -81,7 +81,7 @@ object :
         type : "discrete"
         scope :
           - 1024
-          - 1,048,576‬00
+          - 104857600
         step : 1024
         items : 
         dtype : "int"
@@ -95,7 +95,7 @@ object :
         type : "discrete"
         scope :
           - 1024
-          - 1,048,576‬00
+          - 104857600
         step : 1024
         items : 
         dtype : "int"
@@ -109,7 +109,7 @@ object :
         type : "discrete"
         scope :
           - 1024
-          - 1,048,576‬00
+          - 104857600
         step : 1024
         items : 
         dtype : "int"
@@ -147,7 +147,7 @@ object :
         type : "discrete"
         scope :
           - 1024
-          - 1,048,576‬00
+          - 104857600
         step : 1024
         items : 
         dtype : "int"
@@ -161,7 +161,7 @@ object :
         type : "discrete"
         scope :
           - 1024
-          - 137,438,953,472‬
+          - 1.37E+11
         step : 1024
         items : 
         dtype : "int"
@@ -174,8 +174,8 @@ object :
         needrestart : "false"
         type : "discrete"
         scope :
-          - 1,048,576‬
-          - 1,048,576‬00
-        step : 1,048,576‬
+          - 1048576
+          - 104857600
+        step : 1048576
         items : 
         dtype : "int"
