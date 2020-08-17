@@ -1,0 +1,30 @@
+project: "compress"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "compressLevel"
+    info :
+        desc : "The compresslevel parameter is an integer from 1 to 9 controlling the level of compression"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressLevel=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/compressLevel=\\s*[0-9]*/compressLevel=$value/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 9
+        dtype : "int"
+  -
+    name : "compressMethod"
+    info :
+        desc : "The compressMethod parameter is a string controlling the compression method"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressMethod=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/compressMethod=\\s*[0-9,a-z,\"]*/compressMethod=\"$value\"/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "bz2"
+          - "zlib"
+          - "gzip"
+        dtype : "string"
