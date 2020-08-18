@@ -50,7 +50,9 @@ type Optimizer struct {
 	Engine              string
 	FeatureFilterEngine string
 	TuningFile          string
+	Evaluations         string
 	MinEvalSum          float64
+	EvalMinArray        string
 	EvalBase            string
 	RespPutIns          *models.RespPutBody
 	StartIterTime       string
@@ -185,7 +187,7 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 	for scanner.Scan() {
 		line := scanner.Text()
 		items := strings.Split(line, "|")
-		if len(items) != 5 {
+		if len(items) != 6 {
 			continue
 		}
 
@@ -199,7 +201,7 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 		}
 
 		if o.Iter == 1 {
-			o.EvalBase = fmt.Sprintf("%s=%.2f", project.BASE_BENCHMARK_VALUE, yFloat)
+			o.EvalBase = items[4]
 			o.MinEvalSum = yFloat
 		}
 
@@ -214,8 +216,9 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 
 		if yFloat < o.MinEvalSum {
 			o.MinEvalSum = yFloat
+			o.EvalMinArray = items[4]
 		}
-		xPara := strings.Split(items[4], ",")
+		xPara := strings.Split(items[5], ",")
 		xValue := make([]string, 0)
 		for _, para := range xPara {
 			if !o.active(strings.Split(para, "=")[0]) {
@@ -260,7 +263,8 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		}
 	}
 
-	if err := os.Setenv("ITERATION", strconv.Itoa(o.Iter)); err != nil {
+	err = os.Setenv("ITERATION", strconv.Itoa(o.Iter))
+	if err != nil {
 		return err
 	}
 
@@ -336,12 +340,18 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 
 	o.Iter++
-	evalMinSum := fmt.Sprintf("%s=%.2f", project.MIN_BENCHMARK_VALUE, o.MinEvalSum)
 	log.Infof("send back to client to start benchmark")
 	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark,
 		Content:       []byte(o.RespPutIns.Param),
 		FeatureFilter: o.FeatureFilter,
-		TuningLog:     &PB.TuningHistory{BaseEval: o.EvalBase, MinEval: evalMinSum, TotalTime: int64(o.TotalTime), Starts: int32(o.Iter)}}
+		TuningLog: &PB.TuningHistory{
+			BaseEval:  o.EvalBase,
+			MinEval:   o.EvalMinArray,
+			SumEval:   fmt.Sprintf("%.2f", o.MinEvalSum),
+			TotalTime: int64(o.TotalTime),
+			Starts:    int32(o.Iter),
+		},
+	}
 	return nil
 }
 
@@ -440,7 +450,7 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 	endIterTime := time.Now().Format(config.DefaultTimeFormat)
 	iterInfo := make([]string, 0)
 	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
-		eval, o.RespPutIns.Param)
+		o.Evaluations, eval, o.RespPutIns.Param)
 	output := strings.Join(iterInfo, "|")
 	err := utils.WriteFile(o.TuningFile, output+"\n", utils.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
@@ -449,29 +459,21 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 		return "", err
 	}
 
-	evalValue := make([]string, 0)
-	evalSum := 0.0
-	for _, benchStr := range strings.Split(eval, ",") {
-		kvs := strings.Split(benchStr, "=")
-		if len(kvs) < 2 {
-			continue
-		}
-
-		floatEval, err := strconv.ParseFloat(kvs[1], 64)
-		if err != nil {
-			log.Error(err)
-			return "", err
-		}
-
-		evalSum += floatEval
-		evalValue = append(evalValue, kvs[1])
+	kvs := strings.Split(o.Evaluations, "=")
+	if len(kvs) != 2 {
+		return "", fmt.Errorf("get evaluation error")
+	}
+	evalSum, err := strconv.ParseFloat(kvs[1], 64)
+	if err != nil {
+		log.Error(err)
+		return "", err
 	}
 
 	if o.Iter == 1 || evalSum < o.MinEvalSum {
 		o.MinEvalSum = evalSum
 		o.FinalEval = eval
 	}
-	return strings.Join(evalValue, ","), nil
+	return kvs[1], nil
 }
 
 func deleteTask(url string) error {

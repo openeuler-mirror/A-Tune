@@ -21,7 +21,6 @@ import (
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
 	"io"
-	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -96,10 +95,13 @@ func profileTunning(ctx *cli.Context) error {
 		return fmt.Errorf("error: %s is not ends with yaml or yml", yamlPath)
 	}
 
-	prj := project.YamlPrjCli{StartsTime: time.Now(), StartIters: 1}
+	prj := project.YamlPrjCli{StartsTime: time.Now(), StartIters: 1, Baseline: true}
 	if err := utils.ParseFile(yamlPath, "yaml", &prj); err != nil {
 		return err
 	}
+	prj.EvalBaseArray = make([]float64, len(prj.Evaluations))
+	prj.EvalCurrentArray = make([]float64, len(prj.Evaluations))
+	prj.EvalMinArray = make([]float64, len(prj.Evaluations))
 	if err := checkTuningPrjYaml(prj); err != nil {
 		return err
 	}
@@ -110,9 +112,8 @@ func profileTunning(ctx *cli.Context) error {
 		go func() {
 			if !ctx.Bool("restart") {
 				fmt.Println("Start to benchmark baseline...")
-				benchmarkByte, err := prj.BenchMark()
+				_, _, err := prj.BenchMark()
 				if err != nil {
-					fmt.Println("benchmark result:", benchmarkByte)
 					errors <- err
 				}
 				finished <- true
@@ -173,9 +174,8 @@ func profileTunning(ctx *cli.Context) error {
 					prj.SetHistoryEvalBase(reply.GetTuningLog())
 				}
 				prj.Params = string(reply.GetContent())
-				benchmarkByte, err := prj.BenchMark()
+				evaluationSum, evaluationDetail, err := prj.BenchMark()
 				if err != nil {
-					fmt.Println("benchmark result:", benchmarkByte)
 					return err
 				}
 
@@ -187,17 +187,22 @@ func profileTunning(ctx *cli.Context) error {
 						prj.StartIters, prj.TotalIters)
 				} else {
 					fmt.Printf(" Current Tuning Progress......(%d/%d)\n", prj.StartIters, prj.TotalIters)
-					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %.2f, Performance Improvement Rate: %s%%\n",
+					fmt.Printf(" Used time: %s, Total Time: %s, Best Performance: %s, Performance Improvement Rate: %s%%\n",
 						currentTime.Sub(prj.StartsTime).Round(time.Second).String(),
 						time.Duration(int64(currentTime.Sub(prj.StartsTime).Round(time.Second).Seconds())+prj.TotalTime)*time.Second,
-						math.Abs(prj.EvalMin), prj.ImproveRateString(prj.EvalMin))
+						prj.BestPerformance(), prj.ImproveRateString(prj.EvalMin))
 				}
 				if ctx.Bool("detail") && !prj.FeatureFilter {
 					fmt.Printf(" The %dth recommand parameters is: %s\n"+
-						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, strings.Replace(benchmarkByte, "-", "", -1), prj.ImproveRateString(prj.EvalCurrent))
+						" The %dth evaluation value: %s(%s%%)\n", prj.StartIters, prj.Params, prj.StartIters, prj.CurrPerformance(), prj.ImproveRateString(prj.EvalCurrent))
 				}
 				prj.StartIters++
-				if err := stream.Send(&PB.TuningMessage{State: PB.TuningMessage_BenchMark, Content: []byte(benchmarkByte)}); err != nil {
+				err = stream.Send(&PB.TuningMessage{
+					State:     PB.TuningMessage_BenchMark,
+					Content:   []byte(evaluationDetail),
+					TuningLog: &PB.TuningHistory{SumEval: evaluationSum},
+				})
+				if err != nil {
 					return fmt.Errorf("client sends failure, error: %v", err)
 				}
 			case PB.TuningMessage_Threshold:
@@ -216,7 +221,7 @@ func profileTunning(ctx *cli.Context) error {
 					fmt.Printf(" %s\n", string(reply.GetContent()))
 				}
 			case PB.TuningMessage_Ending:
-				fmt.Printf(" Baseline Performance is: %.2f\n", math.Abs(prj.EvalBase))
+				fmt.Printf(" Baseline Performance is: %s\n", prj.BasePerformance())
 				fmt.Printf(" %s\n", string(reply.GetContent()))
 				fmt.Printf(" Tuning Finished\n")
 				goto End

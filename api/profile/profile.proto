@@ -125,6 +125,7 @@ message TuningMessage {
 message TuningHistory {
     string BaseEval = 1;
     string MinEval = 2;
-    int64 TotalTime = 3;
-    int32 Starts = 4;
+    string SumEval = 3;
+    int64 TotalTime = 4;
+    int32 Starts = 5;
 }
