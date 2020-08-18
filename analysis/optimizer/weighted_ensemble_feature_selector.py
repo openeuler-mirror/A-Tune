@@ -81,38 +81,6 @@ class WeightedEnsembleFeatureSelector:
         LOGGER.info('Weighted Ensemble Feature Selector using: '
                     'DecisionTree, RandomForest, GradientBoosting, AdaBoost, Bagging')
 
-    @staticmethod
-    def get_unified_feature_importance(regressor):
-        """get unified feature importance"""
-        if hasattr(regressor, "feature_importances_"):
-            return regressor.feature_importances_
-        if hasattr(regressor, "coef_"):
-            return np.abs(regressor.coef_)
-        if hasattr(regressor, "estimators_features_"):
-            feature_importances = np.mean([tree.feature_importances_
-                                           for tree in regressor.estimators_], axis=0)
-            return feature_importances
-        return None
-
-    def get_one_native_feature_importance(self, regressor, list_sample_x,
-                                          list_sample_y, labels, index):
-        """get one native feature importance, just fit data once"""
-        regressor.fit(list_sample_x, list_sample_y)
-        unified_feature_importance = self.get_unified_feature_importance(regressor)
-        result = zip(unified_feature_importance, labels, index)
-        result = sorted(result, key=lambda x: -x[0])
-        sorted_index = [i for coef, label, i in result]
-        return sorted_index
-
-    def get_native_feature_importances(self, list_sample_x, list_sample_y, labels, index):
-        """get natice feature importance"""
-        native_feature_importances = []
-        for regressor in self._regressors:
-            native_fi = self.get_one_native_feature_importance(regressor, list_sample_x,
-                                                               list_sample_y, labels, index)
-            native_feature_importances.append(native_fi)
-        return native_feature_importances
-
     def get_native_feature_importances_parallel(self, list_sample_x, list_sample_y, labels, index):
         native_feature_importances = []
         fs_thread_list = []
@@ -125,7 +93,7 @@ class WeightedEnsembleFeatureSelector:
         for fs_thread in fs_thread_list:
             native_fi = fs_thread.get_sorted_index()
             native_feature_importances.append(native_fi)
-        return nvtive_feature_importances
+        return native_feature_importances
 
     def get_ensemble_train_datas(self, list_sample_x):
         """get ensemble train datas"""
