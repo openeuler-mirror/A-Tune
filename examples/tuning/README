@@ -1,2 +1,0 @@
-cp example-server.yaml /etc/atuned/tuning
-atune-adm tuning example-client.yaml

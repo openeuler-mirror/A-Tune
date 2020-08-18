@@ -19,7 +19,7 @@ object :
     name : "compressMethod"
     info :
         desc : "The compressMethod parameter is a string controlling the compression method"
-        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressMethod=' | awk -F '=' '{print $2}'"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressMethod=' | awk -F '=' '{print $2}' | sed 's/\"//g'"
         set : "sed -i 's/compressMethod=\\s*[0-9,a-z,\"]*/compressMethod=\"$value\"/g' /root/A-Tune/examples/tuning/compress/compress.py"
         needrestart : "false"
         type : "discrete"
