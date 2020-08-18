@@ -79,3 +79,9 @@ disk = sda
 network = enp189s0f0
 
 user = root
+
+#################################### tuning ###############################
+# tuning configs
+[tuning]
+noise = 0.000000001
+sel_feature = false
