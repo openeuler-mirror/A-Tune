@@ -38,7 +38,7 @@ LOGGER = logging.getLogger(__name__)
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50,
+    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, sel_feature=False,
                  x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
@@ -47,6 +47,7 @@ class Optimizer(multiprocessing.Process):
         self.noise = noise
         self.max_eval = int(max_eval)
         self.split_count = split_count
+        self.sel_feature = sel_feature
         self.x_ref = x0
         self.y_ref = y0
         if self.x_ref is not None and len(self.x_ref) == 1:
@@ -347,14 +348,15 @@ class Optimizer(multiprocessing.Process):
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
         final_param = {}
-        wefs = WeightedEnsembleFeatureSelector()
-        rank = wefs.get_ensemble_feature_importance(options, performance, labels)
+        if self.sel_feature is True:
+            wefs = WeightedEnsembleFeatureSelector()
+            rank = wefs.get_ensemble_feature_importance(options, performance, labels)
+            final_param["rank"] = rank
+            LOGGER.info("The feature importances of current evaluation are: %s", rank)
 
         final_param["param"] = params
-        final_param["rank"] = rank
         final_param["finished"] = True
         self.child_conn.send(final_param)
-        LOGGER.info("The feature importances of current evaluation are: %s", rank)
         return params
 
     def stop_process(self):
