@@ -40,6 +40,7 @@ class FeatureSelectorThread(threading.Thread):
         self._list_sample_y = list_sample_y
         self._labels = labels
         self._index = index
+        self._sorted_index = []
 
     def get_unified_feature_importance(self, regressor):
         """get unified feature importance for different type regressor"""
