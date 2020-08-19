@@ -31,6 +31,8 @@ import threading
 LOGGER = logging.getLogger(__name__)
 
 class FeatureSelectorThread(threading.Thread):
+    """class feature selector each with threading"""
+
     def __init__(self, regressor, list_sample_x, list_sample_y, labels, index):
         threading.Thread.__init__(self)
         self._regressor = regressor
@@ -40,6 +42,7 @@ class FeatureSelectorThread(threading.Thread):
         self._index = index
 
     def get_unified_feature_importance(self, regressor):
+        """get unified feature importance for different type regressor"""
         if hasattr(regressor, "feature_importances_"):
             return regressor.feature_importances_
         elif hasattr(regressor, "coef_"):
@@ -53,6 +56,7 @@ class FeatureSelectorThread(threading.Thread):
         return None
 
     def run(self):
+        """main method to train the model and get ranked feature importance"""
         self._regressor.fit(self._list_sample_x, self._list_sample_y)
         unified_feature_importance = self.get_unified_feature_importance(self._regressor)
         result = zip(unified_feature_importance, self._labels, self._index)
@@ -60,10 +64,12 @@ class FeatureSelectorThread(threading.Thread):
         self._sorted_index = [i for coef, label, i in result]
 
     def get_sorted_index(self):
+        """get sorted feature importance index"""
         try:
             return self._sorted_index
         except Exception:
             return None
+
 
 class WeightedEnsembleFeatureSelector:
     """class weighted ensemble feature selector"""
@@ -82,6 +88,7 @@ class WeightedEnsembleFeatureSelector:
                     'DecisionTree, RandomForest, GradientBoosting, AdaBoost, Bagging')
 
     def get_native_feature_importances_parallel(self, list_sample_x, list_sample_y, labels, index):
+        """get native feature importances in parallel with multiple threading"""
         native_feature_importances = []
         fs_thread_list = []
         for regressor in self._regressors:
