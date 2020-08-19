@@ -266,10 +266,11 @@ func WaitForPyservice() error {
 	for {
 		select {
 		case <-ticker.C:
-			_, err := net.Dial("tcp", addr)
+			conn, err := net.Dial("tcp", addr)
 			if err != nil {
 				continue
 			}
+			conn.Close()
 			return nil
 		case <-timeout:
 			return fmt.Errorf("waiting for pyservice timeout")

@@ -231,7 +231,10 @@ func Post(serviceType, paramName, path string) (string, error) {
 		return "", fmt.Errorf("newRequest failed")
 	}
 	request.Header.Set("Content-Type", writer.FormDataContentType())
-	client := &HTTP.Client{}
+	client, err := http.NewhttpClient(url)
+	if err != nil {
+		return "", err
+	}
 	resp, err := client.Do(request)
 	if err != nil {
 		return "", fmt.Errorf("do request error")

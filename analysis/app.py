@@ -65,10 +65,10 @@ def main(filename):
     API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
     API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
 
-    if config.has_option("server", "tls") and config.get("server", "tls") == "true":
-        cert_file = config.get("server", "tlshttpcertfile")
-        key_file = config.get("server", "tlshttpkeyfile")
-        ca_file = config.get("server", "tlshttpcacertfile")
+    if config.has_option("server", "rest_tls") and config.get("server", "rest_tls") == "true":
+        cert_file = config.get("server", "tlsrestservercertfile")
+        key_file = config.get("server", "tlsrestserverkeyfile")
+        ca_file = config.get("server", "tlsrestcacertfile")
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=cert_file, keyfile=key_file)
         context.load_verify_locations(ca_file)
