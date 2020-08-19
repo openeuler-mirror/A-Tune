@@ -131,7 +131,9 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
 	optimizerBody.FeatureFilter = o.FeatureFilter
+	optimizerBody.SelFeature = config.SelFeature
 	optimizerBody.SplitCount = o.SplitCount
+	optimizerBody.Noise = config.Noise
 	optimizerBody.Knobs = make([]models.Knob, 0)
 	for _, item := range o.Prj.Object {
 		if item.Info.Skip {
@@ -361,6 +363,9 @@ func (o *Optimizer) matchRelations(optStr string) bool {
 
 func (o *Optimizer) filterParams() (string, error) {
 	log.Infof("params importance weight is: %s", o.RespPutIns.Rank)
+	if strings.TrimSpace(o.RespPutIns.Rank) == "" {
+		return "", nil
+	}
 	sortedParams := make(utils.SortedPair, 0)
 	paramList := strings.Split(o.RespPutIns.Rank, ",")
 

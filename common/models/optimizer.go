@@ -31,6 +31,8 @@ type OptimizerPostBody struct {
 	Yref          []string   `json:"y_ref,omitempty"`
 	FeatureFilter bool       `json:"feature_filter"`
 	SplitCount    int32      `json:"split_count"`
+	Noise         float64    `json:"noise"`
+	SelFeature    bool       `json:"sel_feature"`
 }
 
 // Knob body store the tuning properties

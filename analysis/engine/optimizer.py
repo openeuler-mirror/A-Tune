@@ -64,7 +64,9 @@ class Optimizer(Resource):
         engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, engine=args.get("engine"),
                                      max_eval=args.get("max_eval"),
                                      n_random_starts=args.get("random_starts"),
-                                     x0=x_ref, y0=y_ref, split_count=args.get("split_count"))
+                                     x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
+                                     noise=args.get("noise"), 
+                                     sel_feature=args.get("feature_filter") or args.get("sel_feature"))
         engine.start()
 
         value = {}

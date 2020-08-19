@@ -36,6 +36,10 @@ OPTIMIZER_POST_PARSER.add_argument('feature_filter', type=bool, location='json',
                                    help="the feature_filter enabled")
 OPTIMIZER_POST_PARSER.add_argument('split_count', type=int, location='json',
                                    help="split_count cannot be null")
+OPTIMIZER_POST_PARSER.add_argument('sel_feature', type=bool, location='json',
+                                   help="enable the feature selection or not")
+OPTIMIZER_POST_PARSER.add_argument('noise', type=float, location='json',
+                                   help="the noise can not be null")
 
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,

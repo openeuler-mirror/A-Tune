@@ -114,6 +114,12 @@ var (
 	TLSHTTPCACertFile string
 )
 
+// the tuning configs
+var (
+	Noise      float64
+	SelFeature bool
+)
+
 // the system config in atuned.cnf
 var (
 	Network string
@@ -187,6 +193,10 @@ func (c *Cfg) Load() error {
 		}
 		Network = net
 	}
+
+	section = cfg.Section("tuning")
+	Noise = section.Key("noise").MustFloat64(0.000000001)
+	SelFeature = section.Key("sel_feature").MustBool(false)
 
 	if err := initLogging(cfg); err != nil {
 		return err
