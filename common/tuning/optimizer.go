@@ -135,6 +135,7 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optimizerBody.SplitCount = o.SplitCount
 	optimizerBody.Noise = config.Noise
 	optimizerBody.Knobs = make([]models.Knob, 0)
+	optimizerBody.PrjName = o.Prj.Project
 	for _, item := range o.Prj.Object {
 		if item.Info.Skip {
 			continue

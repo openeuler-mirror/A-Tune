@@ -40,6 +40,8 @@ OPTIMIZER_POST_PARSER.add_argument('sel_feature', type=bool, location='json',
                                    help="enable the feature selection or not")
 OPTIMIZER_POST_PARSER.add_argument('noise', type=float, location='json',
                                    help="the noise can not be null")
+OPTIMIZER_POST_PARSER.add_argument('prj_name', type=str, location='json',
+                                   help="prj_name cannot be null")
 
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,
