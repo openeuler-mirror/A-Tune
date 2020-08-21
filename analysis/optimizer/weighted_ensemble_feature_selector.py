@@ -24,56 +24,82 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import BaggingRegressor, AdaBoostRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import ElasticNet, Ridge
+from sklearn.tree import ExtraTreeRegressor
+import threading
+
 
 LOGGER = logging.getLogger(__name__)
+
+class FeatureSelectorThread(threading.Thread):
+    """class feature selector each with threading"""
+
+    def __init__(self, regressor, list_sample_x, list_sample_y, labels, index):
+        threading.Thread.__init__(self)
+        self._regressor = regressor
+        self._list_sample_x = list_sample_x
+        self._list_sample_y = list_sample_y
+        self._labels = labels
+        self._index = index
+        self._sorted_index = []
+
+    def get_unified_feature_importance(self, regressor):
+        """get unified feature importance for different type regressor"""
+        if hasattr(regressor, "feature_importances_"):
+            return regressor.feature_importances_
+        elif hasattr(regressor, "coef_"):
+            if hasattr(regressor, "support_vectors_"): # for SVR, return coef_[0]
+                return regressor.coef_[0]
+            return regressor.coef_
+        elif hasattr(regressor, "estimators_features_"):
+            feature_importances = np.mean([tree.feature_importances_ \
+                    for tree in regressor.estimators_], axis=0)
+            return feature_importances
+        return None
+
+    def run(self):
+        """main method to train the model and get ranked feature importance"""
+        self._regressor.fit(self._list_sample_x, self._list_sample_y)
+        unified_feature_importance = self.get_unified_feature_importance(self._regressor)
+        result = zip(unified_feature_importance, self._labels, self._index)
+        result = sorted(result, key=lambda x: -x[0])
+        self._sorted_index = [i for coef, label, i in result]
+
+    def get_sorted_index(self):
+        """get sorted feature importance index"""
+        try:
+            return self._sorted_index
+        except Exception:
+            return None
 
 
 class WeightedEnsembleFeatureSelector:
     """class weighted ensemble feature selector"""
 
     def __init__(self):
-        lasso = Lasso(alpha=0.0005, max_iter=1000000)
+        dtree = DecisionTreeRegressor()
         rf = RandomForestRegressor(n_estimators=10000, random_state=0, n_jobs=-1)
         gb = GradientBoostingRegressor(n_estimators=10000, learning_rate=0.1)
-        en = ElasticNet(alpha=0.0003, max_iter=1000000, l1_ratio=0.8)
         adb = AdaBoostRegressor(DecisionTreeRegressor(max_depth=16),
                                 n_estimators=10000, random_state=0)
-        bag = BaggingRegressor(base_estimator=DecisionTreeRegressor(max_depth=16),
-                               n_estimators=10000)
-        self._regressors = [lasso, rf, gb, en, adb, bag]
+        bag = BaggingRegressor(base_estimator=ExtraTreeRegressor(max_depth=16),
+                               n_estimators=10000, random_state=0, n_jobs=-1)
+        self._regressors = [dtree, rf, gb, adb, bag]
         self._ensemble_model = Ridge(alpha=10, max_iter=1000000)
         LOGGER.info('Weighted Ensemble Feature Selector using: '
-                    'Lasso, RandomForest, GradientBoosting, ElasticNet, AdaBoost, Bagging')
+                    'DecisionTree, RandomForest, GradientBoosting, AdaBoost, Bagging')
 
-    @staticmethod
-    def get_unified_feature_importance(regressor):
-        """get unified feature importance"""
-        if hasattr(regressor, "feature_importances_"):
-            return regressor.feature_importances_
-        if hasattr(regressor, "coef_"):
-            return np.abs(regressor.coef_)
-        if hasattr(regressor, "estimators_features_"):
-            feature_importances = np.mean([tree.feature_importances_
-                                           for tree in regressor.estimators_], axis=0)
-            return feature_importances
-        return None
-
-    def get_one_native_feature_importance(self, regressor, list_sample_x,
-                                          list_sample_y, labels, index):
-        """get one native feature importance, just fit data once"""
-        regressor.fit(list_sample_x, list_sample_y)
-        unified_feature_importance = self.get_unified_feature_importance(regressor)
-        result = zip(unified_feature_importance, labels, index)
-        result = sorted(result, key=lambda x: -x[0])
-        sorted_index = [i for coef, label, i in result]
-        return sorted_index
-
-    def get_native_feature_importances(self, list_sample_x, list_sample_y, labels, index):
-        """get natice feature importance"""
+    def get_native_feature_importances_parallel(self, list_sample_x, list_sample_y, labels, index):
+        """get native feature importances in parallel with multiple threading"""
         native_feature_importances = []
+        fs_thread_list = []
         for regressor in self._regressors:
-            native_fi = self.get_one_native_feature_importance(regressor, list_sample_x,
-                                                               list_sample_y, labels, index)
+            fs_thread = FeatureSelectorThread(regressor, list_sample_x, list_sample_y, labels, index)
+            fs_thread_list.append(fs_thread)
+            fs_thread.start()
+        for fs_thread in fs_thread_list:
+            fs_thread.join()
+        for fs_thread in fs_thread_list:
+            native_fi = fs_thread.get_sorted_index()
             native_feature_importances.append(native_fi)
         return native_feature_importances
 
@@ -103,7 +129,7 @@ class WeightedEnsembleFeatureSelector:
     def get_ensemble_feature_importance(self, list_sample_x, list_sample_y, labels):
         """Make sure the input list_sample_x is preprocessed with StandardScaler"""
         index = list(range(len(labels)))
-        native_feature_importances = self.get_native_feature_importances(
+        native_feature_importances = self.get_native_feature_importances_parallel(
             list_sample_x, list_sample_y, labels, index)
         LOGGER.info('Get feature importances for each model: %s', native_feature_importances)
         ensemble_weights = self.get_ensemble_weights(list_sample_x, list_sample_y)
