@@ -41,10 +41,10 @@ type Evaluate struct {
 
 // EvalInfo :store the evaluation object
 type EvalInfo struct {
-	Get       string `yaml:"get"`
-	Type      string `yaml:"type"`
-	Weight    int64  `yaml:"weight"`
-	Threshold int64  `yaml:"threshold"`
+	Get       string  `yaml:"get"`
+	Type      string  `yaml:"type"`
+	Weight    int64   `yaml:"weight"`
+	Threshold float64 `yaml:"threshold"`
 }
 
 // YamlPrjCli :store the client yaml project
@@ -168,25 +168,25 @@ func (y *YamlPrjCli) BenchMark() (string, string, error) {
 func (y *YamlPrjCli) BestPerformance() string {
 	bestPerformance := make([]string, 0)
 	for index, evaluation := range y.Evaluations {
-		bestPerformance = append(bestPerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalMinArray[index])))
+		bestPerformance = append(bestPerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalMinArray[index])))
 	}
-	return fmt.Sprintf("(%s)", strings.Join(bestPerformance, ","))
+	return fmt.Sprintf("%s", strings.Join(bestPerformance, ","))
 }
 
 func (y *YamlPrjCli) CurrPerformance() string {
 	currPerformance := make([]string, 0)
 	for index, evaluation := range y.Evaluations {
-		currPerformance = append(currPerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalCurrentArray[index])))
+		currPerformance = append(currPerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalCurrentArray[index])))
 	}
-	return fmt.Sprintf("(%s)", strings.Join(currPerformance, ","))
+	return fmt.Sprintf("%s", strings.Join(currPerformance, ","))
 }
 
 func (y *YamlPrjCli) BasePerformance() string {
 	basePerformance := make([]string, 0)
 	for index, evaluation := range y.Evaluations {
-		basePerformance = append(basePerformance, fmt.Sprintf("%s:%.2f", evaluation.Name, math.Abs(y.EvalBaseArray[index])))
+		basePerformance = append(basePerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalBaseArray[index])))
 	}
-	return fmt.Sprintf("(%s)", strings.Join(basePerformance, ","))
+	return fmt.Sprintf("%s", strings.Join(basePerformance, ","))
 }
 
 func (y *YamlPrjCli) calculateBenchMark() float64 {
@@ -217,16 +217,18 @@ func (y *YamlPrjCli) improveRate(index int) float64 {
 
 // Threshold return the threshold, which replace with the benchmark result.
 // it is used when the parameters is not match with the relations
-func (y *YamlPrjCli) Threshold() (string, error) {
+func (y *YamlPrjCli) Threshold() (string, string, error) {
 	benchStr := make([]string, 0)
-	for _, evaluation := range y.Evaluations {
-		out := strconv.FormatFloat(float64(evaluation.Info.Threshold)*float64(evaluation.Info.Weight)/100, 'f', -1, 64)
+	for index, evaluation := range y.Evaluations {
+		floatOut := evaluation.Info.Threshold
 		if evaluation.Info.Type == "negative" {
-			out = "-" + out
+			floatOut = -floatOut
 		}
-		benchStr = append(benchStr, evaluation.Name+"="+out)
+		y.EvalCurrentArray[index] = floatOut
+		benchStr = append(benchStr, fmt.Sprintf("%s=%.2f", evaluation.Name, floatOut))
 	}
-	return strings.Join(benchStr, ","), nil
+	sum := y.calculateBenchMark()
+	return fmt.Sprintf("evaluations=%.2f", sum), strings.Join(benchStr, ","), nil
 }
 
 // SetHistoryEvalBase method call the set the current EvalBase to history baseline
