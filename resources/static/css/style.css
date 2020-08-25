@@ -1,0 +1,219 @@
+/*
+ Copyright (c) 2019 Huawei Technologies Co., Ltd.
+ A-Tune is licensed under the Mulan PSL v2.
+ You can use this software according to the terms and conditions of the Mulan PSL v2.
+ You may obtain a copy of Mulan PSL v2 at:
+    http://license.coscl.org.cn/MulanPSL2
+ THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+ PURPOSE.
+ See the Mulan PSL v2 for more details.
+ Create: 2020-08-17
+*/
+
+
+/* left side bar */
+.sidebar-div {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 300px;
+    background: linear-gradient(white, midnightblue);
+/*    z-index: 200;*/
+    box-shadow: 3px 0 5px 0 #000;
+}
+
+/* logo */
+.logo-div {
+    position: relative;
+    padding: 3px 5px;
+}
+
+.logo-div:before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    top: auto;
+    bottom: 0;
+    height: 1px;
+    width: 270px;
+    background-color: grey;
+}
+
+/* side bar wrapper */
+.sidebar-wrapper-div {
+    position: relative;
+    height: calc(100vh - 200px);
+    overflow: auto;
+    width: 300px;
+    z-index: 4;
+}
+
+.nav {
+    list-style: none;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    margin-top: 20px;
+    display: block;
+}
+
+.nav li {
+    height: 60px;
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 17px;
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+.nav li:hover {
+    border-radius: 40px;
+    background: #f5f5dc;
+    width: 260px;
+    margin: auto;
+    border: none;
+    opacity: .5;
+}
+
+.nav li.active {
+    border-radius: 40px;
+    background: #f0f8ff;
+    width: 260px;
+    margin: auto;
+    border: none;
+}
+
+.nav a {
+    color: #000;
+    height: inherit;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.nav p {
+    margin: 8px;
+    height: 40px;
+    padding: 0;
+    vertical-align: middle;
+}
+
+/* main part */
+.main-panel {
+    position: fixed;
+    top: 0;
+    left: 300px;
+    height: 100vh;
+    width: -webkit-fill-available;
+}
+
+/* top bar */
+.nav-bar-div {
+    margin: 0 auto 60px;
+}
+
+.nav-bar {
+    height: 60px;
+    width: calc(100% - 300px);
+    position: fixed;
+    background: #f0ffff;
+    z-index: 100;
+/*    box-shadow: 0 3px 5px 0 black;*/
+}
+
+.nav-bar-right {
+    justify-content: flex-end;
+    -webkit-box-pack: end;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+}
+
+.nav-bar-right input {
+    font-size: 14px;
+    padding: 9px;
+    border-radius: 25px;
+    outline: none;
+}
+
+.search-bar {
+    opacity: .5;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    padding: 9px;
+    width: 250px;
+}
+
+.search-icon {
+    height: 22px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.nav-bar-right ul {
+    list-style: none;
+    flex-direction: row;
+    display: flex;
+    margin: auto 0;
+    padding: 3px 0 0 5px;
+}
+
+.nav-bar-right li {
+    padding: 0 20px 0 0;
+} 
+
+.nav-bar-right a {
+    color: #000;
+    text-decoration: none;
+}
+
+.nav-bar-right span:hover {
+    opacity: .3;
+}
+
+.nav-bar-right a:hover {
+    opacity: .3;
+}
+
+.nav-dropdown:before {
+    display: inline-block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    content: "";
+    top: -5px;
+    left: auto;
+    right: 20px;
+    color: #FFF;
+    border-bottom: .4em solid;
+    border-right: .4em solid transparent;
+    border-left: .4em solid transparent;
+    border-radius: 5px;
+}
+
+.dropdown-item {
+    margin: 5px;
+    padding: 2px 5px;
+}
+
+.open > .dropdown-menu {
+    display: grid;
+}
+
+/* main page */
+#tuning-chart {
+    overflow-y: scroll;
+    height: calc(100vh - 60px);
+}
+
+.performance-chart {
+    width: 500px;
+    height: 400px;
+    float: left;
+    display: inline;
+}

@@ -33,6 +33,7 @@ type OptimizerPostBody struct {
 	SplitCount    int32      `json:"split_count"`
 	Noise         float64    `json:"noise"`
 	SelFeature    bool       `json:"sel_feature"`
+	PrjName       string     `json:"prj_name"`
 }
 
 // Knob body store the tuning properties

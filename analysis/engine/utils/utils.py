@@ -42,3 +42,12 @@ def extract_file(file_path, target_path):
     tar.close()
     res_path = file_path.rpartition('-')[0]
     return res_path
+
+
+def add_data_to_file(data, mode, filename):
+    """write tuning result to file"""
+    path = "/etc/atuned/webserver/" + filename + ".txt"
+    file_handle = open(path, mode)
+    file_handle.write(str(data))
+    file_handle.write("\n")
+    file_handle.close()

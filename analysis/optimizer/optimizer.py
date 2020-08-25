@@ -20,6 +20,7 @@ import numbers
 import multiprocessing
 import collections
 import numpy as np
+import analysis.engine.utils.utils as utils
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
@@ -38,11 +39,12 @@ LOGGER = logging.getLogger(__name__)
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, engine="bayes", max_eval=50, sel_feature=False,
+    def __init__(self, name, params, child_conn, prj_name, engine="bayes", max_eval=50, sel_feature=False,
                  x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
+        self.project_name = prj_name
         self.engine = engine
         self.noise = noise
         self.max_eval = int(max_eval)
@@ -236,6 +238,12 @@ class Optimizer(multiprocessing.Process):
         performance = []
         labels = []
         estimator = None
+
+        parameters = ""
+        for knob in self.knobs:
+            parameters += knob["name"] + ","
+        utils.add_data_to_file(parameters[:-1], "w", self.project_name)
+
         try:
             if self.engine == 'random' or self.engine == 'forest' or \
                     self.engine == 'gbrt' or self.engine == 'bayes' or self.engine == 'extraTrees':
@@ -304,6 +312,15 @@ class Optimizer(multiprocessing.Process):
                     LOGGER.info("next_y: %s", next_y)
                     ret = optimizer.tell(next_x, next_y)
                     LOGGER.info("finish (ref_x, ref_y) tell")
+
+                    data = ""
+                    for element in next_x:
+                        data += str(element) + ","
+                    data += str(abs(next_y))
+                    utils.add_data_to_file(data, "a", self.project_name)
+
+                utils.add_data_to_file("END", "a", self.project_name)
+
             elif self.engine == 'abtest':
                 abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn,
                                                        self.split_count)
