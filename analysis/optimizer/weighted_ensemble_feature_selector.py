@@ -26,15 +26,15 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import ElasticNet, Ridge
 from sklearn.tree import ExtraTreeRegressor
 
-from multiprocessing import Process, Queue
+import multiprocessing
 
 LOGGER = logging.getLogger(__name__)
 
-class FeatureSelectorProcess(Process):
+class FeatureSelectorProcess(multiprocessing.Process):
     """class feature selector each with multiprocessing"""
 
     def __init__(self, regressor, list_sample_x, list_sample_y, labels, index, sorted_index_queue, prediction_queue):
-        Process.__init__(self)
+        multiprocessing.Process.__init__(self)
         self._regressor = regressor
         self._list_sample_x = list_sample_x
         self._list_sample_y = list_sample_y
@@ -76,7 +76,7 @@ class FeatureSelectorProcess(Process):
         self._prediction_queue.put(prediction)
 
 
-class WeightedEnsembleFeatureSelector:
+class WeightedEnsembleFeatureSelector(object):
     """class weighted ensemble feature selector"""
 
     def __init__(self):
@@ -100,9 +100,10 @@ class WeightedEnsembleFeatureSelector:
         prediction_queue_list = []
 
         for regressor in self._regressors:
-            sorted_index_queue = Queue()
-            prediction_queue = Queue()
-            fs_thread = FeatureSelectorProcess(regressor, list_sample_x, list_sample_y, labels, index, sorted_index_queue, prediction_queue)
+            sorted_index_queue = multiprocessing.Queue()
+            prediction_queue = multiprocessing.Queue()
+            fs_thread = FeatureSelectorProcess(regressor, list_sample_x, list_sample_y, 
+                    labels, index, sorted_index_queue, prediction_queue)
             fs_thread_list.append(fs_thread)
             sorted_index_queue_list.append(sorted_index_queue)
             prediction_queue_list.append(prediction_queue)
