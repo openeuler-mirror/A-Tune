@@ -13,6 +13,13 @@ ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
 GOLDFLAGS += -X gitee.com/openeuler/A-Tune/common/config.Version=$(ATUNEVERSION)
 GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
+CERT_PATH=/etc/atuned
+GRPC_CERT_PATH=$(CERT_PATH)/grpc_certs
+REST_CERT_PATH=$(CERT_PATH)/rest_certs
+ENGINE_CERT_PATH=$(CERT_PATH)/engine_certs
+REST_IP_ADDR=localhost
+ENGINE_IP_ADDR=localhost
+
 all: modules atune-adm atuned db
 
 atune-adm:
@@ -27,11 +34,22 @@ modules:
 clean:
 	rm -rf $(PKGPATH)/*
 
+cleanall: clean
+	rm -rf $(DESTDIR)/etc/atuned/
+	rm -rf $(DESTDIR)$(PREFIX)/lib/atuned/
+	rm -rf $(DESTDIR)$(PREFIX)/share/atuned/
+	rm -rf $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/
+	rm -rf $(DESTDIR)/var/lib/atuned/
+	rm -rf $(DESTDIR)/var/run/atuned/
+	rm -rf $(DESTDIR)/var/atuned/
+
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
 
-install:
-	@echo "BEGIN INSTALL A-Tune"
+install: libinstall restcerts enginecerts
+
+libinstall:
+	@echo "BEGIN INSTALL A-Tune..."
 	mkdir -p $(BINDIR)
 	mkdir -p $(SYSTEMDDIR)
 	rm -rf $(DESTDIR)/etc/atuned/
@@ -81,3 +99,68 @@ rpm:
 models:
 	rm -rf ${CURDIR}/analysis/models/*
 	cd ${CURDIR}/tools/ && python3 generate_models.py
+
+grpccerts:
+	@echo "BEGIN GENERATE GRPC CERTS..."
+	mkdir -p $(GRPC_CERT_PATH)
+	openssl genrsa -out $(GRPC_CERT_PATH)/ca.key 2048
+	openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $(GRPC_CERT_PATH)/ca.key -out $(GRPC_CERT_PATH)/ca.crt
+	@for name in server client; do \
+		openssl genrsa -out $(GRPC_CERT_PATH)/$$name.key 2048; \
+		openssl req -new -subj "/CN=$$name" -key $(GRPC_CERT_PATH)/$$name.key -out $(GRPC_CERT_PATH)/$$name.csr; \
+		openssl x509 -req -sha256 -CA $(GRPC_CERT_PATH)/ca.crt -CAkey $(GRPC_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+			-in $(GRPC_CERT_PATH)/$$name.csr -out $(GRPC_CERT_PATH)/$$name.crt; \
+	done
+	rm -rf $(GRPC_CERT_PATH)/*.srl $(GRPC_CERT_PATH)/*.csr
+	@echo "END GENERATE GRPC CERTS"
+
+restcerts:
+	@echo "BEGIN GENERATE REST CERTS..."
+	mkdir -p $(REST_CERT_PATH)
+	openssl genrsa -out $(REST_CERT_PATH)/ca.key 2048
+	openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $(REST_CERT_PATH)/ca.key -out $(REST_CERT_PATH)/ca.crt
+	openssl genrsa -out $(REST_CERT_PATH)/server.key 2048
+	@if test $(REST_IP_ADDR) == localhost; then \
+		openssl req -new -subj "/CN=localhost" -key $(REST_CERT_PATH)/server.key -out $(REST_CERT_PATH)/server.csr; \
+		openssl x509 -req -sha256 -CA $(REST_CERT_PATH)/ca.crt -CAkey $(REST_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+			-in $(REST_CERT_PATH)/server.csr -out $(REST_CERT_PATH)/server.crt; \
+	else \
+		openssl req -new -subj "/CN=$(REST_IP_ADDR)" -key $(REST_CERT_PATH)/server.key -out $(REST_CERT_PATH)/server.csr; \
+		echo "subjectAltName=IP:$(REST_IP_ADDR)" > $(REST_CERT_PATH)/extfile.cnf; \
+		openssl x509 -req -sha256 -CA $(REST_CERT_PATH)/ca.crt -CAkey $(REST_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+			-extfile $(REST_CERT_PATH)/extfile.cnf -in $(REST_CERT_PATH)/server.csr -out $(REST_CERT_PATH)/server.crt; \
+	fi
+	rm -rf $(REST_CERT_PATH)/*.srl $(REST_CERT_PATH)/*.csr $(REST_CERT_PATH)/extfile.cnf
+	@echo "END GENERATE REST CERTS"
+
+enginecerts:
+	@echo "BEGIN GENERATE ENGINE CERTS..."
+	mkdir -p $(ENGINE_CERT_PATH)
+	@if test ! -f $(ENGINE_CERT_PATH)/ca.key; then \
+		openssl genrsa -out $(ENGINE_CERT_PATH)/ca.key 2048; \
+		openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $(ENGINE_CERT_PATH)/ca.key -out $(ENGINE_CERT_PATH)/ca.crt; \
+	fi
+	@for name in server client; do \
+		openssl genrsa -out $(ENGINE_CERT_PATH)/$$name.key 2048; \
+		if test $(ENGINE_IP_ADDR) == localhost; then \
+			openssl req -new -subj "/CN=localhost" -key $(ENGINE_CERT_PATH)/$$name.key -out $(ENGINE_CERT_PATH)/$$name.csr; \
+			openssl x509 -req -sha256 -CA $(ENGINE_CERT_PATH)/ca.crt -CAkey $(ENGINE_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+				-in $(ENGINE_CERT_PATH)/$$name.csr -out $(ENGINE_CERT_PATH)/$$name.crt; \
+		else \
+			openssl req -new -subj "/CN=$(ENGINE_IP_ADDR)" -key $(ENGINE_CERT_PATH)/$$name.key -out $(ENGINE_CERT_PATH)/$$name.csr; \
+			echo "subjectAltName=IP:$(ENGINE_IP_ADDR)" > $(ENGINE_CERT_PATH)/extfile.cnf; \
+			openssl x509 -req -sha256 -CA $(ENGINE_CERT_PATH)/ca.crt -CAkey $(ENGINE_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+				-extfile $(ENGINE_CERT_PATH)/extfile.cnf -in $(ENGINE_CERT_PATH)/$$name.csr -out $(ENGINE_CERT_PATH)/$$name.crt; \
+		fi; \
+	done
+	rm -rf $(ENGINE_CERT_PATH)/*.srl $(ENGINE_CERT_PATH)/*.csr $(ENGINE_CERT_PATH)/extfile.cnf
+	@echo "END GENERATE ENGINE CERTS"
+
+env:
+	@echo "BEGIN SET ENVIRONMENT VARIABLES..."
+	@echo "export ATUNED_TLS=yes" > $(GRPC_CERT_PATH)/env
+	@echo "export ATUNED_CACERT=$(GRPC_CERT_PATH)/ca.crt" >> $(CERT_PATH)/env
+	@echo "export ATUNED_CLIENTCERT=$(GRPC_CERT_PATH)/client.crt" >> $(CERT_PATH)/env
+	@echo "export ATUNED_CLIENTKEY=$(GRPC_CERT_PATH)/client.key" >> $(CERT_PATH)/env
+	@echo "export ATUNED_SERVERCN=server" >> $(CERT_PATH)/env
+	@echo "END SET ENVIRONMENT VARIABLES"

@@ -37,17 +37,33 @@ func (c *httpClient) Do(req *http.Request) (*http.Response, error) {
 	return response, err
 }
 
-func newhttpClient() (*httpClient, error) {
+// NewhttpClient create an http client
+func NewhttpClient(url string) (*httpClient, error) {
 	var client *http.Client
-	if config.TLS {
+	segs := strings.Split(url, "/")
+	if len(segs) < 5 {
+		return nil, fmt.Errorf("url: %s is not corrent")
+	}
+	uri := segs[4]
+	if config.IsEnginePort(uri) && config.EngineTLS || !config.IsEnginePort(uri) && config.RestTLS {
 		pool := x509.NewCertPool()
-		caCrt, err := ioutil.ReadFile(config.TLSHTTPCACertFile)
+		caFile := config.TLSEngineCACertFile
+		if !config.IsEnginePort(uri) {
+			caFile = config.TLSRestCACertFile
+		}
+		caCrt, err := ioutil.ReadFile(caFile)
 		if err != nil {
 			return nil, err
 		}
 		pool.AppendCertsFromPEM(caCrt)
 
-		clientCrt, err := tls.LoadX509KeyPair(config.TLSHTTPCertFile, config.TLSHTTPKeyFile)
+		clientCertFile := config.TLSEngineClientCertFile
+		clientKeyFile := config.TLSEngineClientKeyFile
+		if !config.IsEnginePort(uri) {
+			clientCertFile = config.TLSRestServerCertFile
+			clientKeyFile = config.TLSRestServerKeyFile
+		}
+		clientCrt, err := tls.LoadX509KeyPair(clientCertFile, clientKeyFile)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +112,7 @@ func newRequest(method string, url string, body interface{}) (*http.Request, err
 
 // Get method call the restfull GET method
 func Get(url string, data interface{}) (*http.Response, error) {
-	restClient, err := newhttpClient()
+	restClient, err := NewhttpClient(url)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +131,7 @@ func Get(url string, data interface{}) (*http.Response, error) {
 
 //Post method call the restfull POST method
 func Post(url string, data interface{}) (*http.Response, error) {
-	restClient, err := newhttpClient()
+	restClient, err := NewhttpClient(url)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +150,7 @@ func Post(url string, data interface{}) (*http.Response, error) {
 
 // Put method call the restfull PUT method
 func Put(url string, data interface{}) (*http.Response, error) {
-	restClient, err := newhttpClient()
+	restClient, err := NewhttpClient(url)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +169,7 @@ func Put(url string, data interface{}) (*http.Response, error) {
 
 // Delete method call the restfull DELETE method
 func Delete(url string) (*http.Response, error) {
-	restClient, err := newhttpClient()
+	restClient, err := NewhttpClient(url)
 	if err != nil {
 		return nil, err
 	}

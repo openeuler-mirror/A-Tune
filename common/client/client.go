@@ -14,8 +14,11 @@
 package client
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"io/ioutil"
 	"net"
 	"os"
 	"time"
@@ -153,13 +156,29 @@ func newClient(address string, opts ...Opt) (*Client, error) {
 		grpc.WithBackoffMaxDelay(3 * time.Second),
 	}
 
-	tls := os.Getenv(config.EnvTLS)
-	if tls == "yes" {
-		clicrt := os.Getenv(config.EnvCliCert)
-		creds, err := credentials.NewClientTLSFromFile(clicrt, "")
+	envTls := os.Getenv(config.EnvTLS)
+	if envTls == "yes" {
+		pool := x509.NewCertPool()
+		caCrt, err := ioutil.ReadFile(os.Getenv(config.EnvCaCert))
 		if err != nil {
-			return nil, fmt.Errorf("failed to create TLS credentials %v", err)
+			return nil, err
 		}
+		if ok := pool.AppendCertsFromPEM(caCrt); !ok {
+			return nil, fmt.Errorf("failed to append ca certs in client")
+		}
+
+		certificate, err := tls.LoadX509KeyPair(os.Getenv(config.EnvClientCert),
+			os.Getenv(config.EnvClientKey))
+		if err != nil {
+			return nil, err
+		}
+
+		creds := credentials.NewTLS(&tls.Config{
+			Certificates: []tls.Certificate{certificate},
+			ServerName:   os.Getenv(config.EnvServerCN),
+			RootCAs:      pool,
+		})
+
 		gopts = append(gopts, grpc.WithTransportCredentials(creds))
 	} else {
 		gopts = append(gopts, grpc.WithInsecure())

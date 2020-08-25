@@ -14,13 +14,16 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/registry"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 
@@ -172,12 +175,28 @@ func runatuned(ctx *cli.Context) error {
 	}
 
 	var opts []grpc.ServerOption
-	if config.TLS {
+	if config.GrpcTLS {
 		log.Info("server tls enabled")
-		creds, err := credentials.NewServerTLSFromFile(config.TLSServerCertFile, config.TLSServerKeyFile)
+		pool := x509.NewCertPool()
+		caCrt, err := ioutil.ReadFile(config.TLSServerCaFile)
 		if err != nil {
-			log.Fatalf("Failed to generate credentials %v", err)
+			return err
 		}
+		if ok := pool.AppendCertsFromPEM(caCrt); !ok {
+			return fmt.Errorf("failed to append ca certs in server")
+		}
+
+		certificate, err := tls.LoadX509KeyPair(config.TLSServerCertFile, config.TLSServerKeyFile)
+		if err != nil {
+			return err
+		}
+
+		creds := credentials.NewTLS(&tls.Config{
+			Certificates: []tls.Certificate{certificate},
+			ClientAuth:   tls.RequireAndVerifyClientCert,
+			ClientCAs:    pool,
+		})
+
 		opts = []grpc.ServerOption{grpc.Creds(creds)}
 	}
 	s := grpc.NewServer(opts...)

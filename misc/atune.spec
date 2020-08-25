@@ -9,7 +9,7 @@ URL: https://gitee.com/openeuler/A-Tune
 Source: openeuler-A-Tune-v%{version}.tar.gz
 
 BuildRequires: rpm-build protobuf-compiler golang-bin python3-pytest procps-ng
-BuildRequires: sqlite >= 3.24.0
+BuildRequires: sqlite >= 3.24.0 openssl
 Requires: systemd
 Requires: atune-client
 Requires: atune-db

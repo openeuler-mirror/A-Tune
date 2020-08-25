@@ -64,10 +64,10 @@ def main(filename):
     API.add_resource(train.Training, '/v1/training', '/v1/training')
     API.add_resource(transfer.Transfer, '/v1/transfer', '/transfer')
 
-    if config.has_option("server", "tls") and config.get("server", "tls") == "true":
-        cert_file = config.get("server", "tlshttpcertfile")
-        key_file = config.get("server", "tlshttpkeyfile")
-        ca_file = config.get("server", "tlshttpcacertfile")
+    if config.has_option("server", "engine_tls") and config.get("server", "engine_tls") == "true":
+        cert_file = config.get("server", "tlsengineservercertfile")
+        key_file = config.get("server", "tlsengineserverkeyfile")
+        ca_file = config.get("server", "tlsenginecacertfile")
         context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         context.load_cert_chain(certfile=cert_file, keyfile=key_file)
         context.load_verify_locations(ca_file)

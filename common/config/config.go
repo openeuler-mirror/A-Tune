@@ -28,10 +28,13 @@ var Version = "no version specified"
 
 // application common config
 const (
-	EnvAddr    = "ATUNED_ADDR"
-	EnvPort    = "ATUNED_PORT"
-	EnvTLS     = "ATUNE_TLS"
-	EnvCliCert = "ATUNE_CLICERT"
+	EnvAddr       = "ATUNED_ADDR"
+	EnvPort       = "ATUNED_PORT"
+	EnvTLS        = "ATUNED_TLS"
+	EnvCaCert     = "ATUNED_CACERT"
+	EnvClientCert = "ATUNED_CLIENTCERT"
+	EnvClientKey  = "ATUNED_CLIENTKEY"
+	EnvServerCN   = "ATUNED_SERVERCN"
 
 	DefaultProtocol = "unix"
 	DefaultTgtAddr  = "/var/run/atuned/atuned.sock"
@@ -98,20 +101,28 @@ const (
 
 // the grpc server config
 var (
-	TransProtocol     string
-	Address           string
-	Connect           string
-	Port              string
-	LocalHost         string
-	RestPort          string
-	EngineHost        string
-	EnginePort        string
-	TLS               bool
-	TLSServerCertFile string
-	TLSServerKeyFile  string
-	TLSHTTPCertFile   string
-	TLSHTTPKeyFile    string
-	TLSHTTPCACertFile string
+	TransProtocol           string
+	Address                 string
+	Connect                 string
+	Port                    string
+	LocalHost               string
+	RestPort                string
+	EngineHost              string
+	EnginePort              string
+	GrpcTLS                 bool
+	RestTLS                 bool
+	EngineTLS               bool
+	TLSServerCaFile         string
+	TLSServerCertFile       string
+	TLSServerKeyFile        string
+	TLSRestServerCertFile   string
+	TLSRestServerKeyFile    string
+	TLSRestCACertFile       string
+	TLSEngineClientCertFile string
+	TLSEngineClientKeyFile  string
+	TLSEngineServerCertFile string
+	TLSEngineServerKeyFile  string
+	TLSEngineCACertFile     string
 )
 
 // the tuning configs
@@ -166,16 +177,36 @@ func (c *Cfg) Load() error {
 	utils.RestHost = LocalHost
 	utils.RestPort = RestPort
 
-	if section.HasKey("tls") {
-		TLS = section.Key("tls").MustBool(false)
+	if section.HasKey("grpc_tls") {
+		GrpcTLS = section.Key("grpc_tls").MustBool(false)
 	}
 
-	if TLS {
+	if section.HasKey("rest_tls") {
+		RestTLS = section.Key("rest_tls").MustBool(true)
+	}
+
+	if section.HasKey("engine_tls") {
+		EngineTLS = section.Key("engine_tls").MustBool(true)
+	}
+
+	if GrpcTLS {
+		TLSServerCaFile = section.Key("tlsservercafile").MustString("")
 		TLSServerCertFile = section.Key("tlsservercertfile").MustString("")
 		TLSServerKeyFile = section.Key("tlsserverkeyfile").MustString("")
-		TLSHTTPCertFile = section.Key("tlshttpcertfile").MustString("")
-		TLSHTTPKeyFile = section.Key("tlshttpkeyfile").MustString("")
-		TLSHTTPCACertFile = section.Key("tlshttpcacertfile").MustString("")
+	}
+
+	if RestTLS {
+		TLSRestServerCertFile = section.Key("tlsrestservercertfile").MustString("")
+		TLSRestServerKeyFile = section.Key("tlsrestserverkeyfile").MustString("")
+		TLSRestCACertFile = section.Key("tlsrestcacertfile").MustString("")
+	}
+
+	if EngineTLS {
+		TLSEngineClientCertFile = section.Key("tlsengineclientcertfile").MustString("")
+		TLSEngineClientKeyFile = section.Key("tlsengineclientkeyfile").MustString("")
+		TLSEngineServerCertFile = section.Key("tlsengineservercertfile").MustString("")
+		TLSEngineServerKeyFile = section.Key("tlsengineserverkeyfile").MustString("")
+		TLSEngineCACertFile = section.Key("tlsenginecacertfile").MustString("")
 	}
 
 	section = cfg.Section("system")
@@ -222,13 +253,15 @@ func initLogging(cfg *ini.File) error {
 // GetURL return the url
 func GetURL(uri string) string {
 	protocol := Protocol
-	if TLS {
-		protocol = "https"
-	}
 	if IsEnginePort(uri) {
+		if EngineTLS {
+			protocol = "https"
+		}
 		return fmt.Sprintf("%s://%s:%s/%s/%s", protocol, EngineHost, EnginePort, APIVersion, uri)
 	}
-
+	if RestTLS {
+		protocol = "https"
+	}
 	url := fmt.Sprintf("%s://%s:%s/%s/%s", protocol, LocalHost, RestPort, APIVersion, uri)
 	return url
 }

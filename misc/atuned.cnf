@@ -47,14 +47,28 @@ sample_num = 20
 # interval for collecting data, default is 5s
 interval = 5
 
-# enable gRPC and http server authentication SSL/TLS
+# enable gRPC authentication SSL/TLS
 # default is false
-# tls = true
-# tlsservercertfile = /etc/atuned/server.pem
-# tlsserverkeyfile = /etc/atuned/server.key
-# tlshttpcertfile = /etc/atuned/http/server.pem
-# tlshttpkeyfile = /etc/atuned/http/server.key
-# tlshttpcacertfile = /etc/atuned/http/cacert.pem
+# grpc_tls = false
+# tlsservercafile = /etc/atuned/grpc_certs/ca.crt
+# tlsservercertfile = /etc/atuned/grpc_certs/server.crt
+# tlsserverkeyfile = /etc/atuned/grpc_certs/server.key
+
+# enable rest server authentication SSL/TLS
+# default is true
+rest_tls = true
+tlsrestcacertfile = /etc/atuned/rest_certs/ca.crt
+tlsrestservercertfile = /etc/atuned/rest_certs/server.crt
+tlsrestserverkeyfile = /etc/atuned/rest_certs/server.key
+
+# enable engine server authentication SSL/TLS
+# default is true
+engine_tls = true
+tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
+tlsengineclientcertfile = /etc/atuned/engine_certs/client.crt
+tlsengineclientkeyfile = /etc/atuned/engine_certs/client.key
+tlsengineservercertfile = /etc/atuned/engine_certs/server.crt
+tlsengineserverkeyfile = /etc/atuned/engine_certs/server.key
 
 #################################### log ###############################
 [log]
