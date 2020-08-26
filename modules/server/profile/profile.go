@@ -623,7 +623,10 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			optimizer.SplitCount = reply.GetSplitCount()
 			cycles = reply.GetFeatureFilterCycle()
-
+			ch <- &PB.TuningMessage{State: PB.TuningMessage_JobCreate}
+		case PB.TuningMessage_JobCreate:
+			optimizer.EvalBase = reply.GetTuningLog().GetBaseEval()
+			optimizer.Evaluations = reply.GetTuningLog().GetSumEval()
 			if cycles == 0 {
 				if optimizer.Restart {
 					message = fmt.Sprintf("%d.Continue to tuning the system......", step)

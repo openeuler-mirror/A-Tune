@@ -290,7 +290,6 @@ class Optimizer(multiprocessing.Process):
                 if ref_x and ref_y is None:
                     ref_y = list(map(objective, ref_x))
                     LOGGER.info("ref_y is: %s", ref_y)
-                    n_calls -= len(ref_y)
 
                 # Pass user suggested initialisation points to the optimizer
                 if ref_x:
@@ -302,6 +301,7 @@ class Optimizer(multiprocessing.Process):
                                          "have the same length")
                     LOGGER.info("ref_x: %s", ref_x)
                     LOGGER.info("ref_y: %s", ref_y)
+                    n_calls -= len(ref_y)
                     ret = optimizer.tell(ref_x, ref_y)
 
                 for i in range(n_calls):

@@ -56,6 +56,7 @@ type Optimizer struct {
 	EvalBase            string
 	RespPutIns          *models.RespPutBody
 	StartIterTime       string
+	InitConfig          string
 	TotalTime           float64
 	Percentage          float64
 	BackupFlag          bool
@@ -124,9 +125,6 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	if o.Restart && iters <= int32(len(optimizerBody.Xref)) {
 		return fmt.Errorf("create task failed for client ask iters less than tuning history")
 	}
-	if o.Restart {
-		iters = iters - int32(len(optimizerBody.Xref))
-	}
 	optimizerBody.MaxEval = iters
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
@@ -168,6 +166,13 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 		State:         PB.TuningMessage_JobInit,
 		FeatureFilter: o.FeatureFilter,
 		Content:       []byte(strconv.Itoa(respPostIns.Iters)),
+		TuningLog: &PB.TuningHistory{
+			BaseEval:  o.EvalBase,
+			MinEval:   o.EvalMinArray,
+			SumEval:   fmt.Sprintf("%.2f", o.MinEvalSum),
+			TotalTime: int64(o.TotalTime),
+			Starts:    int32(o.Iter) + 1,
+		},
 	}
 	url := config.GetURL(config.OptimizerURI)
 	o.OptimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
@@ -203,9 +208,11 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 			return err
 		}
 
-		if o.Iter == 1 {
+		if o.Iter == 0 {
 			o.EvalBase = items[4]
 			o.MinEvalSum = yFloat
+			o.EvalMinArray = items[4]
+			continue
 		}
 
 		if startTime, err = time.Parse(config.DefaultTimeFormat, items[1]); err != nil {
@@ -259,11 +266,9 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	var evalValue string
 	var err error
 	var message string
-	if o.Content != nil {
-		evalValue, err = o.evalParsing(ch)
-		if err != nil {
-			return err
-		}
+	evalValue, err = o.evalParsing(ch)
+	if err != nil {
+		return err
 	}
 
 	err = os.Setenv("ITERATION", strconv.Itoa(o.Iter))
@@ -347,13 +352,6 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	ch <- &PB.TuningMessage{State: PB.TuningMessage_BenchMark,
 		Content:       []byte(o.RespPutIns.Param),
 		FeatureFilter: o.FeatureFilter,
-		TuningLog: &PB.TuningHistory{
-			BaseEval:  o.EvalBase,
-			MinEval:   o.EvalMinArray,
-			SumEval:   fmt.Sprintf("%.2f", o.MinEvalSum),
-			TotalTime: int64(o.TotalTime),
-			Starts:    int32(o.Iter),
-		},
 	}
 	return nil
 }
@@ -451,12 +449,23 @@ func (o *Optimizer) RestoreConfigTuned(ch chan *PB.TuningMessage) error {
 }
 
 func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
-	eval := string(o.Content)
+	if o.Restart && o.Content == nil {
+		return "", nil
+	}
+
+	eval := o.EvalBase
+	if o.Content != nil {
+		eval = string(o.Content)
+	}
+	configs := o.InitConfig
+	if o.RespPutIns != nil {
+		configs = o.RespPutIns.Param
+	}
 
 	endIterTime := time.Now().Format(config.DefaultTimeFormat)
 	iterInfo := make([]string, 0)
 	iterInfo = append(iterInfo, strconv.Itoa(o.Iter), o.StartIterTime, endIterTime,
-		o.Evaluations, eval, o.RespPutIns.Param)
+		o.Evaluations, eval, configs)
 	output := strings.Join(iterInfo, "|")
 	err := utils.WriteFile(o.TuningFile, output+"\n", utils.FilePerm,
 		os.O_APPEND|os.O_WRONLY)
@@ -674,6 +683,7 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 		log.Error(err)
 		return err
 	}
+	o.InitConfig = strings.Join(initConfigure, ",")
 	return nil
 }
 

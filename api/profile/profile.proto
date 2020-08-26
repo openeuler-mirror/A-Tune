@@ -110,6 +110,7 @@ message TuningMessage {
 		SyncConfig = 6;
 		Detail = 7;
 		Threshold = 8;
+		JobCreate = 9;
     }
     status state = 4;
     int32 RandomStarts = 5;
