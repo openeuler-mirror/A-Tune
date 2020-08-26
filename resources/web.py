@@ -16,11 +16,13 @@ Web UI initialization
 """
 
 
-from flask import Flask, render_template
-from flask_socketio import SocketIO
 import os
 import numpy
 import logging
+from flask import Flask, render_template
+from flask_socketio import SocketIO
+from configparser import ConfigParser
+
 
 APP = Flask(__name__, template_folder='./templates', static_folder='./static')
 APP.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -45,6 +47,7 @@ def show_page(timestamp, _):
     """list all tuning project name on page"""
     path = '/etc/atuned/webserver'
     filelist = os.listdir(path)
+    filelist.sort(key=lambda fn: os.path.getmtime(path + '/' + fn), reverse=True)
     res = []
     for each in filelist:
         res.append(each.split('.')[0])
@@ -101,4 +104,6 @@ def update_tuning_page(prj_name, num, timestamp, _):
 
 
 if __name__ == '__main__':
-    socketio.run(APP, host='9.41.51.85', port=10086)
+    config = ConfigParser()
+    config.read('/etc/atuned/atuned.cnf')
+    socketio.run(APP, host=config.get("server", "engine_host"), port=10086)
