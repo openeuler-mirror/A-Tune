@@ -64,31 +64,29 @@ class WorkloadCharacterization:
         """
         detect abnormal data points
         :param x_axis: the input data
-        :returns x_axis: filtered data
+        :returns result: filtered data
         """
         bool_normal = (x_axis.mean() - 3 * x_axis.std() <= x_axis) & \
                       (x_axis <= x_axis.mean() + 3 * x_axis.std())
-        x_axis[bool_normal].dropna(axis=0, how='any')
-        return x_axis
+        result = x_axis[bool_normal]
+        return result
 
     def parsing(self, data_path, header=0, analysis=False):
         """
         parse the data from csv
         :param data_path:  the path of csv
-        :returns dataset:  converted data
         """
         df_content = []
         csvfiles = glob.glob(data_path)
-        selected_cols = self.data_features
+        selected_cols = list(self.data_features)
         selected_cols.append('workload.type')
         selected_cols.append('workload.appname')
 
         for csv in csvfiles:
             data = pd.read_csv(csv, index_col=None, header=header, usecols=selected_cols)
-            data = self.abnormal_detection(data)
-            df_content.append(data)
-            dataset = pd.concat(df_content, sort=False)
-        self.dataset = dataset
+            data[self.data_features] = self.abnormal_detection(data[self.data_features])
+            df_content.append(data.dropna(axis=0))
+        self.dataset = pd.concat(df_content, sort=False)
         if analysis:
             status_content = []
             for app, group in self.dataset.groupby('workload.appname'):
@@ -97,7 +95,6 @@ class WorkloadCharacterization:
                 status_content.append(status)
                 total_status = pd.concat(status_content, sort=False)
             total_status.to_csv('statistics.csv')
-        return dataset
 
     def feature_selection(self, x_axis, y_axis, clfpath=None):
         """
