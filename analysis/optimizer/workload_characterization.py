@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 import joblib
 from sklearn import svm
+from sklearn.linear_model import Lasso
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectFromModel
@@ -102,48 +103,17 @@ class WorkloadCharacterization:
         :param x_axis, y_axis:  orginal input and output data
         :returns selected_x:  selected input data
         """
-        x_scaled = StandardScaler().fit_transform(x_axis)
-        x_train, x_test, y_train, y_test = tts(x_scaled, y_axis, test_size=0.3)
-        model = RandomForestClassifier(n_estimators=500, random_state=0, n_jobs=-1)
-        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
-        class_weights = dict(zip(np.unique(y_train), weights))
-        w_array = np.ones(y_train.shape[0], dtype='float')
-        for i, val in enumerate(y_train):
-            w_array[i] = class_weights[val]
-        model.fit(x_train, y_train, sample_weight=w_array)
-        y_pred = model.predict(x_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        print("the accuracy of current model is %f" % accuracy)
-        importances = model.feature_importances_.tolist()
-        features = self.dataset.iloc[:, :-2].columns.tolist()
-        featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
-        result = ",".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
-        print("Overall feature importances:", result)
+        lasso = Lasso(alpha=0.01).fit(x_axis, y_axis)
+        importance = lasso.coef_.tolist()
+        featureimportance = sorted(zip(self.data_features, importance), key=lambda x: -np.abs(x[1]))
+        result = ", ".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
+        print("Feature selection result of current classifier:", result)
 
-        thresholds = sorted(set(importances), reverse=True)
-        for thresh in thresholds:
-            smodel = SelectFromModel(model, threshold=thresh, prefit=True)
-            x_selected = smodel.transform(x_train)
-            xt_selected = smodel.transform(x_test)
-
-            feature_model = RandomForestClassifier(n_estimators=500, random_state=0, n_jobs=-1)
-            feature_model.fit(x_selected, y_train, sample_weight=w_array)
-            y_pred = feature_model.predict(xt_selected)
-            print("Current threshold value:%.2f, number of selected features: %d, "
-                  "model accuracy:%.4f"
-                  % (thresh, x_selected.shape[1], accuracy_score(y_test, y_pred)))
-            if accuracy_score(y_test, y_pred) >= accuracy:
-                importances = feature_model.feature_importances_.tolist()
-                featureimportance = sorted(zip(features, importances), key=lambda x: -np.abs(x[1]))
-                result = ",".join("%s: %s" % (label, round(coef, 3))
-                                  for label, coef in featureimportance)
-                print("Feature importances of final model in feature selection:", result)
-                label = [result[0] for result in featureimportance]
-                selected_x = pd.DataFrame(x_axis, columns=label)
-                if clfpath is not None:
-                    joblib.dump(smodel, clfpath)
-                return selected_x
-        return x_axis
+        feature_model = SelectFromModel(lasso, threshold=0.001)
+        selected_x = feature_model.fit_transform(x_axis, y_axis)
+        if clfpath is not None:
+            joblib.dump(feature_model, clfpath)
+        return selected_x
 
     @staticmethod
     def svm_clf(x_axis, y_axis, clfpath=None, kernel='rbf'):
@@ -216,7 +186,7 @@ class WorkloadCharacterization:
         self.parsing(data_path)
 
         x_type = self.dataset.iloc[:, :-2]
-        self.scaler.fit(x_type)
+        self.scaler.fit_transform(x_type)
         y_type = self.tencoder.fit_transform(self.dataset.iloc[:, -2])
         y_app = self.aencoder.fit_transform(self.dataset.iloc[:, -1])
         joblib.dump(self.tencoder, tencoder_path)
@@ -224,15 +194,13 @@ class WorkloadCharacterization:
         joblib.dump(self.scaler, scaler_path)
 
         if feature_selection:
-            selected_x = StandardScaler().fit_transform(
-                self.feature_selection(x_type, y_type, type_feature))
-        else:
-            selected_x = StandardScaler().fit_transform(x_type)
-        self.rf_clf(selected_x, y_type, clfpath=type_clf)
+            x_type = self.feature_selection(x_type, y_type, type_feature)
+
+        self.rf_clf(x_type, y_type, clfpath=type_clf)
         print("The overall classifier has been generated.")
 
         for workload, group in self.dataset.groupby('workload.type'):
-            x_app = group.iloc[:, :-2]
+            x_app = self.scaler.transform(group.iloc[:, :-2])
             y_app = self.aencoder.transform(group.iloc[:, -1])
 
             clf_name = workload + "_clf.m"
@@ -241,14 +209,12 @@ class WorkloadCharacterization:
             feature_path = os.path.join(self.model_path, feature_name)
 
             if feature_selection:
-                selected_x = StandardScaler().fit_transform(
-                    self.feature_selection(x_app, y_app, feature_path))
-            else:
-                selected_x = StandardScaler().fit_transform(x_app)
+                x_app = self.feature_selection(x_app, y_app, feature_path)
+
             if workload == "default":
-                self.rf_clf(selected_x, y_app, clf_path)
+                self.rf_clf(x_app, y_app, clf_path)
             elif workload == "throughput_performance":
-                self.svm_clf(selected_x, y_app, clf_path)
+                self.svm_clf(x_app, y_app, clf_path)
             print("The application classifiers have been generated.")
 
     def identify(self, data, feature_selection=False):
@@ -273,6 +239,8 @@ class WorkloadCharacterization:
         df_clf = joblib.load(df_path)
         tp_clf = joblib.load(tp_path)
 
+        data = self.scaler.transform(data)
+
         if feature_selection:
             feature_path = os.path.join(self.model_path, "total_feature.m")
             df_feature = os.path.join(self.model_path, "default_feature.m")
@@ -282,8 +250,6 @@ class WorkloadCharacterization:
             df_feat = joblib.load(df_feature)
             tp_feat = joblib.load(tp_feature)
 
-        data = self.scaler.transform(data)
-        if feature_selection:
             df_data = df_feat.transform(data)
             tp_data = tp_feat.transform(data)
             data = type_feat.transform(data)
