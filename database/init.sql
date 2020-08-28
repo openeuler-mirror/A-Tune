@@ -192,6 +192,7 @@ INSERT INTO tuned_item(property, item) VALUES("selinux", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("skew_tick", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("numa_spinlock", "Bootloader");
 INSERT INTO tuned_item(property, item) VALUES("scsi_mod.use_blk_mq", "Bootloader");
+INSERT INTO tuned_item(property, item) VALUES("sched_steal_node_limit", "Bootloader");
 
 INSERT INTO tuned_item(property, item) VALUES("openssl_hpre", "Script");
 INSERT INTO tuned_item(property, item) VALUES("hinic", "Script");
@@ -205,6 +206,11 @@ INSERT INTO tuned_item(property, item) VALUES("Support SPCR", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Max Payload Size", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Power Policy", "Bios");
 INSERT INTO tuned_item(property, item) VALUES("Rank Interleaving", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Read Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Write Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("I/O Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Access Policy", "Bios");
+INSERT INTO tuned_item(property, item) VALUES("Drive Cache", "Bios");
 
 INSERT INTO tuned_item(property, item) VALUES("vm.nr_hugepages", "Sysctl");
 INSERT INTO tuned_item(property, item) VALUES("vm.swappiness", "Sysctl");

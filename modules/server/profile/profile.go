@@ -282,6 +282,7 @@ func (s *ProfileServer) Profile(profileInfo *PB.ProfileInfo, stream PB.ProfileMg
 		return err
 	}
 
+	time.Sleep(1 * time.Second)
 	return nil
 }
 
