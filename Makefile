@@ -168,3 +168,10 @@ env:
 	@echo "export ATUNED_CLIENTKEY=$(GRPC_CERT_PATH)/client.key" >> $(CERT_PATH)/env
 	@echo "export ATUNED_SERVERCN=server" >> $(CERT_PATH)/env
 	@echo "END SET ENVIRONMENT VARIABLES"
+
+startup:
+	systemctl daemon-reload
+	systemctl restart atuned
+	systemctl restart atune-engine
+
+run: all install startup

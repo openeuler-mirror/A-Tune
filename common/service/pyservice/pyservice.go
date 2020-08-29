@@ -50,7 +50,7 @@ func (p *PyEngine) Set(cfg *config.Cfg) {
 func (p *PyEngine) Run() error {
 	cmdSlice := make([]string, 0)
 	cmdSlice = append(cmdSlice, "python3")
-	cmdSlice = append(cmdSlice, path.Join(config.DefaultAnalysisPath, "app.py"))
+	cmdSlice = append(cmdSlice, path.Join(config.DefaultAnalysisPath, "app_rest.py"))
 	cmdSlice = append(cmdSlice, path.Join(config.DefaultConfPath, "atuned.cnf"))
 
 	cmdStr := strings.Join(cmdSlice, " ")

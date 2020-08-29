@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2019 Huawei Technologies Co., Ltd.
+# Copyright (c) 2020 Huawei Technologies Co., Ltd.
 # A-Tune is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
 # You may obtain a copy of Mulan PSL v2 at:
@@ -9,77 +9,65 @@
 # IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
-# Create: 2019-10-29
+# Create: 2020-08-25
 
 """
-Application initialization, including log configuration, restful api registration.
+Flask application initialization, including log configuration, restful api registration.
 """
-
 import os
 import ssl
-import sys
 import logging
 from configparser import ConfigParser
 from logging.handlers import SysLogHandler
 from flask import Flask
 from flask_restful import Api
 
-sys.path.insert(0, os.path.dirname(__file__) + "/../")
-from analysis.atuned import configurator, monitor, collector, profile
 
-LOG = logging.getLogger('werkzeug')
-LOG.setLevel(logging.ERROR)
+class App:
+    """flask application"""
 
-APP = Flask(__name__)
-API = Api(APP)
+    def __init__(self):
+        self.app = Flask(__name__)
+        self.app.config.update(SESSION_COOKIE_SECURE=True,
+                               SESSION_COOKIE_HTTPONLY=True,
+                               SESSION_COOKIE_SAMESITE='Lax')
+        self.api = Api(self.app)
 
+    @staticmethod
+    def config_log(level):
+        """app config log"""
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
+        logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
+                                           '%(module)s [%(pathname)s:%(lineno)d] : %(message)s')
+        syslog_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
+        syslog_handler.setFormatter(logging_format)
 
-def config_log(level):
-    """app config log"""
-    logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
-                                       '%(name)s[line:%(lineno)d] : %(message)s')
-    syslog_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
-    syslog_handler.setFormatter(logging_format)
+        root_logger = logging.getLogger()
+        root_logger.setLevel(level)
+        root_logger.addHandler(syslog_handler)
 
-    root_logger = logging.getLogger()
-    root_logger.setLevel(level)
-    root_logger.addHandler(syslog_handler)
+    def add_resource(self):
+        """flask app add resource"""
 
-
-def main(filename):
-    """app main function"""
-    if not os.path.exists(filename):
-        return
-    config = ConfigParser()
-    config.read(filename)
-
-    level = logging.getLevelName(config.get("log", "level").upper())
-    config_log(level)
-    APP.config.update(SESSION_COOKIE_SECURE=True,
-                      SESSION_COOKIE_HTTPONLY=True,
-                      SESSION_COOKIE_SAMESITE='Lax')
-
-
-    API.add_resource(configurator.Configurator, '/v1/setting', '/setting')
-    API.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
-    API.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
-    API.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
-
-    if config.has_option("server", "rest_tls") and config.get("server", "rest_tls") == "true":
-        cert_file = config.get("server", "tlsrestservercertfile")
-        key_file = config.get("server", "tlsrestserverkeyfile")
-        ca_file = config.get("server", "tlsrestcacertfile")
-        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        context.load_cert_chain(certfile=cert_file, keyfile=key_file)
-        context.load_verify_locations(ca_file)
-        context.verify_mode = ssl.CERT_REQUIRED
-        APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"),
-                ssl_context=context)
-    else:
-        APP.run(host=config.get("server", "rest_host"), port=config.get("server", "rest_port"))
-
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        sys.exit(-1)
-    main(sys.argv[1])
+    def startup_app(self, filename, host_tag, port_tag, tls_tag, cert_tag, key_tag, ca_tag):
+        """start flask app"""
+        if not os.path.exists(filename):
+            return
+        config = ConfigParser()
+        config.read(filename)
+        level = logging.getLevelName(config.get("log", "level").upper())
+        self.config_log(level)
+        self.add_resource()
+        host = config.get("server", host_tag)
+        port = config.get("server", port_tag)
+        context = None
+        if config.has_option("server", tls_tag) and config.get("server", tls_tag) == "true":
+            cert_file = config.get("server", cert_tag)
+            key_file = config.get("server", key_tag)
+            ca_file = config.get("server", ca_tag)
+            context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            context.load_cert_chain(certfile=cert_file, keyfile=key_file)
+            context.load_verify_locations(ca_file)
+            context.verify_mode = ssl.CERT_REQUIRED
+        self.app.run(host=host, port=port, ssl_context=context)
