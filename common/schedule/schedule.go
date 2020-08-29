@@ -154,6 +154,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 				for _, key := range section.Keys() {
 					description := key.Name()
 					sendChanToAdm(ch, key.Value(), utils.SUGGEST, description)
+					log.Infof("tip key name: %s, key value: %s", key.Name(), key.Value())
 				}
 				continue
 			}
