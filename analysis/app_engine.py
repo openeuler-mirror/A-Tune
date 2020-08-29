@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# Copyright (c) 2019 Huawei Technologies Co., Ltd.
+# Copyright (c) 2020 Huawei Technologies Co., Ltd.
 # A-Tune is licensed under the Mulan PSL v2.
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
 # You may obtain a copy of Mulan PSL v2 at:
@@ -12,70 +12,37 @@
 # Create: 2020-07-17
 
 """
-Engine application initialization, including log configuration, restful api registration.
+Engine application implementation.
 """
 
 import os
-import ssl
 import sys
-import logging
-from configparser import ConfigParser
-from logging import handlers
-from flask import Flask
-from flask_restful import Api
+
+from app import App
 
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.engine import optimizer, classification, train, transfer
 
-LOG = logging.getLogger('werkzeug')
-LOG.setLevel(logging.ERROR)
 
-APP = Flask(__name__)
-API = Api(APP)
+class AppEngine(App):
+    """app engine"""
 
-
-def config_log(level):
-    """app config log"""
-    logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
-                                       '%(name)s[line:%(lineno)d] : %(message)s')
-    syslog_handler = handlers.SysLogHandler(address="/dev/log")
-    syslog_handler.setFormatter(logging_format)
-
-    root_logger = logging.getLogger()
-    root_logger.setLevel(level)
-    root_logger.addHandler(syslog_handler)
+    def add_resource(self):
+        """flask app add resource"""
+        self.api.add_resource(optimizer.Optimizer, '/v1/optimizer',
+                              '/v1/optimizer/<string:task_id>')
+        self.api.add_resource(classification.Classification, '/v1/classification',
+                              '/v1/classification')
+        self.api.add_resource(train.Training, '/v1/training', '/v1/training')
+        self.api.add_resource(transfer.Transfer, '/v1/transfer', '/transfer')
 
 
 def main(filename):
     """app main function"""
-    if not os.path.exists(filename):
-        return
-    config = ConfigParser()
-    config.read(filename)
-
-    level = logging.getLevelName(config.get("log", "level").upper())
-    config_log(level)
-    APP.config.update(SESSION_COOKIE_SECURE=True,
-                      SESSION_COOKIE_HTTPONLY=True,
-                      SESSION_COOKIE_SAMESITE='Lax')
-
-    API.add_resource(optimizer.Optimizer, '/v1/optimizer', '/v1/optimizer/<string:task_id>')
-    API.add_resource(classification.Classification, '/v1/classification', '/v1/classification')
-    API.add_resource(train.Training, '/v1/training', '/v1/training')
-    API.add_resource(transfer.Transfer, '/v1/transfer', '/transfer')
-
-    if config.has_option("server", "engine_tls") and config.get("server", "engine_tls") == "true":
-        cert_file = config.get("server", "tlsengineservercertfile")
-        key_file = config.get("server", "tlsengineserverkeyfile")
-        ca_file = config.get("server", "tlsenginecacertfile")
-        context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        context.load_cert_chain(certfile=cert_file, keyfile=key_file)
-        context.load_verify_locations(ca_file)
-        context.verify_mode = ssl.CERT_REQUIRED
-        APP.run(host=config.get("server", "engine_host"), port=config.get("server", "engine_port"),
-                ssl_context=context)
-    else:
-        APP.run(host=config.get("server", "engine_host"), port=config.get("server", "engine_port"))
+    app_engine = AppEngine()
+    app_engine.startup_app(filename, "engine_host", "engine_port", "engine_tls",
+                           "tlsengineservercertfile", "tlsengineserverkeyfile",
+                           "tlsenginecacertfile")
 
 
 if __name__ == '__main__':
