@@ -29,8 +29,6 @@ from skopt.utils import normalize_dimensions
 from skopt.utils import cook_estimator
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
-from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
-from analysis.optimizer.tpe_optimizer import TPEOptimizer
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 
 LOGGER = logging.getLogger(__name__)
@@ -329,6 +327,7 @@ class Optimizer(multiprocessing.Process):
                 # convert string option into index
                 options = abtuning_manager.get_options_index(options)
             elif self.engine == 'lhs':
+                from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
                 knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn,
                                                            self.max_eval, self.split_count)
                 options = knobsampling_manager.get_knob_samples()
@@ -336,6 +335,7 @@ class Optimizer(multiprocessing.Process):
                 params = knobsampling_manager.get_best_params(options, performance)
                 options = knobsampling_manager.get_options_index(options)
             elif self.engine == 'tpe':
+                from analysis.optimizer.tpe_optimizer import TPEOptimizer
                 tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
                 best_params = tpe_opt.tpe_minimize_tuning()
                 final_param = {}
