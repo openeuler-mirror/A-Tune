@@ -71,7 +71,15 @@ function updateChart(name, times, value) {
     var oldX = chart.getOption().xAxis[0].data;
     for (var i in times) {
         oldX.push(times[i]);
-        oldData.push(value[i]);
+        if (name === 'best performance') {
+            if (parseInt(value[i], 10) > parseInt(oldData[oldData.length - 1], 10) || oldData[0] === undefined) {
+                oldData.push(value[i]);
+            } else {
+                oldData.push(oldData[oldData.length - 1]);
+            }
+        } else {
+            oldData.push(value[i]);
+        }
     }
     chart.setOption({
         xAxis: {data: oldX},
@@ -93,13 +101,15 @@ function appendPrjList(list, timestamp) {
     }
     var ul = document.createElement('ul');
     container.appendChild(ul);
-    for (var i in list) {
+    for (let i in list) {
         var li = document.createElement('li');
         li.id = 'project-name-' + list[i];
         li.appendChild(document.createTextNode(list[i]));
         ul.appendChild(li);
         li.style.cursor = 'pointer';
+
         li.onclick = function () {
+            console.log(list[i]);
             socket.emit('inital_chart', {'prj_name': list[i]}, timestamp, namespace = '/tuning');
         };
     }
@@ -114,6 +124,9 @@ function updateChartInit(nameList, lineNum, value) {
     }
     for (var i in value) {
         updateChart(nameList[i], lineList, value[i]);
+        if (nameList[i] === 'performance') {
+            updateChart('best performance', lineList, value[i]);
+        }
     }
 }
 

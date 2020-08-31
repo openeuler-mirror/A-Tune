@@ -16,6 +16,9 @@ Provide an interface to read data from csv.
 """
 
 import os
+import re
+import time
+import random
 import logging
 import tarfile
 import pandas as pd
@@ -51,3 +54,15 @@ def add_data_to_file(data, mode, filename):
     file_handle.write(str(data))
     file_handle.write("\n")
     file_handle.close()
+
+
+def change_file_name():
+    """change tuning file name"""
+    path = "/etc/atuned/webserver/"
+    file_list = os.listdir(path)
+    file_list.sort(key=lambda fn: os.path.getmtime(path + fn))
+    if len(file_list) > 0 and re.match(r'\S*-\d{17}\S*', file_list[-1]) is None:
+        old_name = file_list[-1].split(".")[0]
+        curr_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
+        new_name = old_name + "-" + str(curr_time) + str(random.randint(100, 999))
+        os.rename(path + old_name + ".txt", path + new_name + ".txt")

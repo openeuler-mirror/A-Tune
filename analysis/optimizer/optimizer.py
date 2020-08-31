@@ -231,6 +231,8 @@ class Optimizer(multiprocessing.Process):
             performance.append(x_num)
             return x_num
 
+        utils.change_file_name()
+
         params = {}
         options = []
         performance = []
