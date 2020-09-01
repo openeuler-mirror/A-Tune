@@ -1,0 +1,8 @@
+1. Prepare the environment
+sh prepare.sh
+2. download stream.c
+wget http://www.cs.virginia.edu/stream/FTP/Code/stream.c
+3. Start to tuning
+atune-adm tuning --project gcc_compile --detail gcc_compile_client.yaml
+4. Restore the environment
+atune-adm tuning --restore --project gcc_compile
