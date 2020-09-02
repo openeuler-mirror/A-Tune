@@ -1,0 +1,20 @@
+project: "gcc_compile"
+engine : "bayes"
+iterations : 50
+random_starts : 10
+
+benchmark : "sh gcc_compile/gcc_compile.sh"
+evaluations :
+  -
+    name: "bandwidth"
+    info:
+        get: "echo '$out' | grep 'Triad:' | awk '{print $2}'"
+        type: "negative"
+        weight: 80
+  -
+    name: "size"
+    info:
+        get: "echo '$out' | grep 'file size:' | awk '{print $3}'"
+        type: "positive"
+        weight: 20
+

@@ -1,0 +1,69 @@
+project: "gcc_compile"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object :
+  -
+    name : "option"
+    info :
+        desc : "The gcc compilation options"
+        get : "cat gcc_compile/gcc_compile.sh | grep -i '^option=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^option=.*/option=$value/g' gcc_compile/gcc_compile.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "O0"
+          - "O1"
+          - "O2"
+          - "O3"
+          - "Os"
+          - "Ofast"
+        dtype : "string"
+  -
+    name : "mtune"
+    info :
+        desc : "Tune to cpu-type everything applicable about the generated code"
+        get : "cat gcc_compile/gcc_compile.sh | grep -i '^tune=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^tune=.*/tune=$value/g' gcc_compile/gcc_compile.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "generic"
+          - "native"
+        dtype : "string"
+  -
+    name : "march"
+    info :
+        desc : "Generate instructions for the machine type cpu-type"
+        get : "cat gcc_compile/gcc_compile.sh | grep -i '^isarch=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^isarch=.*/isarch=$value/g' gcc_compile/gcc_compile.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "yes"
+          - "no"
+        dtype : "string"
+  -
+    name : "openmp"
+    info :
+        desc : "Adapts to multi-processor env, the defalut number of threads is the number of CPU threads after the function is enabled."
+        get : "cat gcc_compile/gcc_compile.sh | grep -i '^isopenmp=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^isopenmp=.*/isopenmp=$value/g' gcc_compile/gcc_compile.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "yes"
+          - "no"
+        dtype : "string"
+  -
+    name : "offset"
+    info :
+        desc : "the array offset"
+        get : "cat gcc_compile/gcc_compile.sh | grep -i '^offset=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^offset=.*/offset=$value/g' gcc_compile/gcc_compile.sh"
+        needrestart: "false"
+        type : "continuous"
+        scope :
+          - 1024
+          - 61440
+        dtype : "int"
