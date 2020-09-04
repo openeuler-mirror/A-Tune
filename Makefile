@@ -1,4 +1,4 @@
-VERSION = 0.2
+VERSION = 0.3
 .PHONY: all clean modules
 
 PKGPATH=pkg
@@ -13,7 +13,7 @@ ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
 GOLDFLAGS += -X gitee.com/openeuler/A-Tune/common/config.Version=$(ATUNEVERSION)
 GOFLAGS = -ldflags "$(GOLDFLAGS)"
 
-CERT_PATH=/etc/atuned
+CERT_PATH=$(DESTDIR)/etc/atuned
 GRPC_CERT_PATH=$(CERT_PATH)/grpc_certs
 REST_CERT_PATH=$(CERT_PATH)/rest_certs
 ENGINE_CERT_PATH=$(CERT_PATH)/engine_certs
@@ -80,6 +80,7 @@ libinstall:
 	install -m 750 pkg/atuned $(BINDIR)
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
+	install -m 640 misc/engine.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 rules/tuning/tuning_rules.grl $(DESTDIR)/etc/atuned/rules
 	install -m 640 misc/atune-engine.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
@@ -91,13 +92,13 @@ libinstall:
 	\cp -rf resources/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources/
 	\cp -rf profiles/* $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
-	chmod -R 640 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
+	chmod -R 750 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	@echo "END INSTALL A-Tune"
 
 rpm:
-	cd .. && tar -zcvf openeuler-A-Tune-v$(VERSION).tar.gz A-Tune
+	cd .. && tar -zcvf v$(VERSION).tar.gz A-Tune
 	mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-	mv ../openeuler-A-Tune-v$(VERSION).tar.gz ~/rpmbuild/SOURCES
+	mv ../v$(VERSION).tar.gz ~/rpmbuild/SOURCES
 	rpmbuild -ba misc/atune.spec
 
 models:

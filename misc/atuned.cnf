@@ -67,8 +67,6 @@ engine_tls = true
 tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
 tlsengineclientcertfile = /etc/atuned/engine_certs/client.crt
 tlsengineclientkeyfile = /etc/atuned/engine_certs/client.key
-tlsengineservercertfile = /etc/atuned/engine_certs/server.crt
-tlsengineserverkeyfile = /etc/atuned/engine_certs/server.key
 
 #################################### log ###############################
 [log]
