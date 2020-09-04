@@ -2,20 +2,22 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 0.2
+Version: 0.3
 Release: 0.1
 License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
-Source: openeuler-A-Tune-v%{version}.tar.gz
+Source: https://gitee.com/openeuler/A-Tune/repository/archive/v%{version}.tar.gz
 
-BuildRequires: rpm-build protobuf-compiler golang-bin python3-pytest procps-ng
+BuildRequires: rpm-build golang-bin procps-ng
 BuildRequires: sqlite >= 3.24.0 openssl
+BuildRequires: python3-scikit-optimize python3-pandas python3-xgboost
 Requires: systemd
 Requires: atune-client
 Requires: atune-db
 Requires: python3-dict2xml
 Requires: python3-flask-restful
 Requires: python3-pandas
+Requires: python3-lhsmdu
 Requires: prefetch_tuning
 Requires: perf
 Requires: sysstat
@@ -56,6 +58,10 @@ atune engine tool for manage atuned AI tuning system.
 %autosetup -n A-Tune -p1
 
 %build
+sed -i "s/^rest_tls.*/rest_tls = false/" misc/atuned.cnf
+sed -i "s/^engine_tls.*/engine_tls = false/" misc/atuned.cnf
+sed -i "s/^engine_tls.*/engine_tls = false/" misc/engine.cnf
+make models
 %make_build
 
 %install
@@ -78,14 +84,17 @@ atune engine tool for manage atuned AI tuning system.
 %exclude /usr/libexec/atuned/analysis/engine/
 %attr(0750,root,root) %dir /usr/lib/atuned
 %attr(0750,root,root) %dir /usr/lib/atuned/modules
-%attr(0640,root,root) %dir /usr/lib/atuned/profiles
+%attr(0750,root,root) %dir /usr/lib/atuned/profiles
 %attr(0750,root,root) %dir /usr/libexec/atuned
 %attr(0750,root,root) %dir /usr/libexec/atuned/scripts
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/share/atuned
-%attr(0640,root,root) %dir /etc/atuned
-%attr(0640,root,root) %dir /var/atuned
-%attr(0640,root,root) /etc/atuned/*
+%attr(0750,root,root) %dir /etc/atuned
+%attr(0750,root,root) %dir /etc/atuned/rules
+%attr(0750,root,root) %dir /var/atuned
+%attr(0640,root,root) /etc/atuned/atuned.cnf
+%exclude /etc/atuned/engine_certs/*
+%exclude /etc/atuned/rest_certs/*
 
 %files client
 %attr(0750,root,root) %{_bindir}/atune-adm
@@ -112,7 +121,11 @@ atune engine tool for manage atuned AI tuning system.
 %exclude /usr/libexec/atuned/analysis/atuned/
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/libexec/atuned/resources
-%attr(0640,root,root) %dir /etc/atuned
+%attr(0750,root,root) %dir /etc/atuned
+%exclude /etc/atuned/atuned.cnf
+%exclude /etc/atuned/rules
+%exclude /etc/atuned/engine_certs/*
+%exclude /etc/atuned/rest_certs/*
 
 %post
 %systemd_post atuned.service

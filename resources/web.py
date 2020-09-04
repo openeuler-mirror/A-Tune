@@ -105,5 +105,5 @@ def update_tuning_page(prj_name, num, timestamp, _):
 
 if __name__ == '__main__':
     config = ConfigParser()
-    config.read('/etc/atuned/atuned.cnf')
+    config.read('/etc/atuned/engine.cnf')
     socketio.run(APP, host=config.get("server", "engine_host"), port=10086)
