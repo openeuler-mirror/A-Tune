@@ -17,7 +17,6 @@ Requires: atune-db
 Requires: python3-dict2xml
 Requires: python3-flask-restful
 Requires: python3-pandas
-Requires: python3-lhsmdu
 Requires: prefetch_tuning
 Requires: perf
 Requires: sysstat
@@ -45,11 +44,12 @@ Database and AI model used by atuned AI tuning system.
 
 %package engine
 Summary: engine tool for auto tuning system
-License: MuLan PSL v1
+License: MuLan PSL v2
 Requires: python3-scikit-optimize
 Requires: python3-xgboost
 Requires: python3-flask-restful
 Requires: python3-pandas
+Requires: python3-lhsmdu
 
 %description engine
 atune engine tool for manage atuned AI tuning system.
@@ -137,6 +137,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Fri Sep 4 2020 Zhipeng Xie<xiezhipeng1@huawei.com> - 0.3-0.1
+- upgrade to v0.3
+
 * Thu Mar 19 2020 openEuler Buildteam <buildteam@openeuler.org> - 0.2-0.1
 - Package init
 
