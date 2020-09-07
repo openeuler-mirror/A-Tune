@@ -64,27 +64,29 @@ A-Tune支持的主要特性、特性成熟度以及使用建议请参见表1-1�
 
 | **特性**                       | **成熟度** | **使用建议** |
 | ------------------------------ | ---------- | ------------ |
-| 七大类11款应用负载类型自动优化 | 已测试     | 试用         |
-| 自定义负载类型和业务模型       | 已测试     | 试用         |
+| 11大类15款应用负载类型自动优化 | 已测试     | 试用         |
+| 自定义profile和业务模型        | 已测试     | 试用         |
 | 参数自调优                     | 已测试     | 试用         |
 
 - 支持业务模型
 
-根据应用的负载特征，A-Tune将业务分为七大类，各类型的负载特征和A-Tune支持的应用请参见表1-2。
+根据应用的负载特征，A-Tune将业务分为11大类，各类型的瓶颈点和A-Tune支持的应用请参见表1-2。
 
 表1-2 支持的业务类型和应用
 
-| **负载模型**                   | **业务类型**        | **负载特征**                                                 | **支持的应用**                      |
-| ------------------------------ | ------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| default                        | 默认类型            | CPU、内存带宽、网络、IO各维度资源使用率都不高                | N/A                                 |
-| webserver                      | https应用           | CPU使用率高                                                  | Nginx                               |
-| big_database                   | 数据库              | -  关系型数据库  <br />读： CPU、内存带宽、网络使用率高  <br />写：IO使用率高<br /> - 非关系型数据库<br />CPU、IO使用率高 | MongoDB、MySQL、PostgreSQL、MariaDB |
-| big_data                       | 大数据              | CPU、IO使用率较高                                            | Hadoop、Spark                       |
-| in-memory_computing            | 内存密集型应用      | CPU、内存带宽使用率高                                        | SPECjbb2015                         |
-| in-memory_database             | 计算+网络密集型应用 | CPU单核使用率高，多实例下网络使用率高                        | Redis                               |
-| single_computer_intensive_jobs | 计算密集型应用      | CPU单核使用率高，部分子项内存带宽使用率高                    | SPECCPU2006                         |
-| communication                  | 网络密集型应用      | CPU、网络使用率高                                            | Dubbo                               |
-| idle                           | 系统idle            | 系统处于空闲状态，无任何应用运行                             | N/A                                 |
+| **业务大类**       | **业务类型** | **瓶颈点**                                 | **支持的应用**                      |
+| ------------------ | ------------ | ------------------------------------------ | ----------------------------------- |
+| default            | 默认类型     | 算力、内存、网络、IO各维度资源使用率都不高 | N/A                                 |
+| webserver          | web应用      | 算力瓶颈、网络瓶颈                         | Nginx、Apache Traffic Server        |
+| database           | 数据库       | 算力瓶颈、内存瓶颈、IO瓶颈                 | Mongodb、Mysql、Postgresql、Mariadb |
+| big-data           | 大数据       | 算力瓶颈、内存瓶颈                         | Hadoop-hdfs、Hadoop-spark           |
+| middleware         | 中间件框架   | 算力瓶颈、网络瓶颈                         | Dubbo                               |
+| in-memory-database | 内存数据库   | 内存瓶颈、IO瓶颈                           | Redis                               |
+| basic-test-suite   | 基础测试套   | 算力瓶颈、内存瓶颈                         | SPECCPU2006、SPECjbb2015            |
+| hpc                | 人类基因组   | 算力瓶颈、内存瓶颈、IO瓶颈                 | Gatk4                               |
+| storage            | 存储         | 网络瓶颈、IO瓶颈                           | Ceph                                |
+| virtualization     | 虚拟化       | 算力瓶颈、内存瓶颈、IO瓶颈                 | Consumer-cloud、Mariadb             |
+| docker             | 容器         | 算力瓶颈、内存瓶颈、IO瓶颈                 | Mariadb                             |
 
 
 
@@ -146,10 +148,10 @@ A-Tune支持单机模式和分布式模式安装：
 
 ```shell
 [local] 
- name=local 
- baseurl=file:///mnt 
- gpgcheck=1 
- enabled=1
+name=local 
+baseurl=file:///mnt 
+gpgcheck=1 
+enabled=1
 ```
 
 **步骤 3**   导入公钥。
@@ -166,6 +168,7 @@ rpm --import /mnt/RPM-GPG-KEY-openEuler
 
 ```shell
 # yum install atune -y
+# yum install atune-engine -y
 ```
 
 **步骤 5**   若为分布式部署，请在相关服务器上安装A-Tune客户端。
@@ -181,6 +184,7 @@ rpm --import /mnt/RPM-GPG-KEY-openEuler
  atune-client-xxx 
  atune-db-xxx 
  atune-xxx
+ atune-engine-xxx
 ```
 
 有如上回显信息表示安装成功。
@@ -202,8 +206,30 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 - protocol：系统grpc服务使用的协议，unix或tcp，unix为本地socket通信方式，tcp为socket监听端口方式。默认为unix。
 - address：系统grpc服务的侦听地址，默认为unix socket，若为分布式部署，需修改为侦听的ip地址。
 - port：系统grpc服务的侦听端口，范围为0~65535未使用的端口。如果protocol配置是unix，则不需要配置。
-- rest_port：系统restservice的侦听端口, 范围为0~65535未使用的端口。
-- sample_num：系统执行analysis流程时采集样本的数量。
+- connect：若为集群部署时，atune所在节点的ip列表，ip地址以逗号分隔。
+- rest_host：系统rest service的侦听地址，默认为localhost。
+- rest_port：系统rest service的侦听端口, 范围为0~65535未使用的端口，默认为8383。
+- engine_host：与系统atune engine service链接的地址。
+- engine_port：与系统atune engine service链接的端口。
+- sample_num：系统执行analysis流程时采集样本的数量，默认为20。
+- interval：系统执行analysis流程时采集样本的间隔时间，默认为5s。
+- grpc_tls：系统grpc的SSL/TLS证书校验开关，默认不开启。开启grpc_tls后，atune-adm命令在使用前需要设置以下环境变量方可与服务端进行通讯：
+  - export ATUNE_TLS=yes
+  - export ATUNED_CACERT=<客户端CA证书路径>
+  - export ATUNED_CLIENTCERT=<客户端证书路径>
+  - export ATUNED_CLIENTKEY=<客户端秘钥路径>
+  - export ATUNED_SERVERCN=server
+- tlsservercafile：gPRC服务端CA证书路径。
+- tlsservercertfile：gPRC服务端证书路径。
+- tlsserverkeyfile：gPRC服务端秘钥路径。
+- rest_tls：系统rest service的SSL/TLS证书校验开关，默认开启。
+- tlsrestcacertfile：系统rest service的服务端CA证书路径。
+- tlsrestservercertfile：系统rest service的服务端证书路径
+- tlsrestserverkeyfile：系统rest service的服务端秘钥路径。
+- engine_tls：系统atune engine service的SSL/TLS证书校验开关，默认开启。
+- tlsenginecacertfile：系统atune engine service的客户端CA证书路径。
+- tlsengineclientcertfile：系统atune engine service的客户端证书路径
+- tlsengineclientkeyfile：系统atune engine service的客户端秘钥路径。
 
 **system信息**
 
@@ -215,29 +241,22 @@ system为系统执行相关的优化需要用到的参数信息，必须根据�
 
 - user：执行ulimit相关优化时用到的用户名。目前只支持root用户。
 
-- tls：开启A-Tune的gRPC和http服务SSL/TLS证书校验，默认不开启。开启TLS后atune-adm命令在使用前需要设置以下环境变量方可与服务端进行通讯：
-
-  - export ATUNE_TLS=yes
-
-  - export ATUNE_CLICERT=<客户端证书路径>
-
--  tlsservercertfile：gPRC服务端证书路径。
-
--  tlsserverkeyfile：gPRC服务端秘钥路径。
-
--  tlshttpcertfile：http服务端证书路径。
-
--  tlshttpkeyfile：http服务端秘钥路径。
-
--  tlshttpcacertfile：http服务端CA证书路径。
 
 **日志信息**
 
-根据情况修改日志的路径和级别，默认的日志信息在/var/log/messages中。
+根据情况修改日志的级别，默认为info级别，日志信息打印在/var/log/messages中。
 
 **monitor信息**
 
 为系统启动时默认采集的系统硬件信息。
+
+**tuning信息**
+
+tuning为系统进行离线调优时需要用到的参数信息。
+
+- noise：高斯噪声的评估值。
+
+- sel_feature：控制离线调优参数重要性排名输出的开关，默认关闭。
 
 **配置示例**
 
@@ -249,57 +268,130 @@ system为系统执行相关的优化需要用到的参数信息，必须根据�
  # ranges: unix or tcp 
  protocol = unix 
 
- # the address that the grpc server to bind to 
- # default is unix socket /var/run/atuned/atuned.sock 
- # ranges: /var/run/atuned/atuned.sock or ip 
+ # the address that the grpc server to bind to
+ # default is unix socket /var/run/atuned/atuned.sock
+ # ranges: /var/run/atuned/atuned.sock or ip address
  address = /var/run/atuned/atuned.sock 
 
- # the atuned grpc listening port, default is 60001 
- # the port can be set between 0 to 65535 which not be used 
- port = 60001 
+ # the atune nodes in cluster mode, separated by commas
+ # it is valid when protocol is tcp
+ # connect = ip01,ip02,ip03
 
- # the rest service listening port, default is 8383 
- # the port can be set between 0 to 65535 which not be used 
- rest_port = 8383 
+ # the atuned grpc listening port
+ # the port can be set between 0 to 65535 which not be used
+ # port = 60001
 
- # when run analysis command, the numbers of collected data. 
- # default is 20 
- sample_num = 20 
+ # the rest service listening port, default is 8383
+ # the port can be set between 0 to 65535 which not be used
+ rest_host = localhost
+ rest_port = 8383
 
- # Enable gRPC and http server authentication SSL/TLS 
- # default is false 
- # tls = true 
- # tlsservercertfile = /etc/atuned/server.pem 
- # tlsserverkeyfile = /etc/atuned/server.key 
- # tlshttpcertfile = /etc/atuned/http/server.pem 
- # tlshttpkeyfile = /etc/atuned/http/server.key 
- # tlshttpcacertfile = /etc/atuned/http/cacert.pem 
+ # the tuning optimizer host and port, start by engine.service
+ # if engine_host is same as rest_host, two ports cannot be same
+ # the port can be set between 0 to 65535 which not be used
+ engine_host = localhost
+ engine_port = 3838
+
+ # when run analysis command, the numbers of collected data.
+ # default is 20
+ sample_num = 20
+
+ # interval for collecting data, default is 5s
+ interval = 5
+
+ # enable gRPC authentication SSL/TLS
+ # default is false
+ # grpc_tls = false
+ # tlsservercafile = /etc/atuned/grpc_certs/ca.crt
+ # tlsservercertfile = /etc/atuned/grpc_certs/server.crt
+ # tlsserverkeyfile = /etc/atuned/grpc_certs/server.key
+
+ # enable rest server authentication SSL/TLS
+ # default is true
+ rest_tls = true
+ tlsrestcacertfile = /etc/atuned/rest_certs/ca.crt
+ tlsrestservercertfile = /etc/atuned/rest_certs/server.crt
+ tlsrestserverkeyfile = /etc/atuned/rest_certs/server.key
+
+ # enable engine server authentication SSL/TLS
+ # default is true
+ engine_tls = true
+ tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
+ tlsengineclientcertfile = /etc/atuned/engine_certs/client.crt
+ tlsengineclientkeyfile = /etc/atuned/engine_certs/client.key
+
 
  #################################### log ############################### 
- # Either "debug", "info", "warn", "error", "critical", default is "info" 
- level = info 
+ [log]
+ # either "debug", "info", "warn", "error", "critical", default is "info"
+ level = info
 
  #################################### monitor ############################### 
- [monitor] 
- # With the module and format of the MPI, the format is {module}_{purpose} 
- # The module is Either "mem", "net", "cpu", "storage" 
- # The purpose is "topo" 
- module = mem_topo, cpu_topo 
+ [monitor]
+ # with the module and format of the MPI, the format is {module}_{purpose}
+ # the module is Either "mem", "net", "cpu", "storage"
+ # the purpose is "topo"
+ module = mem_topo, cpu_topo
 
  #################################### system ############################### 
- # you can add arbitrary key-value here, just like key = value 
- # you can use the key in the profile 
- [system] 
- # the disk to be analysis 
- disk = sda 
+ # you can add arbitrary key-value here, just like key = value
+ # you can use the key in the profile
+ [system]
+ # the disk to be analysis
+ disk = sda
 
- # the network to be analysis 
- network = enp189s0f0 
+ # the network to be analysis
+ network = enp189s0f0
 
  user = root
+ 
+ #################################### tuning ###############################
+ # tuning configs
+ [tuning]
+ noise = 0.000000001
+ sel_feature = false
 ```
 
+A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
 
+**A-Tune engine服务启动配置**
+
+可根据需要进行修改。
+
+- engine_host：系统atune engine service的侦听地址，默认为localhost。
+- engine_port：系统atune engine service的侦听端口，范围为0~65535未使用的端口，默认为3838。
+- engine_tls：系统atune engine service的SSL/TLS证书校验开关，默认开启。
+- tlsenginecacertfile：系统atune engine service的服务端CA证书路径。
+- tlsengineservercertfile：系统atune engine service的服务端证书路径
+- tlsengineserverkeyfile：系统atune engine service的服务端秘钥路径。
+
+**日志信息**
+
+根据情况修改日志的级别，默认为info级别，日志信息打印在/var/log/messages中。
+
+**配置示例**
+
+```shell
+ #################################### engine ###############################
+ [server]
+ # the tuning optimizer host and port, start by engine.service
+ # if engine_host is same as rest_host, two ports cannot be same
+ # the port can be set between 0 to 65535 which not be used
+ engine_host = localhost
+ engine_port = 3838
+
+ # enable engine server authentication SSL/TLS
+ # default is true
+ engine_tls = true
+ tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
+ tlsengineservercertfile = /etc/atuned/engine_certs/server.crt
+ tlsengineserverkeyfile = /etc/atuned/engine_certs/server.key
+
+ #################################### log ###############################
+ [log]
+ # either "debug", "info", "warn", "error", "critical", default is "info"
+ level = info
+```
 
 ## 2.5 启动A-Tune
 
@@ -321,6 +413,26 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
 ![004-zh_atune-img](figures/004-en_atune-img.png)
 
+## 2.6 启动A-Tune engine
+
+若需要使用AI相关的功能，需要启动A-Tune engine服务才能使用。
+
+- 启动atune-engine服务：
+
+  ```shell
+  # systemctl start atune-engine
+  ```
+
+- 查询atune-engine服务状态：
+
+  ```shell
+  # systemctl status atune-engine
+  ```
+
+若回显为如下，则服务启动成功。
+
+![004-zh_atune-img](figures/004-en_atune-engine-img.png)
+
 # 3 使用方法
 
 用户可以通过命令行客户端atune-adm使用A-Tune提供的功能。本章介绍A-Tune客户端包含的功能和使用方法。
@@ -339,10 +451,6 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
 - 命令格式中，[ ] 表示参数可选，<> 表示参数必选，具体参数由实际情况确定。
 
-- 命令格式中，各命令含义如下：
-  - WORKLOAD_TYPE：用户自定义负载类型的名称，负载支持的类型参考list命令查询结果。
-  - PROFILE_NAME：用户自定义profile的名称
-  - PROFILE_PATH：用户自定义profile的路径
 
 ## 3.2 查询负载类型
 
@@ -350,7 +458,7 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
 **功能描述**
 
-查询系统当前支持的workload_type和对应的profile，以及当前处于active状态的profile。
+查询系统当前支持的profile，以及当前处于active状态的profile。
 
 **命令格式**
 
@@ -361,33 +469,107 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 ```shell
 # atune-adm list 
 
- Support WorkloadTypes: 
-+-----------------------------------+------------------------+-----------+
-| WorkloadType                      | ProfileName            | Active    |
-+===================================+========================+===========+
-| default                           | default                | true      |
-+-----------------------------------+------------------------+-----------+
-| webserver                         | ssl_webserver          | false     |
-+-----------------------------------+------------------------+-----------+
-| big_database                      | database               | false     |
-+-----------------------------------+------------------------+-----------+
-| big_data                          | big_data               | false     |
-+-----------------------------------+------------------------+-----------+
-| in-memory_computing               | in-memory_computing    | false     |
-+-----------------------------------+------------------------+-----------+
-| in-memory_database                | in-memory_database     | false     |
-+-----------------------------------+------------------------+-----------+
-| single_computer_intensive_jobs    | compute-intensive      | false     |
-+-----------------------------------+------------------------+-----------+
-| communication                     | rpc_communication      | false     |
-+-----------------------------------+------------------------+-----------+
-| idle                              | default                | false     |
-+-----------------------------------+------------------------+-----------+
+Support profiles:
++------------------------------------------------+-----------+
+| ProfileName                                    | Active    |
++================================================+===========+
+| arm-native-android-container-robox             | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-fio          | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-lmbench      | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-netperf      | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-stream       | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-unixbench    | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-speccpu-speccpu2006           | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-specjbb-specjbb2015           | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-hdd                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-ssd                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-bayesian                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-kmeans                   | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql1                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql10                    | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql2                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql3                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql4                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql5                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql6                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql7                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql8                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql9                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-tersort                  | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-wordcount                | false     |
++------------------------------------------------+-----------+
+| cloud-compute-kvm-host                         | false     |
++------------------------------------------------+-----------+
+| database-mariadb-2p-tpcc-c3                    | false     |
++------------------------------------------------+-----------+
+| database-mariadb-4p-tpcc-c3                    | false     |
++------------------------------------------------+-----------+
+| database-mongodb-2p-sysbench                   | false     |
++------------------------------------------------+-----------+
+| database-mysql-2p-sysbench-hdd                 | false     |
++------------------------------------------------+-----------+
+| database-mysql-2p-sysbench-ssd                 | false     |
++------------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-hdd            | false     |
++------------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-ssd            | false     |
++------------------------------------------------+-----------+
+| default-default                                | false     |
++------------------------------------------------+-----------+
+| docker-mariadb-2p-tpcc-c3                      | false     |
++------------------------------------------------+-----------+
+| docker-mariadb-4p-tpcc-c3                      | false     |
++------------------------------------------------+-----------+
+| hpc-gatk4-human-genome                         | false     |
++------------------------------------------------+-----------+
+| in-memory-database-redis-redis-benchmark       | false     |
++------------------------------------------------+-----------+
+| middleware-dubbo-dubbo-benchmark               | false     |
++------------------------------------------------+-----------+
+| storage-ceph-vdbench-hdd                       | false     |
++------------------------------------------------+-----------+
+| storage-ceph-vdbench-ssd                       | false     |
++------------------------------------------------+-----------+
+| virtualization-consumer-cloud-olc              | false     |
++------------------------------------------------+-----------+
+| virtualization-mariadb-2p-tpcc-c3              | false     |
++------------------------------------------------+-----------+
+| virtualization-mariadb-4p-tpcc-c3              | false     |
++------------------------------------------------+-----------+
+| web-apache-traffic-server-spirent-pingpo       | false     |
++------------------------------------------------+-----------+
+| web-nginx-http-long-connection                 | true      |
++------------------------------------------------+-----------+
+| web-nginx-https-short-connection               | false     |
++------------------------------------------------+-----------+
 ```
 
 > ![zh-cn_image_note](figures/zh-cn_image_note.png)
 >
-> Active为true表示当前激活的profile，示例表示当前激活的是default类型对应的profile。
+> Active为true表示当前激活的profile，示例表示当前激活的profile是web-nginx-http-long-connection。
 
 ## 3.3 分析负载类型并自优化
 
@@ -405,19 +587,26 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
 - OPTIONS
 
-| 参数        | 描述                   |
-| ----------- | ---------------------- |
-| --model, -m | 用户自训练产生的新模型 |
+| 参数                   | 描述                                       |
+| ---------------------- | ------------------------------------------ |
+| --model, -m            | 用户自训练产生的新模型                     |
+| --characterization, -c | 使用默认的模型进行应用识别，不进行自动优化 |
 
 **使用示例**
 
-- 使用默认的模型进行分类识别
+- 使用默认的模型进行应用识别
+
+  ```shell
+  # atune-adm analysis --characterization
+  ```
+
+- 使用默认的模型进行应用识别，并进行自动优化
 
   ```shell
   # atune-adm analysis
   ```
 
-- 使用自训练的模型进行识别
+- 使用自训练的模型进行应用识别
 
   ```shell
   # atune-adm analysis --model /usr/libexec/atuned/analysis/models/new-model.m
@@ -427,9 +616,9 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 
 A-Tune支持用户定义并学习新模型。定义新模型的操作流程如下：
 
-​                **步骤 1**   用define命令定义workload_type和profile
+​                **步骤 1**   用define命令定义一个新应用的profile
 
-​                **步骤 2**   用collection命令收集workload_type对应的画像数据
+​                **步骤 2**   用collection命令收集应用对应的系统数据
 
 ​                **步骤 3**   用train命令训练得到模型
 
@@ -439,49 +628,47 @@ A-Tune支持用户定义并学习新模型。定义新模型的操作流程如�
 
 **功能描述**
 
-添加用户自定义的workload_type，及对应的profile优化项。
+添加用户自定义的应用场景，及对应的profile优化项。
 
 **命令格式**
 
-**atune-adm define** <WORKLOAD_TYPE> <PROFILE_NAME> <PROFILE_PATH>
+**atune-adm define** <service_type> <application_name> <scenario_name> <profile_path>
 
 **使用示例**
 
-新增一个workload type，workload type的名称为test_type，profile name的名称为test_name，优化项的配置文件为example.conf。
+新增一个profile，service_type的名称为test_service，application_name的名称为test_app，scenario_name的名称为test_scenario，优化项的配置文件为example.conf。
 
 ```shell
-# atune-adm define test_type test_name ./example.conf
+# atune-adm define test_service test_app test_scenario ./example.conf
 ```
 
 example.conf 可以参考如下方式书写（以下各优化项非必填，仅供参考），也可通过**atune-adm info**查看已有的profile是如何书写的。
 
 ```shell
-[main] 
- # list its parent profile 
- [tip] 
- # the recommended optimization, which should be performed manunaly 
- [check] 
- # check the environment 
- [affinity.irq] 
- # to change the affinity of irqs 
- [affinity.task] 
- # to change the affinity of tasks 
- [bios] 
- # to change the bios config 
- [bootloader.grub2] 
- # to change the grub2 config 
- [kernel_config] 
- # to change the kernel config 
- [script] 
- # the script extention of cpi 
- [sysctl] 
- # to change the /proc/sys/* config 
- [sysfs] 
- # to change the /sys/* config 
- [systemctl] 
- # to change the system service config 
- [ulimit] 
+ [main]
+ # list its parent profile
+ [kernel_config]
+ # to change the kernel config
+ [bios]
+ # to change the bios config
+ [bootloader.grub2]
+ # to change the grub2 config
+ [sysfs]
+ # to change the /sys/* config
+ [systemctl]
+ # to change the system service status
+ [sysctl]
+ # to change the /proc/sys/* config
+ [script]
+ # the script extention of cpi
+ [ulimit]
  # to change the resources limit of user
+ [schedule_policy]
+ # to change the schedule policy
+ [check]
+ # check the environment
+ [tip]
+ # the recommended optimization, which should be performed manunaly
 ```
 
 ### 3.4.2 collection
@@ -498,37 +685,37 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **命令格式**
 
-**atune-adm collection** <OPTIONS>
+**atune-adm collection** <OPTINOS*>*
 
 **参数说明**
 
 - OPTIONS
 
-| 参数                | 描述                                                 |
-| ------------------- | ---------------------------------------------------- |
-| --filename, -f      | 生成的用于训练的csv文件名：*名称**-**时间戳*.csv     |
-| --output_path, -o   | 生成的csv文件的存放路径，需提供绝对路径              |
-| --disk, -b          | 业务运行时实际使用的磁盘，如/dev/sda                 |
-| --network, -n       | 业务运行时使用的网络接口，如eth0                     |
-| --workload_type, -t | 标记业务的负载类型，作为训练时使用的标签             |
-| --duration, -d      | 业务运行时采集数据的时间，单位秒，默认采集时间1200秒 |
-| --interval，-i      | 采集数据的时间间隔，单位秒，默认采集间隔5秒          |
+| 参数              | 描述                                                 |
+| ----------------- | ---------------------------------------------------- |
+| --filename, -f    | 生成的用于训练的csv文件名：*名称**-**时间戳*.csv     |
+| --output_path, -o | 生成的csv文件的存放路径，需提供绝对路径              |
+| --disk, -b        | 业务运行时实际使用的磁盘，如/dev/sda                 |
+| --network, -n     | 业务运行时使用的网络接口，如eth0                     |
+| --app_type, -t    | 标记业务的应用类型，作为训练时使用的标签             |
+| --duration, -d    | 业务运行时采集数据的时间，单位秒，默认采集时间1200秒 |
+| --interval，-i    | 采集数据的时间间隔，单位秒，默认采集间隔5秒          |
 
 **使用示例**
 
 ```shell
-# atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home/data --disk sda --network eth0 --workload_type test_type 
+# atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home/data --disk sda --network eth0 --app_type test_type 
 ```
 
 ### 3.4.3 train
 
 **功能描述**
 
-使用采集的数据进行模型的训练。训练时至少采集两种workload_type的数据，否则训练会出错。
+使用采集的数据进行模型的训练。训练时至少采集两种应用类型的数据，否则训练会出错。
 
 **命令格式**
 
-**atune-adm train** <OPTIONS>
+**atune-adm train** <OPTINOS*>*
 
 **参数说明**
 
@@ -551,18 +738,18 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **功能描述**
 
-删除用户自定义的workload_type。
+删除用户自定义的profile。
 
 **命令格式**
 
-**atune-adm undefine** <WORKLOAD_TYPE>
+**atune-adm undefine** <profile*>*
 
 **使用示例**
 
-删除自定义的负载类型test_type。
+删除自定义的profile。
 
 ```shell
-# atune-adm undefine test_type 
+# atune-adm undefine test_service-test_app-test_scenario
 ```
 
 
@@ -573,94 +760,89 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **功能描述**
 
-查看workload_type对应的profile内容。
+查看对应的profile内容。
 
 **命令格式**
 
-**atune-adm info** <WORKLOAD_TYPE*>*
+**atune-adm info** <profile*>*
 
 **使用示例**
 
-查看webserver的profile内容：
+查看web-nginx-http-long-connection的profile内容：
 
 ```shell
-# atune-adm info webserver
+# atune-adm info web-nginx-http-long-connection
 
-*** ssl_webserver: 
+*** web-nginx-http-long-connection:
 
- # 
- # webserver tuned configuration 
- # 
- [main] 
- #TODO CONFIG 
+#
+# nginx http long connection A-Tune configuration
+#
+[main]
+include = default-default
 
- [kernel_config] 
- #TODO CONFIG 
+[kernel_config]
+#TODO CONFIG
 
- [bios] 
- #TODO CONFIG 
+[bios]
+#TODO CONFIG
 
- [sysfs] 
- #TODO CONFIG 
+[bootloader.grub2]
+iommu.passthrough = 1
 
- [sysctl] 
- fs.file-max=6553600 
- fs.suid_dumpable = 1 
- fs.aio-max-nr = 1048576 
- kernel.shmmax = 68719476736 
- kernel.shmall = 4294967296 
- kernel.shmmni = 4096 
- kernel.sem = 250 32000 100 128 
- net.ipv4.tcp_tw_reuse = 1 
- net.ipv4.tcp_syncookies = 1 
- net.ipv4.ip_local_port_range = 1024   65500 
- net.ipv4.tcp_max_tw_buckets = 5000 
- net.core.somaxconn = 65535 
- net.core.netdev_max_backlog = 262144 
- net.ipv4.tcp_max_orphans = 262144 
- net.ipv4.tcp_max_syn_backlog = 262144 
- net.ipv4.tcp_timestamps = 0 
- net.ipv4.tcp_synack_retries = 1 
- net.ipv4.tcp_syn_retries = 1 
- net.ipv4.tcp_fin_timeout = 1 
- net.ipv4.tcp_keepalive_time = 60 
- net.ipv4.tcp_mem = 362619   483495  725238 
- net.ipv4.tcp_rmem = 4096     87380  6291456 
- net.ipv4.tcp_wmem = 4096     16384  4194304 
- net.core.wmem_default = 8388608 
- net.core.rmem_default = 8388608 
- net.core.rmem_max = 16777216 
- net.core.wmem_max = 16777216 
+[sysfs]
+#TODO CONFIG
 
- [systemctl] 
- sysmonitor=stop 
- irqbalance=stop 
+[systemctl]
+sysmonitor = stop
+irqbalance = stop
 
- [bootloader.grub2] 
- iommu.passthrough=1 
+[sysctl]
+fs.file-max = 6553600
+fs.suid_dumpable = 1
+fs.aio-max-nr = 1048576
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_local_port_range = 1024     65500
+net.ipv4.tcp_max_tw_buckets = 5000
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 262144
+net.ipv4.tcp_max_orphans = 262144
+net.ipv4.tcp_max_syn_backlog = 262144
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_synack_retries = 1
+net.ipv4.tcp_syn_retries = 1
+net.ipv4.tcp_fin_timeout = 1
+net.ipv4.tcp_keepalive_time = 60
+net.ipv4.tcp_mem =  362619      483495   725238
+net.ipv4.tcp_rmem = 4096         87380   6291456
+net.ipv4.tcp_wmem = 4096         16384   4194304
+net.core.wmem_default = 8388608
+net.core.rmem_default = 8388608
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
 
- [tip] 
- bind your master process to the CPU near the network = affinity 
- bind your network interrupt to the CPU that has this network = affinity 
- relogin into the system to enable limits setting = OS 
- SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = OS
+[script]
+prefetch = off
+ethtool =  -X {network} hfunc toeplitz
 
- [script] 
- openssl_hpre = 0 
- prefetch = off 
+[ulimit]
+{user}.hard.nofile = 102400
+{user}.soft.nofile = 102400
 
- [ulimit] 
- {user}.hard.nofile = 102400 
- {user}.soft.nofile = 102400 
+[schedule_policy]
+#TODO CONFIG
 
- [affinity.task] 
- #TODO CONFIG 
+[check]
+#TODO CONFIG
 
- [affinity.irq] 
- #TODO CONFIG 
-
- [check] 
- #TODO CONFIG 
+[tip]
+SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = kernel
+disable the nginx log = application
 ```
 
 ## 3.6 更新profile
@@ -671,18 +853,18 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **功能描述**
 
-将workload_type原来的优化项更新为new.conf中的内容。
+将已有profile中原来的优化项更新为new.conf中的内容。
 
 **命令格式**
 
-**atune-adm update** <WORKLOAD_TYPE> <PROFILE_NAME> <PROFILE_FILE>
+**atune-adm update** <profile*>* <profile_path*>*
 
 **使用示例**
 
-更新负载类型为test_type，优化项名称为test_name的优化项为new.conf。
+更新名为test_service-test_app-test_scenario的profile优化项为new.conf。
 
 ```shell
-# atune-adm update test_type test_name ./new.conf
+# atune-adm update test_service-test_app-test_scenario ./new.conf
 ```
 
 ## 3.7 激活profile
@@ -691,22 +873,22 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **功能描述**
 
-手动激活workload_type对应的profile，使得workload_type处于active状态。
+手动激活profile，使其处于active状态。
 
 **命令格式**
 
-**atune-adm profile** *<*WORKLOAD_TYPE*>*
+**atune-adm profile** *<*profile*>*
 
 **参数说明**
 
-WORKLOAD_TYPE支持的类型参考list命令查询结果。
+profile名参考list命令查询结果。
 
 **使用示例**
 
-激活webserver对应的profile配置。
+激活web-nginx-http-long-connection对应的profile配置。
 
 ```shell
-# atune-adm profile webserver
+# atune-adm profile web-nginx-http-long-connection
 ```
 
 ## 3.8 回滚profile
@@ -803,9 +985,11 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 
 > ![zh-cn_image_note](figures/zh-cn_image_note.png)
 >
-> - 本命令依赖采样工具perf，mpstat，vmstat，iostat，sar。
+> 在运行命令前，确保以下条件已经满足：
 >
-> - CPU型号目前仅支持鲲鹏920，可通过dmidecode -t processor检查CPU型号。
+> - 服务端的yaml配置文件已经编辑完成并放置于 atuned服务下的**/etc/atuned/tuning/**目录中
+>
+> - 客户端的yaml配置文件已经编译完成并放置于atuned客户端下
 
 **参数说明**
 
@@ -815,12 +999,14 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 | ------------- | ---------------------------------- |
 | --restore, -r | 恢复tuning优化前的初始配置         |
 | --project, -p | 指定需要恢复的yaml文件中的项目名称 |
+| --restart, -c | 基于历史调优结果进行调优           |
+| --detail, -d  | 打印tuning过程的详细信息           |
 
  
 
 > ![zh-cn_image_note](figures/zh-cn_image_note.png)
 >
->  当使用参数时，上述两个参数需要同时使用，且-p参数后需要跟具体的项目名称。
+>  当使用参数时，-p参数后需要跟具体的项目名称且必须指定该项目yaml文件。
 
 - PROJECT_YAML：客户端yaml配置文件。
 
@@ -853,18 +1039,23 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 | step         | 参数值步长，dtype为int时使用                                 | 整型         | 用户自定义                         |
 | items        | 参数值在scope定义范围之外的枚举值，dtype为int时使用          | 整型         | 用户自定义，取值在该参数的合法范围 |
 | options      | 参数值的枚举范围，dtype为string时使用                        | 字符串       | 用户自定义，取值在该参数的合法范围 |
-| ref          | 参数的推荐初始值                                             | 整型或字符串 | 用户自定义，取值在该参数的合法范围 |
 
  
 
 表3-3 客户端yaml文件配置说明
 
-| **配置名称** | **配置说明**                                      | **参数类型** | **取值范围** |
-| ------------ | ------------------------------------------------- | ------------ | ------------ |
-| project      | 项目名称，需要与服务端对应配置文件中的project匹配 | 字符串       | -            |
-| iterations   | 调优迭代次数                                      | 整型         | >=10         |
-| benchmark    | 性能测试脚本                                      | -            | -            |
-| evaluations  | 性能测试评估指标  evaluations 配置项请参见表3-4   | -            | -            |
+| **配置名称**          | **配置说明**                                      | **参数类型** | **取值范围**                                      |
+| --------------------- | ------------------------------------------------- | ------------ | ------------------------------------------------- |
+| project               | 项目名称，需要与服务端对应配置文件中的project匹配 | 字符串       | -                                                 |
+| engine                | 调优算法                                          | 字符串       | "random", "forest", "gbrt", "bayes", "extraTrees" |
+| iterations            | 调优迭代次数                                      | 整型         | >= 10                                             |
+| random_starts         | 随机迭代次数                                      | 整型         | < iterations                                      |
+| feature_filter_engine | 参数搜索算法                                      | 字符串       | "lhs"                                             |
+| feature_filter_cycle  | 参数搜索轮数                                      | 整型         | -                                                 |
+| feature_filter_iters  | 每轮参数搜索的迭代次数                            | 整型         | -                                                 |
+| split_count           | 调优参数取值范围中均匀选取的参数个数              | 整型         | -                                                 |
+| benchmark             | 性能测试脚本                                      | -            | -                                                 |
+| evaluations           | 性能测试评估指标  evaluations 配置项请参见表3-4   | -            | -                                                 |
 
  
 
@@ -885,101 +1076,60 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 服务端yaml文件配置示例：
 
 ```yaml
-project: "example"
-maxiterations: 10
+project: "compress"
+maxiterations: 500
 startworkload: ""
 stopworkload: ""
 object :
   -
-    name : "vm.swappiness"
+    name : "compressLevel"
     info :
-        desc : "the vm.swappiness"
-        get : "sysctl -a | grep vm.swappiness"
-        set : "sysctl -w vm.swappiness=$value"
-        needrestart: "false"
+        desc : "The compresslevel parameter is an integer from 1 to 9 controlling the level of compression"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressLevel=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/compressLevel=\\s*[0-9]*/compressLevel=$value/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
         type : "continuous"
         scope :
-          - 0
-          - 10
-        ref : 1
-  -
-    name : "irqbalance"
-    info :
-        desc : "system irqbalance"
-        get : "systemctl status irqbalance"
-        set : "systemctl $value sysmonitor;systemctl $value irqbalance"
-        needrestart: "false"
-        type : "discrete"
-        options:
-          - "start"
-          - "stop"
-        dtype : "string"
-        ref : "start"
-  -
-    name : "net.tcp_min_tso_segs"
-    info :
-        desc : "the minimum tso number"
-        get : "cat /proc/sys/net/ipv4/tcp_min_tso_segs"
-        set : "echo $value > /proc/sys/net/ipv4/tcp_min_tso_segs"
-        needrestart: "false"
-        type : "continuous"
-        scope:
           - 1
-          - 16
-        ref : 2
+          - 9
+        dtype : "int"
   -
-    name : "prefetcher"
+    name : "compressMethod"
     info :
-        desc : ""
-        get : "cat /sys/class/misc/prefetch/policy"
-        set : "echo $value > /sys/class/misc/prefetch/policy"
-        needrestart: "false"
+        desc : "The compressMethod parameter is a string controlling the compression method"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressMethod=' | awk -F '=' '{print $2}' | sed 's/\"//g'"
+        set : "sed -i 's/compressMethod=\\s*[0-9,a-z,\"]*/compressMethod=\"$value\"/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
         type : "discrete"
-        options:
-          - "0"
-          - "15"
+        options :
+          - "bz2"
+          - "zlib"
+          - "gzip"
         dtype : "string"
-        ref : "15"
-  -
-    name : "kernel.sched_min_granularity_ns"
-    info :
-        desc : "Minimal preemption granularity for CPU-bound tasks"
-        get : "sysctl kernel.sched_min_granularity_ns"
-        set : "sysctl -w kernel.sched_min_granularity_ns=$value"
-        needrestart: "false"
-        type : "continuous"
-        scope:
-          - 5000000
-          - 50000000
-        ref : 10000000
-  -
-    name : "kernel.sched_latency_ns"
-    info :
-        desc : ""
-        get : "sysctl kernel.sched_latency_ns"
-        set : "sysctl -w kernel.sched_latency_ns=$value"
-        needrestart: "false"
-        type : "continuous"
-        scope:
-          - 10000000
-          - 100000000
-        ref : 16000000
 ```
 
 客户端yaml文件配置示例：
 
 ```yaml
-project: "example" 
- iterations : 10 
- benchmark : "sh /home/Benchmarks/mysql/tunning_mysql.sh" 
- evaluations : 
-  - 
-   name: "tps" 
-   info: 
-     get: "echo -e '$out' |grep 'transactions:' |awk '{print $3}' | cut -c 2-" 
-     type: "negative" 
-     weight: 100 
-     threshold: 100
+project: "compress"
+engine : "gbrt"
+iterations : 20
+random_starts : 10
+
+benchmark : "python3 /root/A-Tune/examples/tuning/compress/compress.py"
+evaluations :
+  -
+    name: "time"
+    info:
+        get: "echo '$out' | grep 'time' | awk '{print $3}'"
+        type: "positive"
+        weight: 20
+  -
+    name: "compress_ratio"
+    info:
+        get: "echo '$out' | grep 'compress_ratio' | awk '{print $3}'"
+        type: "negative"
+        weight: 80
 ```
 
 **使用示例**
@@ -987,13 +1137,13 @@ project: "example"
 - 进行tuning调优
 
   ```shell
-  # atune-adm tuning example-client.yaml
+  # atune-adm tuning --project compress --detail compress_client.yaml
   ```
 
-- 恢复tuning调优前的初始配置，example为yaml文件中的项目名称
+- 恢复tuning调优前的初始配置，compress为yaml文件中的项目名称
 
   ```shell
-  # atune-adm tuning --restore --project example
+  # atune-adm tuning --restore --project compress
   ```
 
 
@@ -1058,9 +1208,8 @@ project: "example"
 
 表5-1 术语表
 
-| 术语          | 含义                                     |
-| ------------- | ---------------------------------------- |
-| workload_type | 负载类型，用于标记具有相同特征的一类业务 |
-| profile       | 优化项集合，最佳的参数配置               |
+| 术语    | 含义                       |
+| ------- | -------------------------- |
+| profile | 优化项集合，最佳的参数配置 |
 
  

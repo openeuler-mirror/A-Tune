@@ -62,29 +62,31 @@ Table 1-1 describes the main features supported by A-Tune, feature maturity, and
 
 **Table 1-1** Feature maturity
 
-| Feature                                                      | Maturity | Usage Suggestion |
-| ------------------------------------------------------------ | -------- | ---------------- |
-| Auto optimization of 11 applications in  seven workload types | Tested   | Pilot            |
-| User-defined workload types and service  models              | Tested   | Pilot            |
-| Automatic parameter optimization                             | Tested   | Pilot            |
+| Feature                                                    | Maturity | Usage Suggestion |
+| ---------------------------------------------------------- | -------- | ---------------- |
+| Auto optimization of 15 applications in  11 workload types | Tested   | Pilot            |
+| User-defined profile and service  models                   | Tested   | Pilot            |
+| Automatic parameter optimization                           | Tested   | Pilot            |
 
 **Supported Service Models**
 
-Based on the workload characteristics of applications, A-Tune classifies services into seven types. For details about the workload characteristics of each type and the applications supported by A-Tune, see Table 1-2.
+Based on the workload characteristics of applications, A-Tune classifies services into 11 types. For details about the bottleneck of each type and the applications supported by A-Tune, see Table 1-2.
 
 **Table 1-2** Supported workload types and applications
 
-| Workload                       | Type                                          | Workload Characteristic                                      | Supported Application                   |
-| ------------------------------ | --------------------------------------------- | ------------------------------------------------------------ | --------------------------------------- |
-| default                        | Default type                                  | The usage of CPU, memory bandwidth,  network, and I/O resources is low. | N/A                                     |
-| webserver                      | HTTPS application                             | The CPU usage is high.                                       | Nginx                                   |
-| big_database                   | Database                                      | - Relational database <br />Read: The usage of CPU, memory  bandwidth, and network is high.  Write: The usage of I/O is  high. <br />- Non-relational database<br />The usage of CPU and I/O is  high. | MongoDB, MySQL, PostgreSQL, and MariaDB |
-| big_data                       | Big data                                      | The usage of CPU and I/O is high.                            | Hadoop and Spark                        |
-| in-memory_computing            | Memory-intensive application                  | The usage of CPU and memory bandwidth is  high.              | SPECjbb2015                             |
-| in-memory_database             | Computing- and network-intensive  application | The usage of a single-core CPU is high,  and the network usage is high in multi-instance scenarios. | Redis                                   |
-| single_computer_intensive_jobs | Computing-intensive application               | The usage of a single-core CPU is high,  and the usage of memory bandwidth of some subitems is high. | SPECCPU2006                             |
-| communication                  | Network-intensive application                 | The usage of CPU and network is high.                        | Dubbo                                   |
-| idle                           | System in idle state                          | The system is in idle state and no  applications are running. | N/A                                     |
+| Workload           | Type                 | Workload Characteristic                                      | Supported Application               |
+| ------------------ | -------------------- | ------------------------------------------------------------ | ----------------------------------- |
+| default            | Default type         | The usage of CPU, memory bandwidth,  network, and I/O resources is low. | N/A                                 |
+| webserver          | Web application      | CPU and network bottleneck                                   | Nginx, Apache Traffic Server        |
+| database           | Database             | CPU, memory and IO bottleneck                                | Mongodb, Mysql, Postgresql, Mariadb |
+| big-data           | Big data             | CPU and memory bottleneck                                    | Hadoop-hdfs, Hadoop-spark           |
+| middleware         | Middleware framework | CPU and network bottleneck                                   | Dubbo                               |
+| in-memory-database | Memory database      | Memory and IO bottleneck                                     | Redis                               |
+| basic-test-suite   | Basic test suite     | CPU and memory bottleneck                                    | SPECCPU2006, SPECjbb2015            |
+| hpc                | Human genome         | CPU, memory and IO bottleneck                                | Gatk4                               |
+| storage            | Storage              | Network and IO bottleneck                                    | Ceph                                |
+| virtualization     | Virtualization       | CPU, memory and IO bottleneck                                | Consumer-cloud, Mariadb             |
+| docker             | Docker               | CPU, memory and IO bottleneck                                | Mariadb                             |
 
 
 
@@ -145,10 +147,10 @@ The configured contents are as follows:
 
 ```shell
 [local] 
- name=local 
- baseurl=file:///mnt 
- gpgcheck=1 
- enabled=1
+name=local 
+baseurl=file:///mnt 
+gpgcheck=1 
+enabled=1
 ```
 
 **Step 3** Import Public Key.
@@ -165,6 +167,7 @@ rpm --import /mnt/RPM-GPG-KEY-openEuler
 
 ```shell
 # yum install atune -y
+# yum install atune-engine -y
 ```
 
 **Step 5**   For a distributed mode, install an A-Tune client on associated server.
@@ -180,6 +183,7 @@ rpm --import /mnt/RPM-GPG-KEY-openEuler
  atune-client-xxx 
  atune-db-xxx 
  atune-xxx
+ atune-engine-xxx
 ```
 
 If the preceding information is displayed, the installation is successful.
@@ -201,8 +205,30 @@ You can modify the parameter value as required.
 - **protocol**: Protocol used by the gRPC service. The value can be **unix** or **tcp**. **unix** indicates the local socket communication mode, and **tcp** indicates the socket listening port mode. The default value is **unix**.
 - **address**: Listening IP address of the gRPC service. The default value is **unix socket**. If the gRPC service is deployed in distributed mode, change the value to the listening IP address.
 - **port**: Listening port of the gRPC server. The value ranges from 0 to 65535. If **protocol** is set to **unix**, you do not need to set this parameter.
-- **rest_port**: Listening port of the system REST service. The value ranges from 0 to 65535.
-- **sample_num**: Number of samples collected when the system executes the analysis process.
+- **connect**: IP address list of the nodes where the atune is deployed in a cluster. Use commas (,) to separate the IP addresses.
+- **rest_host**: Listening IP address of the system REST service. The default value is localhost.
+- **rest_port**: Listening port of the system REST service. The value ranges from 0 to 65535. The default value is 8383.
+- **engine_host**: IP address for connecting to the atune engine service.
+- **engine_port**: Port for connecting to the atune engine service.
+- **sample_num**: Number of samples collected when the system executes the analysis process. The default value is 20.
+- **interval**: Interval of samples collected when the system executes the analysis process. The default value is 5.
+- **grpc_tls**: SSL/TLS certificate verification for the gRPC of A-Tune. This is disabled by default. After grpc_tls is enabled, you need to set the following environment variables before running the **atune-adm** command to communicate with the server:
+  - export ATUNE_TLS=yes
+  - export ATUNED_CACERT=<Client ca certificate path>
+  - export ATUNED_CLIENTCERT=<Client certificate path>
+  - export ATUNED_CLIENTKEY=<Client key path>
+  - export ATUNED_SERVERCN=server
+- **tlsservercafile**: path of the gPRC server ca certificate.
+- **tlsservercertfile**: path of the gPRC server certificate.
+- **tlsserverkeyfile**: gPRC server key path.
+- **rest_tls**: SSL/TLS certificate verification for the rest service of A-Tune. This is enabled by default.
+- **tlsrestcacertfile**: path of the rest service ca certificate.
+- **tlsrestservercertfile**: path of the rest service certificate.
+- **tlsrestserverkeyfile**: the rest service key path.
+- **engine_tls**: SSL/TLS certificate verification for the engine service of A-Tune. This is enabled by default.
+- **tlsenginecacertfile**: path of the engine service ca certificate.
+- **tlsengineclientcertfile**: path of the engine service client certificate.
+- **tlsengineclientkeyfile**: the engine service client key path.
 
 **System information**
 
@@ -211,27 +237,21 @@ System is the parameter information required for system optimization. You must m
 - **disk**: Disk information to be collected during the analysis process or specified disk during disk optimization.
 - **network**: NIC information to be collected during the analysis process or specified NIC during NIC optimization.
 - **user**: User name used for ulimit optimization. Currently, only the user **root** is supported.
-- **tls**: SSL/TLS certificate verification for the gRPC and HTTP services of A-Tune. This is disabled by default. After TLS is enabled, you need to set the following environment variables before running the **atune-adm** command to communicate with the server:
-  - export ATUNE_TLS=yes
-  - export ATUNE_CLICERT=<Client certificate path>
-
-- **tlsservercertfile**: path of the gPRC server certificate.
-
-- **tlsserverkeyfile**: gPRC server key path.
-
-- **tlshttpcertfile**: HTTP server certificate path.
-
-- **tlshttpkeyfile**: HTTP server key path.
-
-- **tlshttpcacertfile**: CA certificate path of the HTTP server.
 
 **Log information**
 
-Change the log path and level based on the site requirements. By default, the log information is stored in **/var/log/messages**.
+Change the log level based on the site requirements. The default log level is info. The log information is stored in the **/var/log/messages**.
 
 **Monitor information**
 
 Hardware information that is collected by default when the system is started.
+
+**Tuning information**
+
+Tuning is the parameter information required for offline optimization.
+
+- **noise**: Evaluation value of Gaussian noise.
+- **sel_feature**: Control whether to output the importance ranking of offline optimization parameters. This is disabled by default. 
 
 **Example**
 
@@ -242,55 +262,130 @@ Hardware information that is collected by default when the system is started.
  # the protocol grpc server running on 
  # ranges: unix or tcp 
  protocol = unix 
- 
- # the address that the grpc server to bind to 
- # default is unix socket /var/run/atuned/atuned.sock 
- # ranges: /var/run/atuned/atuned.sock or ip 
+
+ # the address that the grpc server to bind to
+ # default is unix socket /var/run/atuned/atuned.sock
+ # ranges: /var/run/atuned/atuned.sock or ip address
  address = /var/run/atuned/atuned.sock 
- 
- # the atuned grpc listening port, default is 60001 
- # the port can be set between 0 to 65535 which not be used 
- port = 60001 
- 
- # the rest service listening port, default is 8383 
- # the port can be set between 0 to 65535 which not be used 
- rest_port = 8383 
- 
- # when run analysis command, the numbers of collected data. 
- # default is 20 
- sample_num = 20 
- 
- # Enable gRPC and http server authentication SSL/TLS 
- # default is false 
- # tls = true 
- # tlsservercertfile = /etc/atuned/server.pem 
- # tlsserverkeyfile = /etc/atuned/server.key 
- # tlshttpcertfile = /etc/atuned/http/server.pem 
- # tlshttpkeyfile = /etc/atuned/http/server.key 
- # tlshttpcacertfile = /etc/atuned/http/cacert.pem 
- 
+
+ # the atune nodes in cluster mode, separated by commas
+ # it is valid when protocol is tcp
+ # connect = ip01,ip02,ip03
+
+ # the atuned grpc listening port
+ # the port can be set between 0 to 65535 which not be used
+ # port = 60001
+
+ # the rest service listening port, default is 8383
+ # the port can be set between 0 to 65535 which not be used
+ rest_host = localhost
+ rest_port = 8383
+
+ # the tuning optimizer host and port, start by engine.service
+ # if engine_host is same as rest_host, two ports cannot be same
+ # the port can be set between 0 to 65535 which not be used
+ engine_host = localhost
+ engine_port = 3838
+
+ # when run analysis command, the numbers of collected data.
+ # default is 20
+ sample_num = 20
+
+ # interval for collecting data, default is 5s
+ interval = 5
+
+ # enable gRPC authentication SSL/TLS
+ # default is false
+ # grpc_tls = false
+ # tlsservercafile = /etc/atuned/grpc_certs/ca.crt
+ # tlsservercertfile = /etc/atuned/grpc_certs/server.crt
+ # tlsserverkeyfile = /etc/atuned/grpc_certs/server.key
+
+ # enable rest server authentication SSL/TLS
+ # default is true
+ rest_tls = true
+ tlsrestcacertfile = /etc/atuned/rest_certs/ca.crt
+ tlsrestservercertfile = /etc/atuned/rest_certs/server.crt
+ tlsrestserverkeyfile = /etc/atuned/rest_certs/server.key
+
+ # enable engine server authentication SSL/TLS
+ # default is true
+ engine_tls = true
+ tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
+ tlsengineclientcertfile = /etc/atuned/engine_certs/client.crt
+ tlsengineclientkeyfile = /etc/atuned/engine_certs/client.key
+
+
  #################################### log ############################### 
- # Either "debug", "info", "warn", "error", "critical", default is "info" 
- level = info 
- 
+ [log]
+ # either "debug", "info", "warn", "error", "critical", default is "info"
+ level = info
+
  #################################### monitor ############################### 
- [monitor] 
- # With the module and format of the MPI, the format is {module}_{purpose} 
- # The module is Either "mem", "net", "cpu", "storage" 
- # The purpose is "topo" 
- module = mem_topo, cpu_topo 
- 
+ [monitor]
+ # with the module and format of the MPI, the format is {module}_{purpose}
+ # the module is Either "mem", "net", "cpu", "storage"
+ # the purpose is "topo"
+ module = mem_topo, cpu_topo
+
  #################################### system ############################### 
- # you can add arbitrary key-value here, just like key = value 
- # you can use the key in the profile 
- [system] 
- # the disk to be analysis 
- disk = sda 
- 
- # the network to be analysis 
- network = enp189s0f0 
- 
+ # you can add arbitrary key-value here, just like key = value
+ # you can use the key in the profile
+ [system]
+ # the disk to be analysis
+ disk = sda
+
+ # the network to be analysis
+ network = enp189s0f0
+
  user = root
+ 
+ #################################### tuning ###############################
+ # tuning configs
+ [tuning]
+ noise = 0.000000001
+ sel_feature = false
+```
+
+The configuration items in the A-Tune engine configuration file **/etc/atuned/engine.cnf** are described as follows:
+
+**A-Tune engine service startup configuration**
+
+You can modify the parameter value as required.
+
+- **engine_host**: Listening IP address of the atune engine service. The default value is localhost.
+- **engine_port**: Listening port of the atune engine service. The value ranges from 0 to 65535. The default value is 3838.
+- **engine_tls**: SSL/TLS certificate verification for the engine service of A-Tune. This is enabled by default.
+- **tlsenginecacertfile**: path of the engine service ca certificate.
+- **tlsengineservercertfile**: path of the engine service server certificate.
+- **tlsengineserverkeyfile**: the engine service server key path.
+
+**Log information**
+
+Change the log level based on the site requirements. The default log level is info. The log information is stored in the **/var/log/messages**.
+
+**Example**
+
+```shell
+#################################### engine ###############################
+ [server]
+ # the tuning optimizer host and port, start by engine.service
+ # if engine_host is same as rest_host, two ports cannot be same
+ # the port can be set between 0 to 65535 which not be used
+ engine_host = localhost
+ engine_port = 3838
+
+ # enable engine server authentication SSL/TLS
+ # default is true
+ engine_tls = true
+ tlsenginecacertfile = /etc/atuned/engine_certs/ca.crt
+ tlsengineservercertfile = /etc/atuned/engine_certs/server.crt
+ tlsengineserverkeyfile = /etc/atuned/engine_certs/server.key
+
+ #################################### log ###############################
+ [log]
+ # either "debug", "info", "warn", "error", "critical", default is "info"
+ level = info
 ```
 
 ## 2.5 Starting A-Tune
@@ -308,6 +403,22 @@ l  To query the status of the atuned service, run the following command:
 If the following information is displayed, the service is started successfully:
 
 ![004-en_atune-img](figures/004-en_atune-img.png)
+
+## 2.6 Starting A-Tune engine
+
+To use AI-related functions, you need to start the A-Tune engine service.
+
+l  Start the atune engine service.
+
+\# **systemctl start atune-engine**
+
+l  To query the status of the atune-engine service, run the following command:
+
+\# **systemctl status atune-engine**
+
+If the following information is displayed, the service is started successfully:
+
+![004-en_atune-img](figures/004-en_atune-engine-img.png)
 
 # 3 Application Scenarios
 
@@ -327,13 +438,6 @@ You can use functions provided by A-Tune through the CLI client atune-adm. This 
 
 - In the command format, brackets ([]) indicate that the parameter is optional, and angle brackets (<>) indicate that the parameter is mandatory. The actual parameters prevail.
 
-- In the command format, meanings of each command are as follows:
-
-  - **WORKLOAD_TYPE**: name of a user-defined workload type. For details about the supported workload types, see the query result of the **list** command.
-
-  - **PROFILE_NAME**: user-defined profile name.
-
-  - **PROFILE_PATH**: path of the user-defined profile.
 
 ## 3.2 Querying Workload Types
 
@@ -341,7 +445,7 @@ You can use functions provided by A-Tune through the CLI client atune-adm. This 
 
 **Function**
 
-Query the supported workload types, profiles, and the values of Active.
+Query the supported profile, and the values of Active.
 
 **Format**
 
@@ -352,33 +456,107 @@ Query the supported workload types, profiles, and the values of Active.
 ```shell
 # atune-adm list
 
-Support WorkloadTypes:
-+-----------------------------------+------------------------+-----------+
-| WorkloadType                      | ProfileName            | Active    |
-+===================================+========================+===========+
-| default                           | default                | true      |
-+-----------------------------------+------------------------+-----------+
-| webserver                         | ssl_webserver          | false     |
-+-----------------------------------+------------------------+-----------+
-| big_database                      | database               | false     |
-+-----------------------------------+------------------------+-----------+
-| big_data                          | big_data               | false     |
-+-----------------------------------+------------------------+-----------+
-| in-memory_computing               | in-memory_computing    | false     |
-+-----------------------------------+------------------------+-----------+
-| in-memory_database                | in-memory_database     | false     |
-+-----------------------------------+------------------------+-----------+
-| single_computer_intensive_jobs    | compute-intensive      | false     |
-+-----------------------------------+------------------------+-----------+
-| communication                     | rpc_communication      | false     |
-+-----------------------------------+------------------------+-----------+
-| idle                              | default                | false     |
-+-----------------------------------+------------------------+-----------+
+Support profiles:
++------------------------------------------------+-----------+
+| ProfileName                                    | Active    |
++================================================+===========+
+| arm-native-android-container-robox             | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-fio          | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-lmbench      | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-netperf      | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-stream       | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-euleros-baseline-unixbench    | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-speccpu-speccpu2006           | false     |
++------------------------------------------------+-----------+
+| basic-test-suite-specjbb-specjbb2015           | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-hdd                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-ssd                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-bayesian                 | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-kmeans                   | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql1                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql10                    | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql2                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql3                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql4                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql5                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql6                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql7                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql8                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-sql9                     | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-tersort                  | false     |
++------------------------------------------------+-----------+
+| big-data-hadoop-spark-wordcount                | false     |
++------------------------------------------------+-----------+
+| cloud-compute-kvm-host                         | false     |
++------------------------------------------------+-----------+
+| database-mariadb-2p-tpcc-c3                    | false     |
++------------------------------------------------+-----------+
+| database-mariadb-4p-tpcc-c3                    | false     |
++------------------------------------------------+-----------+
+| database-mongodb-2p-sysbench                   | false     |
++------------------------------------------------+-----------+
+| database-mysql-2p-sysbench-hdd                 | false     |
++------------------------------------------------+-----------+
+| database-mysql-2p-sysbench-ssd                 | false     |
++------------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-hdd            | false     |
++------------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-ssd            | false     |
++------------------------------------------------+-----------+
+| default-default                                | false     |
++------------------------------------------------+-----------+
+| docker-mariadb-2p-tpcc-c3                      | false     |
++------------------------------------------------+-----------+
+| docker-mariadb-4p-tpcc-c3                      | false     |
++------------------------------------------------+-----------+
+| hpc-gatk4-human-genome                         | false     |
++------------------------------------------------+-----------+
+| in-memory-database-redis-redis-benchmark       | false     |
++------------------------------------------------+-----------+
+| middleware-dubbo-dubbo-benchmark               | false     |
++------------------------------------------------+-----------+
+| storage-ceph-vdbench-hdd                       | false     |
++------------------------------------------------+-----------+
+| storage-ceph-vdbench-ssd                       | false     |
++------------------------------------------------+-----------+
+| virtualization-consumer-cloud-olc              | false     |
++------------------------------------------------+-----------+
+| virtualization-mariadb-2p-tpcc-c3              | false     |
++------------------------------------------------+-----------+
+| virtualization-mariadb-4p-tpcc-c3              | false     |
++------------------------------------------------+-----------+
+| web-apache-traffic-server-spirent-pingpo       | false     |
++------------------------------------------------+-----------+
+| web-nginx-http-long-connection                 | true      |
++------------------------------------------------+-----------+
+| web-nginx-https-short-connection               | false     |
++------------------------------------------------+-----------+
 ```
 
 > ![en-us_image_note](figures/en-us_image_note.png)
 >
-> If the value of Active is **true**, the profile is activated. In the example, the profile of the default type is activated.
+> If the value of Active is **true**, the profile is activated. In the example, the profile of web-nginx-http-long-connection is activated.
 
 ## 3.3 Workload Type Analysis and Auto Optimization
 
@@ -396,13 +574,20 @@ Collect real-time statistics from the system to identify and automatically optim
 
 - OPTIONS
 
-| Parameter   | Description                              |
-| ----------- | ---------------------------------------- |
-| --model, -m | Model generated by user-defined training |
+| Parameter              | Description                                                  |
+| ---------------------- | ------------------------------------------------------------ |
+| --model, -m            | Model generated by user-defined training                     |
+| --characterization, -c | Use the default model for application identification and do not perform automatic optimization |
 
 **Example**
 
 Use the default model for classification and identification.
+
+```shell
+# atune-adm analysis --characterization
+```
+
+Use the default model for classification and identification and perform automatic optimization
 
 ```shell
 # atune-adm analysis
@@ -418,9 +603,9 @@ Use the user-defined training model for recognition.
 
 A-Tune allows users to define and learn new models. To define a new model, perform the following steps:
 
-​                   **Step 1**   Run the **define** command to define workload_type and profile.
+​                   **Step 1**   Run the **define** command to define a new profile.
 
-​                   **Step 2**   Run the **collection** command to collect the profile data corresponding to workload_type.
+​                   **Step 2**   Run the **collection** command to collect the system data corresponding to the application.
 
 ​                   **Step 3**   Run the **train** command to train the model.
 
@@ -430,49 +615,47 @@ A-Tune allows users to define and learn new models. To define a new model, perfo
 
 **Function**
 
-Add a user-defined workload type and the corresponding profile optimization item.
+Add a user-defined application scenarios and the corresponding profile optimization item.
 
 **Format**
 
-**atune-adm define** <WORKLOAD_TYPE> <PROFILE_NAME> <PROFILE_PATH>
+**atune-adm define** <service_type> <application_name> <scenario_name> <profile_path>
 
 **Example**
 
-Add a workload type. Set workload type to **test_type**, profile name to **test_name**, and configuration file of an optimization item to **example.conf**.
+Add a new profile. Set service_type to **test_service**, application_name to **test_app**, scenario_name to **test_scenario** and configuration file of an optimization item to **example.conf**.
 
 ```shell
-# atune-adm define test_type test_name ./example.conf
+# atune-adm define test_service test_app test_scenario ./example.conf
 ```
 
 The **example.conf** file can be written as follows (the following optimization items are optional and are for reference only). You can also run the **atune-adm info** command to view how the existing profile is written.
 
 ```
-[main] 
- # list its parent profile 
- [tip] 
- # the recommended optimization, which should be performed manunaly 
- [check] 
- # check the environment 
- [affinity.irq] 
- # to change the affinity of irqs 
- [affinity.task] 
- # to change the affinity of tasks 
- [bios] 
- # to change the bios config 
- [bootloader.grub2] 
- # to change the grub2 config 
- [kernel_config] 
- # to change the kernel config 
- [script] 
- # the script extention of cpi 
- [sysctl] 
- # to change the /proc/sys/* config 
- [sysfs] 
- # to change the /sys/* config 
- [systemctl] 
- # to change the system service config 
- [ulimit] 
+ [main]
+ # list its parent profile
+ [kernel_config]
+ # to change the kernel config
+ [bios]
+ # to change the bios config
+ [bootloader.grub2]
+ # to change the grub2 config
+ [sysfs]
+ # to change the /sys/* config
+ [systemctl]
+ # to change the system service status
+ [sysctl]
+ # to change the /proc/sys/* config
+ [script]
+ # the script extention of cpi
+ [ulimit]
  # to change the resources limit of user
+ [schedule_policy]
+ # to change the schedule policy
+ [check]
+ # check the environment
+ [tip]
+ # the recommended optimization, which should be performed manunaly
 ```
 
 ### 3.4.2 collection
@@ -495,20 +678,20 @@ Collect the global resource usage and OS status information during service runni
 
 - OPTIONS
 
-| Parameter           | Description                                                  |
-| ------------------- | ------------------------------------------------------------ |
-| --filename, -f      | Name of the generated CSV file used for  training: *name*-*timestamp*.csv |
-| --output_path, -o   | Path for storing the generated CSV file.  The absolute path is required. |
-| --disk, -b          | Disk used during service running, for  example, /dev/sda.    |
-| --network, -n       | Network port used during service running,  for example, eth0. |
-| --workload_type, -t | Workload type, which is used as a label  for training.       |
-| --duration, -d      | Data collection time during service  running, in seconds. The default collection time is 1200 seconds. |
-| --interval, -i      | Interval for collecting data, in seconds.  The default interval is 5 seconds. |
+| Parameter         | Description                                                  |
+| ----------------- | ------------------------------------------------------------ |
+| --filename, -f    | Name of the generated CSV file used for  training: *name*-*timestamp*.csv |
+| --output_path, -o | Path for storing the generated CSV file.  The absolute path is required. |
+| --disk, -b        | Disk used during service running, for  example, /dev/sda.    |
+| --network, -n     | Network port used during service running,  for example, eth0. |
+| --app_type, -t    | Application type, which is used as a label  for training.    |
+| --duration, -d    | Data collection time during service  running, in seconds. The default collection time is 1200 seconds. |
+| --interval, -i    | Interval for collecting data, in seconds.  The default interval is 5 seconds. |
 
 **Example**
 
 ```shell
-# atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home/data --disk sda --network eth0 --workload_type test_type 
+# atune-adm collection --filename name --interval 5 --duration 1200 --output_path /home/data --disk sda --network eth0 --app_type test_type 
 ```
 
 ### 3.4.3 train
@@ -542,18 +725,18 @@ Use the CSV file in the **data** directory as the training input. The generated 
 
 **Function**
 
-Delete a user-defined workload type.
+Delete a user-defined profile.
 
 **Format**
 
-**atune-adm undefine** <WORKLOAD_TYPE>
+**atune-adm undefine** <profile*>*
 
 **Example**
 
-Delete the **test_type** workload type.
+Delete the user-defined profile.
 
 ```shell
-# atune-adm undefine test_type 
+# atune-adm undefine test_service-test_app-test_scenario 
 ```
 
 ## 3.5 Querying Profiles
@@ -562,94 +745,89 @@ Delete the **test_type** workload type.
 
 **Function**
 
-View the profile content of a workload type.
+View the profile content.
 
 **Format**
 
-**atune-adm info** <WORKLOAD_TYPE*>*
+**atune-adm info** <profile*>*
 
 **Example**
 
-View the profile content of webserver.
+View the profile content of web-nginx-http-long-connection.
 
 ```shell
-# atune-adm info webserver 
+# atune-adm info web-nginx-http-long-connection
 
- *** ssl_webserver: 
+*** web-nginx-http-long-connection:
 
- # 
- # webserver tuned configuration 
- # 
- [main] 
- #TODO CONFIG 
+#
+# nginx http long connection A-Tune configuration
+#
+[main]
+include = default-default
 
- [kernel_config] 
- #TODO CONFIG 
+[kernel_config]
+#TODO CONFIG
 
- [bios] 
- #TODO CONFIG 
+[bios]
+#TODO CONFIG
 
- [sysfs] 
- #TODO CONFIG 
+[bootloader.grub2]
+iommu.passthrough = 1
 
- [sysctl] 
- fs.file-max=6553600 
- fs.suid_dumpable = 1 
- fs.aio-max-nr = 1048576 
- kernel.shmmax = 68719476736 
- kernel.shmall = 4294967296 
- kernel.shmmni = 4096 
- kernel.sem = 250 32000 100 128 
- net.ipv4.tcp_tw_reuse = 1 
- net.ipv4.tcp_syncookies = 1 
- net.ipv4.ip_local_port_range = 1024   65500 
- net.ipv4.tcp_max_tw_buckets = 5000 
- net.core.somaxconn = 65535 
- net.core.netdev_max_backlog = 262144 
- net.ipv4.tcp_max_orphans = 262144 
- net.ipv4.tcp_max_syn_backlog = 262144 
- net.ipv4.tcp_timestamps = 0 
- net.ipv4.tcp_synack_retries = 1 
- net.ipv4.tcp_syn_retries = 1 
- net.ipv4.tcp_fin_timeout = 1 
- net.ipv4.tcp_keepalive_time = 60 
- net.ipv4.tcp_mem = 362619   483495  725238 
- net.ipv4.tcp_rmem = 4096     87380  6291456 
- net.ipv4.tcp_wmem = 4096     16384  4194304 
- net.core.wmem_default = 8388608 
- net.core.rmem_default = 8388608 
- net.core.rmem_max = 16777216 
- net.core.wmem_max = 16777216 
+[sysfs]
+#TODO CONFIG
 
- [systemctl] 
- sysmonitor=stop 
- irqbalance=stop 
+[systemctl]
+sysmonitor = stop
+irqbalance = stop
 
- [bootloader.grub2] 
- iommu.passthrough=1 
+[sysctl]
+fs.file-max = 6553600
+fs.suid_dumpable = 1
+fs.aio-max-nr = 1048576
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+kernel.shmmni = 4096
+kernel.sem = 250 32000 100 128
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_syncookies = 1
+net.ipv4.ip_local_port_range = 1024     65500
+net.ipv4.tcp_max_tw_buckets = 5000
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 262144
+net.ipv4.tcp_max_orphans = 262144
+net.ipv4.tcp_max_syn_backlog = 262144
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_synack_retries = 1
+net.ipv4.tcp_syn_retries = 1
+net.ipv4.tcp_fin_timeout = 1
+net.ipv4.tcp_keepalive_time = 60
+net.ipv4.tcp_mem =  362619      483495   725238
+net.ipv4.tcp_rmem = 4096         87380   6291456
+net.ipv4.tcp_wmem = 4096         16384   4194304
+net.core.wmem_default = 8388608
+net.core.rmem_default = 8388608
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
 
- [tip] 
- bind your master process to the CPU near the network = affinity 
- bind your network interrupt to the CPU that has this network = affinity 
- relogin into the system to enable limits setting = OS 
- SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = OS
+[script]
+prefetch = off
+ethtool =  -X {network} hfunc toeplitz
 
- [script] 
- openssl_hpre = 0 
- prefetch = off 
+[ulimit]
+{user}.hard.nofile = 102400
+{user}.soft.nofile = 102400
 
- [ulimit] 
- {user}.hard.nofile = 102400 
- {user}.soft.nofile = 102400 
+[schedule_policy]
+#TODO CONFIG
 
- [affinity.task] 
- #TODO CONFIG 
+[check]
+#TODO CONFIG
 
- [affinity.irq] 
- #TODO CONFIG 
-
- [check] 
- #TODO CONFIG 
+[tip]
+SELinux provides extra control and security features to linux kernel. Disabling SELinux will improve the performance but may cause security risks. = kernel
+disable the nginx log = application
 ```
 
 ## 3.6 Updating a Profile
@@ -660,18 +838,18 @@ You can update the existing profile as required.
 
 **Function**
 
-Update an optimization item of a workload type to the content in the **new.conf** file.
+Update an optimization item of the profile to the content in the **new.conf** file.
 
 **Format**
 
-**atune-adm update** <WORKLOAD_TYPE> <PROFILE_NAME> <PROFILE_FILE>
+**atune-adm update** <profile*>* <profile_path*>*
 
 **Example**
 
-Update the workload type to **test_type** and the optimization item of test_name to **new.conf**.
+Update the optimization item of the profile named **test_service-test_app-test_scenario** to **new.conf**.
 
 ```shell
-# atune-adm update test_type test_name ./new.conf
+# atune-adm update test_service-test_app-test_scenario ./new.conf
 ```
 
 ## 3.7 Activating a Profile
@@ -680,22 +858,22 @@ Update the workload type to **test_type** and the optimization item of test_name
 
 **Function**
 
-Manually activate a profile of a workload type.
+Manually activate the profile and make it in the active state.
 
 **Format**
 
-**atune-adm profile** *<*WORKLOAD_TYPE*>*
+**atune-adm profile** *<*profile*>*
 
 **Parameter Description**
 
-You can run the **list** command to query the supported workload types.
+You can run the **list** command to query the supported profile name.
 
 **Example**
 
-Activate the profile configuration of webserver.
+Activate the profile configuration of web-nginx-http-long-connection.
 
 ```shell
-# atune-adm profile webserver
+# atune-adm profile web-nginx-http-long-connection
 ```
 
 ## 3.8 Rolling Back Profiles
@@ -807,10 +985,12 @@ Use the specified project file to search the dynamic space for parameters and fi
 | ------------- | ------------------------------------------------------------ |
 | --restore, -r | Restores the initial configuration before  tuning.           |
 | --project, -p | Specifies the project name in the YAML  file to be restored. |
+| --restart, -c | Perform optimization based on historical optimization results. |
+| --detail, -d  | Print details about the tuning process.                      |
 
 > ![en-us_image_note](figures/en-us_image_note.png)
 >
-> The preceding two parameters must be used at the same time, and the -p parameter must be followed by the specific project name.
+> When a parameter is used, the -p parameter must be followed by a specific project name and the YAML file of the project must be specified.
 
 
 
@@ -832,43 +1012,48 @@ Configuration Description
 
 **Table 3-2** Description of object configuration items
 
-| Name        | Description                                                  | Type                        | Value Range                                                  |
-| ----------- | ------------------------------------------------------------ | --------------------------- | ------------------------------------------------------------ |
-| name        | Parameter to be optimized.                                   | Character string            | -                                                            |
-| desc        | Description of parameters to be  optimized.                  | Character string            | -                                                            |
-| get         | Script for querying parameter values.                        | -                           | -                                                            |
-| set         | Script for setting parameter values.                         | -                           | -                                                            |
-| needrestart | Specifies whether to restart the service  for the parameter to take effect. | Enumeration                 | **true** or **false**                                        |
-| type        | Parameter type. Currently, the **discrete** and **continuous** types are supported. | Enumeration                 | **discrete** or **continuous**                               |
-| dtype       | This parameter is available only when  type is set to **discrete**.  Currently, only **int** and **string** are supported. | Enumeration                 | int, string                                                  |
-| scope       | Parameter setting range. This parameter  is valid only when type is set to **discrete**  and dtype is set to **int**, or type  is set to **continuous**. | Integer                     | The value is user-defined and must be  within the valid range of this parameter. |
-| step        | Parameter value step, which is used when **dtype** is set to **int**. | Integer                     | This value is user-defined.                                  |
-| items       | Enumerated value of which the parameter  value is not within the scope. This is used when **dtype** is set to **int**. | Integer                     | The value is user-defined and must be  within the valid range of this parameter. |
-| options     | Enumerated value range of the parameter  value, which is used when **dtype** is  set to **string**. | Character string            | The value is user-defined and must be  within the valid range of this parameter. |
-| ref         | Recommended initial value of the  parameter                  | Integer or character string | The value is user-defined and must be  within the valid range of this parameter. |
+| Name        | Description                                                  | Type             | Value Range                                                  |
+| ----------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------------------ |
+| name        | Parameter to be optimized.                                   | Character string | -                                                            |
+| desc        | Description of parameters to be  optimized.                  | Character string | -                                                            |
+| get         | Script for querying parameter values.                        | -                | -                                                            |
+| set         | Script for setting parameter values.                         | -                | -                                                            |
+| needrestart | Specifies whether to restart the service  for the parameter to take effect. | Enumeration      | **true** or **false**                                        |
+| type        | Parameter type. Currently, the **discrete** and **continuous** types are supported. | Enumeration      | **discrete** or **continuous**                               |
+| dtype       | This parameter is available only when  type is set to **discrete**.  Currently, only **int** and **string** are supported. | Enumeration      | int, string                                                  |
+| scope       | Parameter setting range. This parameter  is valid only when type is set to **discrete**  and dtype is set to **int**, or type  is set to **continuous**. | Integer          | The value is user-defined and must be  within the valid range of this parameter. |
+| step        | Parameter value step, which is used when **dtype** is set to **int**. | Integer          | This value is user-defined.                                  |
+| items       | Enumerated value of which the parameter  value is not within the scope. This is used when **dtype** is set to **int**. | Integer          | The value is user-defined and must be  within the valid range of this parameter. |
+| options     | Enumerated value range of the parameter  value, which is used when **dtype** is  set to **string**. | Character string | The value is user-defined and must be  within the valid range of this parameter. |
 
  
 
 **Table 3-3** Description of configuration items of a YAML file on the client
 
-| Name        | Description                                                  | Type             | Value Range |
-| ----------- | ------------------------------------------------------------ | ---------------- | ----------- |
-| project     | Project name, which must be the same as  that in the configuration file on the server. | Character string | -           |
-| iterations  | Number of optimization iterations.                           | Integer          | ≥ 10        |
-| benchmark   | Performance test script.                                     | -                | -           |
-| evaluations | Performance test evaluation index.  For details about the evaluations  configuration items, see Table 3-4. | -                | -           |
+| Name                  | Description                                                  | Type    | Value Range                                       |
+| --------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
+| project               | Project name, which must be the same as  that in the configuration file on the server. | String  | -                                                 |
+| engine                | Optimization algorithm.                                      | String  | "random", "forest", "gbrt", "bayes", "extraTrees" |
+| iterations            | Number of optimization iterations.                           | Integer | ≥ 10                                              |
+| random_starts         | Number of random iterations.                                 | Integer | < iterations                                      |
+| feature_filter_engine | Parameter search algorithm.                                  | String  | "lhs"                                             |
+| feature_filter_cycle  | Parameter search cycles.                                     | Integer | -                                                 |
+| feature_filter_iters  | Number of iterations in each parameter search.               | Integer | -                                                 |
+| split_count           | Number of parameters evenly selected from the optimization parameter value range. | Integer | -                                                 |
+| benchmark             | Performance test script.                                     | -       | -                                                 |
+| evaluations           | Performance test evaluation index.  For details about the evaluations  configuration items, see Table 3-4. | -       | -                                                 |
 
  
 
 **Table 3-4** Description of evaluations configuration item
 
-| Name      | Description                                                  | Type             | Value Range                  |
-| --------- | ------------------------------------------------------------ | ---------------- | ---------------------------- |
-| name      | Evaluation index name.                                       | Character string | -                            |
-| get       | Script for obtaining performance  evaluation results.        | -                | -                            |
-| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the  performance value is maximized. | Enumeration      | **positive** or **negative** |
-| weight    | Weight of the index. The value ranges  from 0 to 100.        | Integer          | 0-100                        |
-| threshold | Minimum performance requirement of the  index.               | Integer          | User-defined                 |
+| Name      | Description                                                  | Type        | Value Range                  |
+| --------- | ------------------------------------------------------------ | ----------- | ---------------------------- |
+| name      | Evaluation index name.                                       | String      | -                            |
+| get       | Script for obtaining performance  evaluation results.        | -           | -                            |
+| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the  performance value is maximized. | Enumeration | **positive** or **negative** |
+| weight    | Weight of the index. The value ranges  from 0 to 100.        | Integer     | 0-100                        |
+| threshold | Minimum performance requirement of the  index.               | Integer     | User-defined                 |
 
  
 
@@ -877,85 +1062,36 @@ Configuration Description
 The following is an example of the YAML file configuration on a server:
 
 ```yaml
-project: "example"
-maxiterations: 10
+project: "compress"
+maxiterations: 500
 startworkload: ""
 stopworkload: ""
 object :
   -
-    name : "vm.swappiness"
+    name : "compressLevel"
     info :
-        desc : "the vm.swappiness"
-        get : "sysctl -a | grep vm.swappiness"
-        set : "sysctl -w vm.swappiness=$value"
-        needrestart: "false"
+        desc : "The compresslevel parameter is an integer from 1 to 9 controlling the level of compression"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressLevel=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/compressLevel=\\s*[0-9]*/compressLevel=$value/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
         type : "continuous"
         scope :
-          - 0
-          - 10
-        ref : 1
-  -
-    name : "irqbalance"
-    info :
-        desc : "system irqbalance"
-        get : "systemctl status irqbalance"
-        set : "systemctl $value sysmonitor;systemctl $value irqbalance"
-        needrestart: "false"
-        type : "discrete"
-        options:
-          - "start"
-          - "stop"
-        dtype : "string"
-        ref : "start"
-  -
-    name : "net.tcp_min_tso_segs"
-    info :
-        desc : "the minimum tso number"
-        get : "cat /proc/sys/net/ipv4/tcp_min_tso_segs"
-        set : "echo $value > /proc/sys/net/ipv4/tcp_min_tso_segs"
-        needrestart: "false"
-        type : "continuous"
-        scope:
           - 1
-          - 16
-        ref : 2
+          - 9
+        dtype : "int"
   -
-    name : "prefetcher"
+    name : "compressMethod"
     info :
-        desc : ""
-        get : "cat /sys/class/misc/prefetch/policy"
-        set : "echo $value > /sys/class/misc/prefetch/policy"
-        needrestart: "false"
+        desc : "The compressMethod parameter is a string controlling the compression method"
+        get : "cat /root/A-Tune/examples/tuning/compress/compress.py | grep 'compressMethod=' | awk -F '=' '{print $2}' | sed 's/\"//g'"
+        set : "sed -i 's/compressMethod=\\s*[0-9,a-z,\"]*/compressMethod=\"$value\"/g' /root/A-Tune/examples/tuning/compress/compress.py"
+        needrestart : "false"
         type : "discrete"
-        options:
-          - "0"
-          - "15"
+        options :
+          - "bz2"
+          - "zlib"
+          - "gzip"
         dtype : "string"
-        ref : "15"
-  -
-    name : "kernel.sched_min_granularity_ns"
-    info :
-        desc : "Minimal preemption granularity for CPU-bound tasks"
-        get : "sysctl kernel.sched_min_granularity_ns"
-        set : "sysctl -w kernel.sched_min_granularity_ns=$value"
-        needrestart: "false"
-        type : "continuous"
-        scope:
-          - 5000000
-          - 50000000
-        ref : 10000000
-  -
-    name : "kernel.sched_latency_ns"
-    info :
-        desc : ""
-        get : "sysctl kernel.sched_latency_ns"
-        set : "sysctl -w kernel.sched_latency_ns=$value"
-        needrestart: "false"
-        type : "continuous"
-        scope:
-          - 10000000
-          - 100000000
-        ref : 16000000
 ```
 
 
@@ -963,17 +1099,25 @@ object :
 The following is an example of the YAML file configuration on a client:
 
 ```yaml
-project: "example" 
- iterations : 10 
- benchmark : "sh /home/Benchmarks/mysql/tunning_mysql.sh" 
- evaluations : 
-  - 
-   name: "tps" 
-   info: 
-     get: "echo -e '$out' |grep 'transactions:' |awk '{print $3}' | cut -c 2-" 
-     type: "negative" 
-     weight: 100 
-     threshold: 100
+project: "compress"
+engine : "gbrt"
+iterations : 20
+random_starts : 10
+
+benchmark : "python3 /root/A-Tune/examples/tuning/compress/compress.py"
+evaluations :
+  -
+    name: "time"
+    info:
+        get: "echo '$out' | grep 'time' | awk '{print $3}'"
+        type: "positive"
+        weight: 20
+  -
+    name: "compress_ratio"
+    info:
+        get: "echo '$out' | grep 'compress_ratio' | awk '{print $3}'"
+        type: "negative"
+        weight: 80
 ```
 
 
@@ -983,13 +1127,13 @@ project: "example"
 Perform tuning.
 
 ```shell
-# atune-adm tuning example-client.yaml
+# atune-adm tuning --project compress --detail compress_client.yaml
 ```
 
- Restore the initial configuration before tuning. The example value is the project name in the YAML file.
+ Restore the initial configuration before tuning. Compress is the project name in the YAML file.
 
 ```shell
-# atune-adm tuning --restore --project example
+# atune-adm tuning --restore --project compress
 ```
 
 # 4 FAQs
@@ -1054,9 +1198,8 @@ Perform tuning.
 
 **Table 5-1** Terminology
 
-| Term          | Description                                                  |
-| ------------- | ------------------------------------------------------------ |
-| workload_type | Workload type, which is used to identify  a type of service with the same characteristics. |
-| profile       | Set of optimization items and optimal  parameter configuration. |
+| Term    | Description                                                  |
+| ------- | ------------------------------------------------------------ |
+| profile | Set of optimization items and optimal  parameter configuration. |
 
  
