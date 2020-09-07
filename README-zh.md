@@ -31,7 +31,7 @@ yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-sci
 ```
 或
 ```bash
-pip3 install dict2xml Flask-RESTful pandas scikit-optimize==0.5.2 xgboost==0.90 scikit-learn==0.20.4
+pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn
 ```
 
 #### 3、下载源码
@@ -42,6 +42,7 @@ git clone https://gitee.com/openeuler/A-Tune.git
 #### 4、编译
 ```bash
 cd A-Tune
+make models
 make
 ```
 
