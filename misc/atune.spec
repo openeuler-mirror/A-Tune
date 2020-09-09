@@ -17,7 +17,9 @@ Requires: atune-db
 Requires: python3-dict2xml
 Requires: python3-flask-restful
 Requires: python3-pandas
+%ifarch aarch64
 Requires: prefetch_tuning
+%endif
 Requires: perf
 Requires: sysstat
 Requires: hwloc-gui
