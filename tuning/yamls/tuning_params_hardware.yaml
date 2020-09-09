@@ -368,18 +368,6 @@ object :
           - "1"
         dtype : "string"
   -
-    name : "bankintl_stagger"
-    info :
-        desc : "Simple interleave mode fine-tuning enable. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/bankintl_stagger"
-        set : "echo $value > /sys/class/misc/prefetch/bankintl_stagger"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
     name : "cpu_pf_lqos_en"
     info :
         desc : "Whether to enable the prefetch operation delivered by the CPU to be forcibly processed as the lqos operation. 0--disable 1--enable."
