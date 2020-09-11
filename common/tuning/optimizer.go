@@ -62,7 +62,6 @@ type Optimizer struct {
 	BackupFlag          bool
 	FeatureFilter       bool
 	Restart             bool
-	FeatureFilterEnable bool
 }
 
 // InitTuned method for iniit tuning
@@ -117,7 +116,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 
 func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
 	optimizerBody := new(models.OptimizerPostBody)
-	if o.Restart || (o.FeatureFilterEnable && !o.FeatureFilter) {
+	if o.Restart {
 		if err := o.readTuningLog(optimizerBody); err != nil {
 			return err
 		}
@@ -635,7 +634,6 @@ func syncConfigToNode(server string, scripts string) error {
 // InitFeatureSel method for init feature selection tuning
 func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) error {
 	o.FeatureFilter = true
-	o.FeatureFilterEnable = true
 	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
 		return err
 	}
