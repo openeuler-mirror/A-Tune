@@ -29,10 +29,11 @@ from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import train_test_split as tts
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.utils import class_weight
+from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
 
 
-class WorkloadCharacterization:
+class WorkloadCharacterization(object):
     """train models and characterize system workload"""
 
     def __init__(self, model_path):
@@ -116,19 +117,25 @@ class WorkloadCharacterization:
         return selected_x
 
     @staticmethod
-    def svm_clf(x_axis, y_axis, clfpath=None, kernel='rbf'):
+    def svm_clf(x_axis, y_axis, clfpath=None):
         """
         svm_clf: support vector machine classifier
         """
-        x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.5)
+        x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
 
-        rbf = svm.SVC(kernel=kernel, C=100, class_weight='balanced', gamma='auto')
-        rbf.fit(x_train, y_train)
-        rbf_score = rbf.score(x_test, y_test)
-        print("the accuracy of svc is %f" % rbf_score)
+        tuned_parameters = [
+                {'C': range(10, 200, 20), 'kernel':['poly'], 'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
+                {'C': range(10, 200, 20), 'kernel':['rbf'], 'gamma':['scale', 'auto']},
+                {'C': range(10, 200, 20), 'kernel':['sigmoid'], 'gamma':['scale', 'auto']},
+                ]
+        rbf = svm.SVC(class_weight='balanced')
+        grid = GridSearchCV(estimator=rbf, param_grid=tuned_parameters, cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
+        grid.fit(x_train, y_train)
+        y_pred = grid.predict(x_test)
+        print("the accuracy of svc classifier is %f" % accuracy_score(y_test, y_pred))
         if clfpath is not None:
-            joblib.dump(rbf, clfpath)
-        return rbf
+            joblib.dump(grid, clfpath)
+        return grid
 
     @staticmethod
     def rf_clf(x_axis, y_axis, clfpath=None):
@@ -136,18 +143,16 @@ class WorkloadCharacterization:
         ada_clf: Adaptive Boosting classifier
         """
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
-        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
-        class_weights = dict(zip(np.unique(y_train), weights))
-        w_array = np.ones(y_train.shape[0], dtype='float')
-        for i, val in enumerate(y_train):
-            w_array[i] = class_weights[val]
-        model = RandomForestClassifier(n_estimators=150, oob_score=True, random_state=0, n_jobs=-1)
-        model.fit(x_train, y_train, sample_weight=w_array)
-        y_pred = model.predict(x_test)
+        tuned_parameters = {'n_estimators': range(100, 400, 50),
+                'criterion':['gini', 'entropy'], 'max_features': ['sqrt', 'log2']}
+        model = RandomForestClassifier(class_weight='balanced', oob_score=True, random_state=0, n_jobs=-1)
+        grid = GridSearchCV(estimator=model, param_grid=tuned_parameters, cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
+        grid.fit(x_train, y_train)
+        y_pred = grid.predict(x_test)
         print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
         if clfpath is not None:
-            joblib.dump(model, clfpath)
-        return model
+            joblib.dump(grid, clfpath)
+        return grid
 
     @staticmethod
     def xgb_clf(x_axis, y_axis, clfpath=None):
