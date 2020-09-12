@@ -17,6 +17,11 @@ Supported OS: openEuler 1.0 or later
 ```bash
 yum install -y atune
 ```
+For openEuler 20.09 or later, atune-engine is needed
+
+```bash
+yum install -y atune-engine
+```
 
 ### Method 2 (applicable to developers): Use the source code of the local repository for installation.
 
