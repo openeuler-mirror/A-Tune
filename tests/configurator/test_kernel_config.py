@@ -29,7 +29,7 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             value = kernel_config.get("CONFIG_EULEROS_TEST_KERNEL_CONFIG")
             assert value is None
-        except (FileNotFoundError, LookupError):
+        except (Warning, FileNotFoundError, LookupError):
             assert True
 
     def test_get_kernel_config(self):
@@ -38,7 +38,7 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             value = kernel_config.get(self.config_key)
             assert value == "y"
-        except FileNotFoundError:
+        except (Warning, FileNotFoundError):
             assert True
 
     def test_set_kernel_config_active(self):
@@ -47,7 +47,7 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             value = kernel_config.set("{}=y".format(self.config_key))
             assert value is None
-        except (FileNotFoundError, NeedConfigWarning):
+        except (FileNotFoundError, Warning):
             assert True
 
     def test_set_kernel_config(self):
@@ -56,6 +56,6 @@ class TestKernelConfig:
             kernel_config = KernelConfig(self.user)
             kernel_config.set("{}=n".format(self.config_key))
             assert False
-        except (FileNotFoundError, NeedConfigWarning):
+        except (FileNotFoundError, Warning):
             assert True
 

@@ -18,10 +18,9 @@ export TCID="atuned.cnf configuration test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     rpminstall net-tools
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
-    init_env
     # Reduce the numbers of collected data, reduce testcase running time
     change_conf_value sample_num 2
     systemctl restart $ATUNE_SERVICE_NAME
@@ -40,17 +39,19 @@ test01()
 {
     tst_resm TINFO "atuned.cnf file's port configuration test"
     # Default configuration test
-    netstat -anp | grep 60001 | grep atuned
+    systemctl restart $ATUNE_SERVICE_NAME
+    wait_service_ready $ATUNE_SERVICE_NAME
+    netstat -anp | grep 8383 | grep atuned
     check_result $? 0
     
     atune-adm analysis
     check_result $? 0
 
     # The value of the port configuration is null
-    change_conf_value port ""
+    change_conf_value rest_port ""
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
-    netstat -anp | grep 60001 | grep atuned
+    netstat -anp | grep 5000 | grep atuned
     check_result $? 0
 
     atune-adm analysis
@@ -59,20 +60,18 @@ test01()
     # The value of the port configuration is special character and boundary
     array=("$SPECIAL_CHARACTERS" "65536" "-1")
     for ((i=0;i<${#array[@]};i++));do
-        change_conf_value port ${array[i]}
+        change_conf_value rest_port ${array[i]}
         systemctl restart $ATUNE_SERVICE_NAME
         check_result $? 1
     done
 
     # Comment port configuration
-    comment_conf_value port
+    comment_conf_value rest_port
     systemctl restart $ATUNE_SERVICE_NAME
-    wait_service_ready $ATUNE_SERVICE_NAME
-    netstat -anp | grep 60001 | grep atuned
-    check_result $? 0
+    check_result $? 1
 
     atune-adm analysis
-    check_result $? 0
+    check_result $? 1
 
     if [ $EXIT_FLAG -ne 0 ];then
         tst_resm TFAIL

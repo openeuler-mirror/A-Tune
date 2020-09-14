@@ -18,9 +18,8 @@ export TCID="atuned.cnf user configuration test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
-    init_env
 }
 
 cleanup()
@@ -53,10 +52,10 @@ test01()
         systemctl restart $ATUNE_SERVICE_NAME
         wait_service_ready $ATUNE_SERVICE_NAME
         atune-adm analysis > $ANALYSIS_LOG
-        check_result $? 1
+        check_result $? 0
         
         grep "collect data failed" $ANALYSIS_LOG
-        check_result $? 0
+        check_result $? 1
     done
     
     # Comment user configuration

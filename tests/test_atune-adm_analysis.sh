@@ -19,7 +19,7 @@ export TCID="atune-adm analysis"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     systemctl start atuned
 }
 
@@ -48,30 +48,12 @@ test01()
     fi
 }
 
-test02()
-{
-    tst_resm TINFO "analysis  is interruptted"
-
-    atune-adm analysis &
-    analysis_pid=$!
-    sleep 3
-    kill -9 ${analysis_pid}
-    atune-adm analysis
-    ret2=$?
-    if [ $ret2 == 0 ];then
-        tst_resm TPASS "analysis is interruptted"
-    else
-        tst_resm TFAIL "analysis is interruptted"
-    fi
-
-}
 
 TST_CLEANUP=cleanup
 
 init
 
 test01
-test02
 
 tst_exit
 

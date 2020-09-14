@@ -18,7 +18,7 @@ export TCID="atune-adm profile cmd test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -34,21 +34,21 @@ test01()
 {
     tst_resm TINFO "atune-adm profile cmd test"
     # Check all the supported workload
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
-        atune-adm profile ${ARRAY_WORKLOADTYPE[i]} >& temp.log
+    for ((i=0;i<${#ARRAY_PROFILE[@]};i++));do
+        atune-adm profile ${ARRAY_PROFILE[i]} >& temp.log
         check_result $? 0
 
-        grep -i "FAILED" temp.log
+        grep -i "load profile ${ARRAY_PROFILE[i]} Faild" temp.log
         check_result $? 1
 
         atune-adm list > temp.log
-        grep ${ARRAY_WORKLOADTYPE[i]} temp.log | grep true
+        grep ${ARRAY_PROFILE[i]} temp.log | grep true
         check_result $? 0
     done
 
     # Help info
     atune-adm profile -h > temp.log
-    grep "active the specified workload_type,for example,avtive the idle workload type." temp.log
+    grep "active the specified profile and check the actived profile" temp.log
     check_result $? 0
 
     # The value of the Workload name is special character and ultra long character
@@ -62,8 +62,8 @@ test01()
     done
 
     # Workload name is null
-    atune-adm profile > temp.log
-    grep "Incorrect Usage." temp.log
+    atune-adm profile >& temp.log
+    grep "only one workloadload type can be set" temp.log
     check_result $? 0
 
     if [ $EXIT_FLAG -ne 0 ];then

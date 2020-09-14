@@ -18,7 +18,7 @@ export TCID="atune-adm info cmd test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -33,10 +33,10 @@ cleanup()
 test01()
 {
     tst_resm TINFO "atune-adm info cmd test"
-    # Check all the supported workload
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
-        atune-adm info ${ARRAY_WORKLOADTYPE[i]} > temp.log
-        check_result $? 0
+    # Check all the supported profile
+    for ((i=0;i<${#ARRAY_PROFILE[@]};i++));do
+        atune-adm info ${ARRAY_PROFILE[i]} > temp.log
+
 
         grep ".*A-Tune configuration" temp.log
         check_result $? 0
@@ -44,7 +44,7 @@ test01()
 
     # Help info
     atune-adm info -h > temp.log
-    grep "display profile info corresponding to WORKLOAD_TYPE" temp.log
+    grep "display profile info corresponding to profile" temp.log
     check_result $? 0
 
     # The value of the Workload name is special character and ultra long character
@@ -53,7 +53,12 @@ test01()
         atune-adm info ${array[i]} >& temp.log
         check_result $? 1
 
-        grep ".* is not exist in the class_profile table" temp.log
+        case ${array[i]} in
+            "$SPECIAL_CHARACTERS")
+                grep "input:.* is invalid" temp.log;;
+            *)
+                grep "profile .* is not exist" temp.log
+        esac
         check_result $? 0
     done
 

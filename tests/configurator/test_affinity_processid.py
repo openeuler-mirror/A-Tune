@@ -32,6 +32,6 @@ class TestAffinityProcessid:
         try:
             processid_affinity = ProcessidAffinity(self.user)
             processid_affinity.get("atune")
-            assert False
-        except LookupError:
             assert True
+        except LookupError:
+            assert False

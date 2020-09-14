@@ -15,13 +15,14 @@
 export TCID="atune-adm undefine cmd test"
 
 . ./test_lib.sh
-self_workload="self_workload"
-profile_name="self_profile"
-profile_file="./conf/example.conf"
+test_service="test_service"
+test_app="test_app"
+test_scenario="test_scenario"
+profile_path="./conf/example.conf"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -37,20 +38,20 @@ test01()
 {
     tst_resm TINFO "atune-adm undefine cmd test"
     # Check undefine function
-    atune-adm define $self_workload $profile_name $profile_file
+    atune-adm define $test_service $test_app $test_scenario $profile_path
     atune-adm list > temp.log
-    grep "$self_workload" temp.log | grep "$profile_name"
+    grep "$test_service" temp.log | grep "$test_app-$test_secnario"
     check_result $? 0
 
     # delete self define workload
-    atune-adm undefine $self_workload
+    atune-adm undefine $test_service-$test_app-$test_scenario
     atune-adm list > temp.log
-    grep "$self_workload" temp.log | grep "$profile_name"
+    grep "$test_service" temp.log | grep "$test_app-$test_secnario"
     check_result $? 1
 
     # Help info
     atune-adm undefine -h > temp.log
-    grep "delete the specified workload type, only self defined workload type can be delete." temp.log
+    grep "delete the specified profile" temp.log
     check_result $? 0
 
     if [ $EXIT_FLAG -ne 0 ];then
@@ -64,11 +65,11 @@ test02()
 {
     tst_resm TINFO "atune-adm undefine WorkloadType input test"
     # Check all the supported workload
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
-        atune-adm undefine ${ARRAY_WORKLOADTYPE[i]} >& temp.log
+    for ((i=0;i<${#ARRAY_PROFILE[@]};i++));do
+        atune-adm undefine ${ARRAY_PROFILE[i]} >& temp.log
         check_result $? 0
 
-        grep "only self defined workload type can be deleted" temp.log
+        grep "only self defined type can be deleted" temp.log
         check_result $? 0
     done
 
@@ -76,15 +77,18 @@ test02()
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        if [ -z ${array[i]} ];then
-            atune-adm undefine ${array[i]}  >& temp.log
-            check_result $? 1
-            grep -i "Incorrect Usage." temp.log
-        else
-            atune-adm undefine ${array[i]}  >& temp.log
-            check_result $? 0
-            grep "workload type.* may be not exist in the table" temp.log
-        fi
+        atune-adm undefine ${array[i]}  >& temp.log
+        case ${array[i]} in
+            "$SPECIAL_CHARACTERS")
+                check_result $? 1
+                grep "input:.* is invalid" temp.log;;
+            $ULTRA_LONG_CHARACTERS)
+                check_result $? 0
+                grep "only self defined type can be deleted" temp.log;;
+            *)
+                check_result $? 1
+                grep "Incorrect Usage." temp.log
+        esac
         check_result $? 0
     done
 

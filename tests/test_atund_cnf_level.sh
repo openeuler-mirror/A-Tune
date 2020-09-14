@@ -18,9 +18,8 @@ export TCID="atuned.cnf level configuration test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
-    init_env
 }
 
 cleanup()

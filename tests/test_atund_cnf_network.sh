@@ -18,9 +18,8 @@ export TCID="atuned.cnf Network configuration test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     cp -a  $ATUNE_CONF $ATUNE_CONF.bak
-    init_env
 }
 
 cleanup()
@@ -29,7 +28,6 @@ cleanup()
     echo "Clean the System"
     echo "===================="
     mv $ATUNE_CONF.bak $ATUNE_CONF
-    rm -rf $ANALYSIS_LOG
 }
 
 test01()
@@ -40,7 +38,9 @@ test01()
 
     # Correct configuration test
     sys_network=`ip address | grep UP | awk 'NR==1{print $2}' | awk -F ':' '{print $1}'`
-    change_conf_value network $sys_network
+    check_conf_value network $sys_network
+    res=$?
+
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
     atune-adm analysis
@@ -50,22 +50,10 @@ test01()
     array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     for ((i=0;i<${#array[@]};i++));do
         change_conf_value network ${array[i]}
-        if [ -z ${array[i]} ];then
-            change_conf_value network ${array[i]}
-            systemctl restart $ATUNE_SERVICE_NAME
-            wait_service_ready $ATUNE_SERVICE_NAME
-            atune-adm analysis
-            # if network's configuration is null, last net card will be obtained using "sar -n DEV 1" command
-            check_result $? 0
-        else
-            systemctl restart $ATUNE_SERVICE_NAME
-            wait_service_ready $ATUNE_SERVICE_NAME
-            atune-adm analysis > $ANALYSIS_LOG
-            check_result $? 1
-
-            grep "collect data failed" $ANALYSIS_LOG
-            check_result $? 0
-        fi
+        systemctl restart $ATUNE_SERVICE_NAME
+        wait_service_ready $ATUNE_SERVICE_NAME
+        atune-adm analysis
+        check_result $? $res
     done
     
     # Comment network configuration
@@ -73,7 +61,7 @@ test01()
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
     atune-adm analysis
-    check_result $? 1
+    check_result $? $res
 
     if [ $EXIT_FLAG -ne 0 ];then
         tst_resm TFAIL

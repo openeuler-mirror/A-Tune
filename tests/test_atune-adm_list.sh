@@ -18,7 +18,7 @@ export TCID="atune-adm list cmd test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -35,14 +35,14 @@ test01()
     tst_resm TINFO "atune-adm list cmd test"
     # Check all supported workload were listed
     atune-adm list > temp.log
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
-        grep "${ARRAY_WORKLOADTYPE[i]}" temp.log
+    for ((i=0;i<${#ARRAY_SERVICE[@]};i++));do
+        grep "${ARRAY_SERVICE[i]}" temp.log
         check_result $? 0
     done
 
     # Help info
     atune-adm list -h > temp.log
-    grep "list current support workload type" temp.log
+    grep "list current support profiles" temp.log
     check_result $? 0
 
     # Extra input
