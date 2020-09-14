@@ -117,42 +117,50 @@ class WorkloadCharacterization(object):
         return selected_x
 
     @staticmethod
-    def svm_clf(x_axis, y_axis, clfpath=None):
+    def svm_clf(x_axis, y_axis, clfpath=None, kernel='rbf', search=False):
         """
         svm_clf: support vector machine classifier
         """
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
-
-        tuned_parameters = [
-                {'C': range(10, 200, 20), 'kernel':['poly'], 'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
-                {'C': range(10, 200, 20), 'kernel':['rbf'], 'gamma':['scale', 'auto']},
-                {'C': range(10, 200, 20), 'kernel':['sigmoid'], 'gamma':['scale', 'auto']},
-                ]
-        rbf = svm.SVC(class_weight='balanced')
-        grid = GridSearchCV(estimator=rbf, param_grid=tuned_parameters, cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
-        grid.fit(x_train, y_train)
-        y_pred = grid.predict(x_test)
+        model = svm.SVC(kernel=kernel, C=100, class_weight='balanced', gamma='auto')
+        if search:
+            tuned_parameters = [
+                    {'C': range(10, 200, 20), 'kernel':['poly'], 'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
+                    {'C': range(10, 200, 20), 'kernel':['rbf'], 'gamma':['scale', 'auto']},
+                    {'C': range(10, 200, 20), 'kernel':['sigmoid'], 'gamma':['scale', 'auto']},
+                    ]
+            model = GridSearchCV(estimator=model, param_grid=tuned_parameters,
+                    cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
+        model.fit(x_train, y_train)
+        y_pred = model.predict(x_test)
         print("the accuracy of svc classifier is %f" % accuracy_score(y_test, y_pred))
+        if hasattr(model, 'best_params_'):
+            print("the grid search best params is: %s" % model.best_params_)
         if clfpath is not None:
-            joblib.dump(grid, clfpath)
-        return grid
+            joblib.dump(model, clfpath)
+        return model
 
     @staticmethod
-    def rf_clf(x_axis, y_axis, clfpath=None):
+    def rf_clf(x_axis, y_axis, clfpath=None, search=False):
         """
         ada_clf: Adaptive Boosting classifier
         """
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
-        tuned_parameters = {'n_estimators': range(100, 400, 50),
-                'criterion':['gini', 'entropy'], 'max_features': ['sqrt', 'log2']}
-        model = RandomForestClassifier(class_weight='balanced', oob_score=True, random_state=0, n_jobs=-1)
-        grid = GridSearchCV(estimator=model, param_grid=tuned_parameters, cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
-        grid.fit(x_train, y_train)
-        y_pred = grid.predict(x_test)
+        model = RandomForestClassifier(n_estimators=150, class_weight='balanced',
+                oob_score=True, random_state=0, n_jobs=-1)
+        if search:
+            tuned_parameters = {'n_estimators': range(100, 400, 50),
+                    'criterion':['gini', 'entropy'], 'max_features': ['sqrt', 'log2']}
+            model = GridSearchCV(estimator=model, param_grid=tuned_parameters,
+                    cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
+        model.fit(x_train, y_train)
+        y_pred = model.predict(x_test)
         print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
+        if hasattr(model, 'best_params_'):
+            print("the grid search best params is: %s" % model.best_params_)
         if clfpath is not None:
-            joblib.dump(grid, clfpath)
-        return grid
+            joblib.dump(model, clfpath)
+        return model
 
     @staticmethod
     def xgb_clf(x_axis, y_axis, clfpath=None):
@@ -175,7 +183,7 @@ class WorkloadCharacterization(object):
             joblib.dump(model, clfpath)
         return model
 
-    def train(self, data_path, feature_selection=False):
+    def train(self, data_path, feature_selection=False, search=False):
         """
         train the data from csv
         :param data:  the data path
@@ -201,7 +209,7 @@ class WorkloadCharacterization(object):
         if feature_selection:
             x_type = self.feature_selection(x_type, y_type, type_feature)
 
-        self.rf_clf(x_type, y_type, clfpath=type_clf)
+        self.rf_clf(x_type, y_type, clfpath=type_clf, search=search)
         print("The overall classifier has been generated.")
 
         for workload, group in self.dataset.groupby('workload.type'):
@@ -217,9 +225,9 @@ class WorkloadCharacterization(object):
                 x_app = self.feature_selection(x_app, y_app, feature_path)
 
             if workload == "default":
-                self.rf_clf(x_app, y_app, clf_path)
+                self.rf_clf(x_app, y_app, clf_path, search=search)
             elif workload == "throughput_performance":
-                self.svm_clf(x_app, y_app, clf_path)
+                self.svm_clf(x_app, y_app, clf_path, search=search)
             print("The application classifiers have been generated.")
 
     def identify(self, data, feature_selection=False):
