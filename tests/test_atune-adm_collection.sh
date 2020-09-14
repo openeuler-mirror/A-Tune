@@ -27,7 +27,7 @@ workload_type="default"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     rpminstall psmisc # collection script need killall command.
     check_service_started atuned
 }
@@ -65,6 +65,7 @@ test01()
 
 test02()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --filename input test"
     # The input of the filename is special character and ultra long character and null and boundary value
     local str_129="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
@@ -103,6 +104,7 @@ test02()
 
 test03()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --interval input test"
     # The input of the interval is special character and ultra long character and null and boundary value
     local lower=0
@@ -117,7 +119,7 @@ test03()
             "$SPECIAL_CHARACTERS")
                 grep -i "Incorrect Usage: invalid value.*for flag -i" temp.log;;
             $ULTRA_LONG_CHARACTERS)
-                grep -i "Incorrect Usage: invalid value.*for flag -i" temp.log;;
+                grep -i "error: collection interval value must be between 1 and 60 seconds" temp.log;;
             $lower)
                 grep -i "error: collection interval value must be between 1 and 60 seconds" temp.log;;
             $ceiling)
@@ -137,6 +139,7 @@ test03()
 
 test04()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --duration input test"
     # The input of the duration is special character and ultra long character and null and boundary value
     local lower=9
@@ -151,7 +154,7 @@ test04()
             "$SPECIAL_CHARACTERS")
                 grep -i "Incorrect Usage: invalid value.*for flag -d" temp.log;;
             $ULTRA_LONG_CHARACTERS)
-                grep -i "Incorrect Usage: invalid value.*for flag -d" temp.log;;
+                grep -i "error: collection duration value must be bigger than interval\*10" temp.log;;
             $lower)
                 grep -i "error: collection duration value must be bigger than interval\*10" temp.log;;
             $ceiling)
@@ -171,6 +174,7 @@ test04()
 
 test05()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --output_path input test"
     # The input of the output_path is special character, ultra long character, null and an absolute path that did not exist.
     local path_not_exist="/path_not_exist"
@@ -202,6 +206,7 @@ test05()
 
 test06()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --disk input test"
     # The input of the disk is special character, ultra long character and null
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
@@ -230,6 +235,7 @@ test06()
 
 test07()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --network input test"
     # The input of the network is special character, ultra long character and null
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
@@ -258,6 +264,7 @@ test07()
 
 test08()
 {
+    tst_clean
     tst_resm TINFO "atune-adm collection cmd --workload_type input test"
     # The input of the workload_type is special character, ultra long character and null
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
@@ -270,7 +277,7 @@ test08()
             "$SPECIAL_CHARACTERS")
                 grep -i "rpc error: code = Unknown desc = input:.*is invalid" temp.log;;
             $ULTRA_LONG_CHARACTERS)
-                grep -i "rpc error: code = Unknown desc = workload type.*is not exist, please use define command first" temp.log;;
+                grep -i "rpc error: code = Unknown desc = app type.*is not exist, use define command first" temp.log;;
             *)
                 grep -i "Incorrect Usage: flag needs an argument: -t" temp.log;;
         esac
@@ -278,9 +285,10 @@ test08()
     done
 
     # Check all the supported workload for collecting
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
+    for ((i=0;i<${#ARRAY_APP[@]};i++));do
         rm -rf $output_path/*.csv
-        atune-adm collection -f $file_name -i $min_interval -d $min_duration -o $output_path -b $sys_disk -n $sys_network -t ${ARRAY_WORKLOADTYPE[i]} >& temp.log
+        atune-adm collection -f $file_name -i $min_interval -d $min_duration -o $output_path -b $sys_disk -n $sys_network -t ${ARRAY_APP[i]} >& temp.log
+
         check_result $? 0
 
         grep -i "generate .*csv successfully" temp.log

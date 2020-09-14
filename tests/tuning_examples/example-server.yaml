@@ -1,5 +1,5 @@
 project: "example"
-maxiterations: 10
+maxiterations: 11
 startworkload: ""
 stopworkload: ""
 object :
@@ -16,19 +16,6 @@ object :
           - 10
         ref : 1
   -
-    name : "irqbalance"
-    info :
-        desc : "system irqbalance"
-        get : "systemctl status irqbalance"
-        set : "systemctl $value sysmonitor;systemctl $value irqbalance"
-        needrestart: "false"
-        type : "discrete"
-        options:
-          - "start"
-          - "stop"
-        dtype : "string"
-        ref : "start"
-  -
     name : "net.tcp_min_tso_segs"
     info :
         desc : "the minimum tso number"
@@ -40,19 +27,6 @@ object :
           - 1
           - 16
         ref : 2
-  -
-    name : "prefetcher"
-    info :
-        desc : ""
-        get : "cat /sys/class/misc/prefetch/policy"
-        set : "echo $value > /sys/class/misc/prefetch/policy"
-        needrestart: "false"
-        type : "discrete"
-        options:
-          - "0"
-          - "15"
-        dtype : "string"
-        ref : "15"
   -
     name : "kernel.sched_min_granularity_ns"
     info :

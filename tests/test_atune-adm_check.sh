@@ -18,7 +18,7 @@ export TCID="atune-adm check cmd test"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -37,8 +37,8 @@ test01()
     atune-adm check > temp.log
     check_result $? 0
 
-    grep -i "FAILED" temp.log
-    check_result $? 1
+    grep -i "Check finished" temp.log
+    check_result $? 0
 
     # Help info
     atune-adm check -h > temp.log

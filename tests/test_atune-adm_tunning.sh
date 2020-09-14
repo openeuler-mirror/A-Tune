@@ -19,7 +19,11 @@ export TCID="atune-adm tuning"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
+    if [ -f /etc/atuned/tuning/example-server.yaml ]; then
+        cp -ar /etc/atuned/tuning/example-server.yaml /etc/atuned/tuning/example1-server.yaml
+        rm -rf /etc/atuned/tuning/example-server.yaml
+    fi
     cp -ar tuning_examples/example-server.yaml  /etc/atuned/tuning
     systemctl start atuned
 }
@@ -30,7 +34,12 @@ cleanup()
     echo "Clean the System"
     echo "===================="
     rm -rf /etc/atuned/tuning/example-server.yaml
+    if [ -f /etc/atuned/tuning/example1-server.yaml ]; then
+        cp -ar /etc/atuned/tuning/example1-server.yaml /etc/atuned/tuning/example-server.yaml
+        rm -rf /etc/atuned/tuning/example1-server.yaml
+    fi
     rm -rf tuning_file
+    rm -rf temp.log
 }
 
 
@@ -38,13 +47,16 @@ test01()
 {
     tst_resm TINFO "tuning project" 
 
-    sed -i  "s/example/example123456789123456789123456789123456789123456789123456789123456789/g" tuning_examples/example-client.yaml
-    sed -i  "s/example/example123456789123456789123456789123456789123456789123456789123456789/g" /etc/atuned/tuning/example-server.yaml
-    atune-adm tuning tuning_examples/example-client.yaml
-    ret1=$?
-    sed -i  "s/example123456789123456789123456789123456789123456789123456789123456789/example/g" tuning_examples/example-client.yaml
-    sed -i  "s/example123456789123456789123456789123456789123456789123456789123456789/example/g" /etc/atuned/tuning/example-server.yaml
-    if [ $ret1 == 0 ]; then
+    local str_129="000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    sed -i  "s/example/$str_129/g" tuning_examples/example-client.yaml
+    sed -i  "s/example/$str_129/g" /etc/atuned/tuning/example-server.yaml
+    atune-adm tuning --project $str_129 tuning_examples/example-client.yaml >& temp.log
+    sed -i  "s/$str_129/example/g" tuning_examples/example-client.yaml
+    sed -i  "s/$str_129/example/g" /etc/atuned/tuning/example-server.yaml
+    grep "no less than 1 and no greater than 128"  temp.log
+    ret=$?
+    check_result $ret 0
+    if [ $ret == 0 ]; then
          tst_resm TPASS "tuning project"
     else
          tst_resm TFAIL "tuning project"
@@ -53,15 +65,18 @@ test01()
 
 test02()
 {
+    tst_clean
     tst_resm TINFO "tuning project not exist"
 
     sed -i  "s/example/example_no_exist/g" tuning_examples/example-client.yaml
-    atune-adm tuning tuning_examples/example-client.yaml > tuning_file 2>&1
-    cat tuning_file |grep "not found"
+    atune-adm tuning --project example_no_exist tuning_examples/example-client.yaml >& tuning_file
+    grep "project:example_no_exist not found" tuning_file
     ret1=$?
+    check_result $ret1 0
     sed -i "s/example_no_exist/example/g" tuning_examples/example-client.yaml
-    atune-adm tuning tuning_examples/example-client.yaml
+    atune-adm tuning --project example tuning_examples/example-client.yaml > tuning_file
     ret2=$?
+    check_result $ret2 0
 
     if [ $ret1 == 0 ] && [ $ret2 == 0 ];then
         tst_resm TPASS "tuning project not exist"
@@ -72,15 +87,19 @@ test02()
 
 test03()
 {
+    tst_clean
     tst_resm TINFO "tuning project is NULL"
 
-    sed -i  "s/example//g" tuning_examples/example-client.yaml
-    atune-adm tuning tuning_examples/example-client.yaml > tuning_file 2>&1
-    cat tuning_file |grep "not found"
+    sed -i  "s/\"example\"//g" tuning_examples/example-client.yaml
+    atune-adm tuning --project  tuning_examples/example-client.yaml > tuning_file 2>&1
+    cat tuning_file |grep "Incorrect Usage."
     ret1=$?
+    check_result $ret1 0
     sed -i "s/project:.*/project: \"example\"/g" tuning_examples/example-client.yaml
-    atune-adm tuning tuning_examples/example-client.yaml
+    atune-adm tuning --project example tuning_examples/example-client.yaml > tuning_file
     ret2=$?
+    check_result $ret2 0
+
     if [ $ret1 == 0 ] && [ $ret2 == 0 ];then
         tst_resm TPASS "tuning project is NULL"
     else
@@ -96,6 +115,7 @@ init
 
 test01
 test02
+test03
 
 tst_exit
 

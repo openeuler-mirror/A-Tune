@@ -19,7 +19,7 @@ export TCID="atuned"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     systemctl stop atuned
 }
 
@@ -28,6 +28,7 @@ cleanup()
     echo "===================="
     echo "Clean the System"
     echo "===================="
+    systemctl start atuned
 }
 
 test01()

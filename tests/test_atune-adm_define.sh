@@ -15,13 +15,14 @@
 export TCID="atune-adm define cmd test"
 
 . ./test_lib.sh
-self_workload="self_workload"
-profile_name="self_profile"
-profile_file="./conf/example.conf"
+test_service="test_service"
+test_app="test_app"
+test_scenario="test_scenario"
+profile_path="./conf/example.conf"
 
 init()
 {
-    echo "init the sysytem"
+    echo "init the system"
     check_service_started atuned
 }
 
@@ -37,19 +38,19 @@ test01()
 {
     tst_resm TINFO "atune-adm define cmd test"
     # Check define function
-    atune-adm define $self_workload $profile_name $profile_file
+    atune-adm define $test_service $test_app $test_scenario $profile_path
     atune-adm list > temp.log
-    grep "$self_workload" temp.log | grep "$profile_name"
+    grep "$test_service" temp.log | grep "$test_app-$test_secnario"
     check_result $? 0
 
     # define the same workload
-    atune-adm define $self_workload $profile_name $profile_file > temp.log
-    grep "$self_workload is already exist" temp.log
+    atune-adm define $test_service $test_app $test_scenario $profile_path > temp.log
+    grep ".* is already exist" temp.log
     check_result $? 0
 
     # Help info
     atune-adm define -h > temp.log
-    grep "create a new workload type which can not be already exist" temp.log
+    grep "atune-adm define - create a new application profile" temp.log
     check_result $? 0
 
     if [ $EXIT_FLAG -ne 0 ];then
@@ -59,37 +60,37 @@ test01()
     fi
 
     # delete self define workload
-    atune-adm undefine $self_workload
+    atune-adm undefine $test_service-$test_app-$test_scenario-$profile_path
 }
 
 test02()
 {
     tst_resm TINFO "atune-adm define WorkloadType input test"
     # Check all the supported workload
-    for ((i=0;i<${#ARRAY_WORKLOADTYPE[@]};i++));do
-        atune-adm define ${ARRAY_WORKLOADTYPE[i]} $profile_name $profile_file >& temp.log
+    for ((i=0;i<${#ARRAY_SERVICE[@]};i++));do
+        atune-adm define ${ARRAY_SERVICE[i]} $test_app $test_scenario $profile_path >& temp.log
         check_result $? 0
 
-        grep "${ARRAY_WORKLOADTYPE[i]} is already exist" temp.log
+        grep "define a new application profile success" temp.log
         check_result $? 0
+
+        atune-adm undefine ${ARRAY_SERVICE[i]}-$test_app-$test_scenario
     done
 
     # The input of the workload_type is special character, ultra long character and null
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        if [ -z ${array[i]} ];then
-            atune-adm define ${array[i]} $profile_name $profile_file >& temp.log
-            check_result $? 1
-            grep -i "Incorrect Usage." temp.log
-        else
-            atune-adm define ${array[i]} $profile_name $profile_file >& temp.log
-            check_result $? 0
-            atune-adm list > temp.log
-            grep "$profile_name" temp.log
-            check_result $? 0
-            atune-adm undefine ${array[i]}
-        fi
+        atune-adm define ${array[i]} $test_app $test_scenario $profile_path >& temp.log
+        check_result $? 1
+        case ${array[i]} in
+            "$SPECIAL_CHARACTERS")
+                 grep -i "input:.* is invalid" temp.log;;
+            $ULTRA_LONG_CHARACTERS)
+                grep -i "file name too long" temp.log;;
+            *)
+                grep -i "Incorrect Usage." temp.log;;
+        esac
         check_result $? 0
     done
 
@@ -104,30 +105,30 @@ test03()
 {
     tst_resm TINFO "atune-adm define profile_name input test"
     # Check all the supported workload
-    for ((i=0;i<${#ARRAY_PROFILE_NAME[@]};i++));do
-        atune-adm define $self_workload ${ARRAY_PROFILE_NAME[i]} $profile_file >& temp.log
+    for ((i=0;i<${#ARRAY_SERVICE[@]};i++));do
+        atune-adm define $test_service ${ARRAY_SERVICE[i]} $test_scenario $profile_path >& temp.log
         check_result $? 0
 
-        grep "${ARRAY_PROFILE_NAME[i]} is already exist" temp.log
+        grep "define a new application profile success" temp.log
         check_result $? 0
+
+        atune-adm undefine $test_service-${ARRAY_SERVICE[i]}-$test_scenario
     done
 
     # The input of the workload_type is special character, ultra long character and null
     local array=("$SPECIAL_CHARACTERS" "$ULTRA_LONG_CHARACTERS" "")
     local i=0
     for ((i=0;i<${#array[@]};i++));do
-        if [ -z ${array[i]} ];then
-            atune-adm define $self_workload ${array[i]} $profile_file >& temp.log
-            check_result $? 1
-            grep -i "Incorrect Usage." temp.log
-        else
-            atune-adm define $self_workload ${array[i]} $profile_file >& temp.log
-            check_result $? 0
-            atune-adm list > temp.log
-            grep "$self_workload" temp.log
-            check_result $? 0
-            atune-adm undefine $self_workload
-        fi
+        atune-adm define $test_service ${array[i]} $test_scenario $profile_path >& temp.log
+        check_result $? 1
+        case ${array[i]} in
+            "$SPECIAL_CHARACTERS")
+                grep -i "input:.* is invalid" temp.log;;
+            $ULTRA_LONG_CHARACTERS)
+                grep -i "file name too long" temp.log;;
+            *)
+                grep -i "Incorrect Usage." temp.log;;
+        esac
         check_result $? 0
     done
 

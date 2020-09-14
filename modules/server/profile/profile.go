@@ -1229,6 +1229,9 @@ func (s *ProfileServer) collection(npipe string) (*RespCollectorPost, error) {
 	}
 
 	sampleNum := s.Raw.Section("server").Key("sample_num").MustInt(20)
+	if sampleNum == 0 {
+		sampleNum = 20
+	}
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
