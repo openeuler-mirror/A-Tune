@@ -86,8 +86,10 @@ INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mongodb",
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb", "database-mariadb", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mysql", "database-mysql", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("postgresql", "database-postgresql", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx", "web-nginx", "", 0);
-INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_http", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_https_long", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_https_short", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_http_long", "web-nginx", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("nginx_http_short", "web-nginx", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("apache", "web-apache-traffic-server", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("redis", "in-memory-database-redis", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("speccpu", "basic-test-suite-speccpu", "", 0);
@@ -110,8 +112,10 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("mongodb", "databa
 INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb", "database-mariadb-2p-tpcc-c3", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mysql", "database-mysql-2p-sysbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("postgresql", "database-postgresql-2p-sysbench-hdd", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("nginx", "web-nginx-https-short-connection", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_http", "web-nginx-http-long-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_https_short", "web-nginx-https-short-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_https_long", "web-nginx-https-long-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_http_short", "web-nginx-http-short-connection", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("nginx_http_long", "web-nginx-http-long-connection", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("apache", "web-apache-traffic-server-spirent-pingpo", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("redis", "in-memory-database-redis-redis-benchmark", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("speccpu", "basic-test-suite-speccpu-speccpu2006", 0);
