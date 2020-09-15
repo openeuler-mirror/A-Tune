@@ -23,16 +23,17 @@ sys.path.insert(0, "./../")
 from analysis.optimizer.workload_characterization import WorkloadCharacterization
 
 
-def main(csv_path, model_path, feature_selection):
+def main(csv_path, model_path, feature_selection, search):
     """
     generate AI models
     :param csv_path: csv path
     :param model_path: model path
     :param feature_selection: select feature model, default value is False
+    :param search: enable the grid search for model train, default value is False
     :return: None
     """
     processor = WorkloadCharacterization(model_path)
-    processor.train(csv_path, feature_selection)
+    processor.train(csv_path, feature_selection, search)
 
 
 if __name__ == '__main__':
@@ -44,6 +45,8 @@ if __name__ == '__main__':
     ARG_PARSER.add_argument('-s', '--select', metavar='SELECT',
                             type=ast.literal_eval, default=False,
                             help='whether feature models to be generate, True or False')
+    ARG_PARSER.add_argument('-g', '--search', metavar='SEARCH',
+                            default=False, help='wether enable the parameter space search')
     ARGS = ARG_PARSER.parse_args()
 
-    main(ARGS.csv_path, ARGS.model_path, ARGS.select)
+    main(ARGS.csv_path, ARGS.model_path, ARGS.select, ARGS.search)

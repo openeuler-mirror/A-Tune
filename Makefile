@@ -105,6 +105,10 @@ models:
 	rm -rf ${CURDIR}/analysis/models/*
 	cd ${CURDIR}/tools/ && python3 generate_models.py
 
+search:
+	rm -rf ${CURDIR}/analysis/models/*
+	cd ${CURDIR}/tools/ && python3 generate_models.py --search=True
+
 grpccerts:
 	@echo "BEGIN GENERATE GRPC CERTS..."
 	mkdir -p $(GRPC_CERT_PATH)
