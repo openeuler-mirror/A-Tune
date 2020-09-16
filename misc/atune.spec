@@ -1,3 +1,4 @@
+%global with_strip 0
 %define __global_requires_exclude_from  /usr/libexec
 
 Summary: AI auto tuning system
@@ -60,6 +61,9 @@ atune engine tool for manage atuned AI tuning system.
 %autosetup -n A-Tune -p1
 
 %build
+%if %{with_strip}
+export GOLDFLAGS="-s"
+%endif
 sed -i "s/^rest_tls.*/rest_tls = false/" misc/atuned.cnf
 sed -i "s/^engine_tls.*/engine_tls = false/" misc/atuned.cnf
 sed -i "s/^engine_tls.*/engine_tls = false/" misc/engine.cnf
