@@ -118,4 +118,4 @@ We welcome new contributors to participate in the project. And we are happy to p
 Any question or discussion please contact [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/).
 
 ### Routine Meeting
-Holding SIG Meeting at 2:30-4:30 PM on Monday every two weeks. You can apply topic by mail list.
+Holding SIG Meeting at 10:00-12:00 AM on Friday every two weeks. You can apply topic by [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/) mail list.

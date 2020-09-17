@@ -118,4 +118,4 @@ atune-adm analysis mysql
 如果您有任何疑问或讨论，请通过[A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/)邮件列表和我们进行联系。
 
 ### 会议
-每双周周一下午2:30-4:30召开SIG组例会。您可以通过邮件方式申报议题。
+每双周周五上午10:00-12:00召开SIG组例会。您可以通过[A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/)邮件列表方式申报议题。
