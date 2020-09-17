@@ -538,14 +538,18 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 	}()
 
 	stopCh := make(chan int, 1)
+	defer close(stopCh)
 	var cycles int32 = 0
 	var message string
 	var step int32 = 1
 
 	for {
 		select {
-		case <-stopCh:
+		case stop := <-stopCh:
 			if cycles > 0 {
+				if stop == 2 {
+					cycles = 1
+				}
 				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_JobRestart})
 			} else {
 				_ = stream.Send(&PB.TuningMessage{State: PB.TuningMessage_Ending})
@@ -576,6 +580,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			log.Infof("restart cycles is: %d", cycles)
 			optimizer.Content = reply.GetContent()
 			if cycles > 0 {
+				optimizer.EvalStatistics = make([]float64, 0)
 				message = fmt.Sprintf("%d、Starting the next cycle of parameter selection......", step)
 				step += 1
 				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
@@ -624,10 +629,13 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			optimizer.SplitCount = reply.GetSplitCount()
 			cycles = reply.GetFeatureFilterCycle()
+			optimizer.FeatureFilterCount = reply.GetFeatureFilterCount()
+			optimizer.EvalFluctuation = reply.GetEvalFluctuation()
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_JobCreate}
 		case PB.TuningMessage_JobCreate:
 			optimizer.EvalBase = reply.GetTuningLog().GetBaseEval()
 			optimizer.Evaluations = reply.GetTuningLog().GetSumEval()
+			optimizer.TuningParams = make(map[string]struct{})
 			if cycles == 0 {
 				if optimizer.Restart {
 					message = fmt.Sprintf("%d.Continue to tuning the system......", step)
@@ -640,6 +648,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 					return err
 				}
 			} else {
+				optimizer.EvalStatistics = make([]float64, 0)
 				message = fmt.Sprintf("%d.Starting to select the important parameters......", step)
 				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 				step += 1

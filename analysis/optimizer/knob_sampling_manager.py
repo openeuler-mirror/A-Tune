@@ -39,9 +39,9 @@ class KnobSampling:
             if p_nob['range'] is not None:
                 if 'step' in p_nob.keys():
                     if p_nob['dtype'] == 'int':
-                        step = int((p_nob['range'][1] - p_nob['range'][0]) / split_count)
+                        step = int((p_nob['range'][1] - p_nob['range'][0]) / (split_count - 1))
                     elif p_nob['dtype'] == 'float':
-                        step = float((p_nob['range'][1] - p_nob['range'][0]) / split_count)
+                        step = float((p_nob['range'][1] - p_nob['range'][0]) / (split_count - 1))
                 item_val = p_nob['range'][0]
                 for _ in range(split_count):
                     option_range.append(str(item_val))

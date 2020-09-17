@@ -539,3 +539,31 @@ func CalculateBenchMark(eval string) (float64, error) {
 
 	return floatEval, nil
 }
+
+// Mean calculate the average value
+func Mean(data []float64) float64 {
+	var mean float64 = 0
+	for i := 0; i < len(data); i++ {
+		mean += (data[i] - mean) / float64(i+1)
+	}
+	return mean
+}
+
+// Variance calculate the variance
+func Variance(data []float64) float64 {
+	if len(data) <= 0 {
+		return 0
+	}
+	mean := Mean(data)
+	var sum float64 = 0
+	for i := 0; i < len(data); i++ {
+		diff := data[i] - mean
+		sum += diff * diff
+	}
+	return sum / float64(len(data))
+}
+
+// StandardDeviation calculate the standard deviation
+func StandardDeviation(data []float64) float64 {
+	return math.Sqrt(Variance(data))
+}

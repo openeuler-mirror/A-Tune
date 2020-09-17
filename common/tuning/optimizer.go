@@ -27,6 +27,7 @@ import (
 	"golang.org/x/net/context"
 	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"path"
 	"path/filepath"
@@ -43,7 +44,9 @@ type Optimizer struct {
 	Iter                int
 	MaxIter             int32
 	FeatureFilterIters  int32
+	FeatureFilterCount  int32
 	SplitCount          int32
+	EvalFluctuation     float64
 	RandomStarts        int32
 	OptimizerPutURL     string
 	FinalEval           string
@@ -62,6 +65,8 @@ type Optimizer struct {
 	BackupFlag          bool
 	FeatureFilter       bool
 	Restart             bool
+	TuningParams        map[string]struct{}
+	EvalStatistics      []float64
 }
 
 // InitTuned method for iniit tuning
@@ -82,6 +87,16 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations))}
 
+	}
+
+	if len(o.TuningParams) > 0 {
+		for _, item := range o.Prj.Object {
+			if _, ok := o.TuningParams[item.Name]; ok {
+				item.Info.Skip = false
+			} else {
+				item.Info.Skip = true
+			}
+		}
 	}
 
 	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
@@ -334,11 +349,21 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 			message = fmt.Sprintf("\n Parameters reduced from %d to %d.",
 				len(strings.Split(o.RespPutIns.Param, ",")), len(strings.Split(remainParams, ",")))
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
-			message = fmt.Sprintf("The selected most important parameters is:\n %s\n", remainParams)
+			tuningParams := make([]string, 0)
+			for para := range o.TuningParams {
+				tuningParams = append(tuningParams, para)
+			}
+			message = fmt.Sprintf("The selected most important parameters is:\n %s\n"+
+				" Next optional parameters is:\n %s\n", tuningParams, remainParams)
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 		}
 
-		stopCh <- 1
+		if len(o.Prj.Object)-len(o.TuningParams) < int(o.FeatureFilterCount) ||
+			len(strings.Split(o.RespPutIns.Param, ",")) == len(strings.Split(remainParams, ",")) {
+			stopCh <- 2
+		} else {
+			stopCh <- 1
+		}
 		o.Iter = 0
 		if err = deleteTask(o.OptimizerPutURL); err != nil {
 			return err
@@ -386,17 +411,21 @@ func (o *Optimizer) filterParams() (string, error) {
 	sort.Sort(sortedParams)
 	log.Infof("sorted params: %+v", sortedParams)
 
-	var skipIndex int
-	skipIndex = int(float64(len(sortedParams)) * o.Percentage)
-	if len(sortedParams) <= 10 {
-		skipIndex = len(sortedParams)
+	skipIndex := o.FeatureFilterCount
+	mean := utils.Mean(o.EvalStatistics)
+	sd := utils.StandardDeviation(o.EvalStatistics)
+	log.Infof("Eval statistics: %v, mean: %v, sd: %v", o.EvalStatistics, mean, sd)
+	if float64(sd)/math.Abs(mean) < o.EvalFluctuation {
+		skipIndex = 0
 	}
-	skipParams := sortedParams[skipIndex:]
-	remaindParams := sortedParams[:skipIndex]
+
+	skipParams := sortedParams[:skipIndex]
+	remaindParams := sortedParams[skipIndex:]
 
 	skipMap := make(map[string]struct{})
 	for _, param := range skipParams {
 		skipMap[param.Name] = struct{}{}
+		o.TuningParams[param.Name] = struct{}{}
 	}
 	for _, item := range o.Prj.Object {
 		if _, ok := skipMap[item.Name]; ok {
@@ -487,6 +516,11 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 		o.MinEvalSum = evalSum
 		o.FinalEval = eval
 	}
+
+	if o.FeatureFilter && o.Iter != 0 {
+		o.EvalStatistics = append(o.EvalStatistics, evalSum)
+	}
+
 	return kvs[1], nil
 }
 

@@ -121,6 +121,8 @@ message TuningMessage {
     bool FeatureFilter = 10;
     TuningHistory TuningLog = 11;
     int32 SplitCount = 12;
+    int32 FeatureFilterCount = 13;
+    double EvalFluctuation = 14;
 }
 
 message TuningHistory {
