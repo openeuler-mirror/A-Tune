@@ -642,6 +642,8 @@ type TuningMessage struct {
 	FeatureFilter        bool                `protobuf:"varint,10,opt,name=FeatureFilter,proto3" json:"FeatureFilter,omitempty"`
 	TuningLog            *TuningHistory      `protobuf:"bytes,11,opt,name=TuningLog,proto3" json:"TuningLog,omitempty"`
 	SplitCount           int32               `protobuf:"varint,12,opt,name=SplitCount,proto3" json:"SplitCount,omitempty"`
+	FeatureFilterCount   int32               `protobuf:"varint,13,opt,name=FeatureFilterCount,proto3" json:"FeatureFilterCount,omitempty"`
+	EvalFluctuation      float64             `protobuf:"fixed64,14,opt,name=EvalFluctuation,proto3" json:"EvalFluctuation,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -752,6 +754,21 @@ func (m *TuningMessage) GetTuningLog() *TuningHistory {
 func (m *TuningMessage) GetSplitCount() int32 {
 	if m != nil {
 		return m.SplitCount
+	}
+	return 0
+}
+
+
+func (m *TuningMessage) GetFeatureFilterCount() int32 {
+	if m != nil {
+		return m.FeatureFilterCount
+	}
+	return 0
+}
+
+func (m *TuningMessage) GetEvalFluctuation() float64 {
+	if m != nil {
+		return m.EvalFluctuation
 	}
 	return 0
 }

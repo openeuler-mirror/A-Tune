@@ -5,6 +5,7 @@ random_starts : 10
 feature_filter_engine: "lhs"
 feature_filter_cycle: 5
 feature_filter_iters: 20
+feature_filter_count: 2
 split_count: 4
 
 benchmark : "python3 key_parameters_select/key_parameters_select.py"

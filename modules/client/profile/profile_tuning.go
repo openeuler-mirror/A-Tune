@@ -132,7 +132,9 @@ func profileTunning(ctx *cli.Context) error {
 			FeatureFilterEngine: prj.FeatureFilterEngine,
 			FeatureFilterCycle:  prj.FeatureFilterCycle,
 			FeatureFilterIters:  prj.FeatureFilterIters,
+			FeatureFilterCount:  prj.FeatureFilterCount,
 			SplitCount:          prj.SplitCount,
+			EvalFluctuation:     prj.EvalFluctuation,
 		}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
@@ -338,6 +340,16 @@ func checkTuningPrjYaml(prj project.YamlPrjCli) error {
 	}
 	if prj.FeatureFilterCycle > 0 && prj.FeatureFilterIters < 0 {
 		return fmt.Errorf("error: feature_filter_iters must be > 0 "+
+			"in project %s", prj.Project)
+	}
+
+	if prj.FeatureFilterCount < 0 {
+		return fmt.Errorf("error: feature_filter_count must be >= 0 "+
+			"in project %s", prj.Project)
+	}
+
+	if prj.EvalFluctuation < 0 {
+		return fmt.Errorf("error: eval_fluctuation must be >= 0 "+
 			"in project %s", prj.Project)
 	}
 
