@@ -14,10 +14,10 @@
 package pyservice
 
 import (
+	"bufio"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/registry"
-	"bufio"
 	"io"
 	"os"
 	"os/exec"
@@ -94,5 +94,5 @@ func listenToSystemSignals(cmd *exec.Cmd) {
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 	<-signalChan
 	_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
-	os.Exit(-1)
+	os.Exit(100)
 }

@@ -6,6 +6,7 @@ Requires=polkit.service
 [Service]
 Type=notify
 ExecStart=/usr/bin/atuned
+SuccessExitStatus=100
 
 [Install]
 WantedBy=multi-user.target
