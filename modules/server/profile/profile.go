@@ -404,7 +404,11 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	defer os.Remove(npipe)
 
 	go func() {
-		file, _ := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
+		file, err := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
+		if err != nil {
+			log.Errorf("failed to open pipe, err: %v", err)
+			return
+		}
 		reader := bufio.NewReader(file)
 
 		scanner := bufio.NewScanner(reader)

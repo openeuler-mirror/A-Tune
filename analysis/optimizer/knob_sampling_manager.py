@@ -76,8 +76,7 @@ class KnobSamplingManager:
                 self._is_discrete.append(True)
                 self._value_count.append(float(len(option_range)))
                 self._value_min.append(float(0))
-            else:
-                assert isinstance(option_range, tuple)
+            elif isinstance(option_range, tuple):
                 self._is_discrete.append(False)
                 self._value_count.append(float(option_range[1] - option_range[0]))
                 self._value_min = float(option_range[0])
@@ -98,7 +97,6 @@ class KnobSamplingManager:
 
     def get_sample_from_rate(self, dim, rate):
         """return the sample depend on rate"""
-        assert dim < len(self._option_range_list)
         if self._is_discrete[dim]:
             index = int(self._value_count[dim] * rate)
             return self._option_range_list[dim][index]
@@ -112,7 +110,7 @@ class KnobSamplingManager:
         for i in range(self._sample_count):
             knob_sample = []
             for dim in range(len(self._option_range_list)):
-                rate = rates[dim, i]  # Be carefull
+                rate = rates[dim, i]
                 sample = self.get_sample_from_rate(dim, rate)
                 knob_sample.append(sample)
             knob_samples.append(knob_sample)
@@ -127,7 +125,7 @@ class KnobSamplingManager:
         for dim in range(len(self._option_range_list)):
             knob_sample = []
             for i in range(self._sample_count):
-                rate = rates[dim, i]  # Be carefull
+                rate = rates[dim, i]
                 sample = self.get_sample_from_rate(dim, rate)
                 knob_sample.append(sample)
             knob_samples.append(knob_sample)
