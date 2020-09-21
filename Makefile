@@ -180,3 +180,6 @@ startup:
 	systemctl restart atune-engine
 
 run: all install startup
+
+authors:
+	git shortlog --summary --numbered --email|grep -v openeuler-ci-bot|sed 's/<root@localhost.*//'| awk '{$$1=null;print $$0}'|sed 's/^[ ]*//g' > AUTHORS
