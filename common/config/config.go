@@ -60,7 +60,7 @@ const (
 // log config
 const (
 	Formatter = "text"
-	Modes     = "syslog"
+	Modes     = "console"
 )
 
 // python service url
