@@ -88,6 +88,7 @@ make models
 %exclude /usr/libexec/atuned/analysis/models/
 %exclude /usr/libexec/atuned/analysis/optimizer/
 %exclude /usr/libexec/atuned/analysis/engine/
+%exclude /usr/libexec/atuned/analysis/dataset/
 %attr(0750,root,root) %dir /usr/lib/atuned
 %attr(0750,root,root) %dir /usr/lib/atuned/modules
 %attr(0750,root,root) %dir /usr/lib/atuned/profiles
@@ -111,9 +112,6 @@ make models
 %attr(0750,root,root) %dir /var/run/atuned
 %attr(0750,root,root) /var/lib/atuned/atuned.db
 %attr(0750,root,root) %dir /usr/libexec/atuned
-%attr(0750,root,root) %dir /usr/libexec/atuned/analysis
-%attr(0750,root,root) %dir /usr/libexec/atuned/analysis/models
-%attr(0750,root,root) /usr/libexec/atuned/analysis/models/*
 
 %files engine
 %license License/LICENSE
@@ -122,9 +120,10 @@ make models
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0750,root,root) /usr/libexec/atuned/resources/*
 %attr(0750,root,root) /etc/atuned/*
-%exclude /usr/libexec/atuned/analysis/app.py
+%exclude /usr/libexec/atuned/analysis/app_rest.py
 %exclude /usr/libexec/atuned/analysis/plugin/
 %exclude /usr/libexec/atuned/analysis/atuned/
+%exclude /usr/libexec/atuned/analysis/dataset/
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/libexec/atuned/resources
 %attr(0750,root,root) %dir /etc/atuned
