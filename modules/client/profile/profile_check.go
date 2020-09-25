@@ -16,6 +16,7 @@ package profile
 import (
 	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"strings"
 	"gitee.com/openeuler/A-Tune/common/client"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
@@ -97,6 +98,10 @@ func profileCheck(ctx *cli.Context) error {
 		}
 
 		if err != nil {
+			if strings.Contains(err.Error(), "no active profile or more than 1 active profile") {
+				fmt.Println("no active profile or more than 1 active profile")
+				break
+			}
 			return err
 		}
 		utils.Print(reply)
