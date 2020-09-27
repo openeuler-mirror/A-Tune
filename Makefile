@@ -23,10 +23,10 @@ ENGINE_IP_ADDR=localhost
 all: modules atune-adm atuned db
 
 atune-adm:
-	go build -mod=vendor -buildmode=plugin -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
+	go build -mod=vendor -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
 
 atuned:
-	go build -mod=vendor -buildmode=plugin -v $(GOFLAGS) -o $(PKGPATH)/atuned cmd/atuned/*.go
+	go build -mod=vendor -v $(GOFLAGS) -o $(PKGPATH)/atuned cmd/atuned/*.go
 
 modules:
 	cd ${CURDIR}/modules/server/profile/ && go build -mod=vendor -v $(GOFLAGS) -buildmode=plugin -o ${CURDIR}/pkg/daemon_profile_server.so *.go
