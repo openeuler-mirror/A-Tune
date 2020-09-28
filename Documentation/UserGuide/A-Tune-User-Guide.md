@@ -74,19 +74,19 @@ Based on the workload characteristics of applications, A-Tune classifies service
 
 **Table 1-2** Supported workload types and applications
 
-| Workload           | Type                 | Workload Characteristic                                      | Supported Application               |
+| Service category   | Type                 | Bottleneck                                                   | Supported Application               |
 | ------------------ | -------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| default            | Default type         | The usage of CPU, memory bandwidth,  network, and I/O resources is low. | N/A                                 |
-| webserver          | Web application      | CPU and network bottleneck                                   | Nginx, Apache Traffic Server        |
-| database           | Database             | CPU, memory and IO bottleneck                                | Mongodb, Mysql, Postgresql, Mariadb |
-| big-data           | Big data             | CPU and memory bottleneck                                    | Hadoop-hdfs, Hadoop-spark           |
-| middleware         | Middleware framework | CPU and network bottleneck                                   | Dubbo                               |
-| in-memory-database | Memory database      | Memory and IO bottleneck                                     | Redis                               |
-| basic-test-suite   | Basic test suite     | CPU and memory bottleneck                                    | SPECCPU2006, SPECjbb2015            |
-| hpc                | Human genome         | CPU, memory and IO bottleneck                                | Gatk4                               |
-| storage            | Storage              | Network and IO bottleneck                                    | Ceph                                |
-| virtualization     | Virtualization       | CPU, memory and IO bottleneck                                | Consumer-cloud, Mariadb             |
-| docker             | Docker               | CPU, memory and IO bottleneck                                | Mariadb                             |
+| default            | Default type         | Low resource usage in terms of cpu, memory, network, and I/O | N/A                                 |
+| webserver          | Web application      | Bottlenecks of cpu and network                               | Nginx, Apache Traffic Server        |
+| database           | Database             | Bottlenecks of cpu, memory, and I/O                          | Mongodb, Mysql, Postgresql, Mariadb |
+| big-data           | Big data             | Bottlenecks of cpu and memory                                | Hadoop-hdfs, Hadoop-spark           |
+| middleware         | Middleware framework | Bottlenecks of cpu and network                               | Dubbo                               |
+| in-memory-database | Memory database      | Bottlenecks of memory and I/O                                | Redis                               |
+| basic-test-suite   | Basic test suite     | Bottlenecks of cpu and memory                                | SPECCPU2006, SPECjbb2015            |
+| hpc                | Human genome         | Bottlenecks of cpu, memory, and I/O                          | Gatk4                               |
+| storage            | Storage              | Bottlenecks of network, and I/O                              | Ceph                                |
+| virtualization     | Virtualization       | Bottlenecks of cpu, memory, and I/O                          | Consumer-cloud, Mariadb             |
+| docker             | Docker               | Bottlenecks of cpu, memory, and I/O                          | Mariadb                             |
 
 
 
@@ -153,7 +153,7 @@ gpgcheck=1
 enabled=1
 ```
 
-**Step 3** Import Public Key.
+**Step 3** Import the GPG public key of the RPM digital signature to the system.
 
 ```shell
 rpm --import /mnt/RPM-GPG-KEY-openEuler
@@ -163,7 +163,7 @@ rpm --import /mnt/RPM-GPG-KEY-openEuler
 
 > ![en-us_image_note](figures/en-us_image_note.png)
 >
-> this step, both the server and client software packages are installed. For the single-node deployment, skip **Step 5**.
+> In this step, both the server and client software packages are installed. For the single-node deployment, skip **Step 5**.
 
 ```shell
 # yum install atune -y
@@ -205,30 +205,30 @@ You can modify the parameter value as required.
 - **protocol**: Protocol used by the gRPC service. The value can be **unix** or **tcp**. **unix** indicates the local socket communication mode, and **tcp** indicates the socket listening port mode. The default value is **unix**.
 - **address**: Listening IP address of the gRPC service. The default value is **unix socket**. If the gRPC service is deployed in distributed mode, change the value to the listening IP address.
 - **port**: Listening port of the gRPC server. The value ranges from 0 to 65535. If **protocol** is set to **unix**, you do not need to set this parameter.
-- **connect**: IP address list of the nodes where the atune is deployed in a cluster. Use commas (,) to separate the IP addresses.
-- **rest_host**: Listening IP address of the system REST service. The default value is localhost.
-- **rest_port**: Listening port of the system REST service. The value ranges from 0 to 65535. The default value is 8383.
-- **engine_host**: IP address for connecting to the atune engine service.
-- **engine_port**: Port for connecting to the atune engine service.
+- **connect**: IP address list of the nodes where the A-Tune is located when the A-Tune is deployed in a cluster. IP addresses are separated by commas (,).
+- **rest_host**: Listening address of the REST service. The default value is localhost.
+- **rest_port**: Listening port of the REST service. The value ranges from 0 to 65535. The default value is 8383.
+- **engine_host**: IP address for connecting to the A-Tune engine service of the system.
+- **engine_port**: Port for connecting to the A-Tune engine service of the system.
 - **sample_num**: Number of samples collected when the system executes the analysis process. The default value is 20.
-- **interval**: Interval of samples collected when the system executes the analysis process. The default value is 5.
-- **grpc_tls**: SSL/TLS certificate verification for the gRPC of A-Tune. This is disabled by default. After grpc_tls is enabled, you need to set the following environment variables before running the **atune-adm** command to communicate with the server:
+- **interval**: Interval for collecting samples when the system executes the analysis process. The default value is 5s.
+- **grpc_tls**: Indicates whether to enable SSL/TLS certificate verification for the gRPC service. By default, this function is disabled. After grpc_tls is enabled, you need to set the following environment variables before running the **atune-adm** command to communicate with the server:
   - export ATUNE_TLS=yes
-  - export ATUNED_CACERT=<Client ca certificate path>
+  - export ATUNED_CACERT=<Path of the client CA certificate>
   - export ATUNED_CLIENTCERT=<Client certificate path>
   - export ATUNED_CLIENTKEY=<Client key path>
   - export ATUNED_SERVERCN=server
-- **tlsservercafile**: path of the gPRC server ca certificate.
-- **tlsservercertfile**: path of the gPRC server certificate.
-- **tlsserverkeyfile**: gPRC server key path.
-- **rest_tls**: SSL/TLS certificate verification for the rest service of A-Tune. This is enabled by default.
-- **tlsrestcacertfile**: path of the rest service ca certificate.
-- **tlsrestservercertfile**: path of the rest service certificate.
-- **tlsrestserverkeyfile**: the rest service key path.
-- **engine_tls**: SSL/TLS certificate verification for the engine service of A-Tune. This is enabled by default.
-- **tlsenginecacertfile**: path of the engine service ca certificate.
-- **tlsengineclientcertfile**: path of the engine service client certificate.
-- **tlsengineclientkeyfile**: the engine service client key path.
+- **tlsservercafile**: Path of the gPRC server's CA certificate.
+- **tlsservercertfile**: Path of the gPRC server certificate.
+- **tlsserverkeyfile**: Path of the gPRC server key.
+- **rest_tls**: Indicates whether to enable SSL/TLS certificate verification for the REST service. This function is enabled by default.
+- **tlsrestcacertfile**: Path of the server's CA certificate of the REST service.
+- **tlsrestservercertfile**: Path of the server certificate of the REST service.
+- **tlsrestserverkeyfile**: Indicates the key path of the REST service.
+- **engine_tls**: Indicates whether to enable SSL/TLS certificate verification for the A-Tune engine service. This function is enabled by default..
+- **tlsenginecacertfile**: Path of the client CA certificate of the A-Tune engine service.
+- **tlsengineclientcertfile**: Client certificate path of the A-Tune engine service.
+- **tlsengineclientkeyfile**: Client key path of the A-Tune engine service.
 
 **System information**
 
@@ -240,7 +240,7 @@ System is the parameter information required for system optimization. You must m
 
 **Log information**
 
-Change the log level based on the site requirements. The default log level is info. The log information is stored in the **/var/log/messages**.
+Change the log level as required. The default log level is info. Log information is recorded in the **/var/log/messages** file.
 
 **Monitor information**
 
@@ -248,10 +248,10 @@ Hardware information that is collected by default when the system is started.
 
 **Tuning information**
 
-Tuning is the parameter information required for offline optimization.
+Tuning is the parameter information required for offline tuning.
 
 - **noise**: Evaluation value of Gaussian noise.
-- **sel_feature**: Control whether to output the importance ranking of offline optimization parameters. This is disabled by default. 
+- **sel_feature**: Indicates whether to enable the function of generating the importance ranking of offline tuning parameters. By default, this function is disabled.
 
 **Example**
 
@@ -347,22 +347,22 @@ Tuning is the parameter information required for offline optimization.
  sel_feature = false
 ```
 
-The configuration items in the A-Tune engine configuration file **/etc/atuned/engine.cnf** are described as follows:
+The configuration items in the configuration file **/etc/atuned/engine.cnf** of the A-Tune engine are described as follows:
 
-**A-Tune engine service startup configuration**
+**Startup configuration of the A-Tune engine service**
 
-You can modify the parameter value as required.
+You can modify the startup configuration as required.
 
-- **engine_host**: Listening IP address of the atune engine service. The default value is localhost.
-- **engine_port**: Listening port of the atune engine service. The value ranges from 0 to 65535. The default value is 3838.
-- **engine_tls**: SSL/TLS certificate verification for the engine service of A-Tune. This is enabled by default.
-- **tlsenginecacertfile**: path of the engine service ca certificate.
-- **tlsengineservercertfile**: path of the engine service server certificate.
-- **tlsengineserverkeyfile**: the engine service server key path.
+- **engine_host**: Listening address of the A-Tune engine service. The default value is localhost.
+- **engine_port**: Listening port of the A-Tune engine service. The value ranges from 0 to 65535. The default value is 3838.
+- **engine_tls**: Indicates whether to enable SSL/TLS certificate verification for the A-Tune engine service. This function is enabled by default.
+- **tlsenginecacertfile**: Path of the server CA certificate of the A-Tune engine service.
+- **tlsengineservercertfile**: Path of the server certificate of the A-Tune engine service.
+- **tlsengineserverkeyfile**: Server key path of the A-Tune engine service.
 
 **Log information**
 
-Change the log level based on the site requirements. The default log level is info. The log information is stored in the **/var/log/messages**.
+Change the log level as required. The default log level is info. Log information is recorded in the **/var/log/messages** file.
 
 **Example**
 
@@ -396,27 +396,27 @@ l  Start the atuned service.
 
 \# **systemctl start atuned**
 
-l  To query the status of the atuned service, run the following command:
+l  Query the atuned service status.
 
 \# **systemctl status atuned**
 
-If the following information is displayed, the service is started successfully:
+If the following command output is displayed, the service is started successfully:
 
 ![004-en_atune-img](figures/004-en_atune-img.png)
 
 ## 2.6 Starting A-Tune engine
 
-To use AI-related functions, you need to start the A-Tune engine service.
+To use AI functions, you need to start the A-Tune engine service.
 
-l  Start the atune engine service.
+l  Start the atune-engine service.
 
 \# **systemctl start atune-engine**
 
-l  To query the status of the atune-engine service, run the following command:
+l  Query the atune-engine service status.
 
 \# **systemctl status atune-engine**
 
-If the following information is displayed, the service is started successfully:
+If the following command output is displayed, the service is started successfully:
 
 ![004-en_atune-img](figures/004-en_atune-engine-img.png)
 
@@ -576,18 +576,18 @@ Collect real-time statistics from the system to identify and automatically optim
 
 | Parameter              | Description                                                  |
 | ---------------------- | ------------------------------------------------------------ |
-| --model, -m            | Model generated by user-defined training                     |
+| --model, -m            | New model generated after user self-training                 |
 | --characterization, -c | Use the default model for application identification and do not perform automatic optimization |
 
 **Example**
 
-Use the default model for classification and identification.
+Use the default model for application identification.
 
 ```shell
 # atune-adm analysis --characterization
 ```
 
-Use the default model for classification and identification and perform automatic optimization
+Use the default model to identify applications and perform automatic tuning.
 
 ```shell
 # atune-adm analysis
@@ -615,7 +615,7 @@ A-Tune allows users to define and learn new models. To define a new model, perfo
 
 **Function**
 
-Add a user-defined application scenarios and the corresponding profile optimization item.
+Add a user-defined application scenarios and the corresponding profile tuning items.
 
 **Format**
 
@@ -623,7 +623,7 @@ Add a user-defined application scenarios and the corresponding profile optimizat
 
 **Example**
 
-Add a new profile. Set service_type to **test_service**, application_name to **test_app**, scenario_name to **test_scenario** and configuration file of an optimization item to **example.conf**.
+Add a profile whose service_type is **test_service**, application_name is **test_app**, scenario_name is **test_scenario**, and tuning item configuration file is **example.conf**.
 
 ```shell
 # atune-adm define test_service test_app test_scenario ./example.conf
@@ -684,7 +684,7 @@ Collect the global resource usage and OS status information during service runni
 | --output_path, -o | Path for storing the generated CSV file.  The absolute path is required. |
 | --disk, -b        | Disk used during service running, for  example, /dev/sda.    |
 | --network, -n     | Network port used during service running,  for example, eth0. |
-| --app_type, -t    | Application type, which is used as a label  for training.    |
+| --app_type, -t    | Mark the application type of the service as a label for training. |
 | --duration, -d    | Data collection time during service  running, in seconds. The default collection time is 1200 seconds. |
 | --interval, -i    | Interval for collecting data, in seconds.  The default interval is 5 seconds. |
 
@@ -698,7 +698,7 @@ Collect the global resource usage and OS status information during service runni
 
 **Function**
 
-Use the collected data to train the model. Collect data of at least two workload types during training. Otherwise, an error is reported.
+Use the collected data to train the model. Collect data of at least two application types during training. Otherwise, an error is reported.
 
 **Format**
 
@@ -736,7 +736,7 @@ Delete a user-defined profile.
 Delete the user-defined profile.
 
 ```shell
-# atune-adm undefine test_service-test_app-test_scenario 
+# atune-adm undefine test_service-test_app-test_scenario
 ```
 
 ## 3.5 Querying Profiles
@@ -838,7 +838,7 @@ You can update the existing profile as required.
 
 **Function**
 
-Update an optimization item of the profile to the content in the **new.conf** file.
+Update the original tuning items in the existing profile to the content in the **new.conf** file.
 
 **Format**
 
@@ -846,7 +846,7 @@ Update an optimization item of the profile to the content in the **new.conf** fi
 
 **Example**
 
-Update the optimization item of the profile named **test_service-test_app-test_scenario** to **new.conf**.
+Change the tuning item of the profile named **test_service-test_app-test_scenario** to **new.conf**.
 
 ```shell
 # atune-adm update test_service-test_app-test_scenario ./new.conf
@@ -858,7 +858,7 @@ Update the optimization item of the profile named **test_service-test_app-test_s
 
 **Function**
 
-Manually activate the profile and make it in the active state.
+Manually activate the profile to make it in the active state.
 
 **Format**
 
@@ -866,11 +866,11 @@ Manually activate the profile and make it in the active state.
 
 **Parameter Description**
 
-You can run the **list** command to query the supported profile name.
+For details about the profile name, see the query result of the list command.
 
 **Example**
 
-Activate the profile configuration of web-nginx-http-long-connection.
+Activate the profile corresponding to the web-nginx-http-long-connection.
 
 ```shell
 # atune-adm profile web-nginx-http-long-connection
@@ -956,7 +956,7 @@ Check the CPU, BIOS, OS, and NIC information.
 
 ## 3.11 Automatic Parameter Optimization
 
-A-Tune provides the automatic search capability for optimal configurations, eliminating the need for repeated manual parameter adjustment and performance evaluation. This greatly improves the search efficiency of optimal configurations.
+A-Tune provides the automatic search capability with the optimal configuration, saving the trouble of manually configuring parameters and performance evaluation. This greatly improves the search efficiency of optimal configurations.
 
 ### 3.11.1 Tuning
 
@@ -974,8 +974,8 @@ Use the specified project file to search the dynamic space for parameters and fi
 >
 > Before running the command, ensure that the following conditions are met:
 >
-> 1. The YAML configuration file of the server has been edited and placed in the **/etc/atuned/tuning/** directory on the server by the server administrator.
-> 2. The YAML configuration file of the client has been edited and placed in an arbitrary directory on the client.
+> 1. The YAML configuration file on the server has been edited and stored in the **/etc/atuned/tuning/** directory of the atuned service.
+> 2. The YAML configuration file of the client has been compiled and stored on the atuned client.
 
 **Parameter Description**
 
@@ -985,12 +985,12 @@ Use the specified project file to search the dynamic space for parameters and fi
 | ------------- | ------------------------------------------------------------ |
 | --restore, -r | Restores the initial configuration before  tuning.           |
 | --project, -p | Specifies the project name in the YAML  file to be restored. |
-| --restart, -c | Perform optimization based on historical optimization results. |
-| --detail, -d  | Print details about the tuning process.                      |
+| --restart, -c | Perform tuning based on historical tuning results.           |
+| --detail, -d  | Print detailed information about the tuning process.         |
 
 > ![en-us_image_note](figures/en-us_image_note.png)
 >
-> When a parameter is used, the -p parameter must be followed by a specific project name and the YAML file of the project must be specified.
+> If this parameter is used, the -p parameter must be followed by a specific project name and the YAML file of the project must be specified.
 
 
 
@@ -1030,30 +1030,30 @@ Configuration Description
 
 **Table 3-3** Description of configuration items of a YAML file on the client
 
-| Name                  | Description                                                  | Type    | Value Range                                       |
-| --------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
-| project               | Project name, which must be the same as  that in the configuration file on the server. | String  | -                                                 |
-| engine                | Optimization algorithm.                                      | String  | "random", "forest", "gbrt", "bayes", "extraTrees" |
-| iterations            | Number of optimization iterations.                           | Integer | ≥ 10                                              |
-| random_starts         | Number of random iterations.                                 | Integer | < iterations                                      |
-| feature_filter_engine | Parameter search algorithm.                                  | String  | "lhs"                                             |
-| feature_filter_cycle  | Parameter search cycles.                                     | Integer | -                                                 |
-| feature_filter_iters  | Number of iterations in each parameter search.               | Integer | -                                                 |
-| split_count           | Number of parameters evenly selected from the optimization parameter value range. | Integer | -                                                 |
-| benchmark             | Performance test script.                                     | -       | -                                                 |
-| evaluations           | Performance test evaluation index.  For details about the evaluations  configuration items, see Table 3-4. | -       | -                                                 |
+| Name                  | Description                                                  | Type             | Value Range                                       |
+| --------------------- | ------------------------------------------------------------ | ---------------- | ------------------------------------------------- |
+| project               | Project name, which must be the same as  that in the configuration file on the server. | Character string | -                                                 |
+| engine                | Tuning algorithm.                                            | Character string | "random", "forest", "gbrt", "bayes", "extraTrees" |
+| iterations            | Number of optimization iterations.                           | Integer          | ≥ 10                                              |
+| random_starts         | Number of random iterations.                                 | Integer          | < iterations                                      |
+| feature_filter_engine | Parameter search algorithm.                                  | Character string | "lhs"                                             |
+| feature_filter_cycle  | Parameter search cycles.                                     | Integer          | -                                                 |
+| feature_filter_iters  | Number of iterations for each cycle of parameter search.     | Integer          | -                                                 |
+| split_count           | Number of evenly selected parameters in the value range of tuning parameters. | Integer          | -                                                 |
+| benchmark             | Performance test script.                                     | -                | -                                                 |
+| evaluations           | Performance test evaluation index.  For details about the evaluations  configuration items, see Table 3-4. | -                | -                                                 |
 
  
 
 **Table 3-4** Description of evaluations configuration item
 
-| Name      | Description                                                  | Type        | Value Range                  |
-| --------- | ------------------------------------------------------------ | ----------- | ---------------------------- |
-| name      | Evaluation index name.                                       | String      | -                            |
-| get       | Script for obtaining performance  evaluation results.        | -           | -                            |
-| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the  performance value is maximized. | Enumeration | **positive** or **negative** |
-| weight    | Weight of the index. The value ranges  from 0 to 100.        | Integer     | 0-100                        |
-| threshold | Minimum performance requirement of the  index.               | Integer     | User-defined                 |
+| Name      | Description                                                  | Type             | Value Range                  |
+| --------- | ------------------------------------------------------------ | ---------------- | ---------------------------- |
+| name      | Evaluation index name.                                       | Character string | -                            |
+| get       | Script for obtaining performance  evaluation results.        | -                | -                            |
+| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the  performance value is maximized. | Enumeration      | **positive** or **negative** |
+| weight    | Weight of the index. The value ranges  from 0 to 100.        | Integer          | 0-100                        |
+| threshold | Minimum performance requirement of the  index.               | Integer          | User-defined                 |
 
  
 
@@ -1130,7 +1130,7 @@ Perform tuning.
 # atune-adm tuning --project compress --detail compress_client.yaml
 ```
 
- Restore the initial configuration before tuning. Compress is the project name in the YAML file.
+ Restore the initial configuration before tuning. The compress is the project name in the YAML file.
 
 ```shell
 # atune-adm tuning --restore --project compress
