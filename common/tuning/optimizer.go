@@ -99,19 +99,6 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 		}
 	}
 
-	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
-		return err
-	}
-
-	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
-	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
-	err = utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
-		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
 	if !o.BackupFlag {
 		err = o.Backup(ch)
 		if err != nil {
@@ -130,6 +117,18 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 }
 
 func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, engine string) error {
+	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
+		return err
+	}
+
+	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
+	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
+	if err := utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
+		os.O_WRONLY|os.O_CREATE|os.O_APPEND); err != nil {
+		log.Error(err)
+		return err
+	}
+
 	optimizerBody := new(models.OptimizerPostBody)
 	if o.Restart {
 		if err := o.readTuningLog(optimizerBody); err != nil {
@@ -206,6 +205,9 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 	var endTime time.Time
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
+	xrefMap := make(map[int][]string)
+	yrefMap := make(map[int]float64)
+	evalArray := make(map[int]string)
 	for scanner.Scan() {
 		line := scanner.Text()
 		items := strings.Split(line, "|")
@@ -238,10 +240,7 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 		}
 		o.TotalTime = o.TotalTime + endTime.Sub(startTime).Seconds()
 
-		if yFloat < o.MinEvalSum {
-			o.MinEvalSum = yFloat
-			o.EvalMinArray = items[4]
-		}
+		evalArray[o.Iter] = items[4]
 		xPara := strings.Split(items[5], ",")
 		xValue := make([]string, 0)
 		for _, para := range xPara {
@@ -251,9 +250,20 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 			xValue = append(xValue, para)
 		}
 
-		body.Xref = append(body.Xref, xValue)
-		body.Yref = append(body.Yref, strconv.FormatFloat(yFloat, 'f', -1, 64))
+		xrefMap[o.Iter] = xValue
+		yrefMap[o.Iter] = yFloat
 	}
+
+	for i := 1; i <= o.Iter; i++ {
+		if yrefMap[i] < o.MinEvalSum {
+			o.MinEvalSum = yrefMap[i]
+			o.EvalMinArray = evalArray[i]
+		}
+		body.Xref = append(body.Xref, xrefMap[i])
+		body.Yref = append(body.Yref, strconv.FormatFloat(yrefMap[i], 'f', -1, 64))
+	}
+
+	o.FinalEval = o.EvalMinArray
 
 	return nil
 }
@@ -668,21 +678,8 @@ func syncConfigToNode(server string, scripts string) error {
 // InitFeatureSel method for init feature selection tuning
 func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) error {
 	o.FeatureFilter = true
-	if err := utils.CreateDir(config.DefaultTuningLogPath, 0750); err != nil {
-		return err
-	}
 
-	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
-	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
-	err := utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
-		os.O_WRONLY|os.O_CREATE|os.O_APPEND)
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	err = o.Backup(ch)
-	if err != nil {
+	if err := o.Backup(ch); err != nil {
 		return err
 	}
 	if err := o.createOptimizerTask(ch, o.FeatureFilterIters, o.FeatureFilterEngine); err != nil {
