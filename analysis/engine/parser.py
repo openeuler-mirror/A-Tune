@@ -42,6 +42,8 @@ OPTIMIZER_POST_PARSER.add_argument('noise', type=float, location='json',
                                    help="the noise can not be null")
 OPTIMIZER_POST_PARSER.add_argument('prj_name', type=str, location='json',
                                    help="prj_name cannot be null")
+OPTIMIZER_POST_PARSER.add_argument('feature_selector', choices=('wefs', 'vrfs'),
+                                   help="importance feature selector: {error_msg}")
 
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,

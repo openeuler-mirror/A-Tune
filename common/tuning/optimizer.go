@@ -67,6 +67,7 @@ type Optimizer struct {
 	Restart             bool
 	TuningParams        map[string]struct{}
 	EvalStatistics      []float64
+	FeatureSelector     string
 }
 
 // InitTuned method for iniit tuning
@@ -142,6 +143,7 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optimizerBody.Engine = engine
 	optimizerBody.RandomStarts = o.RandomStarts
 	optimizerBody.FeatureFilter = o.FeatureFilter
+	optimizerBody.FeatureSelector = o.FeatureSelector
 	optimizerBody.SelFeature = config.SelFeature
 	optimizerBody.SplitCount = o.SplitCount
 	optimizerBody.Noise = config.Noise

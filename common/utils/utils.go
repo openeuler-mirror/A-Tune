@@ -520,7 +520,7 @@ func (p SortedPair) Len() int {
 }
 
 func (p SortedPair) Less(i, j int) bool {
-	return math.Abs(p[i].Score) >= math.Abs(p[j].Score)
+	return p[i].Score >= p[j].Score
 }
 
 func IsEquals(a, b float64) bool {

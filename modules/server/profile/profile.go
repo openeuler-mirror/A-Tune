@@ -635,6 +635,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			cycles = reply.GetFeatureFilterCycle()
 			optimizer.FeatureFilterCount = reply.GetFeatureFilterCount()
 			optimizer.EvalFluctuation = reply.GetEvalFluctuation()
+			optimizer.FeatureSelector = reply.GetFeatureSelector()
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_JobCreate}
 		case PB.TuningMessage_JobCreate:
 			optimizer.EvalBase = reply.GetTuningLog().GetBaseEval()

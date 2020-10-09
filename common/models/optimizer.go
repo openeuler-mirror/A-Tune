@@ -23,17 +23,18 @@ import (
 
 // OptimizerPostBody send to the service to create a optimizer task
 type OptimizerPostBody struct {
-	MaxEval       int32      `json:"max_eval"`
-	Knobs         []Knob     `json:"knobs"`
-	Engine        string     `json:"engine"`
-	RandomStarts  int32      `json:"random_starts"`
-	Xref          [][]string `json:"x_ref,omitempty"`
-	Yref          []string   `json:"y_ref,omitempty"`
-	FeatureFilter bool       `json:"feature_filter"`
-	SplitCount    int32      `json:"split_count"`
-	Noise         float64    `json:"noise"`
-	SelFeature    bool       `json:"sel_feature"`
-	PrjName       string     `json:"prj_name"`
+	MaxEval         int32      `json:"max_eval"`
+	Knobs           []Knob     `json:"knobs"`
+	Engine          string     `json:"engine"`
+	RandomStarts    int32      `json:"random_starts"`
+	Xref            [][]string `json:"x_ref,omitempty"`
+	Yref            []string   `json:"y_ref,omitempty"`
+	FeatureFilter   bool       `json:"feature_filter"`
+	SplitCount      int32      `json:"split_count"`
+	Noise           float64    `json:"noise"`
+	SelFeature      bool       `json:"sel_feature"`
+	PrjName         string     `json:"prj_name"`
+	FeatureSelector string     `json:"feature_selector"`
 }
 
 // Knob body store the tuning properties

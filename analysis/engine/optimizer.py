@@ -66,7 +66,8 @@ class Optimizer(Resource):
                                      n_random_starts=args.get("random_starts"),
                                      x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
                                      noise=args.get("noise"), 
-                                     sel_feature=args.get("feature_filter") or args.get("sel_feature"))
+                                     sel_feature=args.get("feature_filter") or args.get("sel_feature"),
+                                     feature_selector=args.get("feature_selector"))
         engine.start()
 
         value = {}
