@@ -43,17 +43,16 @@ class MemTopo(Monitor):
                 cmd=self.__cmd, opt=self._option).split(), stderr=no_print)
         return output.decode()
 
-    def table_get_locator(self, bank):
+    @staticmethod
+    def table_get_locator(bank):
         """get locator in table"""
         pattern = re.compile(
             r"DIMM.*?(\d)(\d)(\d).*",
             re.ASCII | re.MULTILINE)
         scd = pattern.findall(bank)
         if len(scd) == 0:
-            err = LookupError("Fail to find data")
-            LOGGER.error("%s.%s: %s", self.__class__.__name__,
-                         inspect.stack()[0][3], str(err))
-            raise err
+            LOGGER.info("slot: %s does not support to parse", bank)
+            return None
 
         ret = []
         for i in scd[0]:
