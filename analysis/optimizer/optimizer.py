@@ -30,6 +30,7 @@ from skopt.utils import cook_estimator
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
+from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
 
 LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
     def __init__(self, name, params, child_conn, prj_name, engine="bayes", max_eval=50, sel_feature=False,
-                 x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2):
+                 x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
         super(Optimizer, self).__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
@@ -56,6 +57,7 @@ class Optimizer(multiprocessing.Process):
         else:
             self.ref = []
         self._n_random_starts = 20 if n_random_starts is None else n_random_starts
+        self.feature_selector = feature_selector
 
     def build_space(self):
         """build space"""
@@ -368,8 +370,12 @@ class Optimizer(multiprocessing.Process):
         LOGGER.info("The optimized profile has been generated.")
         final_param = {}
         if self.sel_feature is True:
-            wefs = WeightedEnsembleFeatureSelector()
-            rank = wefs.get_ensemble_feature_importance(options, performance, labels)
+            if self.feature_selector == "wefs":
+                wefs = WeightedEnsembleFeatureSelector()
+                rank = wefs.get_ensemble_feature_importance(options, performance, labels)
+            elif self.feature_selector == "vrfs":
+                vrfs = VarianceReductionFeatureSelector()
+                rank = vrfs.get_ensemble_feature_importance(options, performance, labels)
             final_param["rank"] = rank
             LOGGER.info("The feature importances of current evaluation are: %s", rank)
 

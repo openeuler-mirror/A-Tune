@@ -58,6 +58,7 @@ type YamlPrjCli struct {
 	FeatureFilterCycle  int32      `yaml:"feature_filter_cycle"`
 	FeatureFilterIters  int32      `yaml:"feature_filter_iters"`
 	FeatureFilterCount  int32      `yaml:"feature_filter_count"`
+	FeatureSelector     string     `yaml:"feature_selector"`
 	SplitCount          int32      `yaml:"split_count"`
 	EvalFluctuation     float64    `yaml:"eval_fluctuation"`
 	Evaluations         []Evaluate `yaml:"evaluations"`

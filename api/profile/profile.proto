@@ -123,6 +123,7 @@ message TuningMessage {
     int32 SplitCount = 12;
     int32 FeatureFilterCount = 13;
     double EvalFluctuation = 14;
+    string FeatureSelector = 15;
 }
 
 message TuningHistory {

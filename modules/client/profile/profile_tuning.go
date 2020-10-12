@@ -102,7 +102,7 @@ func profileTunning(ctx *cli.Context) error {
 	prj.EvalBaseArray = make([]float64, len(prj.Evaluations))
 	prj.EvalCurrentArray = make([]float64, len(prj.Evaluations))
 	prj.EvalMinArray = make([]float64, len(prj.Evaluations))
-	if err := checkTuningPrjYaml(prj); err != nil {
+	if err := checkTuningPrjYaml(&prj); err != nil {
 		return err
 	}
 	err := runTuningRPC(ctx, func(stream PB.ProfileMgr_TuningClient) error {
@@ -111,7 +111,7 @@ func profileTunning(ctx *cli.Context) error {
 		var init bool = false
 		go func() {
 			if !ctx.Bool("restart") {
-				fmt.Println("Start to benchmark baseline...")
+				fmt.Println(" Start to benchmark baseline...")
 				_, _, err := prj.BenchMark()
 				if err != nil {
 					errors <- err
@@ -135,6 +135,7 @@ func profileTunning(ctx *cli.Context) error {
 			FeatureFilterCount:  prj.FeatureFilterCount,
 			SplitCount:          prj.SplitCount,
 			EvalFluctuation:     prj.EvalFluctuation,
+			FeatureSelector:     prj.FeatureSelector,
 		}
 		if err := stream.Send(content); err != nil {
 			return fmt.Errorf("client sends failure, error: %v", err)
@@ -309,7 +310,7 @@ func checkTuningCtx(ctx *cli.Context) error {
 	return nil
 }
 
-func checkTuningPrjYaml(prj project.YamlPrjCli) error {
+func checkTuningPrjYaml(prj *project.YamlPrjCli) error {
 	if len(prj.Project) < 1 || len(prj.Project) > 128 {
 		return fmt.Errorf("error: project name must be no less than 1 " +
 			"and no greater than 128 in yaml or yml")
@@ -357,6 +358,13 @@ func checkTuningPrjYaml(prj project.YamlPrjCli) error {
 		prj.Engine == "abtest" || prj.Engine == "lhs") && prj.SplitCount <= 0 {
 		return fmt.Errorf("error: split_count must be > 0 "+
 			"in project %s", prj.Project)
+	}
+
+	if prj.FeatureSelector == "" {
+		prj.FeatureSelector = "wefs"
+	} else if prj.FeatureSelector == "vrfs" && prj.FeatureFilterCount != 1 {
+		fmt.Println(" Feature selector is vrfs, only select one key parameter at a time.")
+		prj.FeatureFilterCount = 1
 	}
 
 	return nil
