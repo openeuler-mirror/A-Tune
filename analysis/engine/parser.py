@@ -49,6 +49,9 @@ OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,
                                   help="iterations cannot be null")
 OPTIMIZER_PUT_PARSER.add_argument('value', type=str, required=True, help="value cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('line', type=str, required=True, help="line cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('prj_name', type=str, required=True, help="project name cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('max_iter', type=int, required=True, help="max iterations cannot be null")
 
 CLASSIFICATION_POST_PARSER = reqparse.RequestParser()
 CLASSIFICATION_POST_PARSER.add_argument('modelpath', required=True, help="The modelfile to be used")

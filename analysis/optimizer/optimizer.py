@@ -233,18 +233,11 @@ class Optimizer(multiprocessing.Process):
             performance.append(x_num)
             return x_num
 
-        utils.change_file_name()
-
         params = {}
         options = []
         performance = []
         labels = []
         estimator = None
-
-        parameters = ""
-        for knob in self.knobs:
-            parameters += knob["name"] + ","
-        utils.add_data_to_file(parameters[:-1], "w", self.project_name)
 
         try:
             if self.engine == 'random' or self.engine == 'forest' or \
@@ -314,14 +307,6 @@ class Optimizer(multiprocessing.Process):
                     LOGGER.info("next_y: %s", next_y)
                     ret = optimizer.tell(next_x, next_y)
                     LOGGER.info("finish (ref_x, ref_y) tell")
-
-                    data = ""
-                    for element in next_x:
-                        data += str(element) + ","
-                    data += str(abs(next_y))
-                    utils.add_data_to_file(data, "a", self.project_name)
-
-                utils.add_data_to_file("END", "a", self.project_name)
 
             elif self.engine == 'abtest':
                 abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn,

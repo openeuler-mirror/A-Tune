@@ -68,6 +68,7 @@ type Optimizer struct {
 	TuningParams        map[string]struct{}
 	EvalStatistics      []float64
 	FeatureSelector     string
+	PrjId               string
 }
 
 // InitTuned method for iniit tuning
@@ -123,7 +124,7 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	}
 
 	o.TuningFile = path.Join(config.DefaultTuningLogPath, fmt.Sprintf("%s_%s", o.Prj.Project, config.TuningFile))
-	projectName := fmt.Sprintf("project %s\n", o.Prj.Project)
+	projectName := fmt.Sprintf("project %s %s %d\n", o.Prj.Project, o.Engine, o.MaxIter)
 	if err := utils.WriteFile(o.TuningFile, projectName, utils.FilePerm,
 		os.O_WRONLY|os.O_CREATE|os.O_APPEND); err != nil {
 		log.Error(err)
@@ -192,6 +193,19 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	url := config.GetURL(config.OptimizerURI)
 	o.OptimizerPutURL = fmt.Sprintf("%s/%s", url, respPostIns.TaskID)
 	log.Infof("optimizer put url is: %s", o.OptimizerPutURL)
+
+	optPutBody := new(models.OptimizerPutBody)
+	optPutBody.Iterations = -1
+	optPutBody.Value = ""
+	optPutBody.Line = projectName
+	optPutBody.PrjName = o.Prj.Project + "-" + o.PrjId
+	optPutBody.MaxIter = int(o.MaxIter)
+	log.Infof("optimizer put body is: %+v", optPutBody)
+	_, err = optPutBody.Put(o.OptimizerPutURL)
+	if err != nil {
+		log.Errorf("get setting parameter error: %v", err)
+		return err
+	}
 
 	return nil
 }
@@ -292,7 +306,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	var evalValue string
 	var err error
 	var message string
-	evalValue, err = o.evalParsing(ch)
+	lines, evalValue, err := o.evalParsing(ch)
 	if err != nil {
 		return err
 	}
@@ -305,6 +319,9 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = o.Iter
 	optPutBody.Value = evalValue
+	optPutBody.Line = lines
+	optPutBody.PrjName = o.Prj.Project + "-" + o.PrjId
+	optPutBody.MaxIter = int(o.MaxIter)
 	log.Infof("optimizer put body is: %+v", optPutBody)
 	o.RespPutIns, err = optPutBody.Put(o.OptimizerPutURL)
 	if err != nil {
@@ -488,9 +505,9 @@ func (o *Optimizer) RestoreConfigTuned(ch chan *PB.TuningMessage) error {
 	return nil
 }
 
-func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
+func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, string, error) {
 	if o.Restart && o.Content == nil {
-		return "", nil
+		return "", "", nil
 	}
 
 	eval := o.EvalBase
@@ -511,17 +528,17 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 		os.O_APPEND|os.O_WRONLY)
 	if err != nil {
 		log.Error(err)
-		return "", err
+		return "", "", err
 	}
 
 	kvs := strings.Split(o.Evaluations, "=")
 	if len(kvs) != 2 {
-		return "", fmt.Errorf("get evaluation error")
+		return "", "", fmt.Errorf("get evaluation error")
 	}
 	evalSum, err := strconv.ParseFloat(kvs[1], 64)
 	if err != nil {
 		log.Error(err)
-		return "", err
+		return "", "", err
 	}
 
 	if o.Iter == 1 || evalSum < o.MinEvalSum {
@@ -533,7 +550,7 @@ func (o *Optimizer) evalParsing(ch chan *PB.TuningMessage) (string, error) {
 		o.EvalStatistics = append(o.EvalStatistics, evalSum)
 	}
 
-	return kvs[1], nil
+	return output, kvs[1], nil
 }
 
 func deleteTask(url string) error {

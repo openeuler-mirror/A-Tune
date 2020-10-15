@@ -95,7 +95,7 @@ const (
 	TuningFile          string  = "tuning.log"
 	TuningRuleFile      string  = "tuning_rules.grl"
 	TuningRestoreConfig string  = "-tuning-restore.conf"
-	DefaultTimeFormat   string  = "2006-01-02 15:04:05"
+	DefaultTimeFormat   string  = "2006-01-02 15:04:05.000"
 	Percent             float64 = 0.6
 )
 
