@@ -55,24 +55,26 @@ def add_data_to_file(data, mode, filename):
     if not os.path.exists(path):
         create_dir()
     path = path + filename + ".txt"
-    file_handle = open(path, mode)
-    file_handle.write(str(data))
-    file_handle.write("\n")
-    file_handle.close()
+    with open(path, mode) as file_handle:
+        file_handle.write(str(data))
+        file_handle.write("\n")
+        file_handle.close()
 
 
 def create_dir():
     """create dir if not exist"""
-    if not os.path.exists("/var/atune_data"):
+    path = "/var/atune_data/"
+    if not os.path.exists(path):
         os.makedirs(path)
-    if not os.path.exists("/var/atune_data/tuning"):
-        os.makedirs("/var/atune_data/tuning")
-    if not os.path.exists("/var/atune_data/tuning/running"):
-        os.makedirs("/var/atune_data/tuning/running")
-    if not os.path.exists("/var/atune_data/tuning/finished"):
-        os.makedirs("/var/atune_data/tuning/finished")
-    if not os.path.exists("/var/atune_data/tuning/error"):
-        os.makedirs("/var/atune_data/tuning/error")
+    path += "tuning/"
+    if not os.path.exists(path):
+        os.makedirs(path)
+    if not os.path.exists(path + "/running"):
+        os.makedirs(path + "/running")
+    if not os.path.exists(path + "/finished"):
+        os.makedirs(path + "/finished")
+    if not os.path.exists(path + "/error"):
+        os.makedirs(path + "/error")
 
 
 def change_file_name(filename, dest):
