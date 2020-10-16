@@ -46,7 +46,6 @@ class Classification(Resource):
         data_path = args.get(self.data_path)
         model = args.get(self.model, None)
         data = utils.read_from_csv(data_path)
-        os.remove(data_path)
         if data.empty:
             abort("data may be not exist")
 

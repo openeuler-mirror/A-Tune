@@ -35,10 +35,18 @@ class Transfer(Resource):
         current_app.logger.info(request.files)
         save_path = request.form.get("savepath")
         file_obj = request.files.get("file")
-        file_obj.save(save_path)
         service = request.form.get("service")
+ 
         if service == "classification":
-            return save_path, 200
+            file_name = "/var/atune_data/analysis/"
+            if not os.path.exists(file_name):
+                os.makedirs(file_name)
+            file_name += save_path.split(self.file_path + service)[1]
+            current_app.logger.info(file_name)
+            file_obj.save(file_name)
+            return file_name, 200
+
+        file_obj.save(save_path)
         target_path = self.file_path + service
         res = utils.extract_file(save_path, target_path)
         os.remove(save_path)

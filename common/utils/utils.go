@@ -567,3 +567,34 @@ func Variance(data []float64) float64 {
 func StandardDeviation(data []float64) float64 {
 	return math.Sqrt(Variance(data))
 }
+
+// Change file name
+func ChangeFileName(dataPath string) (string, string, error) {
+	path, fileName := filepath.Split(dataPath)
+	extension := filepath.Ext(dataPath)
+	name := strings.TrimSuffix(fileName, extension)
+	timestamp := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
+	newFilePath := path + name + "-" + timestamp + extension
+	log.Infof("new file path: %s", newFilePath)
+	err := os.Rename(dataPath, newFilePath)
+	if err != nil {
+		return "", "", err
+	}
+	return newFilePath, timestamp, nil
+}
+
+// Get log file path
+func GetLogFilePath(dirPath string) (string, error) {
+	dir, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		log.Errorf("dir path does not exists")
+		return "", err
+	}
+
+	for _, file := range dir {
+		if !file.IsDir() && strings.HasSuffix(file.Name(), ".log") && strings.HasPrefix(file.Name(), "test-") {
+			return dirPath + "/" + file.Name(), nil
+		}
+	}
+	return "", fmt.Errorf("cannot find log file")
+}

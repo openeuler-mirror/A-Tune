@@ -24,6 +24,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/go-ini/ini"
@@ -138,6 +140,16 @@ func (s *Scheduler) Schedule(pids string, strategy string, save bool, ch chan *P
 
 // Active schedule strategy
 func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[string]*ini.File) error {
+	logFile, err := utils.GetLogFilePath(config.DefaultTempPath)
+	if err != nil {
+		return fmt.Errorf("get log file path failed: %v", err)
+	}
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY, 0640)
+	if err != nil {
+		return fmt.Errorf("open file failed: %v", err)
+	}
+	defer file.Close()
+
 	for _, item := range itemKeys {
 		value := items[item]
 		if value == nil {
@@ -155,12 +167,20 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 					description := key.Name()
 					sendChanToAdm(ch, key.Value(), utils.SUGGEST, description)
 					log.Infof("tip key name: %s, key value: %s", key.Name(), key.Value())
+					_, err = io.WriteString(file, section.Name() + "|" + key.Name() + "|" + key.Value() + "|\n")
+					if err != nil {
+						log.Errorf("write to log failed: %v", err)
+					}
 				}
 				continue
 			}
 			if section.Name() == "schedule" {
 				for _, key := range section.Keys() {
 					_ = s.Schedule(key.Name(), key.Value(), false, ch)
+					_, err = io.WriteString(file, section.Name() + "|" + key.Name() + "|" + key.Value() + "|\n")
+					if err != nil {
+						log.Errorf("write to log failed: %v", err)
+					}
 				}
 				continue
 			}
@@ -176,7 +196,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 				services := registry.GetCheckerServices()
 				for _, service := range services {
 					log.Infof("initializing checker service: %s", service.Name)
-					if err := service.Instance.Init(); err != nil {
+					if err = service.Instance.Init(); err != nil {
 						return fmt.Errorf("service init failed: %v", err)
 					}
 				}
@@ -192,7 +212,7 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 					if !registry.IsCheckDisabled(service.Instance) {
 						continue
 					}
-					err := checkerService.Check(ch)
+					err = checkerService.Check(ch)
 					if err != nil {
 						log.Errorf("service %s running failed, reason: %v", service.Name, err)
 						continue
@@ -225,6 +245,22 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 						statusStr = respPutIns.Status
 					}
 					message = append(message, respPutIns.Value)
+				}
+				_, err = io.WriteString(file, section.Name() + "|" + statusStr + "|" + key.Name() + "|" + key.Value() + "|")
+				if err != nil {
+					log.Errorf("write to log failed: %v", err)
+				}
+
+				if statusStr != "OK" {
+					_, err = io.WriteString(file, respPutIns.Value)
+					if err != nil {
+						log.Errorf("write to log failed: %v", err)
+					}
+				}
+
+				_, err = io.WriteString(file, "\n")
+				if err != nil {
+					log.Errorf("write to log failed: %v", err)
 				}
 			}
 
