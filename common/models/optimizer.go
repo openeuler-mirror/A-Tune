@@ -61,6 +61,9 @@ type RespPostBody struct {
 type OptimizerPutBody struct {
 	Iterations int    `json:"iterations"`
 	Value      string `json:"value"`
+	Line	   string `json:"line"`
+	PrjName    string `json:"prj_name"`
+	MaxIter    int    `json:"max_iter"`
 }
 
 // RespPutBody :the body returned of each optimizer iteration

@@ -632,6 +632,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			optimizer.FeatureFilterEngine = reply.GetFeatureFilterEngine()
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			optimizer.SplitCount = reply.GetSplitCount()
+			optimizer.PrjId = strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
 			cycles = reply.GetFeatureFilterCycle()
 			optimizer.FeatureFilterCount = reply.GetFeatureFilterCount()
 			optimizer.EvalFluctuation = reply.GetEvalFluctuation()

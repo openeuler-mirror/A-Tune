@@ -17,93 +17,160 @@ Web UI initialization
 
 
 import os
+import time
 import numpy
 import logging
-from flask import Flask, render_template
-from flask_socketio import SocketIO
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 from configparser import ConfigParser
 
 
-APP = Flask(__name__, template_folder='./templates', static_folder='./static')
-APP.config['TEMPLATES_AUTO_RELOAD'] = True
-APP.jinja_env.auto_reload = True
-socketio = SocketIO(APP, async_mode=None)
+# configuration
+DEBUG = True
+
+# instantiate the app
+app = Flask(__name__)
+app.config.from_object(__name__)
+
+# enable CORS
+CORS(app)
 
 
-@APP.route('/tuning')
-def index():
-    """open tuning page"""
-    return render_template('tuning.html', async_mode=socketio.async_mode)
-
-
-@socketio.on('connect', namespace='/tuning')
-def init_connect():
-    """inital connection"""
-    return
-
-
-@socketio.on('show_page', namespace='/tuning')
-def show_page(timestamp, _):
-    """list all tuning project name on page"""
-    path = '/etc/atuned/webserver'
-    filelist = os.listdir(path)
-    filelist.sort(key=lambda fn: os.path.getmtime(path + '/' + fn), reverse=True)
-    res = []
-    for each in filelist:
-        res.append(each.split('.')[0])
-    socketio.emit('get_all_tuning_list', {'prj_list': res, 'timestamp': timestamp}, namespace='/tuning')
-    return
-
-
-@socketio.on('inital_chart', namespace='/tuning')
-def inital_tuning_page(message, timestamp, _):
-    """inital chart graph for project"""
-    prj_name = message['prj_name']
-    path = '/etc/atuned/webserver/' + prj_name + '.txt'
+@app.route('/tuning/<status>/<file_name>', methods=['GET'])
+def get_file_info(status, file_name):
+    """get tuning info"""
+    print(status, file_name)
+    response_object = {}
+    response_object['status'] = status
+    response_object['file_name'] = file_name
+    path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
     if not os.path.exists(path):
-        socketio.emit('file_removed', {'prj_name': prj_name, 'timestamp': timestamp}, namespace='/tuning')
-        return
-    graph_list = []
+        response_object['find_file'] = False
+        return jsonify(response_object)
+    params = []
     with open(path, 'r') as tuning_file:
-        graph_list = tuning_file.readline()[:-1].split(',')
-    socketio.emit('inital_chart',
-                  {'graph_list': graph_list, 'prj_name': prj_name, 'timestamp': timestamp},
-                  namespace='/tuning')
+        infos = tuning_file.readline()[:-1].split(',')
+        base = tuning_file.readline()[:-1]
+        params = tuning_file.readline()[:-1].split(',')
+    response_object['engine'] = infos[0]
+    response_object['round'] = infos[1]
+    response_object['find_file'] = True
+    response_object['parameter'] = params
+    response_object['line'] = 0
+    response_object['base'] = base
+    return jsonify(response_object)
 
 
-@socketio.on('update_chart', namespace='/tuning')
-def update_tuning_page(prj_name, num, timestamp, _):
-    """get info for chart"""
-    path = '/etc/atuned/webserver/' + prj_name + '.txt'
+@app.route('/tuning/<status>/<file_name>/<line>', methods=['GET'])
+def get_file_data(status, file_name, line):
+    """get tuning data"""
+    line = int(line)
+    response_object = {}
+    response_object['status'] = status
+    response_object['file_name'] = file_name
+    response_object['initial_line'] = line
+    path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
     if not os.path.exists(path):
-        socketio.emit('file_removed', {'prj_name': prj_name, 'timestamp': timestamp}, namespace='/tuning')
-        return
+        response_object['find_file'] = False
+        return jsonify(response_object)
     res = []
+    cost = []
     count = 0
-    first_line = ''
+    params = []
     eof = False
     with open(path, 'r') as tuning_file:
-        first_line = tuning_file.readline()[:-1].split(',')
+        _ = tuning_file.readline()
+        _ = tuning_file.readline()
+        params = tuning_file.readline()[:-1].split(',')
         lines = tuning_file.readlines()
-        while num + count < len(lines):
-            if lines[num + count][:-1] == 'END':
+        while line + count < len(lines):
+            if lines[line + count][:-1] == 'END' or lines[line + count][:-1] == 'ERROR':
                 eof = True
                 break
-            line_list = lines[num + count][:-1].split(',')
-            res.append(line_list)
+            line_list = lines[line + count][:-1].split(',', 1)
+            cost.append(line_list[0])
+            res.append(line_list[1].split(','))
             count += 1
-            if count == 5:
+            if count == 10:
                 break
     res = numpy.array(res).T.tolist()
-    next_line = num + count
+    line_res = line + count
     if eof:
-        next_line = -1
-    socketio.emit('update_chart',
-                  {'name': first_line, 'num': num, 'next_line': next_line, 'value': res, 'timestamp': timestamp},
-                  namespace='/tuning')
+        line_res = -1
+    response_object['find_file'] = True
+    response_object['parameter'] = params
+    response_object['line'] = line_res
+    response_object['data'] = res
+    response_object['cost'] = cost
+    return jsonify(response_object)
+
+
+@app.route('/tuning/<types>', methods=['GET'])
+def get_type_list(types):
+    """get type list"""
+    res = []
+    finished = 0
+    running = 0
+    error = 0
+    path = '/var/atune_data/tuning/'
+    if not os.path.exists(path):
+        os.makedirs(path)
+    if not os.path.exists(path + '/running'):
+        os.makedirs(path + '/running')
+    if not os.path.exists(path + '/finished'):
+        os.makedirs(path + '/finished')
+    if not os.path.exists(path + '/error'):
+        os.makedirs(path + '/error')
+
+    if types == 'all':
+        res, _ = get_file_list('running', res)
+        res, _ = get_file_list('finished', res)
+        res, _ = get_file_list('error', res)
+    else:
+        res, _ = get_file_list(types, res)
+
+    if len(res) > 0:
+        res = sorted(res, key=(lambda x:x['date']), reverse=True)
+    response_object = {}
+
+    if request.method == 'GET':
+        response_object['message'] = res
+    if request.method == 'DELETE':
+        remove_book(book_id)
+        response_object['message'] = 'Book removed!'
+    return jsonify(response_object)
+
+
+@app.route('/tuning/findFile/<filename>', methods=['GET'])
+def find_file_dir(filename):
+    """find file by name"""
+    response_object = {}
+    response_object['status'] = 'running'
+    path = '/var/atune_data/tuning/'
+    filename += '.txt'
+    if os.path.exists(path + 'finished/' + filename):
+        response_object['status'] = 'finished'
+    elif os.path.exists(path + 'error/' + filename):
+        response_object['status'] = 'error'
+    return jsonify(response_object)
+
+
+def get_file_list(file_type, res):
+    """get file list by type"""
+    path = '/var/atune_data/tuning/' + file_type
+    filelist = os.listdir(path)
+    for each in filelist:
+        filepath = path + '/' + each
+        modify = os.path.getmtime(filepath)
+        times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
+        current = {'name': each.split('.')[0], 'status': file_type, 'date': times}
+        res.append(current)
+    return res, len(filelist)
+
 
 
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('/etc/atuned/engine.cnf')
-    socketio.run(APP, host=config.get("server", "engine_host"), port=10086)
+    app.run(host=config.get("server", "engine_host"), port='5000')
+

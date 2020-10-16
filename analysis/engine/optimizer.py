@@ -21,7 +21,7 @@ from flask import abort
 from flask_restful import reqparse, Resource
 
 from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
-from analysis.engine.utils import task_cache
+from analysis.engine.utils import task_cache, utils
 from analysis.optimizer import optimizer
 
 LOGGER = logging.getLogger(__name__)
@@ -93,9 +93,37 @@ class Optimizer(Resource):
 
         args = OPTIMIZER_PUT_PARSER.parse_args()
         LOGGER.info(args)
+        if args["iterations"] == -1:
+            value = args["line"][:-1].split(" ")
+            utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
+            return {}, 200
+        if args["iterations"] == 0:
+            tps = args["line"].split("|")[4].split("=")[1]
+            utils.add_data_to_file(tps, "a", args["prj_name"])
+            params = ""
+            for element in args["line"].split("|")[5].split(","):
+                params += element.split("=")[0] + ","
+            params = params[:-1]
+            utils.add_data_to_file(params, "a", args["prj_name"])
+
         out_queue = task[self.pipe]
         if args["iterations"] != 0 and len(args["value"]) != 0:
+            params = utils.get_time_difference(args["line"].split("|")[2], args["line"].split("|")[1])
+            params += ","
+            for element in args["line"].split("|")[5].split(","):
+                params += element.split("=")[1] + ","
+            tps = args["line"].split("|")[4].split("=")[1]
+            if tps[0] == "-":
+                tps = tps[1:]
+            else:
+                tps = "-" + tps
+            params += tps
+            utils.add_data_to_file(params, "a", args["prj_name"])
             out_queue.send(args.get("value"))
+
+        if args["iterations"] == args["max_iter"]:
+            utils.add_data_to_file("END", "a", args["prj_name"])
+            utils.change_file_name(args["prj_name"], "finished")
 
         result = {}
         opt_params = out_queue.recv()
