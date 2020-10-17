@@ -48,7 +48,7 @@ The following figure shows the A-Tune core technical architecture, which consist
 
 l  Intelligent decision-making layer: consists of the awareness and decision-making subsystems, which implements intelligent awareness of applications and system optimization decision-making, respectively.
 
-l  System profile layer: consists of the labeling and learning subsystems. The labeling subsystem is used to cluster service models, and the learning subsystem is used to learn and classify service models.
+l  System profile layer: consists of the feature engineering and two-layer classification model. The feature engineering is used to automatically select service features, and the two-layer classification model is used to learn and classify service models.
 
 l  Interaction system layer: monitors and configures various system resources and executes optimization policies.
 
@@ -947,11 +947,11 @@ Check the CPU, BIOS, OS, and NIC information.
    name: eth1       product: HNS GE/10GE/25GE Network Controller 
    name: eth2       product: HNS GE/10GE/25GE RDMA Network Controller 
    name: eth3       product: HNS GE/10GE/25GE Network Controller 
-   name: eth4        product: HNS GE/10GE/25GE RDMA Network Controller 
+   name: eth4       product: HNS GE/10GE/25GE RDMA Network Controller 
    name: eth5       product: HNS GE/10GE/25GE Network Controller 
    name: eth6       product: HNS GE/10GE/25GE RDMA Network Controller 
    name: eth7       product: HNS GE/10GE/25GE Network Controller 
-   name: docker0      product:
+   name: docker0    product:
 ```
 
 ## 3.11 Automatic Parameter Optimization
@@ -975,7 +975,7 @@ Use the specified project file to search the dynamic space for parameters and fi
 > Before running the command, ensure that the following conditions are met:
 >
 > 1. The YAML configuration file on the server has been edited and stored in the **/etc/atuned/tuning/** directory of the atuned service.
-> 2. The YAML configuration file of the client has been compiled and stored on the atuned client.
+> 2. The YAML configuration file of the client has been edited and stored on the atuned client.
 
 **Parameter Description**
 
@@ -1020,10 +1020,10 @@ Configuration Description
 | set         | Script for setting parameter values.                         | -                | -                                                            |
 | needrestart | Specifies whether to restart the service  for the parameter to take effect. | Enumeration      | **true** or **false**                                        |
 | type        | Parameter type. Currently, the **discrete** and **continuous** types are supported. | Enumeration      | **discrete** or **continuous**                               |
-| dtype       | This parameter is available only when  type is set to **discrete**.  Currently, only **int** and **string** are supported. | Enumeration      | int, string                                                  |
-| scope       | Parameter setting range. This parameter  is valid only when type is set to **discrete**  and dtype is set to **int**, or type  is set to **continuous**. | Integer          | The value is user-defined and must be  within the valid range of this parameter. |
-| step        | Parameter value step, which is used when **dtype** is set to **int**. | Integer          | This value is user-defined.                                  |
-| items       | Enumerated value of which the parameter  value is not within the scope. This is used when **dtype** is set to **int**. | Integer          | The value is user-defined and must be  within the valid range of this parameter. |
+| dtype       | This parameter is available only when  type is set to **discrete**.  Currently, only **int**, **float** and **string** are supported. | Enumeration      | int, float, string                                           |
+| scope       | Parameter setting range. This parameter  is valid only when type is set to **discrete**  and dtype is set to **int** or **float**, or type  is set to **continuous**. | Integer/Float    | The value is user-defined and must be  within the valid range of this parameter. |
+| step        | Parameter value step, which is used when **dtype** is set to **int** or **float**. | Integer/Float    | This value is user-defined.                                  |
+| items       | Enumerated value of which the parameter  value is not within the scope. This is used when **dtype** is set to **int **or **float**. | Integer/Float    | The value is user-defined and must be  within the valid range of this parameter. |
 | options     | Enumerated value range of the parameter  value, which is used when **dtype** is  set to **string**. | Character string | The value is user-defined and must be  within the valid range of this parameter. |
 
  
@@ -1036,10 +1036,10 @@ Configuration Description
 | engine                | Tuning algorithm.                                            | Character string | "random", "forest", "gbrt", "bayes", "extraTrees" |
 | iterations            | Number of optimization iterations.                           | Integer          | ≥ 10                                              |
 | random_starts         | Number of random iterations.                                 | Integer          | < iterations                                      |
-| feature_filter_engine | Parameter search algorithm.                                  | Character string | "lhs"                                             |
-| feature_filter_cycle  | Parameter search cycles.                                     | Integer          | -                                                 |
-| feature_filter_iters  | Number of iterations for each cycle of parameter search.     | Integer          | -                                                 |
-| split_count           | Number of evenly selected parameters in the value range of tuning parameters. | Integer          | -                                                 |
+| feature_filter_engine | Parameter search algorithm, which is used to select important parameters. This parameter is optional. | Character string | "lhs"                                             |
+| feature_filter_cycle  | Parameter search cycles, which is used to select important parameters. This parameter is used together with feature_filter_engine. | Integer          | -                                                 |
+| feature_filter_iters  | Number of iterations for each cycle of parameter search, which is used to select important parameters. This parameter is used together with feature_filter_engine. | Integer          | -                                                 |
+| split_count           | Number of evenly selected parameters in the value range of tuning parameters, which is used to select important parameters. This parameter is used together with feature_filter_engine. | Integer          | -                                                 |
 | benchmark             | Performance test script.                                     | -                | -                                                 |
 | evaluations           | Performance test evaluation index.  For details about the evaluations  configuration items, see Table 3-4. | -                | -                                                 |
 
