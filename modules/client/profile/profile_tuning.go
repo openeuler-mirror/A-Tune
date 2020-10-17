@@ -352,6 +352,8 @@ func checkTuningPrjYaml(prj *project.YamlPrjCli) error {
 	if prj.EvalFluctuation < 0 {
 		return fmt.Errorf("error: eval_fluctuation must be >= 0 "+
 			"in project %s", prj.Project)
+	} else if prj.EvalFluctuation == 0 {
+		prj.EvalFluctuation = 0.001
 	}
 
 	if (prj.FeatureFilterEngine == "abtest" || prj.FeatureFilterEngine == "lhs" ||
