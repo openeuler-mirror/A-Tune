@@ -498,6 +498,16 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	_ = pro.RollbackActive(ch)
 
+	logPath, err := utils.GetLogFilePath(config.DefaultTempPath)
+	if err != nil {
+		return fmt.Errorf("get log file path failed: %v", err)
+	}
+	_, err = Post("classification", "file", logPath)
+	if err != nil {
+		return fmt.Errorf("Failed transfer file log file to server: %v", err)
+	}
+	defer os.Remove(logPath)
+
 	rules := &sqlstore.GetRuleTuned{Class: workloadType}
 	if err := sqlstore.GetRuleTuneds(rules); err != nil {
 		return err
@@ -1267,12 +1277,27 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 	//2. send the collected data to the model for completion type identification
 	var resourceLimit string
 	var workloadType string
-	dataPath, err := Post("classification", "file", dataPath)
+	localPath, timestamp, err := utils.ChangeFileName(dataPath)
+	if err != nil {
+		log.Errorf("Failed to change file name: %v", localPath)
+		return workloadType, resourceLimit, err
+	}
+
+	absPath, _ := filepath.Split(localPath)
+	logPath := absPath + "test-" + timestamp + ".log"
+	log.Infof("log file path: %s", logPath)
+	_, err = os.Create(logPath)
+	if err!= nil {
+		log.Errorf("Failed to create log file: %v", err)
+		return workloadType, resourceLimit, err
+	}
+
+	dataPath, err = Post("classification", "file", localPath)
 	if err != nil {
 		log.Errorf("Failed transfer file to server: %v", err)
 		return workloadType, resourceLimit, err
 	}
-	defer os.Remove(dataPath)
+	defer os.Remove(localPath)
 
 	body := new(ClassifyPostBody)
 	body.Data = dataPath
