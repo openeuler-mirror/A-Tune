@@ -1,0 +1,13 @@
+project: "dubbo"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "kernel.sched_latency_ns"
+  -
+    name : "kernel.sched_min_granularity_ns"
+  -
+    name : "prefetcher"
+  -
+    name : "kernel.sched_migration_cost_ns"

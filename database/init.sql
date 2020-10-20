@@ -107,7 +107,7 @@ INSERT INTO class_profile(class, profile_type, active) VALUES("default", "defaul
 INSERT INTO class_profile(class, profile_type, active) VALUES("ceph", "storage-ceph-vdbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_hdd", "big-data-hadoop-hdfs-dfsio-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_ssd", "big-data-hadoop-hdfs-dfsio-ssd", 0);
-INSERT INTO class_profile(class, profile_type, active) VALUES("spark", "big-data-hadoop-spark-hibench", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("spark", "big-data-hadoop-spark-kmeans", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mongodb", "database-mongodb-2p-sysbench", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mariadb", "database-mariadb-2p-tpcc-c3", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("mysql", "database-mysql-2p-sysbench-hdd", 0);

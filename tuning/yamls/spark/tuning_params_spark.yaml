@@ -1,0 +1,41 @@
+project: "spark"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "block.read_ahead_kb"
+  -
+    name : "transparent_hugepage.defrag"
+  -
+    name : "transparent_hugepage.enabled"
+  -
+    name : "block.queue_depth"
+  -
+    name : "block.nr_requests"
+  -
+    name : "block.max_sectors_kb"
+  -
+    name : "block.scheduler"
+  -
+    name : "block.rq_affinity"
+  -
+    name : "block.nomerges"
+  -
+    name : "vm.dirty_expire_centisecs"
+  -
+    name : "vm.dirty_writeback_centisecs"
+  -
+    name : "vm.min_free_kbytes"
+  -
+    name : "vm.dirty_background_ratio"
+  -
+    name : "vm.dirty_ratio"
+  -
+    name : "kernel.sched_min_granularity_ns"
+  -
+    name : "kernel.sched_wakeup_granularity_ns"
+  -
+    name : "kernel.sched_autogroup_enabled"
+  -
+    name : "kernel.numa_balancing"

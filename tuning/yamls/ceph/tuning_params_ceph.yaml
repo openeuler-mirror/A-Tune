@@ -1,0 +1,11 @@
+project: "ceph"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "block.write_cache"
+  -
+    name : "block.queue_depth"
+  -
+    name : "block.max_sectors_kb"

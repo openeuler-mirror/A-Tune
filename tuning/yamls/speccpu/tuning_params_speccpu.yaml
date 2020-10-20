@@ -1,0 +1,13 @@
+project: "speccpu"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "transparent_hugepage.defrag"
+  -
+    name : "transparent_hugepage.enabled"
+  -
+    name : "prefetcher"
+  -
+    name : "kernel.randomize_va_space"

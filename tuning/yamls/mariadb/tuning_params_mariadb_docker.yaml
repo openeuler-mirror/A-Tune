@@ -1,0 +1,9 @@
+project: "mariadb_docker"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "vm.swappiness"
+  -
+    name : "prefetcher"

@@ -1,0 +1,21 @@
+project: "hadoop_ssd"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "block.nr_requests"
+  -
+    name : "vm.dirty_ratio"
+  -
+    name : "vm.dirty_background_ratio"
+  -
+    name : "vm.dirty_expire_centisecs"
+  -
+    name : "vm.dirty_writeback_centisecs"
+  -
+    name : "block.scheduler"
+  -
+    name : "block.nomerges"
+  -
+    name : "block.rq_affinity"

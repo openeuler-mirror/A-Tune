@@ -46,7 +46,7 @@ cleanall: clean
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
 
-install: libinstall restcerts enginecerts
+install: libinstall restcerts enginecerts yaml-generator
 
 libinstall:
 	@echo "BEGIN INSTALL A-Tune..."
@@ -178,6 +178,11 @@ startup:
 	systemctl daemon-reload
 	systemctl restart atuned
 	systemctl restart atune-engine
+
+yaml-generator:
+	\cp -rf tuning/yamls/* $(DESTDIR)/etc/atuned/tuning
+	chmod -R 750 $(DESTDIR)/etc/atuned/tuning
+	cd ${CURDIR}/tools/ && python3 generate_tuning_file.py -d $(DESTDIR)/etc/atuned/tuning
 
 run: all install startup
 

@@ -18,6 +18,7 @@ Requires: atune-db
 Requires: python3-dict2xml
 Requires: python3-flask-restful
 Requires: python3-pandas
+Requires: python3-pyyaml
 %ifarch aarch64
 Requires: prefetch_tuning
 %endif

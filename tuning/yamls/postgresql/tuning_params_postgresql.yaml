@@ -1,0 +1,33 @@
+project: "postgresql"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "kernel.sched_cfs_bandwidth_slice_us"
+  -
+    name : "kernel.sched_migration_cost_ns"
+  -
+    name : "kernel.sched_latency_ns"
+  -
+    name : "kernel.sched_min_granularity_ns"
+  -
+    name : "kernel.sched_wakeup_granularity_ns"
+  -
+    name : "net.core.rmem_default"
+  -
+    name : "net.core.rmem_max"
+  -
+    name : "net.core.wmem_default"
+  -
+    name : "net.core.wmem_max"
+  -
+    name : "net.ipv4.tcp_rmem"
+  -
+    name : "net.ipv4.tcp_wmem"
+  -
+    name : "net.core.dev_weight"
+  -
+    name : "net.ipv4.tcp_max_syn_backlog"
+  -
+    name : "net.core.somaxconn"
