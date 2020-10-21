@@ -851,6 +851,44 @@ func (m *TuningHistory) GetStarts() int32 {
 	}
 	return 0
 }
+type DetectMessage struct {
+	AppName             string   `protobuf:"bytes,1,opt,name=AppName,proto3" json:"AppName,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DetectMessage) Reset()         { *m = DetectMessage{} }
+func (m *DetectMessage) String() string { return proto.CompactTextString(m) }
+func (*DetectMessage) ProtoMessage()    {}
+func (*DetectMessage) Descriptor() ([]byte, []int) {
+	return fileDescriptor_744bf7a47b381504, []int{12}
+}
+
+func (m *DetectMessage) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DetectMessage.Unmarshal(m, b)
+}
+func (m *DetectMessage) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DetectMessage.Marshal(b, m, deterministic)
+}
+func (m *DetectMessage) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DetectMessage.Merge(m, src)
+}
+func (m *DetectMessage) XXX_Size() int {
+	return xxx_messageInfo_DetectMessage.Size(m)
+}
+func (m *DetectMessage) XXX_DiscardUnknown() {
+	xxx_messageInfo_DetectMessage.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DetectMessage proto.InternalMessageInfo
+
+func (m *DetectMessage) GetAppName() string {
+	if m != nil {
+		return m.AppName
+	}
+	return ""
+}
 
 func init() {
 	proto.RegisterEnum("profile.TuningMessageStatus", TuningMessageStatus_name, TuningMessageStatus_value)
@@ -866,6 +904,7 @@ func init() {
 	proto.RegisterType((*ScheduleMessage)(nil), "profile.ScheduleMessage")
 	proto.RegisterType((*TuningMessage)(nil), "profile.TuningMessage")
 	proto.RegisterType((*TuningHistory)(nil), "profile.TuningHistory")
+	proto.RegisterType((*DetectMessage)(nil), "profile.DetectMessage")
 }
 
 func init() { proto.RegisterFile("profile.proto", fileDescriptor_744bf7a47b381504) }
@@ -969,6 +1008,7 @@ type ProfileMgrClient interface {
 	Update(ctx context.Context, in *ProfileInfo, opts ...grpc.CallOption) (*Ack, error)
 	Schedule(ctx context.Context, in *ScheduleMessage, opts ...grpc.CallOption) (ProfileMgr_ScheduleClient, error)
 	Generate(ctx context.Context, in *ProfileInfo, opts ...grpc.CallOption) (ProfileMgr_GenerateClient, error)
+	Detecting(ctx context.Context, in *DetectMessage, opts ...grpc.CallOption) (ProfileMgr_DetectingClient, error)
 }
 
 type profileMgrClient struct {
@@ -1421,6 +1461,38 @@ func (x *profileMgrGenerateClient) Recv() (*AckCheck, error) {
 	return m, nil
 }
 
+func (c *profileMgrClient) Detecting(ctx context.Context, in *DetectMessage, opts ...grpc.CallOption) (ProfileMgr_DetectingClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_ProfileMgr_serviceDesc.Streams[13], "/profile.ProfileMgr/Detecting", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &profileMgrDetectingClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ProfileMgr_DetectingClient interface {
+	Recv() (*AckCheck, error)
+	grpc.ClientStream
+}
+
+type profileMgrDetectingClient struct {
+	grpc.ClientStream
+}
+
+func (x *profileMgrDetectingClient) Recv() (*AckCheck, error) {
+	m := new(AckCheck)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ProfileMgrServer is the server API for ProfileMgr service.
 type ProfileMgrServer interface {
 	Profile(*ProfileInfo, ProfileMgr_ProfileServer) error
@@ -1439,6 +1511,7 @@ type ProfileMgrServer interface {
 	Update(context.Context, *ProfileInfo) (*Ack, error)
 	Schedule(*ScheduleMessage, ProfileMgr_ScheduleServer) error
 	Generate(*ProfileInfo, ProfileMgr_GenerateServer) error
+	Detecting(*DetectMessage, ProfileMgr_DetectingServer) error
 }
 
 func RegisterProfileMgrServer(s *grpc.Server, srv ProfileMgrServer) {
@@ -1681,6 +1754,27 @@ func (x *profileMgrTrainingServer) Send(m *AckCheck) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _ProfileMgr_Detecting_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DetectMessage)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProfileMgrServer).Detecting(m, &profileMgrDetectingServer{stream})
+}
+
+type ProfileMgr_DetectingServer interface {
+	Send(*AckCheck) error
+	grpc.ServerStream
+}
+
+type profileMgrDetectingServer struct {
+	grpc.ServerStream
+}
+
+func (x *profileMgrDetectingServer) Send(m *AckCheck) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _ProfileMgr_Define_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DefineMessage)
 	if err := dec(in); err != nil {
@@ -1859,6 +1953,11 @@ var _ProfileMgr_serviceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Generate",
 			Handler:       _ProfileMgr_Generate_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Detecting",
+			Handler:       _ProfileMgr_Detecting_Handler,
 			ServerStreams: true,
 		},
 	},

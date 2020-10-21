@@ -1053,6 +1053,33 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 	return nil
 }
 
+// Detecting method detect the misclassified data
+func (s *ProfileServer) Detecting(message *PB.DetectMessage, stream PB.ProfileMgr_DetectingServer) error {
+	AppName := message.GetAppName()
+	_ = stream.Send(&PB.AckCheck{Name: "Detecting the misclassified data"})
+
+	detectBody := new(models.Detecting)
+	detectBody.AppName = AppName
+
+	success, detecterr, result:= detectBody.Post()
+
+	if detecterr != nil {
+	    return detecterr
+	}
+
+	if success {
+		_ = stream.Send(&PB.AckCheck{Name: "Detecting misclassified data success\n"})
+		s := strings.Split(result[1:(len(result)-2)], "@")
+		for _, str := range s{
+			_ = stream.Send(&PB.AckCheck{Name: str})
+ 		}
+		return nil
+	}
+
+	_ = stream.Send(&PB.AckCheck{Name: "Detecting misclassified data failed"})
+	return nil
+}
+
 // Define method user define workload type and profile
 func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (*PB.Ack, error) {
 	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(ctx)

@@ -21,7 +21,7 @@ import sys
 from app import App
 
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
-from analysis.engine import optimizer, classification, train, transfer
+from analysis.engine import optimizer, classification, train, transfer, detect
 
 
 class AppEngine(App):
@@ -35,6 +35,7 @@ class AppEngine(App):
                               '/v1/classification')
         self.api.add_resource(train.Training, '/v1/training', '/v1/training')
         self.api.add_resource(transfer.Transfer, '/v1/transfer', '/transfer')
+        self.api.add_resource(detect.Detecting, '/v1/detecting', '/v1/detecting')
 
 
 def main(filename):
