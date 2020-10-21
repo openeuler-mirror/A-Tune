@@ -1,0 +1,39 @@
+project: "hpc"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "transparent_hugepage.enabled"
+  -
+    name : "vm.swappiness"
+  -
+    name : "kernel.sched_migration_cost_ns"
+  -
+    name : "prefetcher"
+  -
+    name : "kernel.sched_min_granularity_ns"
+  -
+    name : "kernel.sched_wakeup_granularity_ns"
+  -
+    name : "vm.dirty_ratio"
+  -
+    name : "vm.dirty_background_ratio"
+  -
+    name : "vm.dirty_expire_centisecs"
+  -
+    name : "vm.min_free_kbytes"
+  -
+    name : "vm.zone_reclaim_mode"
+  -
+    name : "kernel.numa_balancing"
+  -
+    name : "block.scheduler"
+  -
+    name : "block.read_ahead_kb"
+  -
+    name : "net.core.busy_read"
+  -
+    name : "net.core.busy_poll"
+  -
+    name : "net.ipv4.tcp_fastopen"

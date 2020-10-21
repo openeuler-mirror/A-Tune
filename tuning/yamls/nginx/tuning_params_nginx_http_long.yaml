@@ -1,0 +1,25 @@
+project: "nginx_http_long"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "net.core.netdev_max_backlog"
+  -
+    name : "net.ipv4.tcp_keepalive_time"
+  -
+    name : "net.core.rmem_max"
+  -
+    name : "net.core.wmem_max"
+  -
+    name : "net.ipv4.tcp_tw_reuse"
+  -
+    name : "net.ipv4.ip_local_port_range"
+  -
+    name : "net.ipv4.tcp_max_tw_buckets"
+  -
+    name : "net.core.somaxconn"
+  -
+    name : "net.ipv4.tcp_max_syn_backlog"
+  -
+    name : "net.ipv4.tcp_fin_timeout"

@@ -1,0 +1,15 @@
+project: "default"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "kernel.sched_latency_ns"
+  -
+    name : "kernel.shmmni"
+  -
+    name : "kernel.shmmax"
+  -
+    name : "kernel.shmall"
+  -
+    name : "vm.swappiness"

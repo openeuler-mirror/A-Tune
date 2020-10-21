@@ -1,0 +1,23 @@
+project: "mongodb"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "block.read_ahead_kb"
+  -
+    name : "transparent_hugepage.defrag"
+  -
+    name : "transparent_hugepage.enabled"
+  -
+    name : "vm.dirty_ratio"
+  -
+    name : "vm.dirty_background_ratio"
+  -
+    name : "vm.dirty_writeback_centisecs"
+  -
+    name : "vm.dirty_expire_centisecs"
+  -
+    name : "fs.file-max"
+  -
+    name : "fs.nr_open"

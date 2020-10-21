@@ -1,0 +1,11 @@
+project: "robox"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "kernel.pid_max"
+  -
+    name : "fs.inotify.max_user_instances"
+  -
+    name : "login.UserTasksMax"

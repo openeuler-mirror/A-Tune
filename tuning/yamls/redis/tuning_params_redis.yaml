@@ -5,63 +5,21 @@ stopworkload: ""
 object : 
   -
     name : "redis.tcp-backlog"
-    info :
-        desc : "tcp backlog"
-        get : "cat /etc/redis.conf | grep tcp-backlog | awk '{print $2}'"
-        set : "sed -i 's/tcp-backlog.*/tcp-backlog $value/g' /etc/redis.conf"
-        needrestart : "false"
-        type : "continuous"
-        scope :
-          - 16
-          - 65536
-        dtype : "int"
   -
     name : "redis.tcp-keepalive"
-    info :
-        desc : "closes the connection after holding for a few seconds"
-        get : "cat /etc/redis.conf | grep tcp-keepalive | awk '{print $2}'"
-        set : "sed -i 's/tcp-keepalive.*/tcp-keepalive $value/g' /etc/redis.conf"
-        needrestart : "false"
-        type : "continuous"
-        scope :
-          - 0
-          - 3600
-        dtype : "int"
   -
     name : "redis.supervised"
-    info :
-        desc : "service supervise"
-        get : "cat /etc/redis.conf | grep supervised  | awk '{print $2}'"
-        set : "sed -i 's/supervised .*/supervised  $value/g' /etc/redis.conf"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "no"
-          - "upstart"
-          - "systemd"
-          - "auto"
-        dtype : "string"
   -
     name : "redis.databases"
-    info :
-        desc : "number of databases"
-        get : "cat /etc/redis.conf | grep databases | awk '{print $2}'"
-        set : "sed -i 's/databases.*/databases $value/g' /etc/redis.conf"
-        needrestart : "false"
-        type : "continuous"
-        scope :
-          - 0
-          - 100
-        dtype : "int"
   -
     name : "redis.rdbcompression"
-    info :
-        desc : "whether to compress character strings using LZF when backing up .rdb files"
-        get : "cat /etc/redis.conf | grep rdbcompression  | awk '{print $2}'"
-        set : "sed -i 's/rdbcompression .*/rdbcompression  $value/g' /etc/redis.conf"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "yes"
-          - "no"
-        dtype : "string"
+  -
+    name : "net.core.netdev_budget"
+  -
+    name : "net.core.rmem_max"
+  -
+    name : "net.core.somaxconn"
+  -
+    name : "net.core.optmem_max"
+  -
+    name : "kernel.numa_balancing"

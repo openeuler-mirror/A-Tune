@@ -1,0 +1,9 @@
+project: "apache"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "net.nf_conntrack_max"
+  -
+    name : "kernel.sched_min_granularity_ns"
