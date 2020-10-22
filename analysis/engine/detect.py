@@ -33,7 +33,7 @@ class Detecting(Resource):
 
     def post(self):
         """
-        characterization retrain
+        :returns result, 200 : detect result, status code
         """
         args = DETECT_POST_PARSER.parse_args()
         LOGGER.info(args)
