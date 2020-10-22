@@ -78,7 +78,6 @@ class WorkloadStatistic(object):
     def statistic(self, data_path):
         """
         :param data_path: the path of csv
-        :return:
         """
         self.parsing(data_path, 0)
         self.statistics = pd.DataFrame()
@@ -94,7 +93,7 @@ class WorkloadStatistic(object):
 
 
 class DetectItem(object):
-    """detection"""
+    """detection class"""
 
     def __init__(self, statistics, data_features):
         self.data_features = data_features
@@ -105,7 +104,7 @@ class DetectItem(object):
         :param detect_path: detect dataset path
         :param workload_appname: the workload app name
         :param header: default 0
-        :return:
+        :return: statistics of detecting data
         """
         dataset = pd.read_csv(detect_path, index_col=None, header=header)
         val = dataset.mean()
@@ -115,7 +114,7 @@ class DetectItem(object):
         """
         :param val: statistics
         :param workload_appname: the workload app name
-        :return:
+        :return: detection result
         """
         statistic = self.statistics[self.statistics['workload_appname'] == workload_appname]
         mean = statistic[statistic['data_type'] == 'mean']
