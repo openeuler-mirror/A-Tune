@@ -33,6 +33,7 @@ service ProfileMgr {
 	rpc Update(ProfileInfo) returns (Ack) {}
 	rpc Schedule(ScheduleMessage) returns (stream AckCheck) {}
 	rpc Generate(ProfileInfo) returns (stream AckCheck) {}
+	rpc Detecting(DetectMessage) returns (stream AckCheck) {}
 }
 
 message ListMessage {
@@ -81,6 +82,10 @@ message CollectFlag {
 message TrainMessage {
     string DataPath = 1;
     string OutputPath = 2;
+}
+
+message DetectMessage {
+    string AppName = 1;
 }
 
 message DefineMessage {

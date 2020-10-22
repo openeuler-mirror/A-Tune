@@ -76,6 +76,7 @@ const (
 	ProfileURI        string = "profile"
 	TrainingURI       string = "training"
 	TransferURI       string = "transfer"
+	DetectingURI      string = "detecting"
 )
 
 // database config
@@ -278,6 +279,9 @@ func IsEnginePort(uri string) bool {
 		return true
 	}
 	if strings.EqualFold(uri, TrainingURI) {
+		return true
+	}
+	if strings.EqualFold(uri, DetectingURI) {
 		return true
 	}
 

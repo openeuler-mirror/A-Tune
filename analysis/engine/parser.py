@@ -62,3 +62,6 @@ TRAIN_POST_PARSER = reqparse.RequestParser()
 TRAIN_POST_PARSER.add_argument('datapath', required=True, help="The datapath can not be null")
 TRAIN_POST_PARSER.add_argument('outputpath', required=True, help="The output path can not be null")
 TRAIN_POST_PARSER.add_argument('modelpath', required=True, help="The model path can not be null")
+
+DETECT_POST_PARSER = reqparse.RequestParser()
+DETECT_POST_PARSER.add_argument('appname', required=True, help="The appname path can not be null")
