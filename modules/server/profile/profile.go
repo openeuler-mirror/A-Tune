@@ -461,6 +461,21 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 	apps := classApps.Result[0].Apps
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", apps)})
+
+	logFile, err:= utils.GetLogFilePath(config.DefaultTempPath)
+	if err != nil {
+		return fmt.Errorf("get log file path failed: %v", err)
+	}
+	file, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY, 0640)
+	if err != nil {
+		return fmt.Errorf("open file failed: %v", err)
+	}
+	defer file.Close()
+	_, err = io.WriteString(file, apps + "\n")
+	if err != nil {
+		log.Errorf("write workload type to log failed: %v", err)
+	}
+
 	log.Infof("workload %s support app: %s", workloadType, apps)
 	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
 		workloadType, apps, resourceLimit)

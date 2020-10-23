@@ -135,9 +135,6 @@ def get_type_list(types):
 
     if request.method == 'GET':
         response_object['message'] = res
-    if request.method == 'DELETE':
-        remove_book(book_id)
-        response_object['message'] = 'Book removed!'
     return jsonify(response_object)
 
 
@@ -155,6 +152,78 @@ def find_file_dir(filename):
     return jsonify(response_object)
 
 
+@app.route('/analysis', methods=['GET'])
+def get_analysis_list():
+    """get analysis file list"""
+    response_object = {}
+    path = '/var/atune_data/analysis'
+    res = []
+    filelist = os.listdir(path)
+    for each in filelist:
+        if each.endswith('.csv'):
+            filename = each.rsplit('.')[0]
+            if filename not in res:
+                filepath = path + '/' + each
+                modify = os.path.getmtime(filepath)
+                times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
+                temp = {'name': filename, 'date': times}
+                res.append(temp)
+    res = sorted(res, key=(lambda x:x['date']), reverse=True)
+    response_object['analysis'] = res
+    return jsonify(response_object)
+
+
+@app.route('/analysis/<filename>/<line>', methods=['GET'])
+def get_analysis_details(filename, line):
+    """get analysis info details"""
+    line = int(line)
+    response_object = {'line': line + 20}
+    path = '/var/atune_data/analysis/' + filename
+    if not os.path.exists(path + ".csv"):
+        response_object['file_exist'] = False
+        return jsonify(response_object)
+    response_object['file_exist'] = True
+    csv_res, csv_count, table_header = get_analysis_csv(path + ".csv", line)
+    csv_res = numpy.array(csv_res).T.tolist()
+    response_object['csv_data'] = csv_res
+    response_object['csv_lines'] = csv_count
+    response_object['table_header'] = table_header
+    if not os.path.exists(path + ".log"):
+        response_object['log_data'] = []
+        response_object['log_lines'] = 0
+        return jsonify(response_object)
+    log_res = []
+    log_count = 0
+    with open(path + ".log", 'r') as analysis_log:
+        workload = analysis_log.readline()[:-1]
+        lines = analysis_log.readlines()
+        while line + log_count < len(lines):
+            log_res.append(lines[line + log_count][:-1].split("|"))
+            log_count += 1
+            if log_count == 20:
+                break
+    response_object['workload'] = workload
+    response_object['log_data'] = log_res
+    response_object['log_lines'] = log_count
+    return jsonify(response_object)
+
+
+def get_analysis_csv(path, line):
+    """get analysis csv"""
+    count = 0
+    res = []
+    with open(path, 'r') as analysis_file:
+        table_header = analysis_file.readline()[:-1].split(',')
+        lines = analysis_file.readlines()
+        while line + count < len(lines):
+            line_list = lines[line + count][:-1].split(',')
+            res.append(line_list)
+            count += 1
+            if count == 20:
+                break
+        return res, count, table_header
+
+
 def get_file_list(file_type, res):
     """get file list by type"""
     path = '/var/atune_data/tuning/' + file_type
@@ -166,7 +235,6 @@ def get_file_list(file_type, res):
         current = {'name': each.split('.')[0], 'status': file_type, 'date': times}
         res.append(current)
     return res, len(filelist)
-
 
 
 if __name__ == '__main__':
