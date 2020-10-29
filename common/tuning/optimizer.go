@@ -65,7 +65,7 @@ type Optimizer struct {
 	BackupFlag          bool
 	FeatureFilter       bool
 	Restart             bool
-	TuningParams        map[string]struct{}
+	TuningParams        utils.SortedPair
 	EvalStatistics      []float64
 	FeatureSelector     string
 	PrjId               string
@@ -93,10 +93,12 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 
 	if len(o.TuningParams) > 0 {
 		for _, item := range o.Prj.Object {
-			if _, ok := o.TuningParams[item.Name]; ok {
-				item.Info.Skip = false
-			} else {
-				item.Info.Skip = true
+			item.Info.Skip = true
+			for _, para := range o.TuningParams {
+				if para.Name == item.Name {
+					item.Info.Skip = false
+					break;
+				}
 			}
 		}
 	}
@@ -316,6 +318,8 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		return err
 	}
 
+	optPutStartTime := time.Now()
+
 	optPutBody := new(models.OptimizerPutBody)
 	optPutBody.Iterations = o.Iter
 	optPutBody.Value = evalValue
@@ -361,6 +365,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
+	log.Infof("optimizer put time is: %v", time.Now().Sub(optPutStartTime).Milliseconds())
 
 	if o.RespPutIns.Finished {
 		remainParams, err := o.filterParams()
@@ -372,6 +377,18 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 			finalEval := strings.Replace(o.FinalEval, "=-", "=", -1)
 			message = fmt.Sprintf("\n The final optimization result is: %s\n"+
 				" The final evaluation value is: %s\n", o.RespPutIns.Param, finalEval)
+			if o.RespPutIns.Rank != "" {
+				ranks := strings.Split(o.RespPutIns.Rank, ",")
+				paraSort := make([]string, 0)
+				for _, rank := range ranks {
+					if !strings.Contains(rank, ":") {
+						continue;
+					}
+					paraSort = append(paraSort, strings.TrimSpace(strings.Split(rank, ":")[0]))
+				}
+				message = message + fmt.Sprintf(" The feature importances of current evaluation are: %s\n",
+					strings.Join(paraSort, ","))
+			}
 			log.Info(message)
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 		} else {
@@ -379,8 +396,8 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 				len(strings.Split(o.RespPutIns.Param, ",")), len(strings.Split(remainParams, ",")))
 			ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 			tuningParams := make([]string, 0)
-			for para := range o.TuningParams {
-				tuningParams = append(tuningParams, para)
+			for _, para := range o.TuningParams {
+				tuningParams = append(tuningParams, para.Name)
 			}
 			message = fmt.Sprintf("The selected most important parameters is:\n %s\n"+
 				" Next optional parameters is:\n %s\n", tuningParams, remainParams)
@@ -454,7 +471,7 @@ func (o *Optimizer) filterParams() (string, error) {
 	skipMap := make(map[string]struct{})
 	for _, param := range skipParams {
 		skipMap[param.Name] = struct{}{}
-		o.TuningParams[param.Name] = struct{}{}
+		o.TuningParams = append(o.TuningParams, utils.Pair{param.Name, param.Score})
 	}
 	for _, item := range o.Prj.Object {
 		if _, ok := skipMap[item.Name]; ok {

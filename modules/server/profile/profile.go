@@ -657,7 +657,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			optimizer.FeatureFilterEngine = reply.GetFeatureFilterEngine()
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			optimizer.SplitCount = reply.GetSplitCount()
-			optimizer.PrjId = strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
+			optimizer.PrjId = strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
 			cycles = reply.GetFeatureFilterCycle()
 			optimizer.FeatureFilterCount = reply.GetFeatureFilterCount()
 			optimizer.EvalFluctuation = reply.GetEvalFluctuation()
@@ -666,7 +666,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		case PB.TuningMessage_JobCreate:
 			optimizer.EvalBase = reply.GetTuningLog().GetBaseEval()
 			optimizer.Evaluations = reply.GetTuningLog().GetSumEval()
-			optimizer.TuningParams = make(map[string]struct{})
+			optimizer.TuningParams = make(utils.SortedPair, 0)
 			if cycles == 0 {
 				if optimizer.Restart {
 					message = fmt.Sprintf("%d.Continue to tuning the system......", step)
@@ -1329,7 +1329,7 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 	logPath := absPath + "test-" + timestamp + ".log"
 	log.Infof("log file path: %s", logPath)
 	_, err = os.Create(logPath)
-	if err!= nil {
+	if err != nil {
 		log.Errorf("Failed to create log file: %v", err)
 		return workloadType, resourceLimit, err
 	}
