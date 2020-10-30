@@ -1,0 +1,31 @@
+project: "go_gc"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object :
+  -
+    name : "GOGC"
+    info :
+        desc : ""
+        get : "cat go_gc/go_gc.sh | grep 'GOGC' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/GOGC\\s*=\\s*[0-9]*/GOGC=$value/g' go_gc/go_gc.sh"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 10
+          - 2000
+        step : 10
+        dtype : "int"
+  -
+    name : "GOMAXPROCS"
+    info :
+        desc : ""
+        get : "cat go_gc/go_gc.sh | grep 'GOMAXPROCS' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/GOMAXPROCS\\s*=\\s*[0-9]*/GOMAXPROCS=$value/g' go_gc/go_gc.sh"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 2
+          - 200
+        dtype : "int"
+        step : 2

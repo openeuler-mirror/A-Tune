@@ -1,0 +1,14 @@
+project: "go_gc"
+engine : "bayes"
+iterations : 50
+random_starts : 20
+
+benchmark : "sh go_gc/go_gc.sh 3"
+evaluations :
+  -
+    name: "ns/op"
+    info:
+        get: "echo '$out' | awk '{print $3}' | awk '{if($1!~/s$/)print}' | awk '{sum+=$1}END{print sum/3}'"
+        type: "positive"
+        weight: 100
+        threshold: 100
