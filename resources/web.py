@@ -39,7 +39,6 @@ CORS(app)
 @app.route('/tuning/<status>/<file_name>', methods=['GET'])
 def get_file_info(status, file_name):
     """get tuning info"""
-    print(status, file_name)
     response_object = {}
     response_object['status'] = status
     response_object['file_name'] = file_name
@@ -232,7 +231,7 @@ def get_file_list(file_type, res):
         filepath = path + '/' + each
         modify = os.path.getmtime(filepath)
         times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
-        current = {'name': each.split('.')[0], 'status': file_type, 'date': times}
+        current = {'name': each.rsplit('.', 1)[0], 'status': file_type, 'date': times}
         res.append(current)
     return res, len(filelist)
 

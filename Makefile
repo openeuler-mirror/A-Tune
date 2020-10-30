@@ -83,6 +83,7 @@ libinstall:
 	install -m 640 misc/engine.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 rules/tuning/tuning_rules.grl $(DESTDIR)/etc/atuned/rules
 	install -m 640 misc/atune-engine.service $(SYSTEMDDIR)
+	install -m 640 misc/atune-web.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
 	\cp -rf scripts/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
