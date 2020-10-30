@@ -1,0 +1,10 @@
+[Unit]
+Description=A-Tune database service for Web
+After=network.target
+Requires=polkit.service
+
+[Service]
+ExecStart=python3 /usr/libexec/atuned/resources/web.py
+
+[Install]
+WantedBy=multi-user.target

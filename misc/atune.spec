@@ -118,6 +118,7 @@ make models
 %license License/LICENSE
 %defattr(0640,root,root,-)
 %attr(0640,root,root) %{_unitdir}/atune-engine.service
+%attr(0640,root,root) %{_unitdir}/atune-web.service
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0750,root,root) /usr/libexec/atuned/resources/*
 %attr(0750,root,root) /etc/atuned/*
