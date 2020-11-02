@@ -2,7 +2,6 @@
 Description=A-Tune AI service
 After=network.target
 Requires=polkit.service
-BindsTo=atune-web.service
 
 [Service]
 ExecStart=python3 /usr/libexec/atuned/analysis/app_engine.py /etc/atuned/engine.cnf
