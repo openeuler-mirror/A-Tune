@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copyright (c) 2020 Huawei Technologies Co., Ltd.
 #
-# The implementation was written so as to confirm one-click start.
+# The implementation was written so as to confirm whether to make models.
 #
 # A-Tune is licensed under the Mulan PSL v2,
 # You can use this software according to the terms and conditions of the Mulan PSL v2.
@@ -13,7 +13,7 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2020-10-14
 
-export TCID="make startup"
+export TCID="make models"
 
 . ./test_lib.sh
 
@@ -28,23 +28,29 @@ cleanup()
     echo "===================="
     echo "Clean the System"
     echo "===================="
-    rm -rf startup_file
+    rm -rf models_file
+    sed -i 's/#export GOMP_CPU_AFFINITY.*$/export GOMP_CPU_AFFINITY=0-$[CPUNO - 1]/g' /etc/profile.d/performance.sh
+    cd ..
+    make startup
 }
 
 
 test01()
 {
-    tst_resm TINFO "startup"
+    tst_resm TINFO "make models"
     cd ..
-    make startup
+    make models
     ret1=$?
-    systemctl is-active atuned  > startup_file
-    startup=`cat startup_file`
+    str=`cat /etc/profile.d/performance.sh | grep GOMP_CPU_AFFINITY`
+    sed -i 's/export GOMP_CPU_AFFINITY.*$/#export GOMP_CPU_AFFINITY=0-$[CPUNO - 1]/g' /etc/profile.d/performance.sh
+    make startup
+    cd tools/
+    python3 generate_models.py -d ../analysis/dataset -m ../analysis/models -s True -g True
     ret2=$?
-    if [ $ret1 == 0 ] && [ $ret2 == 0 ] && [[ "$startup" == "active" ]]; then
-         tst_resm TPASS "startup"
+    if [ $ret1 == 0 ] && [ $ret2 == 0 ]; then
+         tst_resm TPASS "make models"
     else
-         tst_resm TFAIL "startup"
+         tst_resm TFAIL "make models"
     fi
 }
 
@@ -56,4 +62,3 @@ init
 test01
 
 tst_exit
-

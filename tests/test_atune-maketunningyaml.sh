@@ -36,7 +36,7 @@ test01()
     tst_resm TINFO "make tunning yaml"
     pip3 install openpyxl
     cd ../tools/translate_yaml/
-    python3 translate.py -i /home/gopath/src/A-Tune/tuning/csv/ -o /home/gopath/src/A-Tune/tools/translate_yaml > yaml_file
+    python3 translate.py -i ../../tuning/csv/ -o ../../tools/translate_yaml > yaml_file
     ret1=$?
     startup=`cat yaml_file | grep FAILED`
     if [ $ret1 == 0 ] && [[ "$startup" == "" ]]; then
