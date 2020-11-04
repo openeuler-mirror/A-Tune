@@ -76,7 +76,7 @@ class Optimizer(Resource):
         task_cache.TasksCache.get_instance().set(task_id, value)
 
         iters = args.get("max_eval")
-        if args.get("engine") == "abtest":
+        if args.get("engine") == "abtest" or args.get("engine") == "gridsearch":
             iters = parent_conn.recv()
         result["task_id"] = task_id
         result["status"] = "OK"

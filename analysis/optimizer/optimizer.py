@@ -29,6 +29,7 @@ from skopt.utils import normalize_dimensions
 from skopt.utils import cook_estimator
 
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
+from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
 
@@ -315,6 +316,12 @@ class Optimizer(multiprocessing.Process):
                 params = abtuning_manager.get_best_params()
                 # convert string option into index
                 options = abtuning_manager.get_options_index(options)
+            elif self.engine == 'gridsearch':
+                gstuning_manager = GridSearchTuningManager(self.knobs, self.child_conn)
+                options, performance = gstuning_manager.do_gridsearch()
+                params, labels = gstuning_manager.get_best_params()
+                # convert string option into index
+                options = gstuning_manager.get_options_index(options)
             elif self.engine == 'lhs':
                 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
                 knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn,
@@ -349,7 +356,8 @@ class Optimizer(multiprocessing.Process):
         for i, knob in enumerate(self.knobs):
             if estimator is not None:
                 params[knob['name']] = ret.x[i]
-            labels.append(knob['name'])
+            if self.engine != 'gridsearch':
+                labels.append(knob['name'])
 
         LOGGER.info("Optimized result: %s", params)
         LOGGER.info("The optimized profile has been generated.")
