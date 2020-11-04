@@ -24,7 +24,7 @@ OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
                                    help="knobs list cannot be null")
 OPTIMIZER_POST_PARSER.add_argument('engine',
                                    choices=('random', 'forest', 'gbrt', 'extraTrees',
-                                            'bayes', 'abtest', 'lhs', 'tpe'),
+                                            'bayes', 'abtest', 'lhs', 'tpe', 'gridsearch'),
                                    help='engine choice: {error_msg}')
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json',
                                    help="random_starts cannot be null")
