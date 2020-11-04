@@ -98,26 +98,24 @@ class Optimizer(Resource):
             utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
             return {}, 200
         if args["iterations"] == 0:
-            tps = args["line"].split("|")[4].split("=")[1]
-            utils.add_data_to_file(tps, "a", args["prj_name"])
-            params = ""
-            for element in args["line"].split("|")[5].split(","):
-                params += element.split("=")[0] + ","
+            total_eval = args["line"].split("|")[3].split("=")[1]
+            utils.add_data_to_file(utils.get_opposite_num(total_eval, True), "a", args["prj_name"])
+            params = utils.get_string_split(args["line"], 5, 0, "")
+            params += utils.get_string_split(args["line"], 4, 0, "evaluation-")
+            if len(args["line"].split("|")[4].split(",")) > 1:
+                params += "evaluation-TOTAL" + ","
             params = params[:-1]
             utils.add_data_to_file(params, "a", args["prj_name"])
 
         out_queue = task[self.pipe]
         if args["iterations"] != 0 and len(args["value"]) != 0:
             params = utils.get_time_difference(args["line"].split("|")[2], args["line"].split("|")[1])
-            params += ","
-            for element in args["line"].split("|")[5].split(","):
-                params += element.split("=")[1] + ","
-            tps = args["line"].split("|")[4].split("=")[1]
-            if tps[0] == "-":
-                tps = tps[1:]
-            else:
-                tps = "-" + tps
-            params += tps
+            params += "," + utils.get_string_split(args["line"], 5, 1, "")
+            if len(args["line"].split("|")[4].split(",")) > 1:
+                for each_eval in args["line"].split("|")[4].split(","):
+                    params += utils.get_opposite_num(each_eval.split("=")[1], False) + ","
+            total_eval = args["line"].split("|")[3].split("=")[1]
+            params += utils.get_opposite_num(total_eval, True)
             utils.add_data_to_file(params, "a", args["prj_name"])
             out_queue.send(args.get("value"))
 

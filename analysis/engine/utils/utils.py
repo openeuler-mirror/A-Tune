@@ -90,11 +90,28 @@ def get_time_difference(end_time, start_time):
     """get time difference in second"""
     end_time += "000"
     start_time += "000"
-    end = re.split("-| |:|\.", end_time)
-    start = re.split("-| |:|\.", start_time)
+    end = re.split(r"-| |:|\.", end_time)
+    start = re.split(r"-| |:|\.", start_time)
     for i in range(len(end)):
         end[i] = int(end[i])
         start[i] = int(start[i])
     date_end = datetime.datetime(end[0], end[1], end[2], end[3], end[4], end[5], end[6])
     date_start = datetime.datetime(start[0], start[1], start[2], start[3], start[4], start[5], start[6])
     return str((date_end - date_start).total_seconds())
+
+
+def get_opposite_num(num, opposite):
+    """get opposite number for string"""
+    if num[0] == "-":
+        return num[1:]
+    if opposite and num[0] != "-":
+        return "-" + num
+    return num
+
+
+def get_string_split(line, index, key, val):
+    """get split value for line"""
+    params = ""
+    for element in line.split("|")[index].split(","):
+        params += val + element.split("=")[key] + ","
+    return params
