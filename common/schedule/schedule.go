@@ -234,7 +234,6 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 				logStr += section.Name() + "|" + statusStr + "|" + key.Name() + "|" + key.Value() + "|"
 				if statusStr != "OK" {
 					logStr += respPutIns.Value
-					}
 				}
 				logStr += "\n"
 			}
