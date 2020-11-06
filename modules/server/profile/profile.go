@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/csv"
 	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	_ "gitee.com/openeuler/A-Tune/common/checker"
@@ -385,15 +386,55 @@ func (s *ProfileServer) CheckInitProfile(profileInfo *PB.ProfileInfo,
 	return nil
 }
 
+func handleCsv(curPath string, storePath string) error {
+	if storePath == "" {
+		return nil
+	}
+	fs, err := os.Open(curPath)
+	if err != nil {
+		return fmt.Errorf("can not get file, err is %+v", err)
+	}
+	defer fs.Close()
+	r := csv.NewReader(fs)
+	content, err := r.ReadAll()
+	if err != nil {
+		return fmt.Errorf("can not get file, err is %+v", err)
+	}
+
+	tempFile, err := os.OpenFile(storePath, os.O_RDWR|os.O_APPEND, 0640)
+	if err != nil {
+		return fmt.Errorf("can not get file, err is %+v", err)
+	}
+	defer tempFile.Close()
+
+	w := csv.NewWriter(tempFile)
+	w.WriteAll(content[1:])
+	w.Flush()
+
+	os.Rename(storePath, curPath)
+
+	return nil
+}
+
+var collectStatus  = make(map[string]string)
+
 // Analysis method analysis the system traffic load
 func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileMgr_AnalysisServer) error {
+	id := message.GetId()
+	if message.GetFlag() == "end" {
+		collectStatus[id] = "end"
+		return nil
+	}
+	if message.GetFlag() == "start" {
+		collectStatus[id] = "run"
+	}
+
 	if !message.Characterization {
 		if !s.TryLock() {
 			return fmt.Errorf("dynamic optimizer search or analysis has been in running")
 		}
 		defer s.Unlock()
 	}
-
 	_ = stream.Send(&PB.AckCheck{Name: "1. Analysis system runtime information: CPU Memory IO and Network..."})
 
 	npipe, err := utils.CreateNamedPipe()
@@ -403,28 +444,54 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	defer os.Remove(npipe)
 
+	subProcess := true
 	go func() {
-		file, err := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
-		if err != nil {
-			log.Errorf("failed to open pipe, err: %v", err)
-			return
-		}
-		reader := bufio.NewReader(file)
+		for {
+			file, err := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
+			if err != nil {
+				log.Errorf("failed to open pipe, err: %v", err)
+				return
+			}
+			reader := bufio.NewReader(file)
+	
+			scanner := bufio.NewScanner(reader)
+	
+			for scanner.Scan() {
+				line := scanner.Text()
+				_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+			}
 
-		scanner := bufio.NewScanner(reader)
-
-		for scanner.Scan() {
-			line := scanner.Text()
-			_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+			if !subProcess {
+				break
+			}
 		}
 	}()
 
-	respCollectPost, err := s.collection(npipe)
-	if err != nil {
-		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-		log.Errorf("collection system data error: %v", err)
-		return err
+	var respCollectPost *RespCollectorPost
+	tempFile := ""
+	for {
+		respCollectPost, err = s.collection(npipe, message.GetTime())
+		if err != nil {
+			_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+			log.Errorf("collection system data error: %v", err)
+			return err
+		}
+
+		err = handleCsv(respCollectPost.Path, tempFile)
+		if err != nil {
+			return err
+		}
+
+		if collectStatus[id] == "end" {
+			delete(collectStatus, id)
+			break
+		}
+		if message.GetFlag() == "" {
+			break
+		}
 	}
+
+	subProcess = false
 
 	workloadType, resourceLimit, err := s.classify(respCollectPost.Path, message.GetModel())
 	if err != nil {
@@ -1260,7 +1327,7 @@ func (s *ProfileServer) Schedule(message *PB.ScheduleMessage,
 	return nil
 }
 
-func (s *ProfileServer) collection(npipe string) (*RespCollectorPost, error) {
+func (s *ProfileServer) collection(npipe string, time string) (*RespCollectorPost, error) {
 	//1. get the dimension structure of the system data to be collected
 	collections, err := sqlstore.GetCollections()
 	if err != nil {
@@ -1299,6 +1366,14 @@ func (s *ProfileServer) collection(npipe string) (*RespCollectorPost, error) {
 	if sampleNum == 0 {
 		sampleNum = 20
 	}
+
+	if time != "" {
+		sampleNum, err = strconv.Atoi(time)
+		if err != nil {
+			return nil, err
+		}
+	}
+	
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
@@ -1363,7 +1438,7 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 func (s *ProfileServer) Getworkload() (string, error) {
 	var npipe string
 	var customeModel string
-	respCollectPost, err := s.collection(npipe)
+	respCollectPost, err := s.collection(npipe, "")
 	if err != nil {
 		return "", err
 	}
@@ -1390,7 +1465,7 @@ func (s *ProfileServer) Generate(message *PB.ProfileInfo, stream PB.ProfileMgr_G
 
 	_ = stream.Send(&PB.AckCheck{Name: "1.Start to analysis the system bottleneck"})
 	var npipe string
-	respCollectPost, err := s.collection(npipe)
+	respCollectPost, err := s.collection(npipe, "")
 	if err != nil {
 		return err
 	}

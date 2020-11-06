@@ -20,6 +20,10 @@ import (
 	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"io"
+	"os"
+	"syscall"
+	"os/exec"
+	"time"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
@@ -39,6 +43,16 @@ var profileAnalysisCommand = cli.Command{
 			Name:  "characterization, c",
 			Usage: "only analysis the workload type",
 		},
+		cli.StringFlag{
+			Name:  "times, t",
+			Usage: "specify the collection times",
+			Value: "",
+		},
+		cli.StringFlag{
+			Name:  "script, s",
+			Usage: "specify the script to be executed",
+			Value: "",
+		},
 	},
 	Description: func() string {
 		desc := `
@@ -49,7 +63,11 @@ var profileAnalysisCommand = cli.Command{
 	 can be end with .m.
 	     example: atune-adm analysis --model ./self_trained.m
 	 you can only analysis the workload type.
-	     example: atune-adm analysis --characterization`
+	     example: atune-adm analysis --characterization
+	you can specify the collecting times.
+	     example: atune-adm analysis -t 5
+	 you can specify the script to be executed.
+	     example: atune-adm analysis -s script.sh`
 		return desc
 	}(),
 	Action: profileAnalysis,
@@ -94,10 +112,28 @@ func profileAnalysis(ctx *cli.Context) error {
 		return fmt.Errorf("input:%s is invalid", modelFile)
 	}
 
-	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname,
-		Model: modelFile, Characterization: ctx.Bool("characterization")})
+	times := ctx.String("times")
+	if times != "" && !utils.IsInputStringValid(times) {
+		return fmt.Errorf("input:%s is invalid", times)
+	}
 
+	var pid int
+	id := string(time.Now().Unix())
+	cmd := ctx.String("script")
+	svc := PB.NewProfileMgrClient(c.Connection())
+	flag := ""
+	if cmd != "" {
+		cmdline := "sh " + cmd + ">> log.txt"
+		ch := make(chan int)
+		go ExecScript(cmdline, ch)
+		pid = <-ch
+		times = "1"
+		flag = "start"
+	}
+	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile, 
+		Characterization: ctx.Bool("characterization"), Times: times, Flag: flag, Id:id})
+
+	endCollect := false
 	for {
 		reply, err := stream.Recv()
 
@@ -109,7 +145,40 @@ func profileAnalysis(ctx *cli.Context) error {
 			return err
 		}
 		utils.Print(reply)
+		if cmd != "" && !checkPid(pid) && !endCollect {
+			svcend := PB.NewProfileMgrClient(c.Connection())
+			endCollect = true
+			_, _ = svcend.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile,
+				Characterization: ctx.Bool("characterization"), Times: times, Flag: "end", Id:id})
+		}
 	}
 
 	return nil
+}
+
+func checkPid(pid int) bool {
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false
+	}
+
+	err = process.Signal(syscall.Signal(0))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func ExecScript(cmdline string, ch chan int) {
+	cmd := exec.Command("/bin/bash", "-c", cmdline)
+	cmd.Stdout = os.Stdout
+	err := cmd.Start()
+	if err != nil {
+		return 
+	}
+	ch <- cmd.Process.Pid
+	err = cmd.Wait()
+	if err != nil {
+		return
+	}
 }

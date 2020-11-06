@@ -177,6 +177,9 @@ type AnalysisMessage struct {
 	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
 	Model                string   `protobuf:"bytes,2,opt,name=Model,proto3" json:"Model,omitempty"`
 	Characterization     bool     `protobuf:"varint,3,opt,name=Characterization,proto3" json:"Characterization,omitempty"`
+	Times                string   `protobuf:"bytes,4,opt,name=Time,proto3" json:"Time,omitempty"`
+	Flag                 string   `protobuf:"bytes,5,opt,name=Flag,proto3" json:"Flag,omitempty"`
+	Id                   string   `protobuf:"bytes,6,opt,name=Id,proto3" json:"Id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -226,6 +229,27 @@ func (m *AnalysisMessage) GetCharacterization() bool {
 		return m.Characterization
 	}
 	return false
+}
+
+func (m *AnalysisMessage) GetTime() string {
+	if m != nil {
+		return m.Times
+	}
+	return ""
+}
+
+func (m *AnalysisMessage) GetFlag() string {
+	if m != nil {
+		return m.Flag
+	}
+	return ""
+}
+
+func (m *AnalysisMessage) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
 }
 
 type Ack struct {
