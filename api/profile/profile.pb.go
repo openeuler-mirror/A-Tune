@@ -876,7 +876,8 @@ func (m *TuningHistory) GetStarts() int32 {
 	return 0
 }
 type DetectMessage struct {
-	AppName             string   `protobuf:"bytes,1,opt,name=AppName,proto3" json:"AppName,omitempty"`
+	AppName              string   `protobuf:"bytes,1,opt,name=AppName,proto3" json:"AppName,omitempty"`
+	DetectPath           string   `protobuf:"bytes,2,opt,name=DetectPath,proto3" json:"DetectPath,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -910,6 +911,13 @@ var xxx_messageInfo_DetectMessage proto.InternalMessageInfo
 func (m *DetectMessage) GetAppName() string {
 	if m != nil {
 		return m.AppName
+	}
+	return ""
+}
+
+func (m *DetectMessage) GetDetectPath() string {
+	if m != nil {
+		return m.DetectPath
 	}
 	return ""
 }
