@@ -238,7 +238,7 @@ func Post(serviceType, paramName, path string) (string, error) {
 	}
 	resp, err := client.Do(request)
 	if err != nil {
-		return "", fmt.Errorf("do request error")
+		return "", fmt.Errorf("do request error: %v", err)
 	} else {
 		defer resp.Body.Close()
 
@@ -584,11 +584,11 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	if err != nil {
 		return fmt.Errorf("get log file path failed: %v", err)
 	}
+	defer os.Remove(logPath)
 	_, err = Post("classification", "file", logPath)
 	if err != nil {
 		return fmt.Errorf("Failed transfer file log file to server: %v", err)
 	}
-	defer os.Remove(logPath)
 
 	rules := &sqlstore.GetRuleTuned{Class: workloadType}
 	if err := sqlstore.GetRuleTuneds(rules); err != nil {
@@ -1399,6 +1399,7 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 		log.Errorf("Failed to change file name: %v", localPath)
 		return workloadType, resourceLimit, err
 	}
+	defer os.Remove(localPath)
 
 	absPath, _ := filepath.Split(localPath)
 	logPath := absPath + "test-" + timestamp + ".log"
@@ -1414,7 +1415,6 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 		log.Errorf("Failed transfer file to server: %v", err)
 		return workloadType, resourceLimit, err
 	}
-	defer os.Remove(localPath)
 
 	body := new(ClassifyPostBody)
 	body.Data = dataPath
