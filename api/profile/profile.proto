@@ -89,6 +89,7 @@ message TrainMessage {
 
 message DetectMessage {
     string AppName = 1;
+    string DetectPath = 2;
 }
 
 message DefineMessage {

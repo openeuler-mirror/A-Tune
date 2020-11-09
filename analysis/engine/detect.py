@@ -30,6 +30,8 @@ LOGGER = logging.getLogger(__name__)
 class Detecting(Resource):
     """provide the method of post for detecting"""
     app_name = "appname"
+    detect_path = "detectpath"
+    folder_path = "/var/atune_data/analysis/"
 
     def post(self):
         """
@@ -39,10 +41,13 @@ class Detecting(Resource):
         LOGGER.info(args)
 
         app_name = args.get(self.app_name)
-
-        paths = glob('/var/atune_data/tuning/*.csv')
-        detect_path = max(paths, key=os.path.getctime)
-
+        detect_path = args.get(self.detect_path)
+        if detect_path == "":
+            globpath = self.folder_path + '*.csv'
+            paths = glob(globpath)
+            detect_path = max(paths, key=os.path.getctime)
+        else: 
+            detect_path = self.folder_path + detect_path + '.csv'
         data_path = "/usr/libexec/atuned/analysis/dataset"
         data_path = os.path.join(data_path, "*.csv")
         statis = WorkloadStatistic()

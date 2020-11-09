@@ -1138,10 +1138,12 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 // Detecting method detect the misclassified data
 func (s *ProfileServer) Detecting(message *PB.DetectMessage, stream PB.ProfileMgr_DetectingServer) error {
 	AppName := message.GetAppName()
+	DetectPath := message.GetDetectPath()
 	_ = stream.Send(&PB.AckCheck{Name: "Detecting the misclassified data"})
 
 	detectBody := new(models.Detecting)
 	detectBody.AppName = AppName
+	detectBody.DetectPath = DetectPath
 
 	success, detecterr, result:= detectBody.Post()
 

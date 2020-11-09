@@ -23,6 +23,7 @@ import (
 // Detecting : The data that send to http service for detecting
 type Detecting struct {
 	AppName    string `json:"appname"`
+	DetectPath    string `json:"detectpath"`
 }
 
 // Post method call detecting service

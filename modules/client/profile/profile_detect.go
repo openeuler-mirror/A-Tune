@@ -35,12 +35,19 @@ var detectCommand = cli.Command{
 			Usage: "the name actual running workload",
 			Value: "",
 		},
+		cli.StringFlag{
+			Name:  "detect_file, f",
+			Usage: "specify the file to be detect",
+			Value: "",
+		},
 	},
 	Description: func() string {
 		desc := `
 	 detect the error of misclassified data. you have to input the actual type
 	 and application name of the workload.
-	     example: atune-adm detect --app_name=mysql`
+		 example: atune-adm detect --app_name=mysql
+	 you can also specify the file you want to detect.
+		 example: atune-adm detect --app_name=mysql --detect_file=test-1011`
 		return desc
 	}(),
 	Action: detect,
@@ -93,6 +100,7 @@ func detect(ctx *cli.Context) error {
 	}
 
 	appName := ctx.String("app_name")
+	detectPath := ctx.String("detect_file")
 
 	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
@@ -101,7 +109,7 @@ func detect(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Detecting(CTX.Background(), &PB.DetectMessage{AppName: appName})
+	stream, err := svc.Detecting(CTX.Background(), &PB.DetectMessage{AppName: appName, DetectPath: detectPath})
 	if err != nil {
 		return err
 	}
