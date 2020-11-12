@@ -43,6 +43,7 @@ class Transfer(Resource):
                 os.makedirs(file_name)
             file_name += save_path.split(self.file_path + service)[1]
             current_app.logger.info(file_name)
+            current_app.logger.info(request.remote_addr)
             file_obj.save(file_name)
             return file_name, 200
 

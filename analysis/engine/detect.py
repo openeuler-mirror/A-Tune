@@ -33,7 +33,7 @@ class Detecting(Resource):
     detect_path = "detectpath"
     folder_path = "/var/atune_data/analysis/"
 
-    def post(self):
+    def get(self):
         """
         :returns result, 200 : detect result, status code
         """
@@ -46,7 +46,7 @@ class Detecting(Resource):
             globpath = self.folder_path + '*.csv'
             paths = glob(globpath)
             detect_path = max(paths, key=os.path.getctime)
-        else: 
+        else:
             detect_path = self.folder_path + detect_path + '.csv'
         data_path = "/usr/libexec/atuned/analysis/dataset"
         data_path = os.path.join(data_path, "*.csv")
@@ -59,4 +59,4 @@ class Detecting(Resource):
             LOGGER.error(err)
             abort(500)
 
-        return result, 200
+        return result, 200, [('Access-Control-Allow-Origin', '*')]
