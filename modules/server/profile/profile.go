@@ -1145,7 +1145,7 @@ func (s *ProfileServer) Detecting(message *PB.DetectMessage, stream PB.ProfileMg
 	detectBody.AppName = AppName
 	detectBody.DetectPath = DetectPath
 
-	success, detecterr, result:= detectBody.Post()
+	success, detecterr, result:= detectBody.Get()
 
 	if detecterr != nil {
 	    return detecterr

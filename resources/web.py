@@ -21,7 +21,6 @@ import time
 import numpy
 import logging
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 from configparser import ConfigParser
 
 
@@ -32,8 +31,7 @@ DEBUG = True
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-# enable CORS
-CORS(app)
+cors = [('Access-Control-Allow-Origin', '*')]
 
 
 @app.route('/tuning/<status>/<file_name>', methods=['GET'])
@@ -45,7 +43,7 @@ def get_file_info(status, file_name):
     path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
     if not os.path.exists(path):
         response_object['find_file'] = False
-        return jsonify(response_object)
+        return jsonify(response_object), 200, cors
     params = []
     with open(path, 'r') as tuning_file:
         infos = tuning_file.readline()[:-1].split(',')
@@ -57,7 +55,27 @@ def get_file_info(status, file_name):
     response_object['parameter'] = params
     response_object['line'] = 0
     response_object['base'] = base
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
+
+
+@app.route('/tuning/<status>/<file_name>/new_file/<new_name>', methods=['GET'])
+def rename_tuning_file(status, file_name, new_name):
+    """rename tuning file"""
+    response_object = {}
+    response_object['status'] = status
+    locate = '/var/atune_data/tuning/' + status + '/'
+    if os.path.isfile(locate + file_name + '.txt'):
+        if not os.path.isfile(locate + new_name + '.txt'):
+            os.rename(locate + file_name + '.txt', locate + new_name + '.txt')
+            response_object['duplicate'] = False
+            response_object['rename'] = True
+        else:
+            response_object['duplicate'] = True
+            response_object['rename'] = False
+    else:
+        response_object['duplicate'] = False
+        response_object['rename'] = False
+    return jsonify(response_object), 200, cors
 
 
 @app.route('/tuning/<status>/<file_name>/<line>', methods=['GET'])
@@ -71,7 +89,7 @@ def get_file_data(status, file_name, line):
     path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
     if not os.path.exists(path):
         response_object['find_file'] = False
-        return jsonify(response_object)
+        return jsonify(response_object), 200, cors
     res = []
     cost = []
     count = 0
@@ -101,7 +119,7 @@ def get_file_data(status, file_name, line):
     response_object['line'] = line_res
     response_object['data'] = res
     response_object['cost'] = cost
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
 
 
 @app.route('/tuning/<types>', methods=['GET'])
@@ -134,7 +152,7 @@ def get_type_list(types):
 
     if request.method == 'GET':
         response_object['message'] = res
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
 
 
 @app.route('/tuning/findFile/<filename>', methods=['GET'])
@@ -148,7 +166,7 @@ def find_file_dir(filename):
         response_object['status'] = 'finished'
     elif os.path.exists(path + 'error/' + filename):
         response_object['status'] = 'error'
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
 
 
 @app.route('/analysis', methods=['GET'])
@@ -169,7 +187,26 @@ def get_analysis_list():
                 res.append(temp)
     res = sorted(res, key=(lambda x:x['date']), reverse=True)
     response_object['analysis'] = res
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
+
+
+@app.route('/analysis/<file_name>/new_file/<new_name>', methods=['GET'])
+def rename_analysis_file(file_name, new_name):
+    """rename tuning file"""
+    response_object = {}
+    locate = '/var/atune_data/analysis/'
+    if os.path.isfile(locate + file_name + '.csv'):
+        if not os.path.isfile(locate + new_name + '.csv'):
+            os.rename(locate + file_name + '.csv', locate + new_name + '.csv')
+            response_object['duplicate'] = False
+            response_object['rename'] = True
+        else:
+            response_object['duplicate'] = True
+            response_object['rename'] = False
+    else:
+        response_object['duplicate'] = False
+        response_object['rename'] = False
+    return jsonify(response_object), 200, 
 
 
 @app.route('/analysis/<filename>/<line>', methods=['GET'])
@@ -180,7 +217,7 @@ def get_analysis_details(filename, line):
     path = '/var/atune_data/analysis/' + filename
     if not os.path.exists(path + ".csv"):
         response_object['file_exist'] = False
-        return jsonify(response_object)
+        return jsonify(response_object), 200, cors
     response_object['file_exist'] = True
     csv_res, csv_count, table_header = get_analysis_csv(path + ".csv", line)
     csv_res = numpy.array(csv_res).T.tolist()
@@ -190,7 +227,7 @@ def get_analysis_details(filename, line):
     if not os.path.exists(path + ".log"):
         response_object['log_data'] = []
         response_object['log_lines'] = 0
-        return jsonify(response_object)
+        return jsonify(response_object), 200, cors
     log_res = []
     log_count = 0
     with open(path + ".log", 'r') as analysis_log:
@@ -204,7 +241,7 @@ def get_analysis_details(filename, line):
     response_object['workload'] = workload
     response_object['log_data'] = log_res
     response_object['log_lines'] = log_count
-    return jsonify(response_object)
+    return jsonify(response_object), 200, cors
 
 
 def get_analysis_csv(path, line):

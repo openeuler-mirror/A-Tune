@@ -27,10 +27,10 @@ type Detecting struct {
 }
 
 // Post method call detecting service
-func (t *Detecting) Post() (bool, error, string) {
+func (t *Detecting) Get() (bool, error, string) {
 	url := config.GetURL(config.DetectingURI)
 	result := " "
-	response, err := http.Post(url, t)
+	response, err := http.Get(url, t)
 	if err != nil {
 		return false, err, result
 	}
