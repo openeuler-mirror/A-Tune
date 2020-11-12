@@ -2044,11 +2044,347 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "iocapacity_limit"
+    name : "reg_nosnp_atomic_bypass_en"
+    info :
+        desc : "Whether to bypass atomic operations of CPUs. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_nosnp_atomic_bypass_en"
+        set : "echo $value > /sys/class/misc/prefetch/reg_nosnp_atomic_bypass_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ro_alloc_shut_en"
+    info :
+        desc : "Whether to allow allocating readonce operation into L3. 0--allow 1--forbid"
+        get : "cat /sys/class/misc/prefetch/reg_ro_alloc_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ro_alloc_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_wrfull_hit_shut_en"
+    info :
+        desc : "Whether to send createE to HA when 64wu-full hit spipe M. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_wrfull_hit_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/reg_wrfull_hit_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "req_conflict_en"
+    info :
+        desc : "Whether to enable the operation of reversing back one pat when receiving requests from both in and out of CPU. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/req_conflict_en"
+        set : "echo $value > /sys/class/misc/prefetch/req_conflict_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "lower_power_en"
+    info :
+        desc : "Whether to enable CQ low power method. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/lower_power_en"
+        set : "echo $value > /sys/class/misc/prefetch/lower_power_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "dataclean_shut_en"
+    info :
+        desc : "Whether to shield the CE bit of Taishan Core's write_no_snoop_full. 0--not shield 1--shield"
+        get : "cat /sys/class/misc/prefetch/dataclean_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/dataclean_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "arb_flush_shut_en"
+    info :
+        desc : "Whether to enable the reset of ARBIT scheduling pointer when CQ queue is at idle status. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/arb_flush_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/arb_flush_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "pgnt_arb_exat_shut_en"
+    info :
+        desc : "Whether to enable pgrant scheduling method in which only one grant tries at one time. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/pgnt_arb_exat_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/pgnt_arb_exat_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "fast_exter_shut_en"
+    info :
+        desc : "Whether to forbid data missed from extern requests to be transferred through fast access. 0--allow 1--forbid"
+        get : "cat /sys/class/misc/prefetch/fast_exter_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/fast_exter_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "fast_data_shut_en"
+    info :
+        desc : "Whether to forbid data missed to be transferred through fast access. 0--allow 1--forbid"
+        get : "cat /sys/class/misc/prefetch/fast_data_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/fast_data_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "pend_data_shut_en"
+    info :
+        desc : "Whether to forbid data missed to be transferred through pend access. 0--allow 1--forbid"
+        get : "cat /sys/class/misc/prefetch/pend_data_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/pend_data_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "ramswap_full_shut_en"
+    info :
+        desc : "Full or partial when doing ramswap. 1--partial 0--Full."
+        get : "cat /sys/class/misc/prefetch/ramswap_full_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/ramswap_full_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "ramfwd_shut_en"
+    info :
+        desc : "Enable ramfwd method. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/ramfwd_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/ramfwd_shut_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reads_upgrade_en"
+    info :
+        desc : "Enable read_shared operation status promotion. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reads_upgrade_en"
+        set : "echo $value > /sys/class/misc/prefetch/reads_upgrade_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "rdmerge_pipe_en"
+    info :
+        desc : "Whether to allow requests from Sqmerge to be hit in Cpipe5. 0--forbid 1--allow"
+        get : "cat /sys/class/misc/prefetch/rdmerge_pipe_en"
+        set : "echo $value > /sys/class/misc/prefetch/rdmerge_pipe_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "spill_en"
+    info :
+        desc : "Enable spill in L3T. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/spill_en"
+        set : "echo $value > /sys/class/misc/prefetch/spill_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "spill_shared_en"
+    info :
+        desc : "Enable spill at shared status of L3T. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/spill_shared_en"
+        set : "echo $value > /sys/class/misc/prefetch/spill_shared_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "spill_instr_en"
+    info :
+        desc : "Enable instruction spill in L3T. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/spill_instr_en"
+        set : "echo $value > /sys/class/misc/prefetch/spill_instr_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sqrdmerge_en"
+    info :
+        desc : "Use RDMERGE acceleration in SQ merge operations. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/sqrdmerge_en"
+        set : "echo $value > /sys/class/misc/prefetch/sqrdmerge_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_drop_en"
+    info :
+        desc : "Enable the drop of prefetch in L3T. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prefetch_drop_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_drop_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "datapull_en"
+    info :
+        desc : "Enable the datapull in L3T. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/datapull_en"
+        set : "echo $value > /sys/class/misc/prefetch/datapull_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "mkinvld_en"
+    info :
+        desc : "Enable the transformation from makelinvalid to cleinvalid. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/mkinvld_en"
+        set : "echo $value > /sys/class/misc/prefetch/mkinvld_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "ramthr_en"
+    info :
+        desc : "Allow CPU to derive data back from thr channel directly in L3D. 0--forbid 1--allow"
+        get : "cat /sys/class/misc/prefetch/ramthr_en"
+        set : "echo $value > /sys/class/misc/prefetch/ramthr_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "rsperr_en"
+    info :
+        desc : "Allow to report rsperr. 0--forbid 1--allow"
+        get : "cat /sys/class/misc/prefetch/rsperr_en"
+        set : "echo $value > /sys/class/misc/prefetch/rsperr_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "iocapacity_limit_en"
     info :
         desc : "Whether to limit the io capacity of cache. 0--unlimiet 1--limit."
-        get : "cat /sys/class/misc/prefetch/iocapacity_limit"
-        set : "echo $value > /sys/class/misc/prefetch/iocapacity_limit"
+        get : "cat /sys/class/misc/prefetch/iocapacity_limit_en"
+        set : "echo $value > /sys/class/misc/prefetch/iocapacity_limit_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "force_cq_clk_en"
+    info :
+        desc : "Force to open Cache queue clock. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/force_cq_clk_en"
+        set : "echo $value > /sys/class/misc/prefetch/force_cq_clk_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sqmerge_en"
+    info :
+        desc : "Whether consecutive address access can occupy only one entry in the squeue to accelerate the merge process. 0--limit 1--merge."
+        get : "cat /sys/class/misc/prefetch/sqmerge_en"
+        set : "echo $value > /sys/class/misc/prefetch/sqmerge_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "rdmerge_upgrade_en"
+    info :
+        desc : "Whether to allow the RS to merge with the preceding ReadE. 0--disabl 1--allow."
+        get : "cat /sys/class/misc/prefetch/rdmerge_upgrade_en"
+        set : "echo $value > /sys/class/misc/prefetch/rdmerge_upgrade_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_drop_hha_en"
+    info :
+        desc : "Whether to merge a non-prefetch operation with the previous prefetch operation. 0--allow 1--limit."
+        get : "cat /sys/class/misc/prefetch/prefetch_drop_hha_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_drop_hha_en"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2070,11 +2406,11 @@ The default value is 2048. You are advised to change the value to 8192."
         items : 
         dtype : "int"
   -
-    name : "ramswap"
+    name : "rdnosnp_nca_shut_en"
     info :
-        desc : "Full or partial when doing ramswap. 1--partial 0--Full."
-        get : "cat /sys/class/misc/prefetch/ramswap"
-        set : "echo $value > /sys/class/misc/prefetch/ramswap"
+        desc : "Whether to mark the readnosnp of the bypass sent by the CPU as NCA. 0--yes 1--no"
+        get : "cat /sys/class/misc/prefetch/rdnosnp_nca_shut_en"
+        set : "echo $value > /sys/class/misc/prefetch/rdnosnp_nca_shut_en"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2082,11 +2418,11 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "sqmerge"
+    name : "wrfull_create_en"
     info :
-        desc : "whether consecutive address access can occupy only one entry in the squeue to accelerate the merge process. 0--limit 1--merge."
-        get : "cat /sys/class/misc/prefetch/sqmerge"
-        set : "echo $value > /sys/class/misc/prefetch/sqmerge"
+        desc : "Whether to enable 128-byte writeunique only to obtain permission but not data from HHA. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/wrfull_create_en"
+        set : "echo $value > /sys/class/misc/prefetch/wrfull_create_en"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2094,11 +2430,11 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "prefetch_drop_hha"
+    name : "cleanunique_data_en"
     info :
-        desc : "Whether to merge a non-prefetch operation with the previous prefetch operation. 0--allow 1--limit."
-        get : "cat /sys/class/misc/prefetch/prefetch_drop_hha"
-        set : "echo $value > /sys/class/misc/prefetch/prefetch_drop_hha"
+        desc : "Whether to enable the cleanunqunie to return data. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/cleanunique_data_en"
+        set : "echo $value > /sys/class/misc/prefetch/cleanunique_data_en"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2106,11 +2442,251 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "prime_drop_mask"
+    name : "lock_share_req_en"
+    info :
+        desc : "Whether to enable the register lock function in share mode and not to deliver operations to the HHA. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/lock_share_req_en"
+        set : "echo $value > /sys/class/misc/prefetch/lock_share_req_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "ddr_compress_opt_en"
+    info :
+        desc : "Optimization switch of support HHA compression access. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/ddr_compress_opt_en"
+        set : "echo $value > /sys/class/misc/prefetch/ddr_compress_opt_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "atomic_monitor_en"
+    info :
+        desc : "Enable atomic_monitor. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/atomic_monitor_en"
+        set : "echo $value > /sys/class/misc/prefetch/atomic_monitor_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "snpsleep_en"
+    info :
+        desc : "Whether to enable snp sleep. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/snpsleep_en"
+        set : "echo $value > /sys/class/misc/prefetch/snpsleep_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetchtgt_en"
+    info :
+        desc : "Whether to enable the prefetchtgt. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/prefetchtgt_en"
+        set : "echo $value > /sys/class/misc/prefetch/prefetchtgt_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sequence_shape_en"
+    info :
+        desc : "Enable to push back to the CPU for several cycles when the SQ is about to be full. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/sequence_shape_en"
+        set : "echo $value > /sys/class/misc/prefetch/sequence_shape_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "mpam_portion_en"
+    info :
+        desc : "Enable the function of allocating MPAM based on the way. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/mpam_portion_en"
+        set : "echo $value > /sys/class/misc/prefetch/mpam_portion_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "mpam_capacity_en"
+    info :
+        desc : "Enable the function of allocating MPAM based on capacity statistics. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/mpam_capacity_en"
+        set : "echo $value > /sys/class/misc/prefetch/mpam_capacity_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "eccchk_en"
+    info :
+        desc : "Enable ECC_CHK. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/eccchk_en"
+        set : "echo $value > /sys/class/misc/prefetch/eccchk_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "refill_1024_relax_en"
+    info :
+        desc : "Whether to use the 1024-bit size to send requests for access. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/refill_1024_relax_en"
+        set : "echo $value > /sys/class/misc/prefetch/refill_1024_relax_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "lookup_thr_en"
+    info :
+        desc : "Whether to enable the through channel during pipeline query. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/lookup_thr_en"
+        set : "echo $value > /sys/class/misc/prefetch/lookup_thr_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "snpunique_stash_en"
+    info :
+        desc : "Support to receive hydra snpUniquestash. 0--forbid 1--support"
+        get : "cat /sys/class/misc/prefetch/snpunique_stash_en"
+        set : "echo $value > /sys/class/misc/prefetch/snpunique_stash_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_timeout_mask_en"
+    info :
+        desc : "Enable the count for timeout. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prime_timeout_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_timeout_mask_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_sleep_mask_en"
+    info :
+        desc : "Enable the function of releasing a sleep request after a period of time. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prime_sleep_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_sleep_mask_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_extend_mask_en"
+    info :
+        desc : "Whether to enable random allocation of a request to extendway. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prime_extend_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_extend_mask_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "force_intl_allocate_fail"
+    info :
+        desc : "Enable the function of forcibly determining that the assign operation of the intleave type fails. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/force_intl_allocate_fail"
+        set : "echo $value > /sys/class/misc/prefetch/force_intl_allocate_fail"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "cpu_write_unique_stream_en"
+    info :
+        desc : "Whether to forcibly process the writeunique operation delivered by the CPU as the stream type. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/cpu_write_unique_stream_en"
+        set : "echo $value > /sys/class/misc/prefetch/cpu_write_unique_stream_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "cpu_pf_lqos_en"
+    info :
+        desc : "Whether to enable the prefetch operation delivered by the CPU to be forcibly processed as the lqos operation. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/cpu_pf_lqos_en"
+        set : "echo $value > /sys/class/misc/prefetch/cpu_pf_lqos_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "cpu_vic_lqos_en"
+    info :
+        desc : "Whether to enable the victim operation delivered by the CPU to be forcibly processed as the lqos operation. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/cpu_vic_lqos_en"
+        set : "echo $value > /sys/class/misc/prefetch/cpu_vic_lqos_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_excl_mask_en"
+    info :
+        desc : "Whether to enable the random exclusive operation. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prime_excl_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_excl_mask_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prime_drop_mask_en"
     info :
         desc : "Enable prefetch to retry randomly. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/prime_drop_mask"
-        set : "echo $value > /sys/class/misc/prefetch/prime_drop_mask"
+        get : "cat /sys/class/misc/prefetch/prime_drop_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_drop_mask_en"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2118,17 +2694,81 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "sequence_opt"
+    name : "prime_home_mask_en"
     info :
-        desc : "Whether change the L3T processing to serial mode when blocking. 0--limit 1--enable."
-        get : "cat /sys/class/misc/prefetch/sequence_opt"
-        set : "echo $value > /sys/class/misc/prefetch/sequence_opt"
+        desc : "Enable the forcehome processing on internal requests randomly. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/prime_home_mask_en"
+        set : "echo $value > /sys/class/misc/prefetch/prime_home_mask_en"
         needrestart : "false"
         type : "discrete"
         options :
           - "0"
           - "1"
         dtype : "string"
+  -
+    name : "refillsize_com_ada_en"
+    info :
+        desc : "Whether to enable the auto-sensing of the size of the request sent to the HHA. If the size of the continuously received requests is 128 bytes or 64 bytes, the size of the prefetched request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
+        get : "cat /sys/class/misc/prefetch/refillsize_com_ada_en"
+        set : "echo $value > /sys/class/misc/prefetch/refillsize_com_ada_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "refillsize_pre_ada_en"
+    info :
+        desc : "Whether to enable the adaptation of the size of the request sent to the HHA. If the size of the continuously received request is 128 bytes or 64 bytes, the size of the normal request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
+        get : "cat /sys/class/misc/prefetch/refillsize_pre_ada_en"
+        set : "echo $value > /sys/class/misc/prefetch/refillsize_pre_ada_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "sequence_opt_en"
+    info :
+        desc : "Whether change the L3T processing to serial mode when blocking. 0--limit 1--enable."
+        get : "cat /sys/class/misc/prefetch/sequence_opt_en"
+        set : "echo $value > /sys/class/misc/prefetch/sequence_opt_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_clr_level"
+    info :
+        desc : "Number of requests that fail to find the corresponding prefetch buffer and lower the priority of each buffer to make the existing buffer easier to replace. Range from 0~255."
+        get : "cat /sys/class/misc/prefetch/prefetch_clr_level"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_clr_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 255
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "prefetch_overide_level"
+    info :
+        desc : "Initial coverage priority for an operation to enter the prefetch buffer. If the value is incorrect, the threshold is decreased by 1. If the value is correct, the threshold is increased by 1. If the value is 0, the prefetch rule needs to be replaced. range 0~15."
+        get : "cat /sys/class/misc/prefetch/prefetch_overide_level"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_overide_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 15
+        step : 1
+        items : 
+        dtype : "int"
   -
     name : "prefetch_utl_ddr"
     info :
@@ -2182,271 +2822,9 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
-    name : "prefetch_start_level"
-    info :
-        desc : "The number of missing addresses that leads to prefetch. 0--32 1--2 n-1--n, can be 0-31."
-        get : "cat /sys/class/misc/prefetch/prefetch_start_level"
-        set : "echo $value > /sys/class/misc/prefetch/prefetch_start_level"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 31
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "totem_dual"
-    info :
-        desc : "Assign the number of totems in each socket. 0--1, 1--2."
-        get : "cat /sys/class/misc/prefetch/totem_dual"
-        set : "echo $value > /sys/class/misc/prefetch/totem_dual"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "canum_sktvec"
-    info :
-        desc : "Vector configuration of chip, active high. Range form 0 to 255."
-        get : "cat /sys/class/misc/prefetch/canum_sktvec"
-        set : "echo $value > /sys/class/misc/prefetch/canum_sktvec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt1_tb_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket1 TotemB, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt1_tb_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt1_tb_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt1_ta_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket1 TotemA, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt1_ta_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt1_ta_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt0_tb_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket0 TotemB, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt0_tb_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt0_tb_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt0_ta_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket0 TotemA, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt0_ta_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt0_ta_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt3_tb_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket3 TotemB, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt3_tb_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt3_tb_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt3_ta_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket3 TotemA, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt3_ta_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt3_ta_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt2_tb_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket2 TotemB, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt2_tb_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt2_tb_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "skt2_ta_cavec"
-    info :
-        desc : "Vector configuration of L3T partition in Socket2 TotemA, active high. Range from 0 to 255."
-        get : "cat /sys/class/misc/prefetch/skt2_ta_cavec"
-        set : "echo $value > /sys/class/misc/prefetch/skt2_ta_cavec"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 255
-        step : 1
-        items : 
-        dtype : "int"
-  -
-    name : "rdmerge_upgrade_en"
-    info :
-        desc : "Whether to allow the RS to merge with the preceding ReadE. 0--disabl 1--allow."
-        get : "cat /sys/class/misc/prefetch/rdmerge_upgrade_en"
-        set : "echo $value > /sys/class/misc/prefetch/rdmerge_upgrade_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "ddr_compress_opt_en"
-    info :
-        desc : "Optimization switch of support HHA compression access. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/ddr_compress_opt_en"
-        set : "echo $value > /sys/class/misc/prefetch/ddr_compress_opt_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "snpsleep_en"
-    info :
-        desc : "Whether to enable snp sleep. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/snpsleep_en"
-        set : "echo $value > /sys/class/misc/prefetch/snpsleep_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "prefetchtgt_en"
-    info :
-        desc : "Whether to enable the prefetchtgt. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/prefetchtgt_en"
-        set : "echo $value > /sys/class/misc/prefetch/prefetchtgt_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "bankintl_stagger"
-    info :
-        desc : "Simple interleave mode fine-tuning enable. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/bankintl_stagger"
-        set : "echo $value > /sys/class/misc/prefetch/bankintl_stagger"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "cpu_pf_lqos_en"
-    info :
-        desc : "Whether to enable the prefetch operation delivered by the CPU to be forcibly processed as the lqos operation. 0--disable 1--enable."
-        get : "cat /sys/class/misc/prefetch/cpu_pf_lqos_en"
-        set : "echo $value > /sys/class/misc/prefetch/cpu_pf_lqos_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "refillsize_com_ada_en"
-    info :
-        desc : "Whether to enable the auto-sensing of the size of the request sent to the HHA. If the size of the continuously received requests is 128 bytes or 64 bytes, the size of the prefetched request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
-        get : "cat /sys/class/misc/prefetch/refillsize_com_ada_en"
-        set : "echo $value > /sys/class/misc/prefetch/refillsize_com_ada_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "refillsize_pre_ada_en"
-    info :
-        desc : "Whether to enable the adaptation of the size of the request sent to the HHA. If the size of the continuously received request is 128 bytes or 64 bytes, the size of the normal request is automatically adjusted. 0--disable 1--enable adaptive size adjustment."
-        get : "cat /sys/class/misc/prefetch/refillsize_pre_ada_en"
-        set : "echo $value > /sys/class/misc/prefetch/refillsize_pre_ada_en"
-        needrestart : "false"
-        type : "discrete"
-        options :
-          - "0"
-          - "1"
-        dtype : "string"
-  -
-    name : "prefetch_overide_level"
-    info :
-        desc : "Initial coverage priority for an operation to enter the prefetch buffer. If the value is incorrect, the threshold is decreased by 1. If the value is correct, the threshold is increased by 1. If the value is 0, the prefetch rule needs to be replaced. range 0~15."
-        get : "cat /sys/class/misc/prefetch/prefetch_overide_level"
-        set : "echo $value > /sys/class/misc/prefetch/prefetch_overide_level"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 0
-          - 15
-        step : 1
-        items : 
-        dtype : "int"
-  -
     name : "prefetch_vague_en"
     info :
-        desc : "Indicates whether to enable fuzzy match for prefetch. After the function is enabled, the prefetch summarizes the same 16 KB address rule. The four 4 KB address rules are the same and can be used together. 0--disable 1--enable."
+        desc : "Whether to enable fuzzy match for prefetch. After the function is enabled, the prefetch summarizes the same 16 KB address rule. The four 4 KB address rules are the same and can be used together. 0--disable 1--enable."
         get : "cat /sys/class/misc/prefetch/prefetch_vague_en"
         set : "echo $value > /sys/class/misc/prefetch/prefetch_vague_en"
         needrestart : "false"
@@ -2475,6 +2853,106 @@ The default value is 2048. You are advised to change the value to 8192."
         desc : "Whether to enable the prefetch operation after the prefetch hit. 0--disable 1--enable."
         get : "cat /sys/class/misc/prefetch/prefetch_match_en"
         set : "echo $value > /sys/class/misc/prefetch/prefetch_match_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "prefetch_start_level"
+    info :
+        desc : "The number of missing addresses that leads to prefetch. 0--32 1--2 n-1--n, can be 0-31."
+        get : "cat /sys/class/misc/prefetch/prefetch_start_level"
+        set : "echo $value > /sys/class/misc/prefetch/prefetch_start_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 31
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "pime_timeout_num"
+    info :
+        desc : "The maximum count of timeout. Range from 0 to 65535."
+        get : "cat /sys/class/misc/prefetch/pime_timeout_num"
+        set : "echo $value > /sys/class/misc/prefetch/pime_timeout_num"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 65535
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "reg_ctrl_spillprefetch"
+    info :
+        desc : "Snoop type configuration of the spill. 0--type of request 1--prefetch"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_spillprefetch"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_spillprefetch"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_mpamen"
+    info :
+        desc : "Enable HHA MPAM scheduling. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_mpamen"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_mpamen"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_mpamqos"
+    info :
+        desc : "Enable QoS for modifying the DDR read/write command based on the MPAM monitoring and control bandwidth. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_mpamqos"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_mpamqos"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_poison"
+    info :
+        desc : "Enable HHA to return poison. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_poison"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_poison"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_compress_spec"
+    info :
+        desc : "Enable the random read of 128-byte data in HHA memory data compression. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_compress_spec"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_compress_spec"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_writeevict_drop"
+    info :
+        desc : "Enable the discard of WriteEvictI. 0--disable 1--enable."
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_writeevict_drop"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_writeevict_drop"
         needrestart : "false"
         type : "discrete"
         options :
@@ -2518,6 +2996,318 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
+    name : "reg_ctrl_excl_clear_dis"
+    info :
+        desc : "Whether to disable the function of periodically clearing HHA non-cacheable exclusive monitor. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_excl_clear_dis"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_excl_clear_dis"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_excl_eventen"
+    info :
+        desc : "Enable HHA non-cacheable exclusive monitor event. An event can be sent to wake up the CPU when an address is successfully written or corrupted. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_excl_eventen"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_excl_eventen"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_ctrl_eccen"
+    info :
+        desc : "Enable the memory ECC error correction in the HHA. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_ctrl_eccen"
+        set : "echo $value > /sys/class/misc/prefetch/reg_ctrl_eccen"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_readoncesnp_dis"
+    info :
+        desc : "Disable NCA Readonce fixed snoop. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_readoncesnp_dis"
+        set : "echo $value > /sys/class/misc/prefetch/reg_readoncesnp_dis"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_exter_stash"
+    info :
+        desc : "L3T configuration of extern snoop stash. 0--forbid 1--allow"
+        get : "cat /sys/class/misc/prefetch/reg_cc_exter_stash"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_exter_stash"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_writebacki_spill_full"
+    info :
+        desc : "Enable fixed 128-byte data spill of the WritebackI operation. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_writebacki_spill_full"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_writebacki_spill_full"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_writeevicti_spill_full"
+    info :
+        desc : "Enable fixed 128-byte data spill of the WriteEvictI operation. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_writeevicti_spill_full"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_writeevicti_spill_full"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_stashonce_full"
+    info :
+        desc : "Enable fixed 128-byte data stash of the StashOnce operation. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_stashonce_full"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_stashonce_full"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_atomicstashl2"
+    info :
+        desc : "Enable L2 stash of atomic operations. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_atomicstashl2"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_atomicstashl2"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_atomicstashl3"
+    info :
+        desc : "Enable L3 stash of atomic operations. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_atomicstashl3"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_atomicstashl3"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_atomicstashclr"
+    info :
+        desc : "Clear L3 stash monitor of atomic operations. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_atomicstashclr"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_atomicstashclr"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_cmo_snpme"
+    info :
+        desc : "Enable snoop me for CMO operations. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_cmo_snpme"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_cmo_snpme"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_makee_change"
+    info :
+        desc : "Enable HHA MakeE conversion to readE when the HHA MakeE is not self-hit. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_makee_change"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_makee_change"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_ioc_hitsca_dis"
+    info :
+        desc : "Disable the function of recording CAIDs when the HHA I/O cache hits the exact directory. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_ioc_hitsca_dis"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_ioc_hitsca_dis"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_passdirty"
+    info :
+        desc : "Enable HHA pass dirty. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_passdirty"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_passdirty"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_snpdrop"
+    info :
+        desc : "Enable Snoop Drop. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_snpdrop"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_snpdrop"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_cc_spill"
+    info :
+        desc : "Enable local multi-partition sharing. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_cc_spill"
+        set : "echo $value > /sys/class/misc/prefetch/reg_cc_spill"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_precisionsnp_dis"
+    info :
+        desc : "Disable HHA precise snoop based on shared directories. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_precisionsnp_dis"
+        set : "echo $value > /sys/class/misc/prefetch/reg_precisionsnp_dis"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_notonly_excl"
+    info :
+        desc : "Whether to create new entries for exclusive operations in the HHA share directory buffer. 0--only for exclusive operations 1--for all of operations"
+        get : "cat /sys/class/misc/prefetch/reg_notonly_excl"
+        set : "echo $value > /sys/class/misc/prefetch/reg_notonly_excl"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_buffer_share_dis"
+    info :
+        desc : "Disable HHA share directory buffer. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_buffer_share_dis"
+        set : "echo $value > /sys/class/misc/prefetch/reg_buffer_share_dis"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_miss_allindex"
+    info :
+        desc : "Enable that HHA miss queues are related based on index. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_miss_allindex"
+        set : "echo $value > /sys/class/misc/prefetch/reg_miss_allindex"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_miss_cbackth"
+    info :
+        desc : "Enable HHA miss queue copyback request to use second threshold. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_miss_cbackth"
+        set : "echo $value > /sys/class/misc/prefetch/reg_miss_cbackth"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_miss_normalth"
+    info :
+        desc : "Enable HHA miss queue common request to use second threshold. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_miss_normalth"
+        set : "echo $value > /sys/class/misc/prefetch/reg_miss_normalth"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_miss_tosdir"
+    info :
+        desc : "Enable HHA only to allow miss alloc to be sent to sdir. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_miss_tosdir"
+        set : "echo $value > /sys/class/misc/prefetch/reg_miss_tosdir"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_entry_except"
+    info :
+        desc : "Exclude the same entry address in HHA. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_entry_except"
+        set : "echo $value > /sys/class/misc/prefetch/reg_entry_except"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_dir_precision"
+    info :
+        desc : "Configuration of HHA precise directory. 0--disable to allow vague directory recording 1--enable to forbid vague directory recording"
+        get : "cat /sys/class/misc/prefetch/reg_dir_precision"
+        set : "echo $value > /sys/class/misc/prefetch/reg_dir_precision"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
     name : "reg_dir_replace_alg"
     info :
         desc : "Directory replacement algorithm configuration. 0--EDIR random+SDIR random 1--EDIR random+SDIR polling 2--EDIR PLRU+SDIR random 3--EDIR PLRU+SDIR polling"
@@ -2532,6 +3322,18 @@ The default value is 2048. You are advised to change the value to 8192."
         items : 
         dtype : "int"
   -
+    name : "strict_order"
+    info :
+        desc : "Keep the order of HHA operation queue strictly. 0--enable 1--unable"
+        get : "cat /sys/class/misc/prefetch/strict_order"
+        set : "echo $value > /sys/class/misc/prefetch/strict_order"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
     name : "prefetch_comb"
     info :
         desc : "Read operation and prefetchtgt merge enable. 0--The read operation can be merged with the fetchtgt operation. 1--The read operation and the fetchtgt merge operation are not allowed."
@@ -2544,11 +3346,287 @@ The default value is 2048. You are advised to change the value to 8192."
           - "1"
         dtype : "string"
   -
+    name : "evict_green"
+    info :
+        desc : "Unblocking configuration of the evict in PQ. 0--evict can't be blocked 1--evict can be blocked"
+        get : "cat /sys/class/misc/prefetch/evict_green"
+        set : "echo $value > /sys/class/misc/prefetch/evict_green"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "block_retry"
+    info :
+        desc : "Whether to perform retry configuration directly when the MPAM hardlim flow bandwidth exceeds the configured one such that enters CMD. 0--retry directly 1--don't retry directly and be scheduled with other flows"
+        get : "cat /sys/class/misc/prefetch/block_retry"
+        set : "echo $value > /sys/class/misc/prefetch/block_retry"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "buffer_prio"
+    info :
+        desc : "Priority configuration for the ingress queue of the CMD buffer request and PGNT application. 0--CMD buffer priors to pgnt 1--CMD buffer and pgnt have equivalent priority"
+        get : "cat /sys/class/misc/prefetch/buffer_prio"
+        set : "echo $value > /sys/class/misc/prefetch/buffer_prio"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "half_wr_rdddr_delay"
+    info :
+        desc : "Enables the DDR read delay during 64-byte full write operations after compression. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/half_wr_rdddr_delay"
+        set : "echo $value > /sys/class/misc/prefetch/half_wr_rdddr_delay"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "wback_cnfl_rdhalf"
+    info :
+        desc : "DDR size configuration that is reread when the writeback conflict occurs. 0--depend on Writeback address and size 1--size=128B"
+        get : "cat /sys/class/misc/prefetch/wback_cnfl_rdhalf"
+        set : "echo $value > /sys/class/misc/prefetch/wback_cnfl_rdhalf"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_pendprecision"
+    info :
+        desc : "Enable precise pend. 0--pend is precisely depend on flit 1--pend=1"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_pendprecision"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_pendprecision"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_combrdddr"
+    info :
+        desc : "Reread DDR after multiple adjacent narrow write operations are merged."
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_combrdddr"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_combrdddr"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_scramble"
+    info :
+        desc : "Ingress queue scrambling. 0--enable 1--disable"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_scramble"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_scramble"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_stashidpg"
+    info :
+        desc : "Whether to enable the partial good conversion of the Stash TGTID."
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_stashidpg"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_stashidpg"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_rdatatime"
+    info :
+        desc : "HHA receives DMC read data anti-starvation threshold configuration. 0--threshold=8 1--threshold=4"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_rdatatime"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_rdatatime"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_dmcutl"
+    info :
+        desc : "DMC usage source selection. 0--from DDRC 1--from queue processing utilization ratio inside HHA"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_dmcutl"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_dmcutl"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_cancelexcept"
+    info :
+        desc : "The pipeline index check excludes requests that are not actually queried (for example, prefetchtgt). 0--enable exclusion 1--disable exclusion"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_cancelexcept"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_cancelexcept"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_ccixcbupdate"
+    info :
+        desc : "Whether to update the directory in the CCIX copyback of the multi-CA. 0--allow 1--forbid"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_ccixcbupdate"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_ccixcbupdate"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_funcdis_updateopen"
+    info :
+        desc : "Block the update dir command in the processing queue based on index. 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/reg_funcdis_updateopen"
+        set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_updateopen"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
     name : "reg_funcdis_comb"
     info :
-        desc : "Whether to merge write operations whose size is less than 128 bytes. 0--enable 1--disables the merge function of the write operation."
+        desc : "Whether to merge write operations whose size is less than 128 bytes. 0--enable 1--disable the merge function of the write operation."
         get : "cat /sys/class/misc/prefetch/reg_funcdis_comb"
         set : "echo $value > /sys/class/misc/prefetch/reg_funcdis_comb"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "reg_prefetchtgt_outstanding"
+    info :
+        desc : "Outstanding configuration for the HHA to read data from the DDR prefetch. When the read/write operation sent by the HHA to the DDR exceeds the threshold, the prefetchtgt operation is forbidden to read the DDR data and the operation is directly discarded. This configuration and reg_prefetch_outstanding control the prefetch threshold at the same time. Threshold ranges from 0 to 127."
+        get : "cat /sys/class/misc/prefetch/reg_prefetchtgt_outstanding"
+        set : "echo $value > /sys/class/misc/prefetch/reg_prefetchtgt_outstanding"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 127
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "reg_prefetchtgt_level"
+    info :
+        desc : "Threshold for the HHA to read data from the DDR prefetch. When the DDR read/write operations in the HHA processing queue exceed the threshold, the prefetchtgt operation is forbidden to read the DDR data and the operation is directly discarded. This configuration and reg_prefetch_outstanding control the prefetch threshold at the same time. Threshold ranges from 0 to 127."
+        get : "cat /sys/class/misc/prefetch/reg_prefetchtgt_level"
+        set : "echo $value > /sys/class/misc/prefetch/reg_prefetchtgt_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 127
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "reg_spec_rd_level"
+    info :
+        desc : "DDR threshold configuration for speculation read. When the DDR read and write commands in the HHA processing queue exceed the threshold, speculative reading of the DDR is prohibited. After the directory is queried, the system determines whether to read the DDR based on the directory query result. Note: The value 0x08 or 0x10 is recommended. Range from 0 to 127"
+        get : "cat /sys/class/misc/prefetch/reg_spec_rd_level"
+        set : "echo $value > /sys/class/misc/prefetch/reg_spec_rd_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 127
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "reg_drop_level"
+    info :
+        desc : "Prefetch drop threshold configuration. When the number of DDR read and write commands in the HHA processing queue exceeds the threshold, some prefetch read commands can be discarded. Range from 0 to 127."
+        get : "cat /sys/class/misc/prefetch/reg_drop_level"
+        set : "echo $value > /sys/class/misc/prefetch/reg_drop_level"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 127
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "dvmsnp_outstanding"
+    info :
+        desc : "Outstanding value of the DVMSNP of the MN. Note 1: If dvmsnp_perf_en is enabled, the configured value is valid. The maximum value of outstanding can be 5 when the TaiShan core is used. Otherwise, overflow errors occur. Note 2: The SMMU cannot match the Dvmsnp outstanding value 5. Therefore, you need to set the switch to 3 for Totem and Infinite of 1383. Totem and Nimbus of 1620: Set DVM outstanding to 5. However, do not configure POE for the DVMSNP broadcast node. The POE uses a private page table and does not require DVMSNP. Range from 0 to 15.(Note: 0 represents that outstanding level is 1)"
+        get : "cat /sys/class/misc/prefetch/dvmsnp_outstanding"
+        set : "echo $value > /sys/class/misc/prefetch/dvmsnp_outstanding"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 15
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "dvmreq_outstanding"
+    info :
+        desc : "Outstanding value of the DVMREQ of the MN. Note 1: If dvmreq_perf_en is enabled, the configured value is valid. The maximum value of outstanding can be 9 when there are four chips. Otherwise, an overflow error occurs. Note 2: In the case of two chips, the maximum outstanding value of totem can be 10, and the maximum outstanding value of nimbus or infinite is 24. This ensures the best performance. Note 3: In the case of a single chip, there is no restriction on the outstanding configuration of the totem. Range from 0 to 31.(Note: 0 represents that outstanding level is 1)"
+        get : "cat /sys/class/misc/prefetch/dvmreq_outstanding"
+        set : "echo $value > /sys/class/misc/prefetch/dvmreq_outstanding"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 31
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "dvmsnp_perf_en"
+    info :
+        desc : "Whether to enable the outstanding level for the dvmsnp.(Note: After the function is enabled, the dvmsnp outstanding value of the MN is equal to the value of dvmsnp_outstanding.) 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/dvmsnp_perf_en"
+        set : "echo $value > /sys/class/misc/prefetch/dvmsnp_perf_en"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "dvmreq_perf_en"
+    info :
+        desc : "Whether to enable the outstanding level for the dvmreq.(Note: After the function is enabled, the dvmreq outstanding value of the MN is equal to the value of dvmreq_outstanding.) 0--disable 1--enable"
+        get : "cat /sys/class/misc/prefetch/dvmreq_perf_en"
+        set : "echo $value > /sys/class/misc/prefetch/dvmreq_perf_en"
         needrestart : "false"
         type : "discrete"
         options :
