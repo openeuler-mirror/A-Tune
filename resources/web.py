@@ -61,20 +61,11 @@ def get_file_info(status, file_name):
 @app.route('/tuning/<status>/<file_name>/new_file/<new_name>', methods=['GET'])
 def rename_tuning_file(status, file_name, new_name):
     """rename tuning file"""
-    response_object = {}
-    response_object['status'] = status
     locate = '/var/atune_data/tuning/' + status + '/'
-    if os.path.isfile(locate + file_name + '.txt'):
-        if not os.path.isfile(locate + new_name + '.txt'):
-            os.rename(locate + file_name + '.txt', locate + new_name + '.txt')
-            response_object['duplicate'] = False
-            response_object['rename'] = True
-        else:
-            response_object['duplicate'] = True
-            response_object['rename'] = False
-    else:
-        response_object['duplicate'] = False
-        response_object['rename'] = False
+    old_path = locate + file_name + '.txt'
+    new_path = locate + new_name + '.txt'
+    response_object = rename_file(old_path, new_path)
+    response_object['status'] = status
     return jsonify(response_object), 200, cors
 
 
@@ -193,20 +184,12 @@ def get_analysis_list():
 @app.route('/analysis/<file_name>/new_file/<new_name>', methods=['GET'])
 def rename_analysis_file(file_name, new_name):
     """rename tuning file"""
-    response_object = {}
     locate = '/var/atune_data/analysis/'
-    if os.path.isfile(locate + file_name + '.csv'):
-        if not os.path.isfile(locate + new_name + '.csv'):
-            os.rename(locate + file_name + '.csv', locate + new_name + '.csv')
-            response_object['duplicate'] = False
-            response_object['rename'] = True
-        else:
-            response_object['duplicate'] = True
-            response_object['rename'] = False
-    else:
-        response_object['duplicate'] = False
-        response_object['rename'] = False
-    return jsonify(response_object), 200, 
+    old_path = locate + file_name
+    new_path = locate + new_name
+    response_object = rename_file(old_path + '.csv', new_path + '.csv')
+    rename_file(old_path + '.log', new_path + '.log')
+    return jsonify(response_object), 200, cors
 
 
 @app.route('/analysis/<filename>/<line>', methods=['GET'])
@@ -242,6 +225,23 @@ def get_analysis_details(filename, line):
     response_object['log_data'] = log_res
     response_object['log_lines'] = log_count
     return jsonify(response_object), 200, cors
+
+
+def rename_file(old_path, new_path):
+    """rename helper function"""
+    response_object = {}
+    if os.path.isfile(old_path):
+        if not os.path.isfile(new_path):
+            os.rename(old_path, new_path)
+            response_object['duplicate'] = False
+            response_object['rename'] = True
+        else:
+            response_object['duplicate'] = True
+            response_object['rename'] = False
+    else:
+        response_object['duplicate'] = False
+        response_object['rename'] = False
+    return response_object
 
 
 def get_analysis_csv(path, line):
