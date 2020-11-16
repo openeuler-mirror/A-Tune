@@ -42,7 +42,7 @@ class Detecting(Resource):
 
         app_name = args.get(self.app_name)
         detect_path = args.get(self.detect_path)
-        if detect_path == "":
+        if detect_path == "" or detect_path is None:
             globpath = self.folder_path + '*.csv'
             paths = glob(globpath)
             detect_path = max(paths, key=os.path.getctime)
