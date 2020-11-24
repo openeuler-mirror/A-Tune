@@ -16,13 +16,13 @@ Restful api with collector, in order to provide the method of post.
 """
 import os
 
+from atune_collector.plugin.plugin import MPI
 from flask import current_app, abort
 from flask_restful import reqparse, Resource
 from flask_restful import marshal_with_field
 import pandas as pd
 from analysis.atuned.field import PROFILE_GET_FIELD
 from analysis.atuned.parser import COLLECTOR_POST_PARSER
-from analysis.plugin.plugin import MPI
 from analysis.atuned.utils.npipe import get_npipe
 
 PARSER = reqparse.RequestParser()
@@ -80,7 +80,7 @@ class Collector(Resource):
                     float_data.append(type_name)
             data.append(float_data)
 
-        data_average = [sum(elem)/len(elem) for elem in zip(*data_field)]
+        data_average = [sum(elem) / len(elem) for elem in zip(*data_field)]
         data_result = {}
         for index, _ in enumerate(data_average):
             data_result[field_name[index]] = data_average[index]

@@ -16,12 +16,12 @@ Restful api for monitor, in order to provide the method of post and get.
 """
 
 import getopt
+from atune_collector.plugin.plugin import MPI
 from flask import abort
 from flask import current_app
 from flask_restful import reqparse, Resource
 from analysis.atuned.parser import MONITOR_GET_PARSER
 from analysis.atuned.parser import MONITOR_POST_PARSER
-from analysis.plugin.plugin import MPI
 
 PARSER = reqparse.RequestParser()
 

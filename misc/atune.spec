@@ -12,6 +12,7 @@ Source: https://gitee.com/openeuler/A-Tune/repository/archive/v%{version}.tar.gz
 BuildRequires: rpm-build golang-bin procps-ng
 BuildRequires: sqlite >= 3.24.0 openssl
 BuildRequires: python3-scikit-optimize python3-pandas python3-xgboost
+BuildRequires: python3-pyyaml
 Requires: systemd
 Requires: atune-client
 Requires: atune-db
@@ -82,7 +83,6 @@ make models
 %attr(0640,root,root) /usr/lib/atuned/modules/daemon_profile_server.so
 %attr(0640,root,root) %{_unitdir}/atuned.service
 %attr(0750,root,root) %{_bindir}/atuned
-%attr(0750,root,root) /usr/libexec/atuned/scripts/*
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0640,root,root) /usr/lib/atuned/profiles/*
 %exclude /usr/libexec/atuned/analysis/app_engine.py
@@ -94,7 +94,6 @@ make models
 %attr(0750,root,root) %dir /usr/lib/atuned/modules
 %attr(0750,root,root) %dir /usr/lib/atuned/profiles
 %attr(0750,root,root) %dir /usr/libexec/atuned
-%attr(0750,root,root) %dir /usr/libexec/atuned/scripts
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/share/atuned
 %attr(0750,root,root) %dir /etc/atuned
