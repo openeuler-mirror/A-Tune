@@ -32,11 +32,11 @@ yum install -y golang-bin python3 perf sysstat hwloc-gui
 
 #### 2、安装python依赖包
 ```bash
-yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost
+yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
 或
 ```bash
-pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn
+pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
 
 #### 3、下载源码
@@ -53,6 +53,7 @@ make
 
 #### 5、安装
 ```bash
+make collector-install
 make install
 ```
 

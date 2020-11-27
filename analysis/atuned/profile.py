@@ -14,12 +14,11 @@
 """
 Restful api for profile, in order to provide the method of get and put.
 """
-
+from atune_collector.plugin.plugin import CPI
 from flask import abort
 from flask import current_app
 from flask_restful import Resource
 from analysis.atuned.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
-from analysis.plugin.plugin import CPI
 
 
 class Profile(Resource):

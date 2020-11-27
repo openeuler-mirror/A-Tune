@@ -154,9 +154,6 @@ func (p *Profile) Backup() error {
 			if err != nil {
 				return err
 			}
-			if unit.Name() == "script" {
-				keyName = path.Join(config.DefaultScriptPath, keyName)
-			}
 
 			cfg := keyName + "=" + keyValue
 			body := &models.Profile{
@@ -242,7 +239,7 @@ func (p *Profile) active(ch chan *PB.AckCheck) error {
 					return err
 				}
 				if section.Name() == "script" {
-					scriptKey = path.Join(config.DefaultScriptPath, strings.Trim(scriptKey, " "))
+					scriptKey = strings.Trim(scriptKey, " ")
 				}
 
 				if section.HasKey(scriptKey) {
@@ -376,7 +373,7 @@ func (p *Profile) Check(ch chan *PB.AckCheck) error {
 			}
 
 			if section.Name() == "script" {
-				scriptKey = path.Join(config.DefaultScriptPath, strings.Trim(key.Name(), " "))
+				scriptKey = strings.Trim(key.Name(), " ")
 			}
 
 			body := &ConfigPutBody{
@@ -441,7 +438,7 @@ func (p *Profile) ActiveTuned(ch chan *PB.AckCheck, params string) error {
 		for _, key := range section.Keys() {
 			scriptKey := key.Name()
 			if section.Name() == "script" {
-				scriptKey = path.Join(config.DefaultScriptPath, strings.Trim(key.Name(), " "))
+				scriptKey = strings.Trim(key.Name(), " ")
 			}
 			if _, exist := tuned[key.Name()]; !exist {
 				continue

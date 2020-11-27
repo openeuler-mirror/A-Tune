@@ -48,6 +48,15 @@ db:
 
 install: libinstall restcerts enginecerts yaml-generator
 
+collector-install:
+	@echo "BEGIN INSTALL A-Tune-Collector..."
+	pip3 uninstall atune-collector -y
+	rm -rf collector
+	git clone https://gitee.com/openeuler/A-Tune-Collector.git collector
+	cd collector && python3 setup.py install
+	cd -
+	@echo "END INSTALL A-Tune-Collector..."
+
 libinstall:
 	@echo "BEGIN INSTALL A-Tune..."
 	mkdir -p $(BINDIR)
@@ -68,7 +77,6 @@ libinstall:
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/profiles
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/training
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
-	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources
 	mkdir -p $(DESTDIR)/var/lib/atuned
@@ -86,8 +94,6 @@ libinstall:
 	install -m 640 misc/atune-web.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
-	\cp -rf scripts/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
-	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/scripts/
 	\cp -rf analysis/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
 	\cp -rf resources/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources/
@@ -185,7 +191,7 @@ yaml-generator:
 	chmod -R 750 $(DESTDIR)/etc/atuned/tuning
 	cd ${CURDIR}/tools/ && python3 generate_tuning_file.py -d $(DESTDIR)/etc/atuned/tuning
 
-run: all install startup
+run: all collector-install install startup
 
 authors:
 	git shortlog --summary --numbered --email|grep -v openeuler-ci-bot|sed 's/<root@localhost.*//'| awk '{$$1=null;print $$0}'|sed 's/^[ ]*//g' > AUTHORS

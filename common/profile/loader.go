@@ -239,12 +239,11 @@ func loadConfigData(name string) (*ini.File, error) {
 	if config == nil {
 		return nil, fmt.Errorf("%s profile is not found!", name)
 	}
-	dirName := CONF.DefaultScriptPath
 	for _, section := range config.Sections() {
 		if section.Name() == "script" {
 			if section.HasKey("shell") {
 				key, _ := section.GetKey("shell")
-				scriptPath := path.Join(dirName, strings.Trim(key.Value(), " "))
+				scriptPath := strings.Trim(key.Value(), " ")
 				config.Section(section.Name()).Key("shell").SetValue(scriptPath)
 			}
 		}

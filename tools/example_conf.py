@@ -15,10 +15,7 @@
 Tool to generate an example of profile configuration.
 """
 
-import sys
-
-sys.path.insert(0, "./../")
-from analysis.plugin.plugin import CPI
+from atune_collector.plugin.plugin import CPI
 
 print("#")
 print("# example of atuned profile configuration")

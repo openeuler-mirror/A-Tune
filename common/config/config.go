@@ -49,7 +49,6 @@ const (
 	DefaultConfPath         = "/etc/atuned/"
 	DefaultTuningPath       = DefaultConfPath + "tuning/"
 	DefaultRulePath         = DefaultConfPath + "rules/"
-	DefaultScriptPath       = "/usr/libexec/atuned/scripts"
 	DefaultAnalysisPath     = "/usr/libexec/atuned/analysis"
 	DefaultTempPath         = "/run/atuned"
 	DefaultCheckerPath      = "/usr/share/atuned/checker/"
