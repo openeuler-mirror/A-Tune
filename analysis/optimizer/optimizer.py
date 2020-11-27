@@ -317,8 +317,11 @@ class Optimizer(multiprocessing.Process):
                 # convert string option into index
                 options = abtuning_manager.get_options_index(options)
             elif self.engine == 'gridsearch':
+                num_done = 0
+                if self.y_ref is not None:
+                    num_done = len(self.y_ref)
                 gstuning_manager = GridSearchTuningManager(self.knobs, self.child_conn)
-                options, performance = gstuning_manager.do_gridsearch()
+                options, performance = gstuning_manager.do_gridsearch(num_done)
                 params, labels = gstuning_manager.get_best_params()
                 # convert string option into index
                 options = gstuning_manager.get_options_index(options)
