@@ -1,0 +1,13 @@
+project: "nginx_http_long"
+engine : "gbrt"
+iterations : 30
+random_starts : 10
+
+benchmark : "sh nginx/nginx_benchmark.sh"
+evaluations :
+  -
+    name: "rps"
+    info:
+        get: "echo '$out' | grep 'TIMING:' | awk '{print $4}'"
+        type: "negative"
+        weight: 100
