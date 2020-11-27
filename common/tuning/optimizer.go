@@ -139,7 +139,7 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 			return err
 		}
 	}
-	if o.Restart && iters <= int32(len(optimizerBody.Xref)) {
+	if o.Restart && iters <= int32(len(optimizerBody.Xref)) && (engine != "gridsearch") && (engine != "abtest") {
 		return fmt.Errorf("create task failed for client ask iters less than tuning history")
 	}
 	optimizerBody.MaxEval = iters
