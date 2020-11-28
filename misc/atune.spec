@@ -4,7 +4,7 @@
 Summary: AI auto tuning system
 Name: atune
 Version: 0.3
-Release: 0.1
+Release: 0.2
 License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
 Source: https://gitee.com/openeuler/A-Tune/repository/archive/v%{version}.tar.gz
@@ -55,6 +55,7 @@ Requires: python3-xgboost
 Requires: python3-flask-restful
 Requires: python3-pandas
 Requires: python3-lhsmdu
+Conflicts: atune < 0.3-0.1
 
 %description engine
 atune engine tool for manage atuned AI tuning system.
@@ -143,6 +144,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Sat Nov 28 2020 hanxinke<hanxinke@huawei.com> - 0.3-0.2
+- The engine package conflicts with atune < 0.3-0.1.
+
 * Fri Sep 4 2020 Zhipeng Xie<xiezhipeng1@huawei.com> - 0.3-0.1
 - upgrade to v0.3
 
