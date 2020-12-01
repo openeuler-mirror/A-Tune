@@ -20,7 +20,6 @@ import numbers
 import multiprocessing
 import collections
 import numpy as np
-import analysis.engine.utils.utils as utils
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
@@ -33,15 +32,17 @@ from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
 
+
 LOGGER = logging.getLogger(__name__)
 
 
 class Optimizer(multiprocessing.Process):
     """find optimal settings and generate optimized profile"""
 
-    def __init__(self, name, params, child_conn, prj_name, engine="bayes", max_eval=50, sel_feature=False,
-                 x0=None, y0=None, n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
-        super(Optimizer, self).__init__(name=name)
+    def __init__(self, name, params, child_conn, prj_name, engine="bayes",
+                 max_eval=50, sel_feature=False, x0=None, y0=None,
+                 n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
+        super().__init__(name=name)
         self.knobs = params
         self.child_conn = child_conn
         self.project_name = prj_name
@@ -78,14 +79,14 @@ class Optimizer(multiprocessing.Process):
                         r_range[1] = int(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an integer value"
-                                         .format(p_nob['name']))
+                                         .format(p_nob['name'])) from None
                 elif p_nob['dtype'] == 'float':
                     try:
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an float value"
-                                         .format(p_nob['name']))
+                                         .format(p_nob['name'])) from None
 
                 if len(self.ref) > 0:
                     if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
@@ -116,7 +117,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = int(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not an integer value"
-                                     .format(p_nob['name']))
+                                     .format(p_nob['name'])) from None
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -138,7 +139,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = float(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not a float value"
-                                     .format(p_nob['name']))
+                                     .format(p_nob['name'])) from None
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -149,7 +150,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = str(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not a string value"
-                                     .format(p_nob['name']))
+                                     .format(p_nob['name'])) from None
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -170,17 +171,17 @@ class Optimizer(multiprocessing.Process):
                          for coef, label in result)
         return rank
 
-    def _get_value_from_knobs(self, kv):
+    def _get_value_from_knobs(self, kev):
         x_each = []
         for p_nob in self.knobs:
-            if p_nob['name'] not in kv.keys():
+            if p_nob['name'] not in kev.keys():
                 raise ValueError("the param {} is not in the x0 ref".format(p_nob['name']))
             if p_nob['dtype'] == 'int':
-                x_each.append(int(kv[p_nob['name']]))
+                x_each.append(int(kev[p_nob['name']]))
             elif p_nob['dtype'] == 'float':
-                x_each.append(float(kv[p_nob['name']]))
+                x_each.append(float(kev[p_nob['name']]))
             else:
-                x_each.append(kv[p_nob['name']])
+                x_each.append(kev[p_nob['name']])
         return x_each
 
     def transfer(self):
@@ -191,7 +192,7 @@ class Optimizer(multiprocessing.Process):
             return (list_ref_x, list_ref_y)
 
         for x_value in self.x_ref:
-            kv = {}
+            kev = {}
             if len(x_value) != len(self.knobs):
                 raise ValueError("x0 is not the same length with knobs")
 
@@ -199,9 +200,9 @@ class Optimizer(multiprocessing.Process):
                 params = val.split("=")
                 if len(params) != 2:
                     raise ValueError("the param format of {} is not correct".format(params))
-                kv[params[0]] = params[1]
+                kev[params[0]] = params[1]
 
-            ref_x = self._get_value_from_knobs(kv)
+            ref_x = self._get_value_from_knobs(kev)
             if len(ref_x) != len(self.knobs):
                 raise ValueError("tuning parameter is not the same length with knobs")
             list_ref_x.append(ref_x)

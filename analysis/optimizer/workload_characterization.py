@@ -33,7 +33,7 @@ from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
 
 
-class WorkloadCharacterization(object):
+class WorkloadCharacterization:
     """train models and characterize system workload"""
 
     def __init__(self, model_path):
@@ -125,9 +125,12 @@ class WorkloadCharacterization(object):
         model = svm.SVC(kernel=kernel, C=100, class_weight='balanced', gamma='auto')
         if search:
             tuned_parameters = [
-                    {'C': range(10, 200, 20), 'kernel':['poly'], 'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
-                    {'C': range(10, 200, 20), 'kernel':['rbf'], 'gamma':['scale', 'auto']},
-                    {'C': range(10, 200, 20), 'kernel':['sigmoid'], 'gamma':['scale', 'auto']},
+                    {'C': range(10, 200, 20), 'kernel':['poly'],
+                     'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
+                    {'C': range(10, 200, 20), 'kernel':['rbf'],
+                     'gamma':['scale', 'auto']},
+                    {'C': range(10, 200, 20), 'kernel':['sigmoid'],
+                     'gamma':['scale', 'auto']},
                     ]
             model = GridSearchCV(estimator=model, param_grid=tuned_parameters,
                     cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')

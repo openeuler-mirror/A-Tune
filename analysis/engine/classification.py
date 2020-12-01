@@ -15,7 +15,6 @@
 Restful api for classification, in order to provide the method of post.
 """
 
-import os
 import logging
 from flask import abort
 from flask import current_app

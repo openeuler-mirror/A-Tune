@@ -36,9 +36,14 @@ func (t *Detecting) Get() (bool, error, string) {
 	}
 
 	defer response.Body.Close()
-	res, err := ioutil.ReadAll(response.Body)
+
 	if response.StatusCode != 200 {
 		return false, fmt.Errorf("detecting data failed %d", response.StatusCode), result
+	}
+
+	res, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return false, err, result
 	}
 
 	return true, nil, string(res)

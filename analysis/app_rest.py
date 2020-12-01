@@ -18,9 +18,8 @@ Rest application implementation.
 import os
 import sys
 
-from app import App
-
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
+from analysis.app import App
 from analysis.atuned import configurator, monitor, collector, profile
 
 

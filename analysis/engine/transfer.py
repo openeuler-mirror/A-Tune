@@ -36,7 +36,7 @@ class Transfer(Resource):
         save_path = request.form.get("savepath")
         file_obj = request.files.get("file")
         service = request.form.get("service")
- 
+
         if service == "classification":
             file_name = "/var/atune_data/analysis/"
             if not os.path.exists(file_name):

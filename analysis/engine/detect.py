@@ -16,10 +16,9 @@ Restful api for detecting, in order to provide the method of post.
 """
 import os
 import logging
-import shutil
+from glob import glob
 from flask import abort
 from flask_restful import Resource
-from glob import glob
 
 from analysis.optimizer.difference_detect import WorkloadStatistic, DetectItem
 from analysis.engine.parser import DETECT_POST_PARSER

@@ -61,12 +61,14 @@ class Optimizer(Resource):
         x_ref = args.get("x_ref")
         y_ref = args.get("y_ref")
         result = {}
-        engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, args["prj_name"], engine=args.get("engine"),
+        engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, args["prj_name"],
+                                     engine=args.get("engine"),
                                      max_eval=args.get("max_eval"),
                                      n_random_starts=args.get("random_starts"),
                                      x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
-                                     noise=args.get("noise"), 
-                                     sel_feature=args.get("feature_filter") or args.get("sel_feature"),
+                                     noise=args.get("noise"),
+                                     sel_feature=args.get("feature_filter") or \
+                                                 args.get("sel_feature"),
                                      feature_selector=args.get("feature_selector"))
         engine.start()
 
@@ -109,7 +111,8 @@ class Optimizer(Resource):
 
         out_queue = task[self.pipe]
         if args["iterations"] != 0 and len(args["value"]) != 0:
-            params = utils.get_time_difference(args["line"].split("|")[2], args["line"].split("|")[1])
+            params = utils.get_time_difference(args["line"].split("|")[2],
+                                               args["line"].split("|")[1])
             params += "," + utils.get_string_split(args["line"], 5, 1, "")
             if len(args["line"].split("|")[4].split(",")) > 1:
                 for each_eval in args["line"].split("|")[4].split(","):

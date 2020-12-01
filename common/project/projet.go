@@ -15,14 +15,15 @@ package project
 
 import (
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"math"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
+
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 const (
@@ -173,7 +174,7 @@ func (y *YamlPrjCli) BestPerformance() string {
 	for index, evaluation := range y.Evaluations {
 		bestPerformance = append(bestPerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalMinArray[index])))
 	}
-	return fmt.Sprintf("%s", strings.Join(bestPerformance, ","))
+	return strings.Join(bestPerformance, ",")
 }
 
 func (y *YamlPrjCli) CurrPerformance() string {
@@ -181,7 +182,7 @@ func (y *YamlPrjCli) CurrPerformance() string {
 	for index, evaluation := range y.Evaluations {
 		currPerformance = append(currPerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalCurrentArray[index])))
 	}
-	return fmt.Sprintf("%s", strings.Join(currPerformance, ","))
+	return strings.Join(currPerformance, ",")
 }
 
 func (y *YamlPrjCli) BasePerformance() string {
@@ -189,7 +190,7 @@ func (y *YamlPrjCli) BasePerformance() string {
 	for index, evaluation := range y.Evaluations {
 		basePerformance = append(basePerformance, fmt.Sprintf("%s=%.2f", evaluation.Name, math.Abs(y.EvalBaseArray[index])))
 	}
-	return fmt.Sprintf("%s", strings.Join(basePerformance, ","))
+	return strings.Join(basePerformance, ",")
 }
 
 func (y *YamlPrjCli) calculateBenchMark() float64 {

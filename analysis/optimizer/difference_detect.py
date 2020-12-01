@@ -16,11 +16,9 @@ This class is used to statistic the data
 """
 
 import glob
-import os
-import argparse
 import pandas as pd
 
-class WorkloadStatistic(object):
+class WorkloadStatistic:
     """statistics"""
 
     def __init__(self):
@@ -92,7 +90,7 @@ class WorkloadStatistic(object):
             self.statistics = pd.concat([self.statistics, std, mean], ignore_index=True)
 
 
-class DetectItem(object):
+class DetectItem:
     """detection class"""
 
     def __init__(self, statistics, data_features):
