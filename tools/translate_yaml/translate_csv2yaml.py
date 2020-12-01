@@ -27,8 +27,8 @@ class TranslateCsv2Yaml(TranslateYaml):
 
     def __init__(self, in_file_name, out_file_name, project_name,
                  iterations, block_dev, network_dev, test):
-        super(TranslateCsv2Yaml, self).__init__(out_file_name, project_name,
-                                                iterations, block_dev, network_dev, test)
+        super().__init__(out_file_name, project_name,
+                         iterations, block_dev, network_dev, test)
         with open(in_file_name) as file:
             reader = csv.reader(file)
             self.rows = list(reader)

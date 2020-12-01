@@ -17,9 +17,7 @@ Provide an interface to read data from csv.
 
 import os
 import re
-import time
 import datetime
-import random
 import shutil
 import logging
 import tarfile
@@ -90,13 +88,11 @@ def get_time_difference(end_time, start_time):
     """get time difference in second"""
     end_time += "000"
     start_time += "000"
-    end = re.split(r"-| |:|\.", end_time)
-    start = re.split(r"-| |:|\.", start_time)
-    for i in range(len(end)):
-        end[i] = int(end[i])
-        start[i] = int(start[i])
+    end = [int(ele) for ele in re.split(r"-| |:|\.", end_time)]
+    start = [int(ele) for ele in re.split(r"-| |:|\.", start_time)]
     date_end = datetime.datetime(end[0], end[1], end[2], end[3], end[4], end[5], end[6])
-    date_start = datetime.datetime(start[0], start[1], start[2], start[3], start[4], start[5], start[6])
+    date_start = datetime.datetime(start[0], start[1], start[2],
+                                   start[3], start[4], start[5], start[6])
     return str((date_end - date_start).total_seconds())
 
 

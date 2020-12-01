@@ -48,20 +48,30 @@ OPTIMIZER_POST_PARSER.add_argument('feature_selector', choices=('wefs', 'vrfs'),
 OPTIMIZER_PUT_PARSER = reqparse.RequestParser()
 OPTIMIZER_PUT_PARSER.add_argument('iterations', type=int, required=True,
                                   help="iterations cannot be null")
-OPTIMIZER_PUT_PARSER.add_argument('value', type=str, required=True, help="value cannot be null")
-OPTIMIZER_PUT_PARSER.add_argument('line', type=str, required=True, help="line cannot be null")
-OPTIMIZER_PUT_PARSER.add_argument('prj_name', type=str, required=True, help="project name cannot be null")
-OPTIMIZER_PUT_PARSER.add_argument('max_iter', type=int, required=True, help="max iterations cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('value', type=str, required=True,
+                                  help="value cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('line', type=str, required=True,
+                                  help="line cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('prj_name', type=str, required=True,
+                                  help="project name cannot be null")
+OPTIMIZER_PUT_PARSER.add_argument('max_iter', type=int, required=True,
+                                  help="max iterations cannot be null")
 
 CLASSIFICATION_POST_PARSER = reqparse.RequestParser()
-CLASSIFICATION_POST_PARSER.add_argument('modelpath', required=True, help="The modelfile to be used")
-CLASSIFICATION_POST_PARSER.add_argument('data', help="The data path to be used")
-CLASSIFICATION_POST_PARSER.add_argument('model', help="The model self trained to be used")
+CLASSIFICATION_POST_PARSER.add_argument('modelpath', required=True,
+                                        help="The modelfile to be used")
+CLASSIFICATION_POST_PARSER.add_argument('data',
+                                        help="The data path to be used")
+CLASSIFICATION_POST_PARSER.add_argument('model',
+                                        help="The model self trained to be used")
 
 TRAIN_POST_PARSER = reqparse.RequestParser()
-TRAIN_POST_PARSER.add_argument('datapath', required=True, help="The datapath can not be null")
-TRAIN_POST_PARSER.add_argument('outputpath', required=True, help="The output path can not be null")
-TRAIN_POST_PARSER.add_argument('modelpath', required=True, help="The model path can not be null")
+TRAIN_POST_PARSER.add_argument('datapath', required=True,
+                               help="The datapath can not be null")
+TRAIN_POST_PARSER.add_argument('outputpath', required=True,
+                               help="The output path can not be null")
+TRAIN_POST_PARSER.add_argument('modelpath', required=True,
+                               help="The model path can not be null")
 
 DETECT_POST_PARSER = reqparse.RequestParser()
 DETECT_POST_PARSER.add_argument('appname', required=True, help="The appname path can not be null")

@@ -22,7 +22,7 @@ import numpy as np
 LOGGER = logging.getLogger(__name__)
 
 
-class GridSearchTuning(object):
+class GridSearchTuning:
     """gridsearch tuning"""
 
     def __init__(self, p_nob):
@@ -46,7 +46,7 @@ class GridSearchTuning(object):
         self.items = items
 
 
-class GridSearchTuningManager(object):
+class GridSearchTuningManager:
     """gridsearch tuning manager"""
 
     def __init__(self, knobs, child_conn):
@@ -58,12 +58,12 @@ class GridSearchTuningManager(object):
             option_list[p_nob['name']] = gstuning
             dict_para[p_nob['name']] = gstuning.items
             dict_para_type[p_nob['name']] = p_nob['dtype']
-      
+
         self._dict_para = dict_para
         self._dict_para_type = dict_para_type
         self._name = []
         self._option_list = option_list
-        self._options = []       
+        self._options = []
         self._performance = []
         self._child_conn = child_conn
 
@@ -96,14 +96,15 @@ class GridSearchTuningManager(object):
             for key in space:
                 option.append(space[key])
                 name.append(key)
-                LOGGER.info('key: %s,  value: %s, type: %s', key, space[key], self._dict_para_type[key])
+                LOGGER.info('key: %s,  value: %s, type: %s', key,
+                             space[key], self._dict_para_type[key])
                 if self._dict_para_type[key] == 'int':
                     params[key] = int(space[key])
                 elif self._dict_para_type[key] == 'float':
                     params[key] = float(space[key])
                 elif self._dict_para_type[key] == 'string':
-                    params[key] = space[key] 
-                    
+                    params[key] = space[key]
+
             self._options.append(option)
             self._name = name
             iter_result["param"] = params
@@ -116,16 +117,15 @@ class GridSearchTuningManager(object):
                 x_num = x_num + num
             performance = x_num
             self._performance.append(performance)
-            
+
         return self._options, self._performance
-        
+
     def get_best_params(self):
         """return the parameters of the best performance"""
         params = {}
         best_index = np.argmin(self._performance)
         best_option = self._options[best_index]
         for i, val in enumerate(best_option):
-            
             knob_val = val
             knob_name = self._name[i]
             if self._dict_para_type[knob_name] == 'int':
@@ -139,7 +139,7 @@ class GridSearchTuningManager(object):
 
     def get_option_index(self, option):
         """return the index of the option list"""
-        option_range_list = self._option_list       
+        option_range_list = self._option_list
         option_index = []
         for i, val in enumerate(option):
             index = option_range_list[self._name[i]].items.index(val)

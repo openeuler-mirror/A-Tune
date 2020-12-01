@@ -7,22 +7,22 @@ import zlib
 import gzip
 import bz2
 
-file_path = "/root/A-Tune/examples/tuning/compress/enwik8"
+FILE_PATH = "/root/A-Tune/examples/tuning/compress/enwik8"
 
-compressLevel=6
-compressMethod="zlib"
+COMPRESS_LEVEL = 6
+COMPRESS_METHOD = "zlib"
 
-with open(file_path, 'rb') as f_in:
+with open(FILE_PATH, 'rb') as f_in:
     data = f_in.read()
     start = time.time()
-    c = b"compressed result"
-    if compressMethod == "bz2":
-        c = bz2.compress(data, compressLevel)
-    elif compressMethod == "zlib":
-        c = zlib.compress(data, compressLevel)
-    elif compressMethod == "gzip":
-        c = gzip.compress(data, compressLevel)
+    RES = b"compressed result"
+    if COMPRESS_METHOD == "bz2":
+        RES = bz2.compress(data, COMPRESS_LEVEL)
+    elif COMPRESS_METHOD == "zlib":
+        RES = zlib.compress(data, COMPRESS_LEVEL)
+    elif COMPRESS_METHOD == "gzip":
+        RES = gzip.compress(data, COMPRESS_LEVEL)
     end = time.time()
 
     print("time = %f" % (end - start))
-    print("compress_ratio = %f" % (len(data) / len(c)))
+    print("compress_ratio = %f" % (len(data) / len(RES)))

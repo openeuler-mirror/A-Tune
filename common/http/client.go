@@ -14,7 +14,6 @@
 package http
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
@@ -24,6 +23,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"gitee.com/openeuler/A-Tune/common/config"
 )
 
 //HTTPClient :the structer that encapsulation the net/http package
@@ -42,7 +43,7 @@ func NewhttpClient(url string) (*httpClient, error) {
 	var client *http.Client
 	segs := strings.Split(url, "/")
 	if len(segs) < 5 {
-		return nil, fmt.Errorf("url: %s is not corrent")
+		return nil, fmt.Errorf("url: %s is not correct", url)
 	}
 	uri := segs[4]
 	if config.IsEnginePort(uri) && config.EngineTLS || !config.IsEnginePort(uri) && config.RestTLS {

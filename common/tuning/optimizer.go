@@ -16,15 +16,6 @@ package tuning
 import (
 	"bufio"
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/client"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/http"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/models"
-	"gitee.com/openeuler/A-Tune/common/project"
-	"gitee.com/openeuler/A-Tune/common/utils"
-	"golang.org/x/net/context"
 	"io"
 	"io/ioutil"
 	"math"
@@ -35,6 +26,16 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/project"
+	"gitee.com/openeuler/A-Tune/common/utils"
+	"golang.org/x/net/context"
 )
 
 // Optimizer : the type implement the bayes serch service
@@ -97,7 +98,7 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 			for _, para := range o.TuningParams {
 				if para.Name == item.Name {
 					item.Info.Skip = false
-					break;
+					break
 				}
 			}
 		}
@@ -365,7 +366,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 
 	o.StartIterTime = time.Now().Format(config.DefaultTimeFormat)
-	log.Infof("optimizer put time is: %v", time.Now().Sub(optPutStartTime).Milliseconds())
+	log.Infof("optimizer put time is: %v", time.Since(optPutStartTime).Milliseconds())
 
 	if o.RespPutIns.Finished {
 		remainParams, err := o.filterParams()
@@ -382,7 +383,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 				paraSort := make([]string, 0)
 				for _, rank := range ranks {
 					if !strings.Contains(rank, ":") {
-						continue;
+						continue
 					}
 					paraSort = append(paraSort, strings.TrimSpace(strings.Split(rank, ":")[0]))
 				}
@@ -471,7 +472,7 @@ func (o *Optimizer) filterParams() (string, error) {
 	skipMap := make(map[string]struct{})
 	for _, param := range skipParams {
 		skipMap[param.Name] = struct{}{}
-		o.TuningParams = append(o.TuningParams, utils.Pair{param.Name, param.Score})
+		o.TuningParams = append(o.TuningParams, utils.Pair{Name: param.Name, Score: param.Score})
 	}
 	for _, item := range o.Prj.Object {
 		if _, ok := skipMap[item.Name]; ok {

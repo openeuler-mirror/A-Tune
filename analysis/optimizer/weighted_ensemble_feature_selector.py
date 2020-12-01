@@ -17,23 +17,23 @@ to get really importance tuning parameters
 """
 
 import logging
+import multiprocessing
 import numpy as np
-from sklearn.linear_model import Lasso
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import BaggingRegressor, AdaBoostRegressor
 from sklearn.tree import DecisionTreeRegressor
-from sklearn.linear_model import ElasticNet, Ridge
+from sklearn.linear_model import Ridge
 from sklearn.tree import ExtraTreeRegressor
 
-import multiprocessing
 
 LOGGER = logging.getLogger(__name__)
 
 class FeatureSelectorProcess(multiprocessing.Process):
     """class feature selector each with multiprocessing"""
 
-    def __init__(self, regressor, list_sample_x, list_sample_y, labels, index, sorted_index_queue, prediction_queue):
+    def __init__(self, regressor, list_sample_x, list_sample_y,
+                 labels, index, sorted_index_queue, prediction_queue):
         multiprocessing.Process.__init__(self)
         self._regressor = regressor
         self._list_sample_x = list_sample_x
@@ -44,7 +44,8 @@ class FeatureSelectorProcess(multiprocessing.Process):
         self._sorted_index_queue = sorted_index_queue
         self._prediction_queue = prediction_queue
 
-    def get_unified_feature_importance(self, regressor):
+    @staticmethod
+    def get_unified_feature_importance(regressor):
         """get unified feature importance for different type regressor"""
         if hasattr(regressor, "feature_importances_"):
             return regressor.feature_importances_
@@ -76,18 +77,18 @@ class FeatureSelectorProcess(multiprocessing.Process):
         self._prediction_queue.put(prediction)
 
 
-class WeightedEnsembleFeatureSelector(object):
+class WeightedEnsembleFeatureSelector:
     """class weighted ensemble feature selector"""
 
     def __init__(self):
         dtree = DecisionTreeRegressor()
-        rf = RandomForestRegressor(n_estimators=10000, random_state=0, n_jobs=-1)
-        gb = GradientBoostingRegressor(n_estimators=10000, learning_rate=0.1)
+        ranfor = RandomForestRegressor(n_estimators=10000, random_state=0, n_jobs=-1)
+        graboo = GradientBoostingRegressor(n_estimators=10000, learning_rate=0.1)
         adb = AdaBoostRegressor(DecisionTreeRegressor(max_depth=16),
                                 n_estimators=10000, random_state=0)
         bag = BaggingRegressor(base_estimator=ExtraTreeRegressor(max_depth=16),
                                n_estimators=10000, random_state=0, n_jobs=-1)
-        self._regressors = [dtree, rf, gb, adb, bag]
+        self._regressors = [dtree, ranfor, graboo, adb, bag]
         self._ensemble_model = Ridge(alpha=10, max_iter=1000000)
         LOGGER.info('Weighted Ensemble Feature Selector using: '
                     'DecisionTree, RandomForest, GradientBoosting, AdaBoost, Bagging')
@@ -102,7 +103,7 @@ class WeightedEnsembleFeatureSelector(object):
         for regressor in self._regressors:
             sorted_index_queue = multiprocessing.Queue()
             prediction_queue = multiprocessing.Queue()
-            fs_thread = FeatureSelectorProcess(regressor, list_sample_x, list_sample_y, 
+            fs_thread = FeatureSelectorProcess(regressor, list_sample_x, list_sample_y,
                     labels, index, sorted_index_queue, prediction_queue)
             fs_thread_list.append(fs_thread)
             sorted_index_queue_list.append(sorted_index_queue)
@@ -124,7 +125,8 @@ class WeightedEnsembleFeatureSelector(object):
 
         return native_feature_importances, predictions
 
-    def get_ensemble_train_datas(self, list_sample_x, predictions):
+    @staticmethod
+    def get_ensemble_train_datas(list_sample_x, predictions):
         """get ensemble train datas"""
         train_datas = []
         for i in range(len(list_sample_x)):

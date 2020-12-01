@@ -17,9 +17,22 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"encoding/json"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
+	HTTP "net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	_ "gitee.com/openeuler/A-Tune/common/checker"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -33,18 +46,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/tuning"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"io"
-	"io/ioutil"
-	"mime/multipart"
-	HTTP "net/http"
-	"os"
-	"path"
-	"path/filepath"
-	"regexp"
-	"sort"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/go-ini/ini"
 	"github.com/mitchellh/mapstructure"
@@ -408,15 +409,18 @@ func handleCsv(curPath string, storePath string) error {
 	defer tempFile.Close()
 
 	w := csv.NewWriter(tempFile)
-	w.WriteAll(content[1:])
-	w.Flush()
+	if err := w.WriteAll(content[1:]); err != nil {
+		return fmt.Errorf("can not write to file, err is %+v", err)
+	}
 
-	os.Rename(storePath, curPath)
+	if err := os.Rename(storePath, curPath); err != nil {
+		return fmt.Errorf("can not rename the path, err is %+v", err)
+	}
 
 	return nil
 }
 
-var collectStatus  = make(map[string]string)
+var collectStatus = make(map[string]string)
 
 // Analysis method analysis the system traffic load
 func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileMgr_AnalysisServer) error {
@@ -453,9 +457,9 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 				return
 			}
 			reader := bufio.NewReader(file)
-	
+
 			scanner := bufio.NewScanner(reader)
-	
+
 			for scanner.Scan() {
 				line := scanner.Text()
 				_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
@@ -529,7 +533,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	apps := classApps.Result[0].Apps
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", apps)})
 
-	logFile, err:= utils.GetLogFilePath(config.DefaultTempPath)
+	logFile, err := utils.GetLogFilePath(config.DefaultTempPath)
 	if err != nil {
 		return fmt.Errorf("get log file path failed: %v", err)
 	}
@@ -538,7 +542,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		return fmt.Errorf("open file failed: %v", err)
 	}
 	defer file.Close()
-	_, err = io.WriteString(file, apps + "\n")
+	_, err = io.WriteString(file, apps+"\n")
 	if err != nil {
 		log.Errorf("write workload type to log failed: %v", err)
 	}
@@ -1145,18 +1149,18 @@ func (s *ProfileServer) Detecting(message *PB.DetectMessage, stream PB.ProfileMg
 	detectBody.AppName = AppName
 	detectBody.DetectPath = DetectPath
 
-	success, detecterr, result:= detectBody.Get()
+	success, detecterr, result := detectBody.Get()
 
 	if detecterr != nil {
-	    return detecterr
+		return detecterr
 	}
 
 	if success {
 		_ = stream.Send(&PB.AckCheck{Name: "Detecting misclassified data success\n"})
 		s := strings.Split(result[1:(len(result)-2)], "@")
-		for _, str := range s{
+		for _, str := range s {
 			_ = stream.Send(&PB.AckCheck{Name: str})
- 		}
+		}
 		return nil
 	}
 
@@ -1375,7 +1379,7 @@ func (s *ProfileServer) collection(npipe string, time string) (*RespCollectorPos
 			return nil, err
 		}
 	}
-	
+
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors

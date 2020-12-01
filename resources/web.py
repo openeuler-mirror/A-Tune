@@ -18,11 +18,9 @@ Web UI initialization
 
 import os
 import time
-import numpy
-import logging
-from flask import Flask, jsonify, request
 from configparser import ConfigParser
-
+from flask import Flask, jsonify, request
+import numpy
 
 # configuration
 DEBUG = True
@@ -117,9 +115,6 @@ def get_file_data(status, file_name, line):
 def get_type_list(types):
     """get type list"""
     res = []
-    finished = 0
-    running = 0
-    error = 0
     path = '/var/atune_data/tuning/'
     if not os.path.exists(path):
         os.makedirs(path)
@@ -277,4 +272,3 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('/etc/atuned/engine.cnf')
     app.run(host=config.get("server", "engine_host"), port='5000')
-
