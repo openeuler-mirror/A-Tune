@@ -3,7 +3,7 @@ engine : "gbrt"
 iterations : 20
 random_starts : 10
 
-benchmark : "python3 /root/A-Tune/examples/tuning/compress/compress.py"
+benchmark : "python3 compress/compress.py"
 evaluations :
   -
     name: "time"

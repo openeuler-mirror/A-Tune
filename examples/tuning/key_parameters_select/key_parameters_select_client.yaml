@@ -13,6 +13,6 @@ evaluations :
   -
     name: "y"
     info:
-        get: "echo '$out' | grep 'y' | awk '{print $3}'"
+        get: "echo '$out' | grep 'Y' | awk '{print $3}'"
         type: "negative"
         weight: 100

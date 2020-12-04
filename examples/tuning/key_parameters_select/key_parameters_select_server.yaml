@@ -7,8 +7,8 @@ object :
     name : "x1"
     info :
         desc : "x1"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x1 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x1 =\\s*[0-9]*/x1 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X1 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X1 =\\s*[0-9]*/X1 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -19,8 +19,8 @@ object :
     name : "x2"
     info :
         desc : "x2"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x2 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x2 =\\s*[0-9]*/x2 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X2 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X2 =\\s*[0-9]*/X2 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -31,8 +31,8 @@ object :
     name : "x3"
     info :
         desc : "x3"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x3 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x3 =\\s*[0-9]*/x3 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X3 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X3 =\\s*[0-9]*/X3 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -43,8 +43,8 @@ object :
     name : "x4"
     info :
         desc : "x4"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x4 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x4 =\\s*[0-9]*/x4 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X4 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X4 =\\s*[0-9]*/X4 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -55,8 +55,8 @@ object :
     name : "x5"
     info :
         desc : "x5"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x5 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x5 =\\s*[0-9]*/x5 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X5 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X5 =\\s*[0-9]*/X5 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -67,8 +67,8 @@ object :
     name : "x6"
     info :
         desc : "x6"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x6 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x6 =\\s*[0-9]*/x6 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X6 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X6 =\\s*[0-9]*/X6 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -79,8 +79,8 @@ object :
     name : "x7"
     info :
         desc : "x7"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x7 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x7 =\\s*[0-9]*/x7 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X7 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X7 =\\s*[0-9]*/X7 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -91,8 +91,8 @@ object :
     name : "x8"
     info :
         desc : "x8"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x8 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x8 =\\s*[0-9]*/x8 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X8 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X8 =\\s*[0-9]*/X8 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -103,8 +103,8 @@ object :
     name : "x9"
     info :
         desc : "x9"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x9 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x9 =\\s*[0-9]*/x9 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X9 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X9 =\\s*[0-9]*/X9 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -115,8 +115,8 @@ object :
     name : "x10"
     info :
         desc : "x10"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x10 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x10 =\\s*[0-9]*/x10 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X10 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X10 =\\s*[0-9]*/X10 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -127,8 +127,8 @@ object :
     name : "x11"
     info :
         desc : "x11"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x11 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x11 =\\s*[0-9]*/x11 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X11 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X11 =\\s*[0-9]*/X11 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -139,8 +139,8 @@ object :
     name : "x12"
     info :
         desc : "x12"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x12 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x12 =\\s*[0-9]*/x12 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X12 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X12 =\\s*[0-9]*/X12 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -151,8 +151,8 @@ object :
     name : "x13"
     info :
         desc : "x13"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x13 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x13 =\\s*[0-9]*/x13 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X13 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X13 =\\s*[0-9]*/X13 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -163,8 +163,8 @@ object :
     name : "x14"
     info :
         desc : "x14"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x14 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x14 =\\s*[0-9]*/x14 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X14 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X14 =\\s*[0-9]*/X14 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -175,8 +175,8 @@ object :
     name : "x15"
     info :
         desc : "x15"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x15 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x15 =\\s*[0-9]*/x15 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X15 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X15 =\\s*[0-9]*/X15 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -187,8 +187,8 @@ object :
     name : "x16"
     info :
         desc : "x16"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x16 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x16 =\\s*[0-9]*/x16 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X16 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X16 =\\s*[0-9]*/X16 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -199,8 +199,8 @@ object :
     name : "x17"
     info :
         desc : "x17"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x17 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x17 =\\s*[0-9]*/x17 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X17 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X17 =\\s*[0-9]*/X17 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -211,8 +211,8 @@ object :
     name : "x18"
     info :
         desc : "x18"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x18 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x18 =\\s*[0-9]*/x18 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X18 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X18 =\\s*[0-9]*/X18 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -223,8 +223,8 @@ object :
     name : "x19"
     info :
         desc : "x19"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x19 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x19 =\\s*[0-9]*/x19 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X19 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X19 =\\s*[0-9]*/X19 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
@@ -235,8 +235,8 @@ object :
     name : "x20"
     info :
         desc : "x20"
-        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^x20 =' | awk -F '=' '{print $2}'"
-        set : "sed -i 's/^x20 =\\s*[0-9]*/x20 = $value/g' key_parameters_select/key_parameters_select.py"
+        get : "cat key_parameters_select/key_parameters_select.py | grep -i '^X20 =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^X20 =\\s*[0-9]*/X20 = $value/g' key_parameters_select/key_parameters_select.py"
         needrestart : "false"
         type : "continuous"
         scope :
