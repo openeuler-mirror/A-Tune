@@ -22,6 +22,8 @@ from flask_restful import Resource
 from flask_restful import request
 
 from analysis.engine.utils import utils
+from analysis.engine.parser import TRANSFER_PUT_PARSER
+from analysis.engine.database import trigger_analysis
 
 LOGGER = logging.getLogger(__name__)
 
@@ -52,3 +54,30 @@ class Transfer(Resource):
         res = utils.extract_file(save_path, target_path)
         os.remove(save_path)
         return res, 200
+
+    @staticmethod
+    def put():
+        """provide the method of put"""
+        args = TRANSFER_PUT_PARSER.parse_args()
+        LOGGER.info(args)
+
+        curr_id = args['collect_id']
+        if curr_id == -1:
+            client_ip = request.remote_addr
+            curr_id = trigger_analysis.add_new_collection(client_ip)
+        if curr_id != -1:
+            types = args['type']
+            status = args['status']
+            workload = args['workload_type']
+
+            if types == 'csv' and status == 'running':
+                trigger_analysis.add_collection_data(curr_id, args['collect_data'])
+            elif types == 'csv' and status == 'finished':
+                trigger_analysis.change_collection_status(curr_id, status, types)
+                trigger_analysis.change_collection_info(curr_id, workload)
+            elif types == 'log' and status == 'running':
+                trigger_analysis.add_analysis_log(curr_id, args['collect_data'])
+            else:
+                trigger_analysis.change_collection_status(curr_id, status, types)
+                trigger_analysis.change_collection_info(curr_id, workload)
+        return curr_id, 200

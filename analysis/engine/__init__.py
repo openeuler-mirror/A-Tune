@@ -14,5 +14,3 @@
 """
 Init files
 """
-
-import analysis.engine.utils

@@ -449,6 +449,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	defer os.Remove(npipe)
 
 	subProcess := true
+	collectionId := -1
 	go func() {
 		for {
 			file, err := os.OpenFile(npipe, os.O_RDONLY, os.ModeNamedPipe)
@@ -463,9 +464,22 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 			for scanner.Scan() {
 				line := scanner.Text()
 				_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+				retId, err := models.InitTransfer("csv", "running", line, "", collectionId)
+				if err != nil {
+					_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+					log.Errorf("cllection system data error: transfer data %v", err)
+					return
+				}
+                collectionId = retId
 			}
 
 			if !subProcess {
+				_, err := models.InitTransfer("csv", "finished", "", "", collectionId)
+				if err != nil {
+					_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+					log.Errorf("cllection system data error: transfer data %v", err)
+					return
+				}
 				break
 			}
 		}
@@ -498,6 +512,11 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	subProcess = false
 
 	workloadType, resourceLimit, err := s.classify(respCollectPost.Path, message.GetModel())
+	if err != nil {
+		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
+		return err
+	}
+	_, err = models.InitTransfer("csv", "finished", "", workloadType, collectionId)
 	if err != nil {
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
@@ -570,6 +589,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 4. Match profile: %s", profileType)})
 	pro, _ := profile.Load(profileNames)
 	pro.SetWorkloadType(workloadType)
+	pro.SetCollectionId(collectionId)
 
 	_ = stream.Send(&PB.AckCheck{Name: "\n 5. bengin to set static profile"})
 	log.Infof("bengin to set static profile")

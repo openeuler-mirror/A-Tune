@@ -26,7 +26,7 @@ type Detecting struct {
 	DetectPath    string `json:"detectpath"`
 }
 
-// Post method call detecting service
+// Get method call detecting service
 func (t *Detecting) Get() (bool, error, string) {
 	url := config.GetURL(config.DetectingURI)
 	result := " "

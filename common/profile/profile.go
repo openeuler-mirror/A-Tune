@@ -43,6 +43,7 @@ type Profile struct {
 
 	name string
 	path string
+	collId int
 
 	options *ini.Section
 	units   []*ini.Section
@@ -253,6 +254,7 @@ func (p *Profile) active(ch chan *PB.AckCheck) error {
 	}
 
 	scheduler := schedule.GetScheduler()
+	scheduler.SetScheduleId(p.collId)
 	_ = scheduler.Active(ch, itemKeys, p.items)
 
 	return nil
@@ -261,6 +263,11 @@ func (p *Profile) active(ch chan *PB.AckCheck) error {
 // SetWorkloadType method set the workload type name to Profile
 func (p *Profile) SetWorkloadType(name string) {
 	p.name = name
+}
+
+// SetCollectionId method set the collId 'int id' to Profile
+func (p *Profile) SetCollectionId(id int) {
+	p.collId = id
 }
 
 //ItemSort method allocate property to different item
