@@ -7,7 +7,7 @@ import zlib
 import gzip
 import bz2
 
-FILE_PATH = "/root/A-Tune/examples/tuning/compress/enwik8"
+FILE_PATH = "compress/enwik8"
 
 COMPRESS_LEVEL = 6
 COMPRESS_METHOD = "zlib"
