@@ -1,0 +1,12 @@
+project: "mariadb"
+engine: "gbrt"
+iterations: 30
+random_starts: 10
+
+benchmark: "sh mariadb/mariadb_benchmark.sh"
+evaluations:
+  - name: "tpmc"
+    info:
+      get: "echo '$out' | grep ' TpmC' | awk '{print $1}'"
+      type: "negative"
+      weight: 100
