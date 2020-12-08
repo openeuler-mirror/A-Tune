@@ -28,3 +28,28 @@ tlsengineserverkeyfile = /etc/atuned/engine_certs/server.key
 [log]
 # either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
+
+#################################### database ###############################
+[database]
+# enable database server
+# default is false
+db_enable = false
+
+# information about database
+# currently support for PostgreSQL database
+database = PostgreSQL
+
+# the database service listening host and port
+db_host = localhost
+db_port = 5432
+
+# database name
+db_name = atune_db
+
+# database user info
+# user_passwd should be encrypted according to Advanced Encryption Standard (AES)
+# you can use ./tools/encrypt.py to encrypt your password
+user_name = admin
+passwd_key = 5KvYfdOH2x1C72yu/y+WhY7xS4s5aUwXd2QPQlZx2z8=
+passwd_iv = qaZqUbHYnz/N7yhoi0tsI0wp+bsVgbyS9ujAx6DI3ig=
+user_passwd = SYpni9Y=

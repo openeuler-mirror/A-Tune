@@ -76,3 +76,11 @@ TRAIN_POST_PARSER.add_argument('modelpath', required=True,
 DETECT_POST_PARSER = reqparse.RequestParser()
 DETECT_POST_PARSER.add_argument('appname', required=True, help="The appname path can not be null")
 DETECT_POST_PARSER.add_argument('detectpath', type=str, help="The path of file to be detect")
+
+TRANSFER_PUT_PARSER = reqparse.RequestParser()
+TRANSFER_PUT_PARSER.add_argument('type', type=str, required=True, help="type of data can not be null")
+TRANSFER_PUT_PARSER.add_argument('collect_id', type=int, required=True,
+        help="Collection id can not be null")
+TRANSFER_PUT_PARSER.add_argument('status', type=str, required=True, help="Status can not be null")
+TRANSFER_PUT_PARSER.add_argument('collect_data', type=str, required=False, help="Collection data")
+TRANSFER_PUT_PARSER.add_argument('workload_type', type=str, required=False, help="Workload type")

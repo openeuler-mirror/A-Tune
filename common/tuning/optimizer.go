@@ -202,7 +202,7 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optPutBody.Value = ""
 	optPutBody.Line = projectName
 	optPutBody.PrjName = o.Prj.Project + "-" + o.PrjId
-	optPutBody.MaxIter = int(o.MaxIter)
+	optPutBody.MaxIter = respPostIns.Iters
 	log.Infof("optimizer put body is: %+v", optPutBody)
 	_, err = optPutBody.Put(o.OptimizerPutURL)
 	if err != nil {

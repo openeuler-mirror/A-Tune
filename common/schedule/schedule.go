@@ -21,6 +21,7 @@ import (
 	"gitee.com/openeuler/A-Tune/common/registry"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/models"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -105,6 +106,7 @@ func (c *ConfigPutBody) Get() (*RespPut, error) {
 // Scheduler class
 type Scheduler struct {
 	schedule []*sqlstore.Schedule
+	id       int
 }
 
 var instance *Scheduler = nil
@@ -114,6 +116,11 @@ func (s *Scheduler) Init() error {
 	s.schedule = sqlstore.GetSchedule()
 
 	return nil
+}
+
+// SetScheduleId method set id to scheduler
+func (s *Scheduler) SetScheduleId(scheduleId int) {
+	s.id = scheduleId
 }
 
 // Schedule :update database and do schedule
@@ -158,14 +165,24 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 					description := key.Name()
 					sendChanToAdm(ch, key.Value(), utils.SUGGEST, description)
 					log.Infof("tip key name: %s, key value: %s", key.Name(), key.Value())
-					logStr += section.Name() + "|" + key.Name() + "|" + key.Value() + "|\n"
+					currLog := section.Name() + "|" + key.Name() + "|" + key.Value() + "|"
+					logStr += currLog + "\n"
+					_, err := models.InitTransfer("log", "running", currLog, "", s.id)
+					if err != nil {
+						log.Errorf("log info write error: transfer data %v", err)
+					}
 				}
 				continue
 			}
 			if section.Name() == "schedule" {
 				for _, key := range section.Keys() {
 					_ = s.Schedule(key.Name(), key.Value(), false, ch)
-					logStr += section.Name() + "|" + key.Name() + "|" + key.Value() + "|\n"
+					currLog := section.Name() + "|" + key.Name() + "|" + key.Value() + "|"
+					logStr += currLog + "\n"
+					_, err := models.InitTransfer("log", "running", currLog, "", s.id)
+					if err != nil {
+						log.Errorf("log info write error: transfer data %v", err)
+					}
 				}
 				continue
 			}
@@ -231,11 +248,15 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 					}
 					message = append(message, respPutIns.Value)
 				}
-				logStr += section.Name() + "|" + statusStr + "|" + key.Name() + "|" + key.Value() + "|"
+				currLog := section.Name() + "|" + statusStr + "|" + key.Name() + "|" + key.Value() + "|"
 				if statusStr != "OK" {
-					logStr += respPutIns.Value
+					currLog += respPutIns.Value
 				}
-				logStr += "\n"
+				logStr += currLog + "\n"
+				_, err = models.InitTransfer("log", "running", currLog, "", s.id)
+				if err != nil {
+					log.Errorf("log info write error: transfer data %v", err)
+				}
 			}
 
 			message = utils.RemoveDuplicateElement(message)
@@ -264,6 +285,11 @@ func (s *Scheduler) Active(ch chan *PB.AckCheck, itemKeys []string, items map[st
 		if err != nil {
 			log.Errorf("write to log failed: %v", err)
 		}
+	}
+
+	_, err = models.InitTransfer("log", "finished", "", "", s.id)
+	if err != nil {
+		log.Errorf("log info write error: transfer data %v", err)
 	}
 	return nil
 }
