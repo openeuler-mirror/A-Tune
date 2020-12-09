@@ -10,7 +10,7 @@ A-Tune是一款基于AI的操作系统性能调优引擎。A-Tune利用AI技术�
 一、安装A-Tune
 ----------
 
-支持操作系统：openEuler 1.0及以上版本
+支持操作系统：openEuler 20.03 LTS及以上版本
 
 ### 方法一（适用于普通用户）：使用openEuler默认自带的A-Tune
 

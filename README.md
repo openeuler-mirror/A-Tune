@@ -10,7 +10,7 @@ English | [简体中文](./README-zh.md)
 I. A-Tune Installation
 ----------
 
-Supported OS: openEuler 1.0 or later
+Supported OS: openEuler 20.03 LTS or later
 
 ### Method 1 (applicable to common users): Use the default A-Tune of openEuler.
 
