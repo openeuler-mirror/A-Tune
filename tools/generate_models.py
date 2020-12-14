@@ -17,9 +17,11 @@ Usage: python3 generate_models.py [-h] [-d] [-m] [-s]
 """
 import argparse
 import ast
+import os
 import sys
 
-sys.path.insert(0, "./../")
+FILE_PATH = os.path.realpath(os.path.dirname(__file__))
+sys.path.insert(0, FILE_PATH + "/../")
 from analysis.optimizer.workload_characterization import WorkloadCharacterization
 
 
@@ -39,9 +41,9 @@ def main(csv_path, model_path, feature_selection, search):
 if __name__ == '__main__':
     ARG_PARSER = argparse.ArgumentParser(description="generate AI models")
     ARG_PARSER.add_argument('-d', '--csv_path', metavar='DATA',
-                            default="../analysis/dataset", help='input csv path')
+                            default=FILE_PATH + "/../analysis/dataset", help='input csv path')
     ARG_PARSER.add_argument('-m', '--model_path', metavar='MODEL',
-                            default="../analysis/models", help='input model path')
+                            default=FILE_PATH + "/../analysis/models", help='input model path')
     ARG_PARSER.add_argument('-s', '--select', metavar='SELECT',
                             type=ast.literal_eval, default=False,
                             help='whether feature models to be generate, True or False')
