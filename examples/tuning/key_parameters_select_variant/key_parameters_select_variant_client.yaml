@@ -1,0 +1,16 @@
+project: "key_parameters_select_variant"
+engine : "gbrt"
+iterations : 30
+random_starts : 10
+feature_filter_engine: "traverse" # the parameter filter is traverse
+feature_filter_cycle: 1           # the value of this variable must be '1'
+feature_filter_count: 10          # this variable is used to control the number of parameters you want to select
+
+benchmark : "python3 key_parameters_select_variant/key_parameters_select_variant.py"
+evaluations :
+  -
+    name: "y"
+    info:
+        get: "echo '$out' | grep 'y' | awk '{print $3}'"
+        type: "negative"
+        weight: 100

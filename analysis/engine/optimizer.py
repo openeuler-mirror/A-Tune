@@ -34,7 +34,7 @@ class Optimizer(Resource):
     """restful api for optimizer, in order to provide the method of post, get, put and delete"""
     task_id_info = "taskid"
     pipe = "pipe"
-    _feature_filter_engine = ['random', 'abtest', 'lhs']
+    _feature_filter_engine = ['random', 'abtest', 'lhs', 'traverse']
 
     def get(self, task_id=None):
         """provide the method of get"""
@@ -57,7 +57,7 @@ class Optimizer(Resource):
         task_id = str(uuid.uuid1())
         if args.get("feature_filter") and args.get("engine") not in self._feature_filter_engine:
             abort(400, "feature_filter_engine is not a valid choice, "
-                       "only random, abtest and lhs enabled")
+                       "only random, abtest, lhs and traverse enabled")
         parent_conn, child_conn = Pipe()
         x_ref = args.get("x_ref")
         y_ref = args.get("y_ref")
@@ -79,7 +79,8 @@ class Optimizer(Resource):
         task_cache.TasksCache.get_instance().set(task_id, value)
 
         iters = args.get("max_eval")
-        if args.get("engine") == "abtest" or args.get("engine") == "gridsearch":
+        if args.get("engine") == "abtest" or args.get("engine") == "gridsearch" or \
+                args.get("engine") == "traverse":
             iters = parent_conn.recv()
         result["task_id"] = task_id
         result["status"] = "OK"
