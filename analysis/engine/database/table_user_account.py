@@ -17,7 +17,7 @@ Mapping for user_account table.
 
 from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, UniqueConstraint, PrimaryKeyConstraint
-from sqlalchemy import select
+from sqlalchemy import func, select, insert
 
 
 class UserAccount(Base):
@@ -29,7 +29,7 @@ class UserAccount(Base):
     account_name = Column(VARCHAR(255), nullable=False)
     email = Column(VARCHAR(255), nullable=False, unique=True)
     password = Column(VARCHAR(255), nullable=False)
-    limitation = Column(VARCHAR(255), nullable=False, default='user')
+    role = Column(VARCHAR(255), nullable=False, default='user')
 
     __table_args__ = (
         PrimaryKeyConstraint('user_id', name='pk_users'),
@@ -45,4 +45,26 @@ class UserAccount(Base):
         """find uid in user_account table"""
         sql = select([UserAccount]).where(UserAccount.user_id == uid)
         res = session.execute(sql).scalar()
+        return res is not None
+
+    @staticmethod
+    def get_field_by_key(field, key, val, session):
+        """get user password by email"""
+        sql = select([field]).where(key == val)
+        res = session.execute(sql).scalar()
+        return res
+
+    @staticmethod
+    def get_max_uid(session):
+        """get max user_id in user_account table"""
+        sql = func.max(UserAccount.user_id)
+        uid = session.query(sql).scalar()
+        return uid
+
+    @staticmethod
+    def insert_new_user(uid, email, name, pwd, session):
+        """insert new user into user_account table"""
+        sql = insert(UserAccount).values(user_id=uid, account_name=name, email=email,
+                password=pwd)
+        res = session.execute(sql)
         return res is not None

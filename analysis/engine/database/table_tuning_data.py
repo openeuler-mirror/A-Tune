@@ -16,6 +16,7 @@ Func for initial and use tuning_data table.
 """
 
 import re
+import numpy
 import logging
 from sqlalchemy import Table, Column, Integer, VARCHAR, MetaData, text
 from sqlalchemy.exc import SQLAlchemyError
@@ -73,7 +74,7 @@ def exist_tuning_column(table, param, session):
     return key, True
 
 
-def get_tuning_data(table, iteration, line, session):
+def execute_tuning_data(table, iteration, line, session):
     """execute data of new round"""
     keys = '(_round, _cost'
     vals = '(:_round, :_cost'
@@ -103,3 +104,25 @@ def get_tuning_data(table, iteration, line, session):
     keys += ')'
     vals += ')'
     return keys, vals, pairs
+
+
+def get_param_by_table_name(table_name, session):
+    """get parameter name in table"""
+    sql = 'select * from ' + table_name + ' where ' + table_name + '._round = 0'
+    res = session.execute(sql).first()
+    return [each for each in res][1:]
+
+
+def get_tuning_data(total_round, table_name, line, session):
+    """get tuning data by table_name"""
+    end_line = int(line) + 10
+    sql = 'select * from ' + table_name + ' where ' + table_name + '._round > ' +\
+            str(line) + ' and ' + table_name + '._round <= ' + str(end_line)
+    res = session.execute(sql).fetchall()
+    lines = len(res) + int(line)
+    if lines == total_round:
+        lines = -1
+    cost = [row[1] for row in res]
+    res = [list(row) for row in res]
+    res = numpy.array(res).T.tolist()
+    return lines, cost, res

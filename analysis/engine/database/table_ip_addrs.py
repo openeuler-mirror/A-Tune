@@ -53,3 +53,13 @@ class IpAddrs(Base):
         sql = insert(IpAddrs).values(user_id=uid, ip=iip)
         inserts = session.execute(sql)
         return inserts is not None
+
+    @staticmethod
+    def get_ips_by_uid(uid, session):
+        """get all ips by user_id"""
+        sql = select([IpAddrs.ip]).where(IpAddrs.user_id == uid)
+        tuples = session.execute(sql).fetchall()
+        res = []
+        for each_line in tuples:
+            res.append(each_line[0])
+        return res

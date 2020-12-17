@@ -54,6 +54,13 @@ class CollectionTable(Base):
         return res is not None
 
     @staticmethod
+    def check_exist_by_name(field, name, session):
+        """find field if exist"""
+        sql = select([field]).where(CollectionTable.collection_name == name)
+        res = session.execute(sql).fetchall()
+        return len(res) != 0
+
+    @staticmethod
     def get_max_cid(session):
         """get max collection_id in collection_table"""
         sql = func.max(CollectionTable.collection_id)
@@ -63,11 +70,21 @@ class CollectionTable(Base):
         return cid
 
     @staticmethod
-    def get_field_by_cid(field, cid, session):
-        """get field info by collection_id"""
-        sql = select([field]).where(CollectionTable.collection_id == cid)
+    def get_field_by_key(field, key, val, session):
+        """get field by given key and val pair"""
+        sql = select([field]).where(key == val)
         value = session.execute(sql).scalar()
         return value
+
+    @staticmethod
+    def get_all_collection_by_ip(cip, session):
+        """get all collections by cip as a list"""
+        sql = select([CollectionTable.collection_name, CollectionTable.collection_status,
+            CollectionTable.collection_date, CollectionTable.collection_ip])\
+                    .where(CollectionTable.collection_ip == cip)\
+                    .order_by(CollectionTable.collection_id.desc())
+        res = session.execute(sql).fetchall()
+        return res
 
     @staticmethod
     def update_status(cid, status, session):
@@ -84,6 +101,14 @@ class CollectionTable(Base):
                 .where(CollectionTable.collection_id == cid)\
                 .values(total_round=rounds)
         res = session.execute(update_round)
+        return res is not None
+
+    @staticmethod
+    def update_collection_name(name, new_name, session):
+        """update name by name"""
+        sql = update(CollectionTable).where(CollectionTable.collection_name == name)\
+                .values(collection_name=new_name)
+        res = session.execute(sql)
         return res is not None
 
     @staticmethod

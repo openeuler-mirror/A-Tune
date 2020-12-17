@@ -18,7 +18,7 @@ Mapping for analysis_log table.
 from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy import func, insert
+from sqlalchemy import func, insert, select
 
 from analysis.engine.database.table_collection import CollectionTable
 
@@ -62,3 +62,16 @@ class AnalysisLog(Base):
         rounds = session.query(func.max(AnalysisLog.round_num))\
                 .filter(AnalysisLog.analysis_id == aid).scalar()
         return 0 if rounds is None else rounds
+
+
+    @staticmethod
+    def get_line(aid, line_start, line_end, session):
+        """get selected line by cid and line range"""
+        sql = select([AnalysisLog]).where(AnalysisLog.analysis_id == aid)\
+                .where(AnalysisLog.round_num > line_start)\
+                .where(AnalysisLog.round_num <= line_end)
+        res = session.execute(sql).fetchall()
+        if len(res) == 0:
+            return []
+        res = [list(row)[2:] for row in res]
+        return res

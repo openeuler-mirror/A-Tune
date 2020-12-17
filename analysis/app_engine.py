@@ -21,6 +21,8 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.app import App
 from analysis.engine import optimizer, classification, train, transfer, detect
+from analysis.engine.database import ui_tuning, ui_analysis, ui_user
+from analysis.engine.config import EngineConfig
 
 
 class AppEngine(App):
@@ -35,10 +37,14 @@ class AppEngine(App):
         self.api.add_resource(train.Training, '/v1/training', '/v1/training')
         self.api.add_resource(transfer.Transfer, '/v1/transfer', '/transfer')
         self.api.add_resource(detect.Detecting, '/v1/detecting', '/v1/detecting')
+        self.api.add_resource(ui_tuning.UiTuning, '/v1/UI/tuning/<string:cmd>')
+        self.api.add_resource(ui_analysis.UiAnalysis, '/v1/UI/analysis/<string:cmd>')
+        self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
 
 
 def main(filename):
     """app main function"""
+    EngineConfig.initial_params(filename)
     app_engine = AppEngine()
     app_engine.startup_app(filename, "engine_host", "engine_port", "engine_tls",
                            "tlsengineservercertfile", "tlsengineserverkeyfile",
