@@ -470,101 +470,105 @@ A-Tune安装完成后，需要启动A-Tune服务才能使用。
 # atune-adm list 
 
 Support profiles:
-+------------------------------------------------+-----------+
-| ProfileName                                    | Active    |
-+================================================+===========+
-| arm-native-android-container-robox             | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-euleros-baseline-fio          | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-euleros-baseline-lmbench      | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-euleros-baseline-netperf      | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-euleros-baseline-stream       | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-euleros-baseline-unixbench    | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-speccpu-speccpu2006           | false     |
-+------------------------------------------------+-----------+
-| basic-test-suite-specjbb-specjbb2015           | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-hdfs-dfsio-hdd                 | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-hdfs-dfsio-ssd                 | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-bayesian                 | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-kmeans                   | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql1                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql10                    | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql2                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql3                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql4                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql5                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql6                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql7                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql8                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-sql9                     | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-tersort                  | false     |
-+------------------------------------------------+-----------+
-| big-data-hadoop-spark-wordcount                | false     |
-+------------------------------------------------+-----------+
-| cloud-compute-kvm-host                         | false     |
-+------------------------------------------------+-----------+
-| database-mariadb-2p-tpcc-c3                    | false     |
-+------------------------------------------------+-----------+
-| database-mariadb-4p-tpcc-c3                    | false     |
-+------------------------------------------------+-----------+
-| database-mongodb-2p-sysbench                   | false     |
-+------------------------------------------------+-----------+
-| database-mysql-2p-sysbench-hdd                 | false     |
-+------------------------------------------------+-----------+
-| database-mysql-2p-sysbench-ssd                 | false     |
-+------------------------------------------------+-----------+
-| database-postgresql-2p-sysbench-hdd            | false     |
-+------------------------------------------------+-----------+
-| database-postgresql-2p-sysbench-ssd            | false     |
-+------------------------------------------------+-----------+
-| default-default                                | false     |
-+------------------------------------------------+-----------+
-| docker-mariadb-2p-tpcc-c3                      | false     |
-+------------------------------------------------+-----------+
-| docker-mariadb-4p-tpcc-c3                      | false     |
-+------------------------------------------------+-----------+
-| hpc-gatk4-human-genome                         | false     |
-+------------------------------------------------+-----------+
-| in-memory-database-redis-redis-benchmark       | false     |
-+------------------------------------------------+-----------+
-| middleware-dubbo-dubbo-benchmark               | false     |
-+------------------------------------------------+-----------+
-| storage-ceph-vdbench-hdd                       | false     |
-+------------------------------------------------+-----------+
-| storage-ceph-vdbench-ssd                       | false     |
-+------------------------------------------------+-----------+
-| virtualization-consumer-cloud-olc              | false     |
-+------------------------------------------------+-----------+
-| virtualization-mariadb-2p-tpcc-c3              | false     |
-+------------------------------------------------+-----------+
-| virtualization-mariadb-4p-tpcc-c3              | false     |
-+------------------------------------------------+-----------+
-| web-apache-traffic-server-spirent-pingpo       | false     |
-+------------------------------------------------+-----------+
-| web-nginx-http-long-connection                 | true      |
-+------------------------------------------------+-----------+
-| web-nginx-https-short-connection               | false     |
-+------------------------------------------------+-----------+
++---------------------------------------------+-----------+
+| ProfileName                                 | Active    |
++=============================================+===========+
+| arm-native-android-container-robox          | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-baseline-fio               | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-baseline-lmbench           | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-baseline-netperf           | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-baseline-stream            | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-baseline-unixbench         | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-speccpu-speccpu2006        | false     |
++---------------------------------------------+-----------+
+| basic-test-suite-specjbb-specjbb2015        | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-hdd              | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-hdfs-dfsio-ssd              | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-bayesian              | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-kmeans                | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql1                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql10                 | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql2                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql3                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql4                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql5                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql6                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql7                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql8                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-sql9                  | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-tersort               | false     |
++---------------------------------------------+-----------+
+| big-data-hadoop-spark-wordcount             | false     |
++---------------------------------------------+-----------+
+| cloud-compute-kvm-host                      | false     |
++---------------------------------------------+-----------+
+| database-mariadb-2p-tpcc-c3                 | false     |
++---------------------------------------------+-----------+
+| database-mariadb-4p-tpcc-c3                 | false     |
++---------------------------------------------+-----------+
+| database-mongodb-2p-sysbench                | false     |
++---------------------------------------------+-----------+
+| database-mysql-2p-sysbench-hdd              | false     |
++---------------------------------------------+-----------+
+| database-mysql-2p-sysbench-ssd              | false     |
++---------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-hdd         | false     |
++---------------------------------------------+-----------+
+| database-postgresql-2p-sysbench-ssd         | false     |
++---------------------------------------------+-----------+
+| default-default                             | false     |
++---------------------------------------------+-----------+
+| docker-mariadb-2p-tpcc-c3                   | false     |
++---------------------------------------------+-----------+
+| docker-mariadb-4p-tpcc-c3                   | false     |
++---------------------------------------------+-----------+
+| hpc-gatk4-human-genome                      | false     |
++---------------------------------------------+-----------+
+| in-memory-database-redis-redis-benchmark    | false     |
++---------------------------------------------+-----------+
+| middleware-dubbo-dubbo-benchmark            | false     |
++---------------------------------------------+-----------+
+| storage-ceph-vdbench-hdd                    | false     |
++---------------------------------------------+-----------+
+| storage-ceph-vdbench-ssd                    | false     |
++---------------------------------------------+-----------+
+| virtualization-consumer-cloud-olc           | false     |
++---------------------------------------------+-----------+
+| virtualization-mariadb-2p-tpcc-c3           | false     |
++---------------------------------------------+-----------+
+| virtualization-mariadb-4p-tpcc-c3           | false     |
++---------------------------------------------+-----------+
+| web-apache-traffic-server-spirent-pingpo    | false     |
++---------------------------------------------+-----------+
+| web-nginx-http-long-connection              | false     |
++---------------------------------------------+-----------+
+| web-nginx-http-short-connection             | false     |
++---------------------------------------------+-----------+
+| web-nginx-https-long-connection             | false     |
++---------------------------------------------+-----------+
+| web-nginx-https-short-connection            | false     |
++---------------------------------------------+-----------+
 ```
 
 > ![zh-cn_image_note](figures/zh-cn_image_note.png)
@@ -956,7 +960,7 @@ profile名参考list命令查询结果。
    cpu:1  version: Kunpeng 920-6426 speed: 2600000000 HZ  cores: 64 
  system information: 
    DMIBIOSVersion: 0.59 
-   OSRelease: 4.19.36-vhulk1906.3.0.h356.eulerosv2r8.aarch64 
+   OSRelease: ...
  network information: 
    name: eth0       product: HNS GE/10GE/25GE RDMA Network Controller 
    name: eth1       product: HNS GE/10GE/25GE Network Controller 
