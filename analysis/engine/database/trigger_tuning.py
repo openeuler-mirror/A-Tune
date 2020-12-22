@@ -225,7 +225,7 @@ def get_tuning_data(status, name, line):
         total_round = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
         table_name = 'tuning_' + str(tid)
         response['parameter'] = table_tuning_data.get_param_by_table_name(table_name, session)
-        response['line'], response['cost'], response['data'] =\
+        response['line'], response['cost'], response['data'] = \
                 table_tuning_data.get_tuning_data(total_round, table_name, line, session)
     except SQLAlchemyError as err:
         LOGGER.error('Get tuning data failed: %s', err)

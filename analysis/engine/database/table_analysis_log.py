@@ -59,7 +59,7 @@ class AnalysisLog(Base):
     @staticmethod
     def get_max_round(aid, session):
         """get max round_num by analysis_id"""
-        rounds = session.query(func.max(AnalysisLog.round_num))\
+        rounds = session.query(func.max(AnalysisLog.round_num)) \
                 .filter(AnalysisLog.analysis_id == aid).scalar()
         return 0 if rounds is None else rounds
 
@@ -67,8 +67,8 @@ class AnalysisLog(Base):
     @staticmethod
     def get_line(aid, line_start, line_end, session):
         """get selected line by cid and line range"""
-        sql = select([AnalysisLog]).where(AnalysisLog.analysis_id == aid)\
-                .where(AnalysisLog.round_num > line_start)\
+        sql = select([AnalysisLog]).where(AnalysisLog.analysis_id == aid) \
+                .where(AnalysisLog.round_num > line_start) \
                 .where(AnalysisLog.round_num <= line_end)
         res = session.execute(sql).fetchall()
         if len(res) == 0:

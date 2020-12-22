@@ -36,7 +36,7 @@ class CollectionTable(Base):
     total_log = Column(Integer)
 
     def __repr__(self):
-        return "<collection_table(collection='%s %s %s %s %s', round='%s %s')>"\
+        return "<collection_table(collection='%s %s %s %s %s', round='%s %s')>" \
                 % (self.collection_id, self.collection_name, self.collection_status,
                         self.collection_date, self.collection_ip,
                         0 if self.total_round is None else self.total_round,
@@ -80,8 +80,8 @@ class CollectionTable(Base):
     def get_all_collection_by_ip(cip, session):
         """get all collections by cip as a list"""
         sql = select([CollectionTable.collection_name, CollectionTable.collection_status,
-            CollectionTable.collection_date, CollectionTable.collection_ip])\
-                    .where(CollectionTable.collection_ip == cip)\
+            CollectionTable.collection_date, CollectionTable.collection_ip]) \
+                    .where(CollectionTable.collection_ip == cip) \
                     .order_by(CollectionTable.collection_id.desc())
         res = session.execute(sql).fetchall()
         return res
@@ -89,7 +89,7 @@ class CollectionTable(Base):
     @staticmethod
     def update_status(cid, status, session):
         """update collection status"""
-        sql = update(CollectionTable).where(CollectionTable.collection_id == cid)\
+        sql = update(CollectionTable).where(CollectionTable.collection_id == cid) \
                 .values(collection_status=status)
         res = session.execute(sql)
         return res is not None
@@ -97,8 +97,8 @@ class CollectionTable(Base):
     @staticmethod
     def update_total_round(cid, rounds, session):
         """update total round"""
-        update_round = update(CollectionTable)\
-                .where(CollectionTable.collection_id == cid)\
+        update_round = update(CollectionTable) \
+                .where(CollectionTable.collection_id == cid) \
                 .values(total_round=rounds)
         res = session.execute(update_round)
         return res is not None
@@ -106,7 +106,7 @@ class CollectionTable(Base):
     @staticmethod
     def update_collection_name(name, new_name, session):
         """update name by name"""
-        sql = update(CollectionTable).where(CollectionTable.collection_name == name)\
+        sql = update(CollectionTable).where(CollectionTable.collection_name == name) \
                 .values(collection_name=new_name)
         res = session.execute(sql)
         return res is not None
@@ -114,8 +114,8 @@ class CollectionTable(Base):
     @staticmethod
     def update_total_log(cid, logs, session):
         """update total log"""
-        update_log = update(CollectionTable)\
-                .where(CollectionTable.collection_id == cid)\
+        update_log = update(CollectionTable) \
+                .where(CollectionTable.collection_id == cid) \
                 .values(total_log=logs)
         res = session.execute(update_log)
         return res is not None
@@ -123,7 +123,7 @@ class CollectionTable(Base):
     @staticmethod
     def update_name(cid, name, session):
         """update name"""
-        sql = update(CollectionTable).where(CollectionTable.collection_id == cid)\
+        sql = update(CollectionTable).where(CollectionTable.collection_id == cid) \
                 .values(collection_name=name)
         res = session.execute(sql)
         return res is not None
@@ -131,7 +131,7 @@ class CollectionTable(Base):
     @staticmethod
     def update_workload(cid, workload, session):
         """update workload"""
-        sql = update(CollectionTable).where(CollectionTable.collection_id == cid)\
+        sql = update(CollectionTable).where(CollectionTable.collection_id == cid) \
                 .values(workload_type=workload)
         res = session.execute(sql)
         return res is not None

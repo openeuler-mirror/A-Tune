@@ -36,7 +36,7 @@ class TuningTable(Base):
     baseline = Column(VARCHAR(255))
 
     def __repr__(self):
-        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s')>"\
+        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s')>" \
                 % (self.tuning_id, self.tuning_name, self.tuning_engine,
                         self.tuning_status, self.tuning_date, self.tuning_ip,
                         0 if self.total_round is None else self.total_round,
@@ -84,7 +84,7 @@ class TuningTable(Base):
     def get_all_tunings_by_ip(tip, session):
         """get all tunings by tip as a list"""
         sql = select([TuningTable.tuning_name, TuningTable.tuning_status, TuningTable.tuning_date,
-            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip)\
+            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
                     .order_by(TuningTable.tuning_id.desc())
         res = session.execute(sql).fetchall()
         return res
@@ -93,8 +93,8 @@ class TuningTable(Base):
     def get_status_tuning_by_ip(status, tip, session):
         """get tunings in given status by tip as a list"""
         sql = select([TuningTable.tuning_name, TuningTable.tuning_status, TuningTable.tuning_date,
-            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip)\
-                    .where(TuningTable.tuning_status == status)\
+            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
+                    .where(TuningTable.tuning_status == status) \
                     .order_by(TuningTable.tuning_id.desc())
         res = session.execute(sql).fetchall()
         return res
@@ -109,7 +109,7 @@ class TuningTable(Base):
     @staticmethod
     def update_status(name, status, session):
         """update status"""
-        sql = update(TuningTable).where(TuningTable.tuning_name == name)\
+        sql = update(TuningTable).where(TuningTable.tuning_name == name) \
                 .values(tuning_status=status)
         res = session.execute(sql)
         return res is not None
@@ -117,7 +117,7 @@ class TuningTable(Base):
     @staticmethod
     def update_tuning_name(name, new_name, session):
         """update tuning name"""
-        sql = update(TuningTable).where(TuningTable.tuning_name == name)\
+        sql = update(TuningTable).where(TuningTable.tuning_name == name) \
                 .values(tuning_name=new_name)
         res = session.execute(sql)
         return res is not None

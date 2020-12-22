@@ -116,7 +116,7 @@ def get_param_by_table_name(table_name, session):
 def get_tuning_data(total_round, table_name, line, session):
     """get tuning data by table_name"""
     end_line = int(line) + 10
-    sql = 'select * from ' + table_name + ' where ' + table_name + '._round > ' +\
+    sql = 'select * from ' + table_name + ' where ' + table_name + '._round > ' + \
             str(line) + ' and ' + table_name + '._round <= ' + str(end_line)
     res = session.execute(sql).fetchall()
     lines = len(res) + int(line)
