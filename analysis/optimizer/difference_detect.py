@@ -41,7 +41,7 @@ class WorkloadStatistic:
                               'MEM.VMSTAT.util.swap', 'MEM.VMSTAT.util.cpu', 'MEM.VMSTAT.procs.r',
                               'SYS.TASKS.procs', 'SYS.TASKS.cswchs', 'SYS.LDAVG.runq-sz',
                               'SYS.LDAVG.plist-sz', 'SYS.LDAVG.ldavg-1', 'SYS.LDAVG.ldavg-5',
-                              'SYS.FDUTIL.fd-util']
+                              'SYS.FDUTIL.fd-util', 'MEM.VMSTAT.memory.swpd']
 
     @staticmethod
     def abnormal_detection(x_axis):
