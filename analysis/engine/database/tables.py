@@ -16,6 +16,7 @@ Base func for all tables.
 """
 
 import base64
+import logging
 from sqlalchemy.ext.declarative import declarative_base
 from configparser import ConfigParser
 from sqlalchemy import create_engine
@@ -25,6 +26,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 Base = declarative_base()
+LOGGER = logging.getLogger(__name__)
 
 
 def get_session():
@@ -38,7 +40,7 @@ def get_session():
         postgre_session_maker = sessionmaker(bind=engine)
         session = postgre_session_maker()
     except SQLAlchemyError as err:
-        LOGGER.error('Connect database failed: ', err)
+        LOGGER.error('Connect database failed: %s', err)
         return None
     return session
 

@@ -84,3 +84,22 @@ TRANSFER_PUT_PARSER.add_argument('collect_id', type=int, required=True,
 TRANSFER_PUT_PARSER.add_argument('status', type=str, required=True, help="Status can not be null")
 TRANSFER_PUT_PARSER.add_argument('collect_data', type=str, required=False, help="Collection data")
 TRANSFER_PUT_PARSER.add_argument('workload_type', type=str, required=False, help="Workload type")
+
+UI_TUNING_GET_PARSER = reqparse.RequestParser()
+UI_TUNING_GET_PARSER.add_argument('uid', type=int, help="user id")
+UI_TUNING_GET_PARSER.add_argument('status', type=str, help="tuning status")
+UI_TUNING_GET_PARSER.add_argument('name', type=str, help="tuning name")
+UI_TUNING_GET_PARSER.add_argument('newName', type=str, help="new tuning name")
+UI_TUNING_GET_PARSER.add_argument('line', type=str, help="tuning round")
+
+UI_ANALYSIS_GET_PARSER = reqparse.RequestParser()
+UI_ANALYSIS_GET_PARSER.add_argument('uid', type=int, help="user id")
+UI_ANALYSIS_GET_PARSER.add_argument('name', type=str, help="analysis name")
+UI_ANALYSIS_GET_PARSER.add_argument('newName', type=str, help="new analysis name")
+UI_ANALYSIS_GET_PARSER.add_argument('csvLine', type=str, help="analysis round")
+UI_ANALYSIS_GET_PARSER.add_argument('logLine', type=str, help="analysis round")
+
+UI_USER_GET_PARSER = reqparse.RequestParser()
+UI_USER_GET_PARSER.add_argument('email', type=str, help="user email")
+UI_USER_GET_PARSER.add_argument('name', type=str, help="user name")
+UI_USER_GET_PARSER.add_argument('password', type=str, help="user password")

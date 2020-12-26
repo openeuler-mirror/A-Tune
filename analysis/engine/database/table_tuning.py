@@ -36,7 +36,7 @@ class TuningTable(Base):
     baseline = Column(VARCHAR(255))
 
     def __repr__(self):
-        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s')>"\
+        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s')>" \
                 % (self.tuning_id, self.tuning_name, self.tuning_engine,
                         self.tuning_status, self.tuning_date, self.tuning_ip,
                         0 if self.total_round is None else self.total_round,
@@ -60,6 +60,13 @@ class TuningTable(Base):
         return res is not None
 
     @staticmethod
+    def check_exist_by_name(field, name, session):
+        """check if tuning exist"""
+        sql = select([field]).where(TuningTable.tuning_name == name)
+        res = session.execute(sql).fetchall()
+        return len(res) != 0
+
+    @staticmethod
     def get_max_tid(session):
         """get max tuning_id"""
         sql = func.max(TuningTable.tuning_id)
@@ -74,6 +81,25 @@ class TuningTable(Base):
         return value
 
     @staticmethod
+    def get_all_tunings_by_ip(tip, session):
+        """get all tunings by tip as a list"""
+        sql = select([TuningTable.tuning_name, TuningTable.tuning_status, TuningTable.tuning_date,
+            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
+                    .order_by(TuningTable.tuning_id.desc())
+        res = session.execute(sql).fetchall()
+        return res
+
+    @staticmethod
+    def get_status_tuning_by_ip(status, tip, session):
+        """get tunings in given status by tip as a list"""
+        sql = select([TuningTable.tuning_name, TuningTable.tuning_status, TuningTable.tuning_date,
+            TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
+                    .where(TuningTable.tuning_status == status) \
+                    .order_by(TuningTable.tuning_id.desc())
+        res = session.execute(sql).fetchall()
+        return res
+
+    @staticmethod
     def update_baseline(name, base, session):
         """update baseline by tuning_name"""
         sql = update(TuningTable).where(TuningTable.tuning_name == name).values(baseline=base)
@@ -83,7 +109,15 @@ class TuningTable(Base):
     @staticmethod
     def update_status(name, status, session):
         """update status"""
-        sql = update(TuningTable).where(TuningTable.tuning_name == name)\
+        sql = update(TuningTable).where(TuningTable.tuning_name == name) \
                 .values(tuning_status=status)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_tuning_name(name, new_name, session):
+        """update tuning name"""
+        sql = update(TuningTable).where(TuningTable.tuning_name == name) \
+                .values(tuning_name=new_name)
         res = session.execute(sql)
         return res is not None

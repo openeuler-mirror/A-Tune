@@ -92,7 +92,7 @@ def add_tuning_data(name, iters, line):
         tuning_table = TuningTable()
         table_name = str(tuning_table.get_field_by_name(TuningTable.tuning_id, name, session))
         table_name = 'tuning_' + table_name
-        keys, vals, pairs = table_tuning_data.get_tuning_data(table_name, iters, line, session)
+        keys, vals, pairs = table_tuning_data.execute_tuning_data(table_name, iters, line, session)
         if keys is None:
             LOGGER.info('Data in tuning_data does not match what desired')
             return None
@@ -122,3 +122,130 @@ def change_tuning_status(table_name, name):
     except SQLAlchemyError as err:
         LOGGER.error('Change tuning_table status failed: %s', err)
     session.close()
+
+
+def get_tuning_list(uid, status):
+    """get all tuning with status 'status' as a list"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    try:
+        ip_table = IpAddrs()
+        tuning_table = TuningTable()
+        ips = ip_table.get_ips_by_uid(uid, session)
+        res = []
+        for tip in ips:
+            if status == 'all':
+                res.extend(tuning_table.get_all_tunings_by_ip(tip, session))
+            else:
+                res.extend(tuning_table.get_status_tuning_by_ip(status, tip, session))
+        if len(res) > 0:
+            res = sorted(res, key=(lambda x:x[2]), reverse=True)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get tuning list failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return res
+
+
+def rename_tuning(name, new_name):
+    """rename tuning"""
+    session = tables.get_session()
+    if session is None:
+        return False, 'connect'
+    try:
+        tuning_table = TuningTable()
+        if not tuning_table.check_exist_by_name(TuningTable, name, session):
+            return False, 'tuning not exist'
+        if tuning_table.check_exist_by_name(TuningTable, new_name, session):
+            return False, 'duplicate'
+        tuning_table.update_tuning_name(name, new_name, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Rename tuning failed: %s', err)
+        return False, 'error'
+    finally:
+        session.close()
+    return True, ''
+
+
+def tuning_exist(name):
+    """check if tuning exist"""
+    exist = False
+    session = tables.get_session()
+    if session is None:
+        return exist
+    try:
+        tuning_table = TuningTable()
+        exist = tuning_table.check_exist_by_name(TuningTable, name, session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Check if tuning exist failed: %s', err)
+    session.close()
+    return exist
+
+
+def get_tuning_info(status, name):
+    """get info about tuning"""
+    session = tables.get_session()
+    if session is None:
+        return {'isExist': False}
+    response = {}
+    try:
+        tuning_table = TuningTable()
+        response['status'] = status
+        response['file_name'] = name
+        response['engine'] = tuning_table.get_field_by_name(TuningTable.tuning_engine, name, session)
+        response['round'] = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
+        response['base'] = tuning_table.get_field_by_name(TuningTable.baseline, name, session)
+        tid = tuning_table.get_field_by_name(TuningTable.tuning_id, name, session)
+        response['parameter'] = table_tuning_data.get_param_by_table_name('tuning_' + str(tid), session)
+        response['line'] = 0
+    except SQLAlchemyError as err:
+        LOGGER.error('Get tuning info failed: %s', err)
+        return {'isExist': False}
+    finally:
+        session.close()
+    response['isExist'] = True
+    return response
+
+
+def get_tuning_data(status, name, line):
+    """get each round data"""
+    session = tables.get_session()
+    if session is None:
+        return {'isExist': False}
+    response = {}
+    try:
+        tuning_table = TuningTable()
+        response['status'] = status
+        response['file_name'] = name
+        response['initial_line'] = int(line)
+        tid = tuning_table.get_field_by_name(TuningTable.tuning_id, name, session)
+        total_round = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
+        table_name = 'tuning_' + str(tid)
+        response['parameter'] = table_tuning_data.get_param_by_table_name(table_name, session)
+        response['line'], response['cost'], response['data'] = \
+                table_tuning_data.get_tuning_data(total_round, table_name, line, session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get tuning data failed: %s', err)
+        return {'isExist': False}
+    finally:
+        session.close()
+    response['isExist'] = True
+    return response
+
+
+def get_tuning_status(name):
+    """get tuning status"""
+    session = tables.get_session()
+    if session is None:
+        return 'break'
+    status = 'break'
+    try:
+        tuning_table = TuningTable()
+        status = tuning_table.get_field_by_name(TuningTable.tuning_status, name, session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get tuning status failed: %s', err)
+    session.close()
+    return status

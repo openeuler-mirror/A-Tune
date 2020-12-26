@@ -15,10 +15,11 @@
 Mapping for collection_data table.
 """
 
+import numpy
 from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
-from sqlalchemy import func, insert
+from sqlalchemy import func, insert, select
 
 from analysis.engine.database.table_collection import CollectionTable
 
@@ -88,7 +89,7 @@ class CollectionData(Base):
     )
 
     def __repr__(self):
-        return "<collection_data(collection_id='%s', round_num='%s')>"\
+        return "<collection_data(collection_id='%s', round_num='%s')>" \
                 % (self.collection_id, self.round_num)
 
     @staticmethod
@@ -104,8 +105,24 @@ class CollectionData(Base):
     @staticmethod
     def get_max_round(cid, session):
         """get max round_num by collection_id"""
-        rounds = session.query(func.max(CollectionData.round_num))\
+        rounds = session.query(func.max(CollectionData.round_num)) \
                 .filter(CollectionData.collection_id == cid).scalar()
         if rounds is None or rounds == -1:
             rounds = 0
         return rounds
+
+    @staticmethod
+    def get_line(cid, line_start, line_end, session):
+        """get selected line by cid and line range"""
+        sql = select([CollectionData]).where(CollectionData.collection_id == cid) \
+                .where(CollectionData.round_num > line_start) \
+                .where(CollectionData.round_num <= line_end)
+        res = session.execute(sql).fetchall()
+        if len(res) == 0:
+            return [], []
+        if cid == -1:
+            return list(res[0])[2:], []
+        rounds = [row[1] for row in res]
+        res = [list(row)[2:] for row in res]
+        res = numpy.array(res).T.tolist()
+        return res, rounds
