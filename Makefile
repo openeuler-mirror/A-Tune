@@ -11,7 +11,7 @@ SRCVERSION = $(shell git rev-parse --short HEAD 2>/dev/null)
 ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
 
 GOLDFLAGS += -X gitee.com/openeuler/A-Tune/common/config.Version=$(ATUNEVERSION)
-GOFLAGS = -ldflags "$(GOLDFLAGS)"
+GOFLAGS = -ldflags '-s -w -extldflags "-static" -extldflags "-zrelro" -extldflags "-znow" -extldflags "-ftrapv" $(GOLDFLAGS)'
 
 CERT_PATH=$(DESTDIR)/etc/atuned
 GRPC_CERT_PATH=$(CERT_PATH)/grpc_certs

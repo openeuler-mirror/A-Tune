@@ -144,6 +144,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Sat Dec 26 2020 gaoruoshu<gaoruoshu@huawei.com> - 0.3-0.3
+- add security Go compile flags
+
 * Sat Nov 28 2020 hanxinke<hanxinke@huawei.com> - 0.3-0.2
 - The engine package conflicts with atune < 0.3-0.1.
 
