@@ -136,17 +136,19 @@ restcerts:
 	openssl genrsa -out $(REST_CERT_PATH)/ca.key 2048
 	openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $(REST_CERT_PATH)/ca.key -out $(REST_CERT_PATH)/ca.crt
 	openssl genrsa -out $(REST_CERT_PATH)/server.key 2048
+	cp /etc/pki/tls/openssl.cnf $(REST_CERT_PATH)
 	@if test $(REST_IP_ADDR) == localhost; then \
-		openssl req -new -subj "/CN=localhost" -key $(REST_CERT_PATH)/server.key -out $(REST_CERT_PATH)/server.csr; \
-		openssl x509 -req -sha256 -CA $(REST_CERT_PATH)/ca.crt -CAkey $(REST_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
-			-in $(REST_CERT_PATH)/server.csr -out $(REST_CERT_PATH)/server.crt; \
+		echo "[SAN]\nsubjectAltName=DNS:$(REST_IP_ADDR)" >> $(REST_CERT_PATH)/openssl.cnf; \
+		echo "subjectAltName=DNS:$(REST_IP_ADDR)" > $(REST_CERT_PATH)/extfile.cnf; \
 	else \
-		openssl req -new -subj "/CN=$(REST_IP_ADDR)" -key $(REST_CERT_PATH)/server.key -out $(REST_CERT_PATH)/server.csr; \
+		echo "[SAN]\nsubjectAltName=IP:$(REST_IP_ADDR)" >> $(REST_CERT_PATH)/openssl.cnf; \
 		echo "subjectAltName=IP:$(REST_IP_ADDR)" > $(REST_CERT_PATH)/extfile.cnf; \
-		openssl x509 -req -sha256 -CA $(REST_CERT_PATH)/ca.crt -CAkey $(REST_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
-			-extfile $(REST_CERT_PATH)/extfile.cnf -in $(REST_CERT_PATH)/server.csr -out $(REST_CERT_PATH)/server.crt; \
 	fi
-	rm -rf $(REST_CERT_PATH)/*.srl $(REST_CERT_PATH)/*.csr $(REST_CERT_PATH)/extfile.cnf
+	openssl req -new -subj "/CN=$(REST_IP_ADDR)" -config $(REST_CERT_PATH)/openssl.cnf \
+		-key $(REST_CERT_PATH)/server.key -out $(REST_CERT_PATH)/server.csr
+	openssl x509 -req -sha256 -CA $(REST_CERT_PATH)/ca.crt -CAkey $(REST_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+		-extfile $(REST_CERT_PATH)/extfile.cnf -in $(REST_CERT_PATH)/server.csr -out $(REST_CERT_PATH)/server.crt
+	rm -rf $(REST_CERT_PATH)/*.srl $(REST_CERT_PATH)/*.csr $(REST_CERT_PATH)/*.cnf
 	@echo "END GENERATE REST CERTS"
 
 enginecerts:
@@ -156,20 +158,22 @@ enginecerts:
 		openssl genrsa -out $(ENGINE_CERT_PATH)/ca.key 2048; \
 		openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $(ENGINE_CERT_PATH)/ca.key -out $(ENGINE_CERT_PATH)/ca.crt; \
 	fi
+	cp /etc/pki/tls/openssl.cnf $(ENGINE_CERT_PATH)
+	@if test $(ENGINE_IP_ADDR) == localhost; then \
+		echo "[SAN]\nsubjectAltName=DNS:$(ENGINE_IP_ADDR)" >> $(ENGINE_CERT_PATH)/openssl.cnf; \
+		echo "subjectAltName=DNS:$(ENGINE_IP_ADDR)" > $(ENGINE_CERT_PATH)/extfile.cnf; \
+	else \
+		echo "[SAN]\nsubjectAltName=IP:$(ENGINE_IP_ADDR)" >> $(ENGINE_CERT_PATH)/openssl.cnf; \
+		echo "subjectAltName=IP:$(ENGINE_IP_ADDR)" > $(ENGINE_CERT_PATH)/extfile.cnf; \
+	fi
 	@for name in server client; do \
 		openssl genrsa -out $(ENGINE_CERT_PATH)/$$name.key 2048; \
-		if test $(ENGINE_IP_ADDR) == localhost; then \
-			openssl req -new -subj "/CN=localhost" -key $(ENGINE_CERT_PATH)/$$name.key -out $(ENGINE_CERT_PATH)/$$name.csr; \
-			openssl x509 -req -sha256 -CA $(ENGINE_CERT_PATH)/ca.crt -CAkey $(ENGINE_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
-				-in $(ENGINE_CERT_PATH)/$$name.csr -out $(ENGINE_CERT_PATH)/$$name.crt; \
-		else \
-			openssl req -new -subj "/CN=$(ENGINE_IP_ADDR)" -key $(ENGINE_CERT_PATH)/$$name.key -out $(ENGINE_CERT_PATH)/$$name.csr; \
-			echo "subjectAltName=IP:$(ENGINE_IP_ADDR)" > $(ENGINE_CERT_PATH)/extfile.cnf; \
-			openssl x509 -req -sha256 -CA $(ENGINE_CERT_PATH)/ca.crt -CAkey $(ENGINE_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
-				-extfile $(ENGINE_CERT_PATH)/extfile.cnf -in $(ENGINE_CERT_PATH)/$$name.csr -out $(ENGINE_CERT_PATH)/$$name.crt; \
-		fi; \
+		openssl req -new -subj "/CN=$(ENGINE_IP_ADDR)" -config $(ENGINE_CERT_PATH)/openssl.cnf \
+			-key $(ENGINE_CERT_PATH)/$$name.key -out $(ENGINE_CERT_PATH)/$$name.csr; \
+		openssl x509 -req -sha256 -CA $(ENGINE_CERT_PATH)/ca.crt -CAkey $(ENGINE_CERT_PATH)/ca.key -CAcreateserial -days 3650 \
+			-extfile $(ENGINE_CERT_PATH)/extfile.cnf -in $(ENGINE_CERT_PATH)/$$name.csr -out $(ENGINE_CERT_PATH)/$$name.crt; \
 	done
-	rm -rf $(ENGINE_CERT_PATH)/*.srl $(ENGINE_CERT_PATH)/*.csr $(ENGINE_CERT_PATH)/extfile.cnf
+	rm -rf $(ENGINE_CERT_PATH)/*.srl $(ENGINE_CERT_PATH)/*.csr $(ENGINE_CERT_PATH)/*.cnf
 	@echo "END GENERATE ENGINE CERTS"
 
 env:
