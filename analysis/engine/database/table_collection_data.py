@@ -15,114 +15,105 @@
 Mapping for collection_data table.
 """
 
+import re
 import numpy
-from analysis.engine.database.tables import Base
-from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
-from sqlalchemy.orm import relationship
-from sqlalchemy import func, insert, select
+from sqlalchemy import MetaData, create_engine
+from sqlalchemy import Table, Column, VARCHAR, Integer
+from sqlalchemy import text
 
-from analysis.engine.database.table_collection import CollectionTable
+from analysis.engine.database.tables import get_db_url
 
 
-class CollectionData(Base):
-    """mapping collection_data table"""
+def initial_table(table_name, session):
+    """initial collection data table"""
+    metadata = MetaData()
+    table = Table(table_name, metadata,
+            Column('collection_id', Integer, primary_key=True, nullable=False),
+            Column('round', Integer, primary_key=True, nullable=False),
+            Column('timestamp', VARCHAR(255), nullable=True)
+            )
+    engine = create_engine(get_db_url())
+    metadata.create_all(engine)
+    sql = 'insert into ' + table_name + ' values (-1, -1, \'timeStamp\')'
+    session.execute(sql)
+    return table
 
-    __tablename__ = 'collection_data'
 
-    collection_id = Column(Integer, ForeignKey('collection_table.collection_id'))
-    round_num = Column(Integer, nullable=False)
-    cpu_stat_usr = Column(VARCHAR(255), nullable=True)
-    cpu_stat_nice = Column(VARCHAR(255), nullable=True)
-    cpu_stat_sys = Column(VARCHAR(255), nullable=True)
-    cpu_stat_iowait = Column(VARCHAR(255), nullable=True)
-    cpu_stat_irq = Column(VARCHAR(255), nullable=True)
-    cpu_stat_soft = Column(VARCHAR(255), nullable=True)
-    cpu_stat_steal = Column(VARCHAR(255), nullable=True)
-    cpu_stat_guest = Column(VARCHAR(255), nullable=True)
-    cpu_stat_util = Column(VARCHAR(255), nullable=True)
-    cpu_stat_cutil = Column(VARCHAR(255), nullable=True)
-    storage_stat_rs = Column(VARCHAR(255), nullable=True)
-    storage_stat_ws = Column(VARCHAR(255), nullable=True)
-    storage_stat_rmbs = Column(VARCHAR(255), nullable=True)
-    storage_stat_wmbs = Column(VARCHAR(255), nullable=True)
-    storage_stat_rrqm = Column(VARCHAR(255), nullable=True)
-    storage_stat_wrqm = Column(VARCHAR(255), nullable=True)
-    storage_stat_rareq_sz = Column(VARCHAR(255), nullable=True)
-    storage_stat_wareq_sz = Column(VARCHAR(255), nullable=True)
-    storage_stat_r_await = Column(VARCHAR(255), nullable=True)
-    storage_stat_w_await = Column(VARCHAR(255), nullable=True)
-    storage_stat_util = Column(VARCHAR(255), nullable=True)
-    storage_stat_aqu_sz = Column(VARCHAR(255), nullable=True)
-    net_stat_rxkbs = Column(VARCHAR(255), nullable=True)
-    net_stat_txkbs = Column(VARCHAR(255), nullable=True)
-    net_stat_rxpcks = Column(VARCHAR(255), nullable=True)
-    net_stat_txpcks = Column(VARCHAR(255), nullable=True)
-    net_stat_ifutil = Column(VARCHAR(255), nullable=True)
-    net_estat_errs = Column(VARCHAR(255), nullable=True)
-    net_estat_util = Column(VARCHAR(255), nullable=True)
-    mem_bandwidth_total_util = Column(VARCHAR(255), nullable=True)
-    perf_stat_ipc = Column(VARCHAR(255), nullable=True)
-    perf_stat_cache_miss_ratio = Column(VARCHAR(255), nullable=True)
-    perf_stat_mpki = Column(VARCHAR(255), nullable=True)
-    perf_stat_itlb_load_miss_ratio = Column(VARCHAR(255), nullable=True)
-    perf_stat_dtlb_load_miss_ratio = Column(VARCHAR(255), nullable=True)
-    perf_stat_sbpi = Column(VARCHAR(255), nullable=True)
-    perf_stat_sbpc = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_procs_b = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_io_bo = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_system_in = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_system_cs = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_util_swap = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_util_cpu = Column(VARCHAR(255), nullable=True)
-    mem_vmstat_procs_r = Column(VARCHAR(255), nullable=True)
-    sys_tasks_procs = Column(VARCHAR(255), nullable=True)
-    sys_tasks_cswchs = Column(VARCHAR(255), nullable=True)
-    sys_ldavg_runq_sz = Column(VARCHAR(255), nullable=True)
-    sys_ldavg_plist_sz = Column(VARCHAR(255), nullable=True)
-    sys_ldavg_ldavg_1 = Column(VARCHAR(255), nullable=True)
-    sys_ldavg_ldavg_5 = Column(VARCHAR(255), nullable=True)
-    sys_fdutil_fd_util = Column(VARCHAR(255), nullable=True)
-    fk_collection = relationship(CollectionTable, backref='collection_data')
+def get_max_round(cid, cip, session):
+    """get max round num in collection_table"""
+    table_name = get_table_name(cip)
+    if table_name is None:
+        return False
+    sql = 'select max(round) from ' + table_name + ' where collection_id = :id'
+    cid = session.execute(text(sql), {'id': cid}).scalar()
+    if cid is None or cid == -1:
+        return 0
+    return cid
 
-    __table_args__ = (
-        PrimaryKeyConstraint('collection_id', 'round_num', name='pk_collection_data'),
-    )
 
-    def __repr__(self):
-        return "<collection_data(collection_id='%s', round_num='%s')>" \
-                % (self.collection_id, self.round_num)
+def insert_table(cid, rounds, cip, data, session):
+    """insert data into collection_ip table"""
+    table_name = get_table_name(cip)
+    if table_name is None:
+        return False
+    keys, vals, pairs = execute_collection_data(cid, rounds, data, table_name, session)
+    sql = 'insert into ' + table_name + ' ' + keys + ' values ' + vals
+    session.execute(text(sql), pairs)
+    return True
 
-    @staticmethod
-    def insert_collection_data(cid, rounds, data, session):
-        """insert new collection data to table"""
-        val = [cid, rounds]
-        for element in data.split(' '):
-            val.append(element)
-        sql = insert(CollectionData).values(tuple(val))
-        res = session.execute(sql)
-        return res is not None
 
-    @staticmethod
-    def get_max_round(cid, session):
-        """get max round_num by collection_id"""
-        rounds = session.query(func.max(CollectionData.round_num)) \
-                .filter(CollectionData.collection_id == cid).scalar()
-        if rounds is None or rounds == -1:
-            rounds = 0
-        return rounds
+def execute_collection_data(cid, rounds, data, table_name, session):
+    """execute data of new round"""
+    keys = '(collection_id, round'
+    vals = '(:collection_id, :round'
+    pairs = {'collection_id': cid, 'round': rounds}
+    for element in data.split(' '):
+        param = element.split(':')
+        col_name = re.sub(r'[^\w]', '_', param[0].lower())
+        if len(param) != 2:
+            continue
+        if not exist_column(table_name, col_name, session):
+            insert_new_column(table_name, col_name, param[0], session)
+        keys += ', ' + col_name
+        vals += ', :' + col_name
+        pairs[col_name] = param[1]
+    keys += ')'
+    vals += ')'
+    return keys, vals, pairs
 
-    @staticmethod
-    def get_line(cid, line_start, line_end, session):
-        """get selected line by cid and line range"""
-        sql = select([CollectionData]).where(CollectionData.collection_id == cid) \
-                .where(CollectionData.round_num > line_start) \
-                .where(CollectionData.round_num <= line_end)
-        res = session.execute(sql).fetchall()
-        if len(res) == 0:
-            return [], []
-        if cid == -1:
-            return list(res[0])[2:], []
-        rounds = [row[1] for row in res]
-        res = [list(row)[2:] for row in res]
-        res = numpy.array(res).T.tolist()
-        return res, rounds
+
+def exist_column(table_name, col_name, session):
+    """find if column col_name exist"""
+    sql = 'select * from ' + table_name + ' where collection_id = -1'
+    res = session.execute(sql).fetchall()[0]
+    return col_name in tuple(res)
+
+
+def insert_new_column(table_name, col_name, param, session):
+    """insert new column to collection_data table"""
+    sql = 'alter table ' + table_name + ' add column if not exists ' + col_name + ' varchar(255) default null'
+    session.execute(sql)
+    update_sql = 'update ' + table_name + ' set ' + col_name + ' = :param where collection_id = -1'
+    session.execute(text(update_sql), {'param': param})
+
+
+def get_table_name(ip):
+    """get collection data table name by ip"""
+    if ip is None or ip == '':
+        return ip
+    return 'collection_' + re.sub(r'[^\w]', '_', ip.lower())
+
+
+def get_line(cip, cid, start, end, session):
+    """get selected line by cid and line range, return data & round"""
+    table_name = get_table_name(cip)
+    sql = 'select * from ' + table_name + ' where collection_id = :id and round > :round1 and round <= :round2'
+    res = session.execute(text(sql), {'id': cid, 'round1': start, 'round2': end}).fetchall()
+    if len(res) == 0:
+        return [], []
+    if cid == -1:
+        return list(res[0])[2:], [] # get param name
+    rounds = [row[1] for row in res]
+    res = [list(row)[2:] for row in res]
+    res = numpy.array(res).T.tolist()
+    return res, rounds

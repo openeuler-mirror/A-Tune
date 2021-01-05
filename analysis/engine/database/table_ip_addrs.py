@@ -15,11 +15,11 @@
 Mapping for ip_addrs table.
 """
 
-from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy import insert, select
 
+from analysis.engine.database.tables import Base
 from analysis.engine.database.table_user_account import UserAccount
 
 

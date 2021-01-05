@@ -16,9 +16,11 @@ Mapping for collection_table table.
 """
 
 import time
-from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer
 from sqlalchemy import func, select, insert, update
+
+from analysis.engine.database.tables import Base
+from analysis.engine.utils import utils
 
 
 class CollectionTable(Base):
@@ -84,7 +86,8 @@ class CollectionTable(Base):
                     .where(CollectionTable.collection_ip == cip) \
                     .order_by(CollectionTable.collection_id.desc())
         res = session.execute(sql).fetchall()
-        return res
+        dicts = ['name', 'status', 'date', 'info']
+        return utils.zip_key_value(dicts, res)
 
     @staticmethod
     def update_status(cid, status, session):

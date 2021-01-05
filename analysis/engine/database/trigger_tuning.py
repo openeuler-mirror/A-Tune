@@ -140,7 +140,7 @@ def get_tuning_list(uid, status):
             else:
                 res.extend(tuning_table.get_status_tuning_by_ip(status, tip, session))
         if len(res) > 0:
-            res = sorted(res, key=(lambda x:x[2]), reverse=True)
+            res = sorted(res, key=(lambda x:x['date']), reverse=True)
     except SQLAlchemyError as err:
         LOGGER.error('Get tuning list failed: %s', err)
         return None

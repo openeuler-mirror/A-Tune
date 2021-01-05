@@ -22,7 +22,6 @@ from flask_restful import Resource
 
 from analysis.engine.parser import UI_ANALYSIS_GET_PARSER
 from analysis.engine.database import trigger_analysis
-from resources import web
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -40,7 +39,7 @@ class UiAnalysis(Resource):
         if cmd == 'initialPage':
             uid = args.get('uid')
             res = trigger_analysis.get_analysis_list(int(uid))
-            return json.dumps({'analysis': [list(row) for row in res]}), 200, CORS
+            return json.dumps({'analysis': res}), 200, CORS
 
         if cmd == 'rename':
             name = args.get('name')

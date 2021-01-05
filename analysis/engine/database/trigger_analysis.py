@@ -18,11 +18,10 @@ Triggers to action analysis database.
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
-from analysis.engine.database import tables
+from analysis.engine.database import tables, table_collection_data
 from analysis.engine.database.table_ip_addrs import IpAddrs
 from analysis.engine.database.table_collection import CollectionTable
 from analysis.engine.database.table_analysis_log import AnalysisLog
-from analysis.engine.database.table_collection_data import CollectionData
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +36,8 @@ def add_new_collection(cip):
         ip_table = IpAddrs()
         if not ip_table.find_ip(cip, session):
             ip_table.insert_ip_by_user(cip, 0, session)
+            table_name = table_collection_data.get_table_name(cip)
+            table_collection_data.initial_table(table_name, session)
         collection_table = CollectionTable()
         cid = collection_table.get_max_cid(session) + 1
         collection_table.insert_new_collection(cid, cip, session)
@@ -49,19 +50,21 @@ def add_new_collection(cip):
     return cid
 
 
-def add_collection_data(cid, data):
-    """add collection data to collection_data table"""
+def add_collection_data(cid, cip, data):
+    """add collection data to collection_ip table"""
     session = tables.get_session()
     if session is None:
         return
     try:
-        collection_data = CollectionData()
-        rounds = collection_data.get_max_round(cid, session) + 1
-        collection_data.insert_collection_data(cid, rounds, data, session)
+        rounds = table_collection_data.get_max_round(cid, cip, session) + 1
+        res = table_collection_data.insert_table(cid, rounds, cip, data, session)
+        if not res:
+            LOGGER.error('Failed to insert data to collection_table')
         session.commit()
     except SQLAlchemyError as err:
-        LOGGER.error('Add new collection data to collection_data failed: %s', err)
-    session.close()
+        LOGGER.error('Add collection data to collection_table failed: %s', err)
+    finally:
+        session.close()
 
 
 def add_analysis_log(cid, data):
@@ -79,7 +82,7 @@ def add_analysis_log(cid, data):
     session.close()
 
 
-def change_collection_status(cid, status, types):
+def change_collection_status(cid, cip, status, types):
     """change status of collection_table"""
     session = tables.get_session()
     if session is None:
@@ -92,8 +95,7 @@ def change_collection_status(cid, status, types):
             collection_table.update_status(cid, status, session)
 
         if types == 'csv':
-            collection_data = CollectionData()
-            rounds = collection_data.get_max_round(cid, session)
+            rounds = table_collection_data.get_max_round(cid, cip, session)
             collection_table.update_total_round(cid, rounds, session)
         else:
             analysis_log = AnalysisLog()
@@ -119,7 +121,8 @@ def change_collection_info(cid, workload):
                     CollectionTable.collection_id, cid, session)
             names = workload + '-' + names
             collection_table.update_name(cid, names, session)
-            collection_table.update_workload(cid, workload, session)
+            if workload != 'csv_convert':
+                collection_table.update_workload(cid, workload, session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Change name and workload of collection_table failed: %s', err)
@@ -139,7 +142,7 @@ def get_analysis_list(uid):
         for cip in ips:
             res.extend(collection_table.get_all_collection_by_ip(cip, session))
         if len(res) > 0:
-            res = sorted(res, key=(lambda x:x[2]), reverse=True)
+            res = sorted(res, key=(lambda x:x['date']), reverse=True)
     except SQLAlchemyError as err:
         LOGGER.error('Get analysis list failed: %s', err)
         return None
@@ -184,11 +187,16 @@ def collection_exist(name):
     return exist
 
 
-def get_collection_data_dirs(cid, csv_line, response, session):
+def get_collection_data_dirs(cip, cid, csv_line, response, session):
     """get collection data"""
-    collection_data = CollectionData()
-    response['table_header'], _ = collection_data.get_line(-1, -2, -1, session)
-    response['csv_data'], response['round'] = collection_data.get_line(cid, csv_line, csv_line + 10, session)
+    header, _ = table_collection_data.get_line(cip, -1, -2, -1, session)
+    data, response['round'] = table_collection_data.get_line(cip, cid, csv_line, csv_line + 10, session)
+    for i, val in enumerate(data):
+        if val[0] is None:
+            del data[i]
+            del header[i]
+    response['table_header'] = header
+    response['csv_data'] = data
     response['nextCsv'] = csv_line + 0 if len(response['csv_data']) == 0 else len(response['csv_data'][0])
 
 
@@ -209,7 +217,9 @@ def get_analysis_data(name, csv_line, log_line):
         collection_table = CollectionTable()
         cid = collection_table.get_field_by_key(CollectionTable.collection_id,
                 CollectionTable.collection_name, name, session)
-        get_collection_data_dirs(cid, csv_line, response, session)
+        cip = collection_table.get_field_by_key(CollectionTable.collection_ip,
+                CollectionTable.collection_name, name, session)
+        get_collection_data_dirs(cip, cid, csv_line, response, session)
         get_analysis_log_dirs(cid, log_line, response, session)
         workload = collection_table.get_field_by_key(CollectionTable.workload_type,
                 CollectionTable.collection_id, cid, session)
@@ -244,7 +254,9 @@ def get_compare_collection(name, csv_line):
         collection_table = CollectionTable()
         cid = collection_table.get_field_by_key(CollectionTable.collection_id,
                 CollectionTable.collection_name, name, session)
-        get_collection_data_dirs(cid, csv_line, response, session)
+        cip = collection_table.get_field_by_key(CollectionTable.collection_ip,
+                CollectionTable.collection_name, name, session)
+        get_collection_data_dirs(cip, cid, csv_line, response, session)
         if csv_line < response['nextCsv']:
             response['hasNext'] = True
         else:

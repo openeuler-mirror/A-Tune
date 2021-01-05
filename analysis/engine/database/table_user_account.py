@@ -15,9 +15,10 @@
 Mapping for user_account table.
 """
 
-from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy import func, select, insert
+
+from analysis.engine.database.tables import Base
 
 
 class UserAccount(Base):

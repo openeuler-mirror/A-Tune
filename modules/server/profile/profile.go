@@ -462,12 +462,19 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 			scanner := bufio.NewScanner(reader)
 
 			for scanner.Scan() {
-				line := scanner.Text()
-				_ = stream.Send(&PB.AckCheck{Name: line, Status: utils.INFO})
+				line := strings.TrimRight(scanner.Text(), "\n")
+				pairs := strings.Split(line, " ")
+				screen := ""
+				for _, ele := range pairs {
+					if (len(strings.Split(ele, ":")) == 2) {
+						screen += strings.Split(ele, ":")[1] + " "
+					}
+				}
+				_ = stream.Send(&PB.AckCheck{Name: screen, Status: utils.INFO})
 				retId, err := models.InitTransfer("csv", "running", line, "", collectionId)
 				if err != nil {
 					_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-					log.Errorf("cllection system data error: transfer data %v", err)
+					log.Errorf("collect system data error: transfer data %v", err)
 					return
 				}
                 collectionId = retId
@@ -477,7 +484,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 				_, err := models.InitTransfer("csv", "finished", "", "", collectionId)
 				if err != nil {
 					_ = stream.Send(&PB.AckCheck{Name: err.Error()})
-					log.Errorf("cllection system data error: transfer data %v", err)
+					log.Errorf("collect system data error: transfer data %v", err)
 					return
 				}
 				break

@@ -62,8 +62,8 @@ class Transfer(Resource):
         LOGGER.info(args)
 
         curr_id = args['collect_id']
+        client_ip = request.remote_addr
         if curr_id == -1:
-            client_ip = request.remote_addr
             curr_id = trigger_analysis.add_new_collection(client_ip)
         if curr_id != -1:
             types = args['type']
@@ -71,13 +71,13 @@ class Transfer(Resource):
             workload = args['workload_type']
 
             if types == 'csv' and status == 'running':
-                trigger_analysis.add_collection_data(curr_id, args['collect_data'])
+                trigger_analysis.add_collection_data(curr_id, client_ip, args['collect_data'])
             elif types == 'csv' and status == 'finished':
-                trigger_analysis.change_collection_status(curr_id, status, types)
+                trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
                 trigger_analysis.change_collection_info(curr_id, workload)
             elif types == 'log' and status == 'running':
                 trigger_analysis.add_analysis_log(curr_id, args['collect_data'])
             else:
-                trigger_analysis.change_collection_status(curr_id, status, types)
+                trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
                 trigger_analysis.change_collection_info(curr_id, workload)
         return curr_id, 200

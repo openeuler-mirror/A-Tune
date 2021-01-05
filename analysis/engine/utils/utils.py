@@ -111,3 +111,11 @@ def get_string_split(line, index, key, val):
     for element in line.split("|")[index].split(","):
         params += val + element.split("=")[key] + ","
     return params
+
+
+def zip_key_value(key, val_array):
+    """zip key and value together"""
+    res = []
+    for line in val_array:
+        res.append(dict(zip(key, line)))
+    return res

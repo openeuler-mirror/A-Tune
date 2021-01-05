@@ -49,6 +49,7 @@ class Collector(Resource):
                 if opt.split("=")[0] in "--fields":
                     field_name.append("%s.%s.%s" % (monitor["module"], monitor["purpose"],
                                                     opt.split("=")[1]))
+        field_key = field_name[:]
         data_type = args.get("data_type")
         if data_type != "":
             field_name.append("workload.type")
@@ -72,7 +73,10 @@ class Collector(Resource):
 
             str_data = [str(round(data, 3)) for data in float_data]
             if n_pipe is not None:
-                n_pipe.write(" ".join(str_data) + "\n")
+                ret = []
+                for key, val in zip(field_key, str_data):
+                    ret.append(key + ":" + val)
+                n_pipe.write(" ".join(ret) + "\n")
 
             data_field.append(float_data.copy())
             if data_type != "":
