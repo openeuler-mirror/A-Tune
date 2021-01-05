@@ -77,6 +77,9 @@ CREATE TABLE IF NOT EXISTS schedule(
 
 
 -- class_apps:
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("encryption_AES", "encryption", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("encryption_MD5", "encryption", "", 0);
+INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("encryption_RSAPublic", "encryption", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("default", "default", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("ceph", "storage-ceph", "", 0);
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("hadoop_hdd", "big-data-hadoop-hdfs", "", 0);
@@ -103,6 +106,9 @@ INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_k
 INSERT INTO class_apps(class, apps, resource_limit, deletable) VALUES("mariadb_docker", "docker-mariadb", "", 0);
 
 -- class_profile:
+INSERT INTO class_profile(class, profile_type, active) VALUES("encryption_AES", "encryption-AES-chauffeur", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("encryption_MD5", "encryption-MD5-chauffeur", 0);
+INSERT INTO class_profile(class, profile_type, active) VALUES("encryption_RSAPublic", "encryption-RSAPublic-chauffeur", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("default", "default-default", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("ceph", "storage-ceph-vdbench-hdd", 0);
 INSERT INTO class_profile(class, profile_type, active) VALUES("hadoop_hdd", "big-data-hadoop-hdfs-dfsio-hdd", 0);

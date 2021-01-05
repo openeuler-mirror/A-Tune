@@ -153,7 +153,8 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 	optimizerBody.Noise = config.Noise
 	optimizerBody.Knobs = make([]models.Knob, 0)
 	optimizerBody.PrjName = o.Prj.Project
-	for _, item := range o.Prj.Object {
+	defaultValues := strings.Split(o.InitConfig, ",")
+	for i, item := range o.Prj.Object {
 		if item.Info.Skip {
 			continue
 		}
@@ -161,7 +162,11 @@ func (o *Optimizer) createOptimizerTask(ch chan *PB.TuningMessage, iters int32, 
 		knob.Dtype = item.Info.Dtype
 		knob.Name = item.Name
 		knob.Type = item.Info.Type
-		knob.Ref = item.Info.Ref
+		if len(item.Info.Ref) == 0 {
+			knob.Ref = strings.Split(defaultValues[i], "=")[1]
+		} else {
+			knob.Ref = item.Info.Ref
+		}
 		knob.Range = item.Info.Scope
 		knob.Items = item.Info.Items
 		knob.Step = item.Info.Step

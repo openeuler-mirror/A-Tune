@@ -1,0 +1,1805 @@
+project: key_parameters_select_variant
+maxiterations: 500
+startworkload: ''
+stopworkload: ''
+object:
+  - name: x1
+    info:
+      desc: x1
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x1 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x1 =\s*[0-9]*/x1 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x2
+    info:
+      desc: x2
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x2 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x2 =\s*[0-9]*/x2 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x3
+    info:
+      desc: x3
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x3 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x3 =\s*[0-9]*/x3 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x4
+    info:
+      desc: x4
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x4 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x4 =\s*[0-9]*/x4 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x5
+    info:
+      desc: x5
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x5 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x5 =\s*[0-9]*/x5 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x6
+    info:
+      desc: x6
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x6 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x6 =\s*[0-9]*/x6 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x7
+    info:
+      desc: x7
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x7 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x7 =\s*[0-9]*/x7 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x8
+    info:
+      desc: x8
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x8 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x8 =\s*[0-9]*/x8 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x9
+    info:
+      desc: x9
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x9 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x9 =\s*[0-9]*/x9 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x10
+    info:
+      desc: x10
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x10 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x10 =\s*[0-9]*/x10 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x11
+    info:
+      desc: x11
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x11 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x11 =\s*[0-9]*/x11 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x12
+    info:
+      desc: x12
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x12 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x12 =\s*[0-9]*/x12 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x13
+    info:
+      desc: x13
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x13 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x13 =\s*[0-9]*/x13 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x14
+    info:
+      desc: x14
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x14 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x14 =\s*[0-9]*/x14 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x15
+    info:
+      desc: x15
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x15 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x15 =\s*[0-9]*/x15 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x16
+    info:
+      desc: x16
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x16 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x16 =\s*[0-9]*/x16 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x17
+    info:
+      desc: x17
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x17 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x17 =\s*[0-9]*/x17 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x18
+    info:
+      desc: x18
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x18 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x18 =\s*[0-9]*/x18 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x19
+    info:
+      desc: x19
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x19 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x19 =\s*[0-9]*/x19 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x20
+    info:
+      desc: x20
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x20 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x20 =\s*[0-9]*/x20 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x21
+    info:
+      desc: x21
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x21 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x21 =\s*[0-9]*/x21 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x22
+    info:
+      desc: x22
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x22 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x22 =\s*[0-9]*/x22 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x23
+    info:
+      desc: x23
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x23 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x23 =\s*[0-9]*/x23 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x24
+    info:
+      desc: x24
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x24 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x24 =\s*[0-9]*/x24 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x25
+    info:
+      desc: x25
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x25 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x25 =\s*[0-9]*/x25 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x26
+    info:
+      desc: x26
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x26 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x26 =\s*[0-9]*/x26 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x27
+    info:
+      desc: x27
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x27 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x27 =\s*[0-9]*/x27 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x28
+    info:
+      desc: x28
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x28 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x28 =\s*[0-9]*/x28 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x29
+    info:
+      desc: x29
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x29 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x29 =\s*[0-9]*/x29 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x30
+    info:
+      desc: x30
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x30 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x30 =\s*[0-9]*/x30 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x31
+    info:
+      desc: x31
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x31 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x31 =\s*[0-9]*/x31 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x32
+    info:
+      desc: x32
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x32 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x32 =\s*[0-9]*/x32 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x33
+    info:
+      desc: x33
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x33 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x33 =\s*[0-9]*/x33 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x34
+    info:
+      desc: x34
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x34 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x34 =\s*[0-9]*/x34 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x35
+    info:
+      desc: x35
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x35 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x35 =\s*[0-9]*/x35 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x36
+    info:
+      desc: x36
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x36 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x36 =\s*[0-9]*/x36 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x37
+    info:
+      desc: x37
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x37 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x37 =\s*[0-9]*/x37 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x38
+    info:
+      desc: x38
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x38 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x38 =\s*[0-9]*/x38 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x39
+    info:
+      desc: x39
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x39 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x39 =\s*[0-9]*/x39 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x40
+    info:
+      desc: x40
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x40 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x40 =\s*[0-9]*/x40 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x41
+    info:
+      desc: x41
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x41 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x41 =\s*[0-9]*/x41 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x42
+    info:
+      desc: x42
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x42 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x42 =\s*[0-9]*/x42 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x43
+    info:
+      desc: x43
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x43 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x43 =\s*[0-9]*/x43 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x44
+    info:
+      desc: x44
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x44 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x44 =\s*[0-9]*/x44 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x45
+    info:
+      desc: x45
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x45 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x45 =\s*[0-9]*/x45 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x46
+    info:
+      desc: x46
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x46 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x46 =\s*[0-9]*/x46 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x47
+    info:
+      desc: x47
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x47 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x47 =\s*[0-9]*/x47 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x48
+    info:
+      desc: x48
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x48 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x48 =\s*[0-9]*/x48 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x49
+    info:
+      desc: x49
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x49 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x49 =\s*[0-9]*/x49 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x50
+    info:
+      desc: x50
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x50 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x50 =\s*[0-9]*/x50 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x51
+    info:
+      desc: x51
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x51 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x51 =\s*[0-9]*/x51 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x52
+    info:
+      desc: x52
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x52 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x52 =\s*[0-9]*/x52 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x53
+    info:
+      desc: x53
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x53 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x53 =\s*[0-9]*/x53 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x54
+    info:
+      desc: x54
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x54 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x54 =\s*[0-9]*/x54 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x55
+    info:
+      desc: x55
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x55 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x55 =\s*[0-9]*/x55 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x56
+    info:
+      desc: x56
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x56 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x56 =\s*[0-9]*/x56 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x57
+    info:
+      desc: x57
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x57 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x57 =\s*[0-9]*/x57 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x58
+    info:
+      desc: x58
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x58 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x58 =\s*[0-9]*/x58 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x59
+    info:
+      desc: x59
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x59 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x59 =\s*[0-9]*/x59 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x60
+    info:
+      desc: x60
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x60 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x60 =\s*[0-9]*/x60 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x61
+    info:
+      desc: x61
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x61 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x61 =\s*[0-9]*/x61 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x62
+    info:
+      desc: x62
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x62 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x62 =\s*[0-9]*/x62 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x63
+    info:
+      desc: x63
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x63 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x63 =\s*[0-9]*/x63 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x64
+    info:
+      desc: x64
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x64 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x64 =\s*[0-9]*/x64 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x65
+    info:
+      desc: x65
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x65 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x65 =\s*[0-9]*/x65 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x66
+    info:
+      desc: x66
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x66 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x66 =\s*[0-9]*/x66 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x67
+    info:
+      desc: x67
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x67 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x67 =\s*[0-9]*/x67 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x68
+    info:
+      desc: x68
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x68 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x68 =\s*[0-9]*/x68 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x69
+    info:
+      desc: x69
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x69 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x69 =\s*[0-9]*/x69 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x70
+    info:
+      desc: x70
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x70 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x70 =\s*[0-9]*/x70 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x71
+    info:
+      desc: x71
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x71 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x71 =\s*[0-9]*/x71 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x72
+    info:
+      desc: x72
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x72 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x72 =\s*[0-9]*/x72 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x73
+    info:
+      desc: x73
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x73 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x73 =\s*[0-9]*/x73 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x74
+    info:
+      desc: x74
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x74 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x74 =\s*[0-9]*/x74 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x75
+    info:
+      desc: x75
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x75 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x75 =\s*[0-9]*/x75 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x76
+    info:
+      desc: x76
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x76 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x76 =\s*[0-9]*/x76 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x77
+    info:
+      desc: x77
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x77 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x77 =\s*[0-9]*/x77 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x78
+    info:
+      desc: x78
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x78 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x78 =\s*[0-9]*/x78 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x79
+    info:
+      desc: x79
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x79 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x79 =\s*[0-9]*/x79 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x80
+    info:
+      desc: x80
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x80 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x80 =\s*[0-9]*/x80 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x81
+    info:
+      desc: x81
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x81 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x81 =\s*[0-9]*/x81 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x82
+    info:
+      desc: x82
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x82 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x82 =\s*[0-9]*/x82 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x83
+    info:
+      desc: x83
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x83 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x83 =\s*[0-9]*/x83 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x84
+    info:
+      desc: x84
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x84 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x84 =\s*[0-9]*/x84 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x85
+    info:
+      desc: x85
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x85 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x85 =\s*[0-9]*/x85 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x86
+    info:
+      desc: x86
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x86 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x86 =\s*[0-9]*/x86 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x87
+    info:
+      desc: x87
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x87 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x87 =\s*[0-9]*/x87 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x88
+    info:
+      desc: x88
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x88 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x88 =\s*[0-9]*/x88 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x89
+    info:
+      desc: x89
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x89 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x89 =\s*[0-9]*/x89 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x90
+    info:
+      desc: x90
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x90 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x90 =\s*[0-9]*/x90 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x91
+    info:
+      desc: x91
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x91 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x91 =\s*[0-9]*/x91 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x92
+    info:
+      desc: x92
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x92 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x92 =\s*[0-9]*/x92 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x93
+    info:
+      desc: x93
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x93 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x93 =\s*[0-9]*/x93 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x94
+    info:
+      desc: x94
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x94 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x94 =\s*[0-9]*/x94 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x95
+    info:
+      desc: x95
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x95 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x95 =\s*[0-9]*/x95 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x96
+    info:
+      desc: x96
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x96 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x96 =\s*[0-9]*/x96 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x97
+    info:
+      desc: x97
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x97 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x97 =\s*[0-9]*/x97 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x98
+    info:
+      desc: x98
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x98 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x98 =\s*[0-9]*/x98 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x99
+    info:
+      desc: x99
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x99 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x99 =\s*[0-9]*/x99 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x100
+    info:
+      desc: x100
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x100 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x100 =\s*[0-9]*/x100 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x101
+    info:
+      desc: x101
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x101 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x101 =\s*[0-9]*/x101 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x102
+    info:
+      desc: x102
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x102 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x102 =\s*[0-9]*/x102 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x103
+    info:
+      desc: x103
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x103 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x103 =\s*[0-9]*/x103 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x104
+    info:
+      desc: x104
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x104 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x104 =\s*[0-9]*/x104 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x105
+    info:
+      desc: x105
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x105 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x105 =\s*[0-9]*/x105 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x106
+    info:
+      desc: x106
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x106 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x106 =\s*[0-9]*/x106 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x107
+    info:
+      desc: x107
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x107 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x107 =\s*[0-9]*/x107 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x108
+    info:
+      desc: x108
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x108 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x108 =\s*[0-9]*/x108 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x109
+    info:
+      desc: x109
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x109 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x109 =\s*[0-9]*/x109 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x110
+    info:
+      desc: x110
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x110 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x110 =\s*[0-9]*/x110 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x111
+    info:
+      desc: x111
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x111 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x111 =\s*[0-9]*/x111 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x112
+    info:
+      desc: x112
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x112 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x112 =\s*[0-9]*/x112 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x113
+    info:
+      desc: x113
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x113 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x113 =\s*[0-9]*/x113 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x114
+    info:
+      desc: x114
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x114 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x114 =\s*[0-9]*/x114 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x115
+    info:
+      desc: x115
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x115 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x115 =\s*[0-9]*/x115 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x116
+    info:
+      desc: x116
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x116 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x116 =\s*[0-9]*/x116 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x117
+    info:
+      desc: x117
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x117 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x117 =\s*[0-9]*/x117 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x118
+    info:
+      desc: x118
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x118 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x118 =\s*[0-9]*/x118 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x119
+    info:
+      desc: x119
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x119 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x119 =\s*[0-9]*/x119 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x120
+    info:
+      desc: x120
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x120 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x120 =\s*[0-9]*/x120 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x121
+    info:
+      desc: x121
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x121 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x121 =\s*[0-9]*/x121 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x122
+    info:
+      desc: x122
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x122 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x122 =\s*[0-9]*/x122 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x123
+    info:
+      desc: x123
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x123 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x123 =\s*[0-9]*/x123 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x124
+    info:
+      desc: x124
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x124 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x124 =\s*[0-9]*/x124 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x125
+    info:
+      desc: x125
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x125 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x125 =\s*[0-9]*/x125 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x126
+    info:
+      desc: x126
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x126 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x126 =\s*[0-9]*/x126 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x127
+    info:
+      desc: x127
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x127 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x127 =\s*[0-9]*/x127 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x128
+    info:
+      desc: x128
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x128 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x128 =\s*[0-9]*/x128 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x129
+    info:
+      desc: x129
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x129 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x129 =\s*[0-9]*/x129 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x130
+    info:
+      desc: x130
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x130 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x130 =\s*[0-9]*/x130 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x131
+    info:
+      desc: x131
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x131 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x131 =\s*[0-9]*/x131 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x132
+    info:
+      desc: x132
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x132 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x132 =\s*[0-9]*/x132 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x133
+    info:
+      desc: x133
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x133 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x133 =\s*[0-9]*/x133 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x134
+    info:
+      desc: x134
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x134 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x134 =\s*[0-9]*/x134 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x135
+    info:
+      desc: x135
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x135 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x135 =\s*[0-9]*/x135 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x136
+    info:
+      desc: x136
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x136 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x136 =\s*[0-9]*/x136 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x137
+    info:
+      desc: x137
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x137 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x137 =\s*[0-9]*/x137 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x138
+    info:
+      desc: x138
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x138 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x138 =\s*[0-9]*/x138 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x139
+    info:
+      desc: x139
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x139 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x139 =\s*[0-9]*/x139 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x140
+    info:
+      desc: x140
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x140 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x140 =\s*[0-9]*/x140 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x141
+    info:
+      desc: x141
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x141 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x141 =\s*[0-9]*/x141 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x142
+    info:
+      desc: x142
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x142 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x142 =\s*[0-9]*/x142 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x143
+    info:
+      desc: x143
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x143 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x143 =\s*[0-9]*/x143 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x144
+    info:
+      desc: x144
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x144 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x144 =\s*[0-9]*/x144 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x145
+    info:
+      desc: x145
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x145 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x145 =\s*[0-9]*/x145 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x146
+    info:
+      desc: x146
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x146 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x146 =\s*[0-9]*/x146 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x147
+    info:
+      desc: x147
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x147 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x147 =\s*[0-9]*/x147 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x148
+    info:
+      desc: x148
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x148 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x148 =\s*[0-9]*/x148 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x149
+    info:
+      desc: x149
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x149 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x149 =\s*[0-9]*/x149 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
+  - name: x150
+    info:
+      desc: x150
+      get: cat key_parameters_select_variant/key_parameters_select_variant.py |
+        grep -i '^x150 =' | awk -F '=' '{print $2}'
+      set: sed -i 's/^x150 =\s*[0-9]*/x150 = $value/g' key_parameters_select_variant/key_parameters_select_variant.py
+      needrestart: 'false'
+      type: continuous
+      scope:
+        - 1
+        - 5
+      dtype: int
