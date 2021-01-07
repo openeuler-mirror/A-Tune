@@ -218,9 +218,9 @@ You can modify the parameter value as required.
   - export ATUNED_CLIENTCERT=<Client certificate path>
   - export ATUNED_CLIENTKEY=<Client key path>
   - export ATUNED_SERVERCN=server
-- **tlsservercafile**: Path of the gPRC server's CA certificate.
-- **tlsservercertfile**: Path of the gPRC server certificate.
-- **tlsserverkeyfile**: Path of the gPRC server key.
+- **tlsservercafile**: Path of the gRPC server's CA certificate.
+- **tlsservercertfile**: Path of the gRPC server certificate.
+- **tlsserverkeyfile**: Path of the gRPC server key.
 - **rest_tls**: Indicates whether to enable SSL/TLS certificate verification for the REST service. This function is enabled by default.
 - **tlsrestcacertfile**: Path of the server's CA certificate of the REST service.
 - **tlsrestservercertfile**: Path of the server certificate of the REST service.
@@ -548,7 +548,7 @@ Support profiles:
 +---------------------------------------------+-----------+
 | web-apache-traffic-server-spirent-pingpo    | false     |
 +---------------------------------------------+-----------+
-| web-nginx-http-long-connection              | false     |
+| web-nginx-http-long-connection              | true      |
 +---------------------------------------------+-----------+
 | web-nginx-http-short-connection             | false     |
 +---------------------------------------------+-----------+
@@ -1055,7 +1055,7 @@ Configuration Description
 | --------- | ------------------------------------------------------------ | ---------------- | ---------------------------- |
 | name      | Evaluation index name.                                       | Character string | -                            |
 | get       | Script for obtaining performance  evaluation results.        | -                | -                            |
-| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the  performance value is maximized. | Enumeration      | **positive** or **negative** |
+| type      | Specifies a positive or negative type of  the evaluation result. The value **positive**  indicates that the performance value is minimized, and the value **negative** indicates that the performance value is maximized. | Enumeration      | **positive** or **negative** |
 | weight    | Weight of the index. The value ranges  from 0 to 100.        | Integer          | 0-100                        |
 | threshold | Minimum performance requirement of the  index.               | Integer          | User-defined                 |
 
