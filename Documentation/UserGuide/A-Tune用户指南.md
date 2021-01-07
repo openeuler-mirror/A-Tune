@@ -14,7 +14,7 @@ A-Tune、openEuler为华为技术有限公司的商标。本文档提及的其�
 
 **免责声明**
 
-本文档仅作为使用指导，除非适用法强制规定或者双方有明确书面约定, 华为技术有限公司对本文档中的所有陈述、信息和建议不做任何明示或默示的声明或保证，包括但不限于不侵权，时效性或满足特定目的的担保。
+本文档仅作为使用指导，除非适用法律强制规定或者双方有明确书面约定, 华为技术有限公司对本文档中的所有陈述、信息和建议不做任何明示或默示的声明或保证，包括但不限于不侵权，时效性或满足特定目的的担保。
 
 ## 前言
 
@@ -219,9 +219,9 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
   - export ATUNED_CLIENTCERT=<客户端证书路径>
   - export ATUNED_CLIENTKEY=<客户端秘钥路径>
   - export ATUNED_SERVERCN=server
-- tlsservercafile：gPRC服务端CA证书路径。
-- tlsservercertfile：gPRC服务端证书路径。
-- tlsserverkeyfile：gPRC服务端秘钥路径。
+- tlsservercafile：gRPC服务端CA证书路径。
+- tlsservercertfile：gRPC服务端证书路径。
+- tlsserverkeyfile：gRPC服务端秘钥路径。
 - rest_tls：系统rest service的SSL/TLS证书校验开关，默认开启。
 - tlsrestcacertfile：系统rest service的服务端CA证书路径。
 - tlsrestservercertfile：系统rest service的服务端证书路径
@@ -235,9 +235,9 @@ A-Tune配置文件/etc/atuned/atuned.cnf的配置项说明如下：
 
 system为系统执行相关的优化需要用到的参数信息，必须根据系统实际情况进行修改。
 
-- disk：执行analysis流程时需要采集的对应磁盘的信息或执行磁盘相关优化时需要指定的磁盘。
+- disk：执行analysis时需要采集的对应磁盘的信息或执行磁盘相关优化时需要指定的磁盘。
 
-- network：执行analysis时需要采集的对应的网卡的信息或执行网卡相关优化时需要指定的网卡。
+- network：执行analysis时需要采集的对应网卡的信息或执行网卡相关优化时需要指定的网卡。
 
 - user：执行ulimit相关优化时用到的用户名。目前只支持root用户。
 
@@ -561,7 +561,7 @@ Support profiles:
 +---------------------------------------------+-----------+
 | web-apache-traffic-server-spirent-pingpo    | false     |
 +---------------------------------------------+-----------+
-| web-nginx-http-long-connection              | false     |
+| web-nginx-http-long-connection              | true      |
 +---------------------------------------------+-----------+
 | web-nginx-http-short-connection             | false     |
 +---------------------------------------------+-----------+
@@ -1069,7 +1069,7 @@ A-Tune提供了最佳配置的自动搜索能力，免去人工反复做参数�
 | ------------ | ------------------------------------------------------------ | ------------ | --------------------- |
 | name         | 评价指标名称                                                 | 字符串       | -                     |
 | get          | 获取性能评估结果的脚本                                       | -            | -                     |
-| type         | 评估结果的正负类型，positive代表最小化性能值，negative代表最大化对应性能值 | 枚举         | "positive","negative" |
+| type         | 评估结果的正负类型，positive代表最小化性能值，negative代表最大化性能值 | 枚举         | "positive","negative" |
 | weight       | 该指标的权重百分比，0-100                                    | 整型         | 0-100                 |
 | threshold    | 该指标的最低性能要求                                         | 整型         | 用户指定              |
 
