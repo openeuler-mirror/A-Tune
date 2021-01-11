@@ -30,7 +30,9 @@ yum install -y atune-engine
 yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
-#### 2. Install Python dependent packages.
+#### 2. Install Python dependent packages.  
+  
+#### 2-1. Install dependency for atuned and engine.
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
@@ -38,7 +40,20 @@ Or
 ```bash
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
-
+  
+#### 2-2. (Optional) Install dependency for database.
+Once user has already installed database application and wants to save tuning and analysis data into database, following packages should also be installed:
+```bash
+yum install -y python3-sqlalchemy python3-cryptography
+```
+Or
+```bash
+pip3 install sqlalchemy cryptography
+```
+To use database, user should also install database adapter package:
+| **Database** | **Install using yum** | **Install using pip** |
+| ------------------------------ | ---------- | ------------ |
+| PostgreSQL | yum install -y python3-psycopg2 | pip3 install psycopg2 |
 #### 3. Download the source code.
 ```bash
 git clone https://gitee.com/openeuler/A-Tune.git

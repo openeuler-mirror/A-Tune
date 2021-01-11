@@ -22,8 +22,8 @@ from flask_restful import reqparse, Resource
 
 from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
 from analysis.engine.utils import task_cache, utils
-from analysis.engine.database import trigger_tuning
 from analysis.optimizer import optimizer
+from analysis.engine.config import EngineConfig
 
 LOGGER = logging.getLogger(__name__)
 
@@ -100,8 +100,10 @@ class Optimizer(Resource):
         if args["iterations"] == -1:
             value = args["line"][:-1].split(" ")
             utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
-            client_ip = request.remote_addr
-            trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'], client_ip)
+            if EngineConfig.db_enable:
+                from analysis.engine.database import trigger_tuning
+                client_ip = request.remote_addr
+                trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'], client_ip)
             return {}, 200
         if args["iterations"] == 0:
             total_eval = args["line"].split("|")[3].split("=")[1]
@@ -112,9 +114,11 @@ class Optimizer(Resource):
                 params += "evaluation-TOTAL" + ","
             params = params[:-1]
             utils.add_data_to_file(params, "a", args["prj_name"])
-            trigger_tuning.change_tuning_baseline(args['prj_name'],
-                    utils.get_opposite_num(total_eval, True))
-            trigger_tuning.create_tuning_data_table(args['line'])
+            if EngineConfig.db_enable:
+                from analysis.engine.database import trigger_tuning
+                trigger_tuning.change_tuning_baseline(args['prj_name'],
+                        utils.get_opposite_num(total_eval, True))
+                trigger_tuning.create_tuning_data_table(args['line'])
 
         out_queue = task[self.pipe]
         if args["iterations"] != 0 and len(args["value"]) != 0:
@@ -128,9 +132,11 @@ class Optimizer(Resource):
             params += utils.get_opposite_num(total_eval, True)
             utils.add_data_to_file(params, "a", args["prj_name"])
             out_queue.send(args.get("value"))
-            table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'], args['line'])
-            if table_name is not None:
-                trigger_tuning.change_tuning_status(table_name, args['prj_name'])
+            if EngineConfig.db_enable:
+                from analysis.engine.database import trigger_tuning
+                table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'], args['line'])
+                if table_name is not None:
+                    trigger_tuning.change_tuning_status(table_name, args['prj_name'])
 
         if args["iterations"] == args["max_iter"]:
             utils.add_data_to_file("END", "a", args["prj_name"])

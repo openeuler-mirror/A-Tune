@@ -30,7 +30,9 @@ yum install -y atune-engine
 yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
-#### 2、安装python依赖包
+#### 2、安装python依赖包  
+  
+#### 2.1 安装atuned及engine的依赖包
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
@@ -38,6 +40,19 @@ yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-sci
 ```bash
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
+#### 2.2、安装数据库依赖包（可选）
+如用户已安装数据库应用，并需要将A-Tune采集的数据存储到数据库中，需要安装以下依赖包：
+```bash
+yum install -y python3-sqlalchemy python3-cryptography
+```
+或
+```bash
+pip3 install sqlalchemy cryptography
+```
+同时，根据不同的数据库需安装对应的依赖包。请参照下列表格匹配当前已支持的数据库，任选一种方式进行安装：
+| **数据库** | **yum安装** | **pip安装** |
+| ------------------------------ | ---------- | ------------ |
+| PostgreSQL | yum install -y python3-psycopg2 | pip3 install psycopg2 |
 
 #### 3、下载源码
 ```bash

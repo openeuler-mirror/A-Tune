@@ -23,7 +23,7 @@ from flask_restful import request
 
 from analysis.engine.utils import utils
 from analysis.engine.parser import TRANSFER_PUT_PARSER
-from analysis.engine.database import trigger_analysis
+from analysis.engine.config import EngineConfig
 
 LOGGER = logging.getLogger(__name__)
 
@@ -58,6 +58,10 @@ class Transfer(Resource):
     @staticmethod
     def put():
         """provide the method of put"""
+        if not EngineConfig.db_enable:
+            return -1, 200
+
+        from analysis.engine.database import trigger_analysis
         args = TRANSFER_PUT_PARSER.parse_args()
         LOGGER.info(args)
 

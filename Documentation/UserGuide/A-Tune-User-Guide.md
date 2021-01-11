@@ -364,6 +364,22 @@ You can modify the startup configuration as required.
 
 Change the log level as required. The default log level is info. Log information is recorded in the **/var/log/messages** file.
 
+**Database information**
+
+You can modify the following information base on database configuration.
+
+- **db_enable**: Indicates whether to enable database connection. This function is disable by default.
+- **database**: Database application name, currently support for PostgreSQL database.
+- **db_host**: Address for connecting database.
+- **db_port**: Port for connecting database.
+- **db_name**: Database name in application. The default value is atune_db.
+- **user_name**: User name for login to the database. The default value is admin.
+- **user_passwd**: Encrypted password for login to the database.
+- **passwd_key**: Key for encrypt login password.
+- **passwd_iv**: Initialization vector for encrypt login password.
+
+**Note**: User can use encrypt.py under ./tools folder to get user_passwd, passwd_key, passwd_iv.
+
 **Example**
 
 ```shell
@@ -386,6 +402,31 @@ Change the log level as required. The default log level is info. Log information
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
+
+ #################################### database ###############################
+ [database]
+ # enable database server
+ # default is false
+ db_enable = false
+ 
+ # information about database
+ # currently support for PostgreSQL database
+ database = PostgreSQL
+ 
+ # the database service listening host and port
+ db_host = localhost
+ db_port = 5432
+ 
+ # database name
+ db_name = atune_db
+ 
+ # database user info
+ # user_passwd should be encrypted according to Advanced Encryption Standard (AES)
+ # you can use ./tools/encrypt.py to encrypt your password
+ # user_name = admin
+ # passwd_key =
+ # passwd_iv =
+ # user_passwd =
 ```
 
 ## 2.5 Starting A-Tune
