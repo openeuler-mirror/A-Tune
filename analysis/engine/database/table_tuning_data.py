@@ -16,9 +16,9 @@ Func for initial and use tuning_data table.
 """
 
 import re
-import numpy
 import logging
-from sqlalchemy import Table, Column, Integer, VARCHAR, MetaData, text
+import numpy
+from sqlalchemy import Table, Column, Integer, VARCHAR
 from sqlalchemy.exc import SQLAlchemyError
 
 from analysis.engine.utils import utils

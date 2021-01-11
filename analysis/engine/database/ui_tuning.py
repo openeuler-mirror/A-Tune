@@ -40,7 +40,7 @@ class UiTuning(Resource):
             uid = args.get('uid')
             status = args.get('status')
             res = trigger_tuning.get_tuning_list(int(uid), status)
-            return json.dumps({'message': [list(row) for row in res]}), 200, CORS
+            return json.dumps({'message': res}), 200, CORS
 
         if cmd == 'rename':
             name = args.get('name')

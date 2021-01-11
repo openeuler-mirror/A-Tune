@@ -17,8 +17,8 @@ Base func for all tables.
 
 import base64
 import logging
-from sqlalchemy.ext.declarative import declarative_base
 from configparser import ConfigParser
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError

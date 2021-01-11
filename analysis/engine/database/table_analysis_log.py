@@ -15,11 +15,11 @@
 Mapping for analysis_log table.
 """
 
-from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy import func, insert, select
 
+from analysis.engine.database.tables import Base
 from analysis.engine.database.table_collection import CollectionTable
 
 

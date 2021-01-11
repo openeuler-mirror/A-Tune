@@ -16,9 +16,11 @@ Mapping for tuning_table table.
 """
 
 import time
-from analysis.engine.database.tables import Base
 from sqlalchemy import Column, VARCHAR, Integer
 from sqlalchemy import func, select, insert, update
+
+from analysis.engine.database.tables import Base
+from analysis.engine.utils import utils
 
 
 class TuningTable(Base):
@@ -87,7 +89,8 @@ class TuningTable(Base):
             TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
                     .order_by(TuningTable.tuning_id.desc())
         res = session.execute(sql).fetchall()
-        return res
+        dicts = ['name', 'status', 'date', 'info']
+        return utils.zip_key_value(dicts, res)
 
     @staticmethod
     def get_status_tuning_by_ip(status, tip, session):
@@ -97,7 +100,8 @@ class TuningTable(Base):
                     .where(TuningTable.tuning_status == status) \
                     .order_by(TuningTable.tuning_id.desc())
         res = session.execute(sql).fetchall()
-        return res
+        dicts=['name', 'status', 'date', 'info']
+        return utils.zip_key_value(dicts, res)
 
     @staticmethod
     def update_baseline(name, base, session):
