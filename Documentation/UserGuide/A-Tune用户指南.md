@@ -369,6 +369,22 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
 
 根据情况修改日志的级别，默认为info级别，日志信息打印在/var/log/messages中。
 
+**数据库信息**
+
+以下数据应根据数据库的具体配置进行修改。
+
+- db_enable：是否启用数据库连接，默认为false，不启用。
+- database：数据库名称，当前支持数据库为PostgreSQL。
+- db_host：数据库连接地址，应根据数据库的真实地址进行配置。
+- db_port：数据库连接端口，应根据数据库的真实端口进行配置。
+- db_name：数据库中database的名称，应根据数据库的真实信息进行配置，默认为atune_db。
+- user_name：登录数据库使用的用户名，默认为admin。
+- user_passwd：加密后的登录密码。
+- passwd_key：加密使用的秘钥，用于对登录密码进行加解密。
+- passwd_iv：偏移值，用于对登录密码进行加解密。
+
+备注：user_passwd、passwd_key、passwd_iv均可通过运行tools/encrypt.py获取。
+
 **配置示例**
 
 ```shell
@@ -391,6 +407,31 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
+ 
+ #################################### database ###############################
+ [database]
+ # enable database server
+ # default is false
+ db_enable = false
+ 
+ # information about database
+ # currently support for PostgreSQL database
+ database = PostgreSQL
+ 
+ # the database service listening host and port
+ db_host = localhost
+ db_port = 5432
+ 
+ # database name
+ db_name = atune_db
+ 
+ # database user info
+ # user_passwd should be encrypted according to Advanced Encryption Standard (AES)
+ # you can use ./tools/encrypt.py to encrypt your password
+ # user_name = admin
+ # passwd_key =
+ # passwd_iv =
+ # user_passwd =
 ```
 
 ## 2.5 启动A-Tune
