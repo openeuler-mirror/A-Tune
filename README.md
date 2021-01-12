@@ -31,8 +31,8 @@ yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
 #### 2. Install Python dependent packages.  
-  
-#### 2-1. Install dependency for atuned and engine.
+
+#### 2.1 Install dependency for A-Tune service.
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
@@ -40,9 +40,9 @@ Or
 ```bash
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
-  
-#### 2-2. (Optional) Install dependency for database.
-Once user has already installed database application and wants to save tuning and analysis data into database, following packages should also be installed:
+
+#### 2.2 (Optional) Install dependency for database.
+Once user has already installed database application and wants to store A-Tune collection and tuning data to the database, following packages should also be installed:
 ```bash
 yum install -y python3-sqlalchemy python3-cryptography
 ```
@@ -50,7 +50,7 @@ Or
 ```bash
 pip3 install sqlalchemy cryptography
 ```
-To use database, user should also install database adapter package:
+To use database, user should also select either of the following methods to install dependency based on the database applications.
 | **Database** | **Install using yum** | **Install using pip** |
 | ------------------------------ | ---------- | ------------ |
 | PostgreSQL | yum install -y python3-psycopg2 | pip3 install psycopg2 |
@@ -75,53 +75,98 @@ make install
 II. Quick Guide
 ------------
 
-### 1. Manage the atuned service.
+### 1. Configure the A-Tune service.
 
-#### Load and start the atuned service.
+#### Modify the network and disk configuration in the atuned.cnf.
+
+You can run the following command to query the NIC that need to be specified for data collecting or optimizing NIC and change the network configuration item in the /etc/atuned/atuned.cnf to the specified NIC.
+
+```bash
+ip addr
+```
+
+You can run the following command to query the disk that need to be specified for data collection or disk optimization and change the disk configuration item in the /etc/atuned/atuned.cnf to the specified disk.
+
+```bash
+fdisk -l | grep dev
+```
+
+### 2. Manage the A-Tune service.
+
+#### Load and start the atuned and atune-engine service.
+
 ```bash
 systemctl daemon-reload
 systemctl start atuned
 systemctl start atune-engine
 ```
 
-#### Check the atuned service status.
+#### Check the atuned or atune-engine service status.
+
 ```bash
 systemctl status atuned
+systemctl status atune-engine
 ```
 
-### 2. Run the atune-adm command.
+### 3. Run the atune-adm command.
 
 #### The list command.
-This command is used to list the supported workload types, profiles, and the values of Active.
+
+This command is used to list the supported profiles, and the values of active.
 
 Format:
 
 atune-adm list
 
 Example:
+
 ```bash
 atune-adm list
 ```
 
-#### The analysis command.
+#### The profile command.
+
+Manually activate the profile to make it in the active state.
+
+Format:
+
+atune-adm profile <PROFILE>
+
+Example: Activate the profile corresponding to the web-nginx-http-long-connection.
+
+```bash
+atune-adm profile web-nginx-http-long-connection
+```
+
+#### The analysis command. (Online static tuning)
+
 This command is used to collect real-time statistics from the system to identify and automatically optimize workload types.
 
 Format:
 
-atune-adm analysis [OPTIONS] [APP_NAME]
+atune-adm analysis [OPTIONS]
 
-Example 1: Use the default model for classification and identification.
+Example 1: Use the default model to identify applications and perform automatic tuning.
+
 ```bash
 atune-adm analysis
 ```
+
 Example 2: Use the user-defined training model for recognition.
+
 ```bash
-atune-adm analysis –model ./model/new-model.m
+atune-adm analysis --model /usr/libexec/atuned/analysis/models/new-model.m
 ```
-Example 3: Specify the current system application as MySQL, which is for reference only.
-```bash
-atune-adm analysis mysql
-```
+
+#### The tuning command. (Offline dynamic tuning)
+
+Use the specified project file to search the dynamic space for parameters and find the optimal solution under the current environment configuration.
+
+Format:
+
+atune-adm tuning [OPTIONS] <PROJECT_YAML>
+
+Example: See [the A-Tune offline tuning example](./examples/tuning). Each example has a corresponding README guide.
 
 For details about other commands, see the atune-adm help information or [A-Tune User Guide](./Documentation/UserGuide/A-Tune-User-Guide.md).
 

@@ -31,8 +31,8 @@ yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
 #### 2、安装python依赖包  
-  
-#### 2.1 安装atuned及engine的依赖包
+
+#### 2.1 安装A-Tune服务的依赖包
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
@@ -41,7 +41,7 @@ yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-sci
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
 #### 2.2、安装数据库依赖包（可选）
-如用户已安装数据库应用，并需要将A-Tune采集的数据存储到数据库中，需要安装以下依赖包：
+如用户已安装数据库应用，并需要将A-Tune的采集和调优数据存储到数据库中，可以安装以下依赖包：
 ```bash
 yum install -y python3-sqlalchemy python3-cryptography
 ```
@@ -49,7 +49,7 @@ yum install -y python3-sqlalchemy python3-cryptography
 ```bash
 pip3 install sqlalchemy cryptography
 ```
-同时，根据不同的数据库需安装对应的依赖包。请参照下列表格匹配当前已支持的数据库，任选一种方式进行安装：
+同时，请参照下表，根据对应的数据库应用任选一种方式进行依赖安装。
 | **数据库** | **yum安装** | **pip安装** |
 | ------------------------------ | ---------- | ------------ |
 | PostgreSQL | yum install -y python3-psycopg2 | pip3 install psycopg2 |
@@ -75,53 +75,97 @@ make install
 二、快速使用指南
 ------------
 
-### 1、管理atuned服务
+### 1、配置A-Tune服务
 
-#### 加载并启动atuned服务
+#### 修改atuned.cnf配置文件中网卡和磁盘的信息
+
+通过以下命令可以查找当前需要采集或者执行网卡相关优化时需要指定的网卡，并修改/etc/atuned/atuned.cnf中的network配置选项为对应的指定网卡。
+
+```shell
+ip addr
+```
+
+通过以下命令可以查找当前需要采集或者执行磁盘相关优化时需要指定的磁盘，并修改/etc/atuned/atuned.cnf中的disk配置选项为对应的指定磁盘。
+
+```shell
+fdisk -l | grep dev
+```
+
+### 2、管理A-Tune服务
+
+#### 加载并启动atuned和atune-engine服务
+
 ```bash
 systemctl daemon-reload
 systemctl start atuned
 systemctl start atune-engine
 ```
 
-#### 查看atuned服务状态
+#### 查看atuned或atune-engine服务状态
+
 ```bash
 systemctl status atuned
+systemctl status atune-engine
 ```
 
-### 2、atune-adm命令
+### 3、atune-adm命令
 
 #### list命令
-列出系统当前支持的workload类型和对应的profile，当前处于active状态的workload类型。
+列出系统当前支持的profile，以及当前处于active状态的profile。
 
 接口语法：
 
 atune-adm list
 
-示例：
+运行示例：
+
 ```bash
 atune-adm list
 ```
 
-#### analysis命令
+#### profile命令
+
+激活profile，使其处于active状态。
+
+接口语法：
+
+atune-adm profile <PROFILE>
+
+运行示例：激活web-nginx-http-long-connection对应的profile配置
+
+```bash
+atune-adm profile web-nginx-http-long-connection
+```
+
+#### analysis命令（在线静态调优）
+
 实时采集系统的信息进行负载类型的识别，并自动执行对应的优化。
 
 接口语法：
 
-atune-adm analysis [OPTIONS] [APP_NAME]
+atune-adm analysis [OPTIONS]
 
-运行示例1：使用默认的模型进行分类识别
+运行示例1：使用默认的模型进行应用识别，并进行自动优化
+
 ```bash
 atune-adm analysis
 ```
-运行示例2：使用自定义训练的模型进行识别
+
+运行示例2：使用自定义训练的模型进行应用识别
+
 ```bash
-atune-adm analysis –model ./model/new-model.m
+atune-adm analysis --model /usr/libexec/atuned/analysis/models/new-model.m
 ```
-运行示例3：指定当前的系统应用为mysql，仅作为参考。
-```bash
-atune-adm analysis mysql
-```
+
+#### tuning命令（离线动态调优）
+
+使用指定的项目文件对所选参数进行动态空间的搜索，找到当前环境配置下的最优解。
+
+接口语法：
+
+atune-adm tuning [OPTIONS] <PROJECT_YAML>
+
+运行示例：参考[A-Tune 离线调优示例](./examples/tuning)，每一个示例中可参考对应的README指导文档。
 
 其他命令使用详见atune-adm help信息或[A-Tune用户指南](./Documentation/UserGuide/A-Tune用户指南.md)。
 
