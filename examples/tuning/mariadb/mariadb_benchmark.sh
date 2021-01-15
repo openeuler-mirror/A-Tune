@@ -10,7 +10,6 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2020-12-03
 
-systemctl restart mariadb
 tpcc_start -h 127.0.0.1 -P 3306 -d tpcctest -u root -w warehouses -c 5 -r 60 -l 300 2 &>tpcctest.log
 tail tpcctest.log
 rm -rf tpcctest.log

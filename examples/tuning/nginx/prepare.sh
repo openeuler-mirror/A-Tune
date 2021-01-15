@@ -20,6 +20,13 @@ systemctl stop firewalld
 echo "install nginx"
 yum install nginx gnutls gnutls-devel libev libev-devel -y
 
+echo "start nginx"
+if [ -f /run/nginx.pid ]; then
+  /usr/sbin/nginx -s stop
+  sleep 2
+fi
+/usr/sbin/nginx -c /etc/nginx/nginx.conf
+
 echo "install nginx benchmark"
 if [ ! -f /usr/bin/httpress ]; then
   rm -rf httpress
