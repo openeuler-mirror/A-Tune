@@ -598,3 +598,13 @@ func GetLogFilePath(dirPath string) (string, error) {
 	}
 	return "", fmt.Errorf("cannot find log file")
 }
+
+// Check whether the value is in the list
+func CheckValueInSlice(value string, strList []string) bool {
+	for _, str := range strList {
+		if str == value {
+			return true
+		}
+	}
+	return false
+}

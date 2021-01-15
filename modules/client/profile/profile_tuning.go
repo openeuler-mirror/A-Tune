@@ -17,6 +17,7 @@ import (
 	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/project"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
@@ -323,6 +324,13 @@ func checkTuningPrjYaml(prj *project.YamlPrjCli) error {
 	if len(prj.Evaluations) > 10 {
 		return fmt.Errorf("error: evaluations must be no greater than 10 "+
 			"in project %s", prj.Project)
+	}
+
+	for _, evaluation := range prj.Evaluations {
+		if !utils.CheckValueInSlice(evaluation.Info.Type, config.EvaluationType) {
+			return fmt.Errorf("error: evaluation(%s) type must be in %v in project %s",
+				evaluation.Name, config.EvaluationType, prj.Project)
+		}
 	}
 
 	if prj.RandomStarts < 0 {
