@@ -1,7 +1,7 @@
 project: "mariadb"
 maxiterations: 100
-startworkload: ""
-stopworkload: ""
+startworkload: "systemctl start mariadb"
+stopworkload: "systemctl stop mariadb"
 object : 
   -
     name : "mariadb.key_buffer_size"

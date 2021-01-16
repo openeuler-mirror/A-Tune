@@ -10,8 +10,4 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2020-11-26
 
-if [ -f /run/nginx.pid ]; then
-  /usr/sbin/nginx -s stop
-fi
-/usr/sbin/nginx -c /etc/nginx/nginx.conf
 httpress -n 1000000 -c 512 -t 7 -k http://localhost:80
