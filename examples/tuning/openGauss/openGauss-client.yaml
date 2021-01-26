@@ -3,12 +3,12 @@ engine: "bayes"
 random_starts: 20
 iterations : 100
 
-benchmark : "sh /benchmarksql-5.0/run/openGauss_run.sh"
+benchmark : "sh run/openGauss_run.sh"
 evaluations :
   -
     name: "tpmC"
     info:
-        get: "sh /benchmarksql-5.0/run/collect_openGauss.sh"
+        get: "sh run/collect_openGauss.sh"
         type: "negative"
         weight: 100
         threshold: 100
