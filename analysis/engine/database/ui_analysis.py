@@ -21,7 +21,8 @@ from flask import abort
 from flask_restful import Resource
 
 from analysis.engine.parser import UI_ANALYSIS_GET_PARSER
-from analysis.engine.database import trigger_analysis
+from analysis.engine.config import EngineConfig
+from resources import web
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -36,6 +37,36 @@ class UiAnalysis(Resource):
             abort(404, 'does not get command')
 
         args = UI_ANALYSIS_GET_PARSER.parse_args()
+        if not EngineConfig.db_enable:
+            if cmd == 'initialPage':
+                return web.get_analysis_list()
+
+            if cmd == 'rename':
+                name = args.get('name')
+                new_name = args.get('newName')
+                return web.rename_analysis_file(name, new_name)
+
+            if cmd == 'chooseFile':
+                name = args.get('name')
+                return json.dumps({'isExist': web.analysis_exist(name)}), 200, CORS
+
+            if cmd == 'getAnalysisData':
+                name = args.get('name')
+                csv_line = int(args.get('csvLine'))
+                log_line = int(args.get('logLine'))
+                if not web.analysis_exist(name):
+                    return json.dumps({'isExist': False}), 200, CORS
+                return json.dumps(web.get_analysis_details(name, csv_line, log_line)), 200, CORS
+
+            if cmd == 'compareWith':
+                name = args.get('name')
+                line = int(args.get('csvLine'))
+                if not web.analysis_exist(name):
+                    return json.dumps({'isExist': False}), 200, CORS
+                return json.dumps(web.get_analysis_details(name, line, -1)), 200, CORS
+            return '', 200, CORS
+
+        from analysis.engine.database import trigger_analysis
         if cmd == 'initialPage':
             uid = args.get('uid')
             res = trigger_analysis.get_analysis_list(int(uid))
