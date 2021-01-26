@@ -20,7 +20,7 @@ ps -ef | grep gauss > openGuass.txt
 cat openGuass.txt | grep gaussdb | awk '{ $1=NULL; print $10 }'
 gausspath=$(cat openGuass.txt | grep gaussdb | awk '{ $1=NULL; print $10 }')
 sed -i "s#cat .*/postgresql.conf#cat $gausspath/postgresql.conf#g" $path/openGauss.yaml
-sed -i "s#g' .*/postgresql.conf#g' $gausspath/postgresql.conf#g" $path/tuning/openGauss.yaml
+sed -i "s#g' .*/postgresql.conf#g' $gausspath/postgresql.conf#g" $path/openGauss.yaml
 
 echo "copy the server yaml file to /etc/atuned/tuning/"
 cp $path/openGauss.yaml /etc/atuned/tuning/
