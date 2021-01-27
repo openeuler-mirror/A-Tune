@@ -24,6 +24,7 @@ from analysis.atuned.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
 class Profile(Resource):
     """provide the method of get and put for profile"""
     section = "section"
+    cpi = CPI()
 
     def put(self):
         """
@@ -37,7 +38,7 @@ class Profile(Resource):
         submodule = None
         if len(modules) > 1:
             submodule = modules[1]
-        configurators = CPI.get_configurators(modules[0], submodule)
+        configurators = self.cpi.get_configurators(modules[0], submodule)
         if len(configurators) < 1:
             abort(404)
 
@@ -65,7 +66,7 @@ class Profile(Resource):
 
         modules = section.split(".")
         submodule = modules[1] if len(modules) > 1 else None
-        configurators = CPI.get_configurators(modules[0], submodule)
+        configurators = self.cpi.get_configurators(modules[0], submodule)
 
         if len(configurators) < 1:
             result["status"] = "FAILED"

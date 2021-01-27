@@ -30,6 +30,7 @@ class Monitor(Resource):
     """restful api for monitor, in order to provide the method of post and get"""
     module = "module"
     purpose = "purpose"
+    mpi = MPI()
 
     def get(self):
         """provide the method of get"""
@@ -44,7 +45,7 @@ class Monitor(Resource):
 
         path = None if path.strip() == "" else path
         para = None if para.strip() == "" else para
-        monitors = MPI.get_monitors(module, purpose)
+        monitors = self.mpi.get_monitors(module, purpose)
         if len(monitors) < 1:
             result["status"] = "module: {}, purpose:{} is not exist".format(module, purpose)
             return result, 200
@@ -66,7 +67,7 @@ class Monitor(Resource):
         args = MONITOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
 
-        monitors = MPI.get_monitors(args.get(self.module), args.get(self.purpose, None))
+        monitors = self.mpi.get_monitors(args.get(self.module), args.get(self.purpose, None))
 
         if len(monitors) < 1:
             abort(404)
