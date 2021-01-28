@@ -31,6 +31,7 @@ PARSER = reqparse.RequestParser()
 class Collector(Resource):
     """restful api with collector, in order to provide the method of post"""
     monitors = "monitors"
+    mpi = MPI()
 
     @marshal_with_field(PROFILE_GET_FIELD)
     def post(self):
@@ -43,7 +44,7 @@ class Collector(Resource):
         field_name = []
         for monitor in args.get(self.monitors):
             monitors.append([monitor["module"], monitor["purpose"], monitor["field"]])
-            mpis.append(MPI.get_monitor(monitor["module"], monitor["purpose"]))
+            mpis.append(self.mpi.get_monitor(monitor["module"], monitor["purpose"]))
             opts = monitor["field"].split(";")[1].split()
             for opt in opts:
                 if opt.split("=")[0] in "--fields":
@@ -64,7 +65,7 @@ class Collector(Resource):
         data = []
         data_field = []
         for _ in range(collect_num):
-            raw_data = MPI.get_monitors_data(monitors, mpis)
+            raw_data = self.mpi.get_monitors_data(monitors, mpis)
             current_app.logger.info(raw_data)
 
             float_data = list()

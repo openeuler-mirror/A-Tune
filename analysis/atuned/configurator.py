@@ -28,6 +28,7 @@ from analysis.atuned.field import CONFIGURATOR_PUT_FIELD
 class Configurator(Resource):
     """restful api for configurator, in order to provide the method of put and get"""
     section = "section"
+    cpi = CPI()
 
     @marshal_with_field(CONFIGURATOR_PUT_FIELD)
     def put(self):
@@ -47,7 +48,7 @@ class Configurator(Resource):
         submodule = None
         if len(modules) > 1:
             submodule = modules[1]
-        configurators = CPI.get_configurators(modules[0], submodule)
+        configurators = self.cpi.get_configurators(modules[0], submodule)
         if len(configurators) < 1:
             result["status"] = "module %s is not exist" % (section)
             return result, 200
@@ -88,7 +89,7 @@ class Configurator(Resource):
         submodule = None
         if len(modules) > 1:
             submodule = modules[1]
-        configurators = CPI.get_configurators(modules[0], submodule)
+        configurators = self.cpi.get_configurators(modules[0], submodule)
 
         if len(configurators) < 1:
             abort(404)
@@ -127,7 +128,7 @@ class Configurator(Resource):
         modules = section.split(".")
         submodule = modules[1] if len(modules) > 1 else modules[0]
 
-        configurators = CPI.get_configurators(modules[0], submodule)
+        configurators = self.cpi.get_configurators(modules[0], submodule)
         if len(configurators) < 1:
             abort(404)
 
