@@ -128,8 +128,6 @@ object :
   -
     name : "fs.aio-max-nr"
   -
-    name : "fs.inotify.max_user_watches"
-  -
     name : "fs.inotify.max_user_instances"
   -
     name : "fs.suid_dumpable"

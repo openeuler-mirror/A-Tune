@@ -854,20 +854,6 @@ When a container is used, the nf_conntrack module cannot be disabled. Therefore,
         items : 
         dtype : "int"
   -
-    name : "fs.inotify.max_user_watches"
-    info :
-        desc : "Maximum number of monitoring instances"
-        get : "sysctl -n fs.inotify.max_user_watches"
-        set : "sysctl -w fs.inotify.max_user_watches=$value"
-        needrestart : "false"
-        type : "discrete"
-        scope :
-          - 4096
-          - 65536
-        step : 4096
-        items : 
-        dtype : "int"
-  -
     name : "fs.inotify.max_user_instances"
     info :
         desc : "Maximum number of inotify instances that can be started by each user"

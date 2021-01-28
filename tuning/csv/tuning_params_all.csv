@@ -86,7 +86,6 @@ File system parameters,fs.inotify.max_user_watches,Sets the number of processes 
 ,fs.nr_open,Maximum number of file handles that can be concurrently opened by a process,sysctl -n @name,sysctl -w @name=$value,FALSE,discrete,,int,10240,1024000,10240,,yes,
 ,fs.file-max,Number of file handles that can be opened by all processes in the system at the same time,sysctl -n @name,sysctl -w @name=$value,FALSE,discrete,,int,102400,10240000,102400,,yes,
 ,fs.aio-max-nr,Maximum number of AIO requests,sysctl -n @name,sysctl -w @name=$value,FALSE,discrete,,int,102400,10240000,102400,,yes,
-,fs.inotify.max_user_watches,Maximum number of monitoring instances,sysctl -n @name,sysctl -w @name=$value,FALSE,discrete,,int,4096,65536,4096,,yes,
 ,fs.inotify.max_user_instances,Maximum number of inotify instances that can be started by each user,sysctl -n @name,sysctl -w @name=$value,FALSE,discrete,,int,64,65535,64,,yes,
 ,fs.suid_dumpable,"This value can be used to query and set the core dump mode for setuid or otherwise protected/tainted binaries.
 0: default
