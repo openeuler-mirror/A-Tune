@@ -14,10 +14,10 @@
 # 
 # Usage:
 #       docker build -f Dockerfile-atune-engine -t atune-engine .
-#       docker run -p [<HOST_IP>:]<HOST_PORT>:3838 atune-engine
+#       docker run -p [<HOST_IP>:]<HOST_PORT>:3838 -e ENGINE_TLS=false atune-engine
 #
 # Supported running arguments:
-#       -e PORT=<port number>               The atune-engine running port inside container, should be consistent with -p mapping port, default 3838
+#       -e PORT=<CONTAINER_PORT>            The atune-engine running port inside container, should be consistent with the second port of -p, default 3838
 #
 #       -e ENGINE_TLS=<true/false>          Whether using TLS to secure atuned client connection, default true
 #       -e ENGINE_TLS_CA_CERT_FILE=<path>       TLS ca.crt file path, default /etc/atuned/engine_certs/ca.crt
@@ -91,19 +91,26 @@
 # base image
 FROM python:3.8-slim
 
-# install python3 library dependencies
-# If meeting error like 'Failed building wheel for scikit-learn' under some OS, use following RUN to replace:
-# RUN apt update && \
-#     apt install -y gcc g++ && \
-#     pip3 install --no-cache-dir Flask-RESTful pandas scikit-optimize xgboost scikit-learn==0.23.1 pyyaml
-RUN pip3 install --no-cache-dir Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
+# update Debian source
+RUN echo 'deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster main' > /etc/apt/sources.list && \
+    echo 'deb https://mirrors.tuna.tsinghua.edu.cn/debian/ buster-updates main' >> /etc/apt/sources.list && \
+    echo 'deb https://mirrors.tuna.tsinghua.edu.cn/debian-security buster/updates main' >> /etc/apt/sources.list
 
-# in this RUN, we pull latest code from https://gitee.com/openeuler/A-Tune,
-# generate models, remove useless code files and clear cache to reduce image size
+# update pip source
+RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# install python3 library dependencies and rsyslog service
 RUN apt update && \
-    apt install -y --no-install-recommends rsyslog git && \
-    cd ~ && \
-    git -c http.sslVerify=false  clone https://gitee.com/openeuler/A-Tune.git --depth=1 && \
+    apt install -y --no-install-recommends rsyslog gcc g++ && \
+    pip3 install --no-cache-dir Flask-RESTful scipy==1.5.4 pandas scikit-learn==0.23.2 scikit-optimize xgboost pyyaml && \
+    apt purge -y gcc g++ && \
+    apt clean
+
+# in this RUN, we pull latest code from https://gitee.com/openeuler/A-Tune, and generate models
+# then keep necessary files, remove useless files and cache to reduce image size 
+RUN cd ~ && \
+    apt install -y --no-install-recommends git && \
+    git -c http.sslVerify=false clone https://gitee.com/openeuler/A-Tune.git --depth=1 && \
     cd ~/A-Tune/tools && \
     python3 generate_models.py && \
     mkdir -p /usr/libexec/atuned/analysis && \
@@ -123,9 +130,7 @@ RUN apt update && \
     cd ~ && \
     rm -rf ~/A-Tune && \
     apt purge -y git && \
-    apt autoremove -y && \
-    apt clean && \
-    rm -rf /var/lib/apt/lists/*
+    apt clean
 
 # default ENV variables in /etc/atuned/engine.cnf 
 ENV PORT=3838
