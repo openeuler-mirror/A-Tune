@@ -22,7 +22,7 @@ from flask_restful import Resource
 
 from analysis.engine.parser import UI_TUNING_GET_PARSER
 from analysis.engine.config import EngineConfig
-from resources import web
+from analysis.engine import transfer_web
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -40,34 +40,34 @@ class UiTuning(Resource):
         if not EngineConfig.db_enable:
             if cmd == 'initialPage':
                 status = args.get('status')
-                return web.get_type_list(status)
+                return transfer_web.get_type_list(status)
 
             if cmd == 'rename':
                 name = args.get('name')
                 new_name = args.get('newName')
-                return web.rename_tuning_file(name, new_name)
+                return transfer_web.rename_tuning_file(name, new_name)
 
             if cmd == 'chooseFile':
                 name = args.get('name')
                 status = args.get('status')
-                return json.dumps({'isExist': web.tuning_exist(status, name)}), 200, CORS
+                return json.dumps({'isExist': transfer_web.tuning_exist(status, name)}), 200, CORS
 
             if cmd == 'initialChart':
                 name = args.get('name')
                 status = args.get('status')
-                if not web.tuning_exist(status, name):
+                if not transfer_web.tuning_exist(status, name):
                     return json.dumps({'isExist': False}), 200, CORS
-                return json.dumps(web.get_file_info(status, name)), 200, CORS
+                return json.dumps(transfer_web.get_file_info(status, name)), 200, CORS
 
             if cmd == 'compareWith':
                 name = args.get('name')
                 line = args.get('line')
                 response_obj = {}
                 response_obj['status'] = 'finished'
-                if not web.tuning_exist('finished', name):
+                if not transfer_web.tuning_exist('finished', name):
                     response_obj['isExist'] = False
                     return json.dumps(response_obj), 200, CORS
-                return json.dumps(web.get_file_data('finished', name, line, response_obj)), 200, CORS
+                return json.dumps(transfer_web.get_file_data('finished', name, line, response_obj)), 200, CORS
 
             if cmd == 'getTuningData':
                 name = args.get('name')
@@ -75,14 +75,14 @@ class UiTuning(Resource):
                 line = args.get('line')
                 response_obj = {}
                 response_obj['status'] = status
-                if not web.tuning_exist(status, name):
+                if not transfer_web.tuning_exist(status, name):
                     response_obj['isExist'] = False
                     return json.dumps(response_obj), 200, CORS
-                return json.dumps(web.get_file_data(status, name, line, response_obj)), 200, CORS
+                return json.dumps(transfer_web.get_file_data(status, name, line, response_obj)), 200, CORS
 
             if cmd == 'getTuningStatus':
                 name = args.get('name')
-                return json.dumps(web.find_file_dir(name)), 200, CORS
+                return json.dumps(transfer_web.find_file_dir(name)), 200, CORS
             return '', 200, CORS
 
         from analysis.engine.database import trigger_tuning

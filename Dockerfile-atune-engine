@@ -124,7 +124,6 @@ RUN cd ~ && \
     mkdir -p ~/atune-engine && \
     cp -r ~/A-Tune/analysis ~/atune-engine && \
     cp -r ~/A-Tune/License ~/atune-engine && \
-    cp -r ~/A-Tune/resources  ~/atune-engine && \
     mkdir -p ~/atune-engine/tools && \
     cp ~/A-Tune/tools/encrypt.py  ~/atune-engine/tools/ && \
     cd ~ && \

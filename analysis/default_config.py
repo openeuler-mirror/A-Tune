@@ -19,6 +19,9 @@ LOCAL_ADDRS = '/var/run/atuned/atuned.sock'
 REST_CERT_PATH = '/etc/atuned/rest_certs/'
 ENGINE_CERT_PATH = '/etc/atuned/engine_certs/'
 GRPC_CERT_PATH = '/etc/atuned/grpc_certs'
+ANALYSIS_DATA_PATH = '/var/atune_data/analysis/'
+TUNING_DATA_PATH = '/var/atune_data/tuning/'
+TUNING_DATA_DIRS = ['running', 'finished', 'error']
 
 
 def get_or_default(config, section, key, value):

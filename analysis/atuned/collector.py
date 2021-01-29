@@ -103,7 +103,6 @@ class Collector(Resource):
 def save_file(file_name, datas, field):
     """save file"""
     path = os.path.dirname(file_name.strip())
-    if not os.path.exists(path):
-        os.makedirs(path, 0o750)
+    os.makedirs(path, 0o750, exist_ok=True)
     writer = pd.DataFrame(columns=field, data=datas)
     writer.to_csv(file_name, encoding='utf-8', index=False)

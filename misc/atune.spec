@@ -120,14 +120,12 @@ make models
 %attr(0640,root,root) %{_unitdir}/atune-engine.service
 %attr(0640,root,root) %{_unitdir}/atune-web.service
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
-%attr(0750,root,root) /usr/libexec/atuned/resources/*
 %attr(0750,root,root) /etc/atuned/*
 %exclude /usr/libexec/atuned/analysis/app_rest.py
 %exclude /usr/libexec/atuned/analysis/plugin/
 %exclude /usr/libexec/atuned/analysis/atuned/
 %exclude /usr/libexec/atuned/analysis/dataset/
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
-%attr(0750,root,root) %dir /usr/libexec/atuned/resources
 %attr(0750,root,root) %dir /etc/atuned
 %exclude /etc/atuned/atuned.cnf
 %exclude /etc/atuned/rules
