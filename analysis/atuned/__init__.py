@@ -14,4 +14,7 @@
 """
 Init files
 """
+from atune_collector.plugin.plugin import CPI, MPI
 
+CPI_INSTANCE = CPI()
+MPI_INSTANCE = MPI()
