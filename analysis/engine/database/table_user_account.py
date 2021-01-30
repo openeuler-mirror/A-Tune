@@ -16,12 +16,12 @@ Mapping for user_account table.
 """
 
 from sqlalchemy import Column, VARCHAR, Integer, UniqueConstraint, PrimaryKeyConstraint
-from sqlalchemy import func, select, insert
+from sqlalchemy import func, select, insert, update
 
-from analysis.engine.database.tables import Base
+from analysis.engine.database.tables import BASE
 
 
-class UserAccount(Base):
+class UserAccount(BASE):
     """mapping user_account table"""
 
     __tablename__ = 'user_account'
@@ -63,9 +63,16 @@ class UserAccount(Base):
         return uid
 
     @staticmethod
-    def insert_new_user(uid, email, name, pwd, session):
+    def insert_new_user(uid, email, name, pwd, session, role='user'):
         """insert new user into user_account table"""
         sql = insert(UserAccount).values(user_id=uid, account_name=name, email=email,
-                password=pwd)
+                password=pwd, role=role)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_password(uid, pwd, session):
+        """update password"""
+        sql = update(UserAccount).where(UserAccount.user_id == uid).values(password=pwd)
         res = session.execute(sql)
         return res is not None

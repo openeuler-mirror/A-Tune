@@ -19,17 +19,17 @@ from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstrain
 from sqlalchemy.orm import relationship
 from sqlalchemy import insert, select
 
-from analysis.engine.database.tables import Base
+from analysis.engine.database.tables import BASE
 from analysis.engine.database.table_user_account import UserAccount
 
 
-class IpAddrs(Base):
+class IpAddrs(BASE):
     """mapping ip_addrs table"""
 
     __tablename__ = 'ip_addrs'
 
     user_id = Column(Integer, ForeignKey('user_account.user_id'))
-    ip = Column(VARCHAR(255), autoincrement=True, nullable=False)
+    ip = Column(VARCHAR(255), nullable=False)
     ip_status = Column(VARCHAR(255), nullable=False, default='rest')
     fk_user = relationship(UserAccount, backref='ip_addrs')
 
@@ -63,3 +63,9 @@ class IpAddrs(Base):
         for each_line in tuples:
             res.append(each_line[0])
         return res
+
+    @staticmethod
+    def check_exist_by_ip(ip_addr, uid, session):
+        """check if (uid, ip) exist"""
+        sql = select([IpAddrs]).where(IpAddrs.user_id == uid).where(IpAddrs.ip == ip_addr)
+        return session.execute(sql).scalar() is not None

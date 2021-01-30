@@ -19,11 +19,11 @@ import time
 from sqlalchemy import Column, VARCHAR, Integer
 from sqlalchemy import func, select, insert, update
 
-from analysis.engine.database.tables import Base
+from analysis.engine.database.tables import BASE
 from analysis.engine.utils import utils
 
 
-class CollectionTable(Base):
+class CollectionTable(BASE):
     """mapping collection_table table"""
 
     __tablename__ = 'collection_table'
