@@ -46,11 +46,12 @@ class AppEngine(App):
 
 def main(filename):
     """app main function"""
-    EngineConfig.initial_params(filename)
+    if not EngineConfig.initial_params(filename):
+        return
     app_engine = AppEngine()
-    app_engine.startup_app(filename, "engine_host", "engine_port", "engine_tls",
-                           "tlsengineservercertfile", "tlsengineserverkeyfile",
-                           "tlsenginecacertfile")
+    app_engine.startup_app(EngineConfig.engine_host, EngineConfig.engine_port, EngineConfig.engine_tls,
+                           EngineConfig.engine_server_cert, EngineConfig.engine_server_key,
+                           EngineConfig.engine_ca_file, EngineConfig.level)
 
 
 if __name__ == '__main__':

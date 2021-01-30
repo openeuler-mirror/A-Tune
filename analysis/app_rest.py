@@ -21,6 +21,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.app import App
 from analysis.atuned import configurator, monitor, collector, profile
+from analysis.atuned.config import AtunedConfig
 
 
 class AppRest(App):
@@ -36,9 +37,12 @@ class AppRest(App):
 
 def main(filename):
     """app main function"""
+    if not AtunedConfig.initial_params(filename):
+        return
     app_engine = AppRest()
-    app_engine.startup_app(filename, "rest_host", "rest_port", "rest_tls",
-                           "tlsrestservercertfile", "tlsrestserverkeyfile", "tlsrestcacertfile")
+    app_engine.startup_app(AtunedConfig.rest_host, AtunedConfig.rest_port, AtunedConfig.rest_tls,
+                           AtunedConfig.rest_server_cert, AtunedConfig.rest_server_key,
+                           AtunedConfig.rest_ca_file, AtunedConfig.level)
 
 
 if __name__ == '__main__':

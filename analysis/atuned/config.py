@@ -55,10 +55,10 @@ class AtunedConfig:
     sel_feature = ''
 
     @staticmethod
-    def initial_pararms(filename):
+    def initial_params(filename):
         """initial all params"""
         if not os.path.exists(filename):
-            return
+            return False
         config = ConfigParser()
         config.read(filename)
         AtunedConfig.protocol = get_or_default(config, 'server', 'protocol', 'unix')
@@ -102,3 +102,4 @@ class AtunedConfig:
         AtunedConfig.user = get_or_default(config, 'system', 'user', 'root')
         AtunedConfig.noise = get_or_default(config, 'tuning', 'noise', '0.000000001')
         AtunedConfig.sel_feature = get_or_default_bool(config, 'tuning', 'sel_feature', False)
+        return True

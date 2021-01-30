@@ -45,7 +45,7 @@ class EngineConfig:
     def initial_params(filename):
         """initial all params"""
         if not os.path.exists(filename):
-            return
+            return False
         config = ConfigParser()
         config.read(filename)
         EngineConfig.engine_host = get_or_default(config, 'server', 'engine_host', 'localhost')
@@ -69,4 +69,4 @@ class EngineConfig:
             EngineConfig.user_passwd = get_or_default(config, 'database', 'user_passwd', '')
             EngineConfig.passwd_key = get_or_default(config, 'database', 'passwd_key', '')
             EngineConfig.passwd_iv = get_or_default(config, 'database', 'passwd_iv', '')
-
+        return True
