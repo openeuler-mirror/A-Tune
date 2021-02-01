@@ -17,7 +17,6 @@ Flask application initialization, including log configuration, restful api regis
 import os
 import ssl
 import logging
-from configparser import ConfigParser
 from logging.handlers import SysLogHandler
 from flask import Flask
 from flask_restful import Api
@@ -50,22 +49,13 @@ class App:
     def add_resource(self):
         """flask app add resource"""
 
-    def startup_app(self, filename, host_tag, port_tag, tls_tag, cert_tag, key_tag, ca_tag):
+    def startup_app(self, host, port, tls, cert_file, key_file, ca_file, log_level):
         """start flask app"""
-        if not os.path.exists(filename):
-            return
-        config = ConfigParser()
-        config.read(filename)
-        level = logging.getLevelName(config.get("log", "level").upper())
+        level = logging.getLevelName(log_level.upper())
         self.config_log(level)
         self.add_resource()
-        host = config.get("server", host_tag)
-        port = config.get("server", port_tag)
         context = None
-        if config.has_option("server", tls_tag) and config.get("server", tls_tag) == "true":
-            cert_file = config.get("server", cert_tag)
-            key_file = config.get("server", key_tag)
-            ca_file = config.get("server", ca_tag)
+        if tls:
             context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             context.load_cert_chain(certfile=cert_file, keyfile=key_file)
             context.load_verify_locations(ca_file)
