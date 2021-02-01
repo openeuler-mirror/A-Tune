@@ -16,10 +16,11 @@ Restful api for monitor, in order to provide the method of post and get.
 """
 
 import getopt
-from atune_collector.plugin.plugin import MPI
 from flask import abort
 from flask import current_app
 from flask_restful import reqparse, Resource
+
+from analysis.atuned import MPI_INSTANCE
 from analysis.atuned.parser import MONITOR_GET_PARSER
 from analysis.atuned.parser import MONITOR_POST_PARSER
 
@@ -30,7 +31,6 @@ class Monitor(Resource):
     """restful api for monitor, in order to provide the method of post and get"""
     module = "module"
     purpose = "purpose"
-    mpi = MPI()
 
     def get(self):
         """provide the method of get"""
@@ -45,7 +45,7 @@ class Monitor(Resource):
 
         path = None if path.strip() == "" else path
         para = None if para.strip() == "" else para
-        monitors = self.mpi.get_monitors(module, purpose)
+        monitors = MPI_INSTANCE.get_monitors(module, purpose)
         if len(monitors) < 1:
             result["status"] = "module: {}, purpose:{} is not exist".format(module, purpose)
             return result, 200
@@ -67,7 +67,7 @@ class Monitor(Resource):
         args = MONITOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
 
-        monitors = self.mpi.get_monitors(args.get(self.module), args.get(self.purpose, None))
+        monitors = MPI_INSTANCE.get_monitors(args.get(self.module), args.get(self.purpose, None))
 
         if len(monitors) < 1:
             abort(404)

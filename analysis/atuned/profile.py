@@ -14,17 +14,17 @@
 """
 Restful api for profile, in order to provide the method of get and put.
 """
-from atune_collector.plugin.plugin import CPI
 from flask import abort
 from flask import current_app
 from flask_restful import Resource
+
+from analysis.atuned import CPI_INSTANCE
 from analysis.atuned.parser import PROFILE_GET_PARSER, PROFILE_PUT_PARSER
 
 
 class Profile(Resource):
     """provide the method of get and put for profile"""
     section = "section"
-    cpi = CPI()
 
     def put(self):
         """
@@ -38,7 +38,7 @@ class Profile(Resource):
         submodule = None
         if len(modules) > 1:
             submodule = modules[1]
-        configurators = self.cpi.get_configurators(modules[0], submodule)
+        configurators = CPI_INSTANCE.get_configurators(modules[0], submodule)
         if len(configurators) < 1:
             abort(404)
 
@@ -66,7 +66,7 @@ class Profile(Resource):
 
         modules = section.split(".")
         submodule = modules[1] if len(modules) > 1 else None
-        configurators = self.cpi.get_configurators(modules[0], submodule)
+        configurators = CPI_INSTANCE.get_configurators(modules[0], submodule)
 
         if len(configurators) < 1:
             result["status"] = "FAILED"
