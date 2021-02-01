@@ -108,7 +108,32 @@ systemctl status atuned
 systemctl status atune-engine
 ```
 
-### 3、atune-adm命令
+### 3、生成AI模型
+
+用户可以将新采集的数据存放到A-Tune/analysis/dataset目录下，并通过执行模型生成工具，更新A-Tune/analysis/models目录下的AI模型。
+
+接口语法：
+
+python3 generate_models.py <OPTIONS>
+
+参数说明
+
+- OPTIONS
+
+| 参数             | 描述                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| --csv_path, -d   | 存放模型训练所需的csv文件目录，默认为A-Tune/analysis/dataset目录 |
+| --model_path, -m | 训练生成的新模型存放路径，默认为A-Tune/analysis/models目录   |
+| --select, -s     | 是否生成特征模型，默认为否                                   |
+| --search, -g     | 是否启用参数空间搜索，默认为否                               |
+
+运行示例：
+
+```
+python3 generate_models.py
+```
+
+### 4、atune-adm命令
 
 #### list命令
 列出系统当前支持的profile，以及当前处于active状态的profile。
