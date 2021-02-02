@@ -17,31 +17,21 @@ Web UI initialization
 
 
 import os
-import sys
 import json
 import time
 import numpy
-from configparser import ConfigParser
-from flask import Flask, jsonify, request
-from flask_restful import reqparse
 
-FILE_PATH = os.path.realpath(os.path.dirname(__file__))
-sys.path.insert(0, FILE_PATH + "/../")
-from analysis.engine.parser import UI_TUNING_GET_PARSER, UI_ANALYSIS_GET_PARSER
 from analysis.engine.config import EngineConfig
-
-app = Flask(__name__)
-app.config.from_object(__name__)
+from analysis.engine.utils import utils
+from analysis.default_config import ANALYSIS_DATA_PATH, TUNING_DATA_PATH
 
 CORS = [('Access-Control-Allow-Origin', '*')]
 
 
 def tuning_exist(status, file_name):
     """check if tuning file exist"""
-    path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
-    if not os.path.exists(path):
-        return False
-    return True
+    path = TUNING_DATA_PATH + status + '/' + file_name + '.txt'
+    return os.path.exists(path)
 
 
 def get_file_info(status, file_name):
@@ -49,7 +39,7 @@ def get_file_info(status, file_name):
     response_object = {}
     response_object['status'] = status
     response_object['file_name'] = file_name
-    path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
+    path = TUNING_DATA_PATH + status + '/' + file_name + '.txt'
     params = []
     with open(path, 'r') as tuning_file:
         infos = tuning_file.readline()[:-1].split(',')
@@ -66,7 +56,7 @@ def get_file_info(status, file_name):
 
 def rename_tuning_file(file_name, new_name):
     """rename tuning file"""
-    locate = '/var/atune_data/tuning/finished/'
+    locate = TUNING_DATA_PATH + 'finished/'
     old_path = locate + file_name + '.txt'
     new_path = locate + new_name + '.txt'
     response_object = rename_file(old_path, new_path)
@@ -78,7 +68,7 @@ def get_file_data(status, file_name, line, response_object):
     line = int(line)
     response_object['file_name'] = file_name
     response_object['initial_line'] = line
-    path = '/var/atune_data/tuning/' + status + '/' + file_name + '.txt'
+    path = TUNING_DATA_PATH + status + '/' + file_name + '.txt'
     res = []
     cost = []
     count = 0
@@ -116,15 +106,7 @@ def get_file_data(status, file_name, line, response_object):
 def get_type_list(types):
     """get type list"""
     res = []
-    path = '/var/atune_data/tuning/'
-    if not os.path.exists(path):
-        os.makedirs(path)
-    if not os.path.exists(path + '/running'):
-        os.makedirs(path + '/running')
-    if not os.path.exists(path + '/finished'):
-        os.makedirs(path + '/finished')
-    if not os.path.exists(path + '/error'):
-        os.makedirs(path + '/error')
+    utils.create_dir()
 
     if types == 'all':
         res, _ = get_file_list('running', res)
@@ -144,11 +126,10 @@ def find_file_dir(filename):
     """find file by name"""
     response_object = {}
     response_object['status'] = 'running'
-    path = '/var/atune_data/tuning/'
     filename += '.txt'
-    if os.path.exists(path + 'finished/' + filename):
+    if os.path.exists(TUNING_DATA_PATH + 'finished/' + filename):
         response_object['status'] = 'finished'
-    elif os.path.exists(path + 'error/' + filename):
+    elif os.path.exists(TUNING_DATA_PATH + 'error/' + filename):
         response_object['status'] = 'error'
     else:
         response_object['status'] = 'unknown'
@@ -158,14 +139,13 @@ def find_file_dir(filename):
 def get_analysis_list():
     """get analysis file list"""
     response_object = {}
-    path = '/var/atune_data/analysis'
     res = []
-    filelist = os.listdir(path)
+    filelist = os.listdir(ANALYSIS_DATA_PATH)
     for each in filelist:
         if each.endswith('.csv'):
             filename = each.rsplit('.')[0]
             if filename not in res:
-                filepath = path + '/' + each
+                filepath = ANALYSIS_DATA_PATH + each
                 modify = os.path.getmtime(filepath)
                 times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
                 temp = {'name': filename, 'status': 'finished', 'date': times, 'info': EngineConfig.engine_host}
@@ -177,9 +157,8 @@ def get_analysis_list():
 
 def rename_analysis_file(file_name, new_name):
     """rename tuning file"""
-    locate = '/var/atune_data/analysis/'
-    old_path = locate + file_name
-    new_path = locate + new_name
+    old_path = ANALYSIS_DATA_PATH + file_name
+    new_path = ANALYSIS_DATA_PATH + new_name
     response_object = rename_file(old_path + '.csv', new_path + '.csv')
     rename_file(old_path + '.log', new_path + '.log')
     return json.dumps(response_object), 200, CORS
@@ -187,15 +166,13 @@ def rename_analysis_file(file_name, new_name):
 
 def analysis_exist(file_name):
     """check if analysis file exist"""
-    path = '/var/atune_data/analysis/' + file_name
-    if not os.path.exists(path + ".csv"):
-        return False
-    return True
+    path = ANALYSIS_DATA_PATH + file_name
+    return os.path.exists(path + ".csv")
 
 
 def get_analysis_details(file_name, csv_line, log_line):
     """get analysis info details"""
-    path = '/var/atune_data/analysis/' + file_name
+    path = ANALYSIS_DATA_PATH + file_name
     response_object = {}
     response_object['isExist'] = True
     csv_res, csv_count, table_header = get_analysis_csv(path + ".csv", csv_line)
@@ -262,7 +239,7 @@ def get_analysis_csv(path, line):
 
 def get_file_list(file_type, res):
     """get file list by type"""
-    path = '/var/atune_data/tuning/' + file_type
+    path = TUNING_DATA_PATH + file_type
     filelist = os.listdir(path)
     for each in filelist:
         filepath = path + '/' + each

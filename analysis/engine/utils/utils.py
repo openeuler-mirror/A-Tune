@@ -15,18 +15,20 @@
 Provide an interface to read data from csv.
 """
 
-import os
 import re
 import datetime
 import shutil
 import logging
 import tarfile
 import pandas as pd
+from pathlib import Path
+
+from analysis.default_config import TUNING_DATA_PATH, TUNING_DATA_DIRS
 
 
 def read_from_csv(path):
     """read data from csv"""
-    if not os.path.exists(path):
+    if not Path(path).exists():
         return None
     if not path.endswith('.csv'):
         return None
@@ -49,8 +51,8 @@ def extract_file(file_path, target_path):
 
 def add_data_to_file(data, mode, filename):
     """write tuning result to file"""
-    path = "/var/atune_data/tuning/running/"
-    if not os.path.exists(path):
+    path = TUNING_DATA_PATH + "running/"
+    if not Path(path).exists():
         create_dir()
     path = path + filename + ".txt"
     with open(path, mode) as file_handle:
@@ -61,26 +63,15 @@ def add_data_to_file(data, mode, filename):
 
 def create_dir():
     """create dir if not exist"""
-    path = "/var/atune_data/"
-    if not os.path.exists(path):
-        os.makedirs(path)
-    path += "tuning/"
-    if not os.path.exists(path):
-        os.makedirs(path)
-    if not os.path.exists(path + "/running"):
-        os.makedirs(path + "/running")
-    if not os.path.exists(path + "/finished"):
-        os.makedirs(path + "/finished")
-    if not os.path.exists(path + "/error"):
-        os.makedirs(path + "/error")
+    for dir_name in TUNING_DATA_DIRS:
+        Path(TUNING_DATA_PATH + dir_name).mkdir(parents=True, exist_ok=True)
 
 
 def change_file_name(filename, dest):
     """change tuning file name"""
-    path = "/var/atune_data/tuning/running/"
-    dir_path = "/var/atune_data/tuning/" + dest + "/"
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
+    path = TUNING_DATA_PATH + "running/"
+    dir_path = TUNING_DATA_PATH + dest + "/"
+    Path(dir_path).mkdir(parents=True, exist_ok=True)
     shutil.move(path + filename + ".txt", dir_path + filename + ".txt")
 
 

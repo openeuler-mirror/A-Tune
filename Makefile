@@ -78,7 +78,6 @@ libinstall:
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/training
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
 	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
-	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources
 	mkdir -p $(DESTDIR)/var/lib/atuned
 	mkdir -p $(DESTDIR)/var/run/atuned
 	mkdir -p $(DESTDIR)/var/atuned
@@ -96,8 +95,6 @@ libinstall:
 	install -m 640 misc/atune-adm $(DESTDIR)$(PREFIX)/share/bash-completion/completions/
 	\cp -rf analysis/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/
-	\cp -rf resources/* $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources/
-	chmod -R 750 $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/resources/
 	\cp -rf profiles/* $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	@echo "END INSTALL A-Tune"

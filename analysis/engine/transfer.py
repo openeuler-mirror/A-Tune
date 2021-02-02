@@ -41,8 +41,7 @@ class Transfer(Resource):
 
         if service == "classification":
             file_name = "/var/atune_data/analysis/"
-            if not os.path.exists(file_name):
-                os.makedirs(file_name)
+            os.makedirs(file_name, exist_ok=True)
             file_name += save_path.split(self.file_path + service)[1]
             current_app.logger.info(file_name)
             current_app.logger.info(request.remote_addr)
