@@ -19,11 +19,11 @@ from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstrain
 from sqlalchemy.orm import relationship
 from sqlalchemy import func, insert, select
 
-from analysis.engine.database.tables import Base
+from analysis.engine.database.tables import BASE
 from analysis.engine.database.table_collection import CollectionTable
 
 
-class AnalysisLog(Base):
+class AnalysisLog(BASE):
     """mapping analysis_log table"""
 
     __tablename__ = 'analysis_log'

@@ -17,7 +17,6 @@ Base func for all tables.
 
 import base64
 import logging
-from configparser import ConfigParser
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -25,7 +24,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-Base = declarative_base()
+from analysis.engine.config import EngineConfig
+
+BASE = declarative_base()
 LOGGER = logging.getLogger(__name__)
 
 
@@ -36,7 +37,7 @@ def get_session():
         return None
     try:
         engine = create_engine(url)
-        Base.metadata.create_all(engine, checkfirst=True)
+        BASE.metadata.create_all(engine, checkfirst=True)
         postgre_session_maker = sessionmaker(bind=engine)
         session = postgre_session_maker()
     except SQLAlchemyError as err:
@@ -67,20 +68,14 @@ def convert_to_bytes(value):
 
 def get_db_url():
     """combine engine url according to conf"""
-    config = ConfigParser()
-    config.read('/etc/atuned/engine.cnf')
-    if not config.has_option('database', 'db_enable') or \
-            not config.get('database', 'db_enable').lower() == 'true':
+    if not EngineConfig.db_enable:
         return None
     url = ''
-    if config.get('database', 'database').lower() == 'postgresql':
+    if EngineConfig.database.lower() == 'postgresql':
         url += 'postgresql://'
     else:
         return None
-    pwd = decrypted_code(config.get('database', 'user_passwd'),
-            config.get('database', 'passwd_key'), config.get('database', 'passwd_iv'))
-    url += config.get('database', 'user_name') + ':' + pwd + '@' \
-            + config.get('database', 'db_host') + ':' + config.get('database', 'db_port') + '/' \
-            + config.get('database', 'db_name')
-
+    pwd = decrypted_code(EngineConfig.user_passwd, EngineConfig.passwd_key, EngineConfig.passwd_iv)
+    url += EngineConfig.user_name + ':' + pwd + '@' + EngineConfig.db_host + ':' \
+            + EngineConfig.db_port + '/' + EngineConfig.db_name
     return url
