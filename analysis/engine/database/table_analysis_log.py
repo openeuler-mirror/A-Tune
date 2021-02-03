@@ -15,12 +15,10 @@
 Mapping for analysis_log table.
 """
 
-from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, VARCHAR, Integer, PrimaryKeyConstraint
 from sqlalchemy import func, insert, select
 
 from analysis.engine.database.tables import BASE
-from analysis.engine.database.table_collection import CollectionTable
 
 
 class AnalysisLog(BASE):
@@ -28,14 +26,13 @@ class AnalysisLog(BASE):
 
     __tablename__ = 'analysis_log'
 
-    analysis_id = Column(Integer, ForeignKey('collection_table.collection_id'))
+    analysis_id = Column(Integer, nullable=False)
     round_num = Column(Integer, nullable=False)
     section = Column(VARCHAR(255), nullable=False)
     status = Column(VARCHAR(255), nullable=False)
     analysis_key = Column(VARCHAR(255), nullable=False)
     analysis_value = Column(VARCHAR(255), nullable=False)
     notes = Column(VARCHAR(255), nullable=True)
-    fk_analysis = relationship(CollectionTable, backref='analysis_log')
 
     __table_args__ = (
         PrimaryKeyConstraint('analysis_id', 'round_num', name='pk_analysis_log'),

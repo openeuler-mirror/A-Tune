@@ -15,12 +15,10 @@
 Mapping for ip_addrs table.
 """
 
-from sqlalchemy import Column, VARCHAR, Integer, ForeignKey, PrimaryKeyConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, VARCHAR, Integer, PrimaryKeyConstraint
 from sqlalchemy import insert, select
 
 from analysis.engine.database.tables import BASE
-from analysis.engine.database.table_user_account import UserAccount
 
 
 class IpAddrs(BASE):
@@ -28,10 +26,9 @@ class IpAddrs(BASE):
 
     __tablename__ = 'ip_addrs'
 
-    user_id = Column(Integer, ForeignKey('user_account.user_id'))
+    user_id = Column(Integer, nullable=False)
     ip = Column(VARCHAR(255), nullable=False)
     ip_status = Column(VARCHAR(255), nullable=False, default='rest')
-    fk_user = relationship(UserAccount, backref='ip_addrs')
 
     __table_args__ = (
         PrimaryKeyConstraint('user_id', 'ip', name='pk_ip_addrs'),
