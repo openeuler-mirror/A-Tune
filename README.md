@@ -108,7 +108,32 @@ systemctl status atuned
 systemctl status atune-engine
 ```
 
-### 3. Run the atune-adm command.
+### 3、Generate AI models.
+
+You can save the newly collected data to the A-Tune/analysis/dataset directory and run the model generation tool to update the AI model in the A-Tune/analysis/models directory.
+
+**Format**
+
+python3 generate_models.py <OPTIONS>
+
+**Parameter Description**
+
+- OPTIONS
+
+| Parameter        | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| --csv_path, -d   | Path for storing CSV files required for model training. The default directory is A-Tune/analysis/dataset. |
+| --model_path, -m | Path for storing the new models generated during training. The default path is A-Tune/analysis/models. |
+| --select, -s     | Indicates whether to generate feature models. The default value is false. |
+| --search, -g     | Indicates whether to enable parameter space search. The default value is false. |
+
+Example：
+
+```
+python3 generate_models.py
+```
+
+### 4. Run the atune-adm command.
 
 #### The list command.
 
