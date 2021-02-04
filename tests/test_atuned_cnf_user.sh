@@ -63,7 +63,7 @@ test01()
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
     atune-adm analysis
-    check_result $? 1
+    check_result $? 0
 
     if [ $EXIT_FLAG -ne 0 ];then
         tst_resm TFAIL

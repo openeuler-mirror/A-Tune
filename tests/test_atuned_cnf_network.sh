@@ -39,7 +39,6 @@ test01()
     # Correct configuration test
     sys_network=`ip address | grep UP | awk 'NR==1{print $2}' | awk -F ':' '{print $1}'`
     check_conf_value network $sys_network
-    res=$?
 
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
@@ -53,7 +52,7 @@ test01()
         systemctl restart $ATUNE_SERVICE_NAME
         wait_service_ready $ATUNE_SERVICE_NAME
         atune-adm analysis
-        check_result $? $res
+        check_result $? 0
     done
     
     # Comment network configuration
@@ -61,7 +60,7 @@ test01()
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
     atune-adm analysis
-    check_result $? $res
+    check_result $? 0
 
     if [ $EXIT_FLAG -ne 0 ];then
         tst_resm TFAIL

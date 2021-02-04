@@ -52,10 +52,10 @@ test01()
     systemctl restart $ATUNE_SERVICE_NAME
     wait_service_ready $ATUNE_SERVICE_NAME
     netstat -anp | grep 5000 | grep atuned
-    check_result $? 0
+    check_result $? 1
 
     atune-adm analysis
-    check_result $? 0
+    check_result $? 1
 
     # The value of the port configuration is special character and boundary
     array=("$SPECIAL_CHARACTERS" "65536" "-1")

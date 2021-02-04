@@ -45,7 +45,7 @@ test01()
     sed -i 's/export GOMP_CPU_AFFINITY.*$/#export GOMP_CPU_AFFINITY=0-$[CPUNO - 1]/g' /etc/profile.d/performance.sh
     make startup
     cd tools/
-    python3 generate_models.py -d ../analysis/dataset -m ../analysis/models -s True -g True
+    python3 generate_models.py -d ../analysis/dataset -m ../analysis/models
     ret2=$?
     if [ $ret1 == 0 ] && [ $ret2 == 0 ]; then
          tst_resm TPASS "make models"
