@@ -20,8 +20,17 @@ import numpy
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy import Table, Column, VARCHAR, Integer
 from sqlalchemy import text
+from sqlalchemy.engine.reflection import Inspector
 
 from analysis.engine.database.tables import get_db_url
+
+
+def exists_table(table_name):
+    """check if table exists"""
+    engine = create_engine(get_db_url())
+    inspector = Inspector.from_engine(engine)
+    table = inspector.get_table_names()
+    return table_name in table
 
 
 def initial_table(table_name, session):
@@ -44,6 +53,8 @@ def get_max_round(cid, cip, session):
     table_name = get_table_name(cip)
     if table_name is None:
         return False
+    if not exists_table(table_name):
+        initial_table(table_name, session)
     sql = 'select max(round) from ' + table_name + ' where collection_id = :id'
     cid = session.execute(text(sql), {'id': cid}).scalar()
     if cid is None or cid == -1:
