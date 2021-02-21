@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.app import App
 from analysis.engine import optimizer, classification, train, transfer, detect
 from analysis.engine.config import EngineConfig
-from analysis.engine.database import ui_tuning, ui_analysis
+from analysis.engine.database import ui_tuning, ui_analysis, ui_user
 
 
 class AppEngine(App):
@@ -39,9 +39,7 @@ class AppEngine(App):
         self.api.add_resource(detect.Detecting, '/v1/detecting', '/v1/detecting')
         self.api.add_resource(ui_tuning.UiTuning, '/v1/UI/tuning/<string:cmd>')
         self.api.add_resource(ui_analysis.UiAnalysis, '/v1/UI/analysis/<string:cmd>')
-        if EngineConfig.db_enable:
-            from analysis.engine.database import ui_user
-            self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
+        self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
 
 
 def main(filename):
