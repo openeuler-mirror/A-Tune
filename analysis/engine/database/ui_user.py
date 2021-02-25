@@ -21,7 +21,6 @@ from flask import abort
 from flask_restful import Resource
 
 from analysis.engine.parser import UI_USER_GET_PARSER
-from analysis.engine.database import trigger_user
 from analysis.engine.config import EngineConfig
 
 LOGGER = logging.getLogger(__name__)
@@ -37,6 +36,15 @@ class UiUser(Resource):
             abort(404, 'does not get command')
 
         args = UI_USER_GET_PARSER.parse_args()
+        if cmd == 'initialPage':
+            if not EngineConfig.db_enable:
+                return json.dumps({'connectDB': False}), 200, CORS
+
+            from analysis.engine.database import trigger_user
+            has_user = True if trigger_user.count_user() > 0 else False
+            return json.dumps({'connectDB': True, 'hasUser': has_user}), 200, CORS
+
+        from analysis.engine.database import trigger_user
         if cmd == 'login':
             email = args.get('email')
             pwd = args.get('password')
@@ -73,13 +81,6 @@ class UiUser(Resource):
             pwd = args.get('password')
             new_pwd = args.get('newPasswd')
             return json.dumps(trigger_user.change_user_pwd(uid, pwd, new_pwd)), 200, CORS
-
-        if cmd == 'initialPage':
-            if EngineConfig.db_enable:
-                print(EngineConfig.db_enable, EngineConfig.db_host, EngineConfig.db_port)
-                has_user = True if trigger_user.count_user() > 0 else False
-                return json.dumps({'connectDB': True, 'hasUser': has_user}), 200, CORS
-            return json.dumps({'connectDB': False}), 200, CORS
 
         if cmd == 'createAdmin':
             has_user = True if trigger_user.count_user() > 0 else False
