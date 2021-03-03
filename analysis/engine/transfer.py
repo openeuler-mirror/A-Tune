@@ -24,6 +24,7 @@ from flask_restful import request
 from analysis.engine.utils import utils
 from analysis.engine.parser import TRANSFER_PUT_PARSER
 from analysis.engine.config import EngineConfig
+from analysis.default_config import ANALYSIS_DATA_PATH
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,11 +41,9 @@ class Transfer(Resource):
         service = request.form.get("service")
 
         if service == "classification":
-            file_name = "/var/atune_data/analysis/"
             os.makedirs(file_name, exist_ok=True)
-            file_name += save_path.split(self.file_path + service)[1]
+            file_name = ANALYSIS_DATA_PATH + save_path.split(self.file_path + service)[1][1:]
             current_app.logger.info(file_name)
-            current_app.logger.info(request.remote_addr)
             file_obj.save(file_name)
             return file_name, 200
 
