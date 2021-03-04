@@ -41,7 +41,7 @@ class Transfer(Resource):
         service = request.form.get("service")
 
         if service == "classification":
-            os.makedirs(file_name, exist_ok=True)
+            os.makedirs(ANALYSIS_DATA_PATH, exist_ok=True)
             file_name = ANALYSIS_DATA_PATH + save_path.split(self.file_path + service)[1][1:]
             current_app.logger.info(file_name)
             file_obj.save(file_name)
