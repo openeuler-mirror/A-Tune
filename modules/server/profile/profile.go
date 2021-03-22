@@ -1437,7 +1437,7 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 	absPath, _ := filepath.Split(localPath)
 	logPath := absPath + "test-" + timestamp + ".log"
 	log.Infof("log file path: %s", logPath)
-	_, err = os.Create(logPath)
+	_, err = os.OpenFile(logPath, os.O_WRONLY|os.O_CREATE, 0640)
 	if err != nil {
 		log.Errorf("Failed to create log file: %v", err)
 		return workloadType, resourceLimit, err
