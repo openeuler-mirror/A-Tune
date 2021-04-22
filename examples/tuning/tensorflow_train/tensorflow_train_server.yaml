@@ -1,0 +1,43 @@
+project: "tensorflow_train"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "BatchSize"
+    info :
+        desc : "The BatchSize parameter is an integer from 8 to 64 representing the sample size to feed to ANN every train step"
+        get : "cat tensorflow_train/tensorflow_train.py | grep 'BATCH_SIZE =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^BATCH_SIZE =\\s*[0-9]*/BATCH_SIZE = $value/g' tensorflow_train/tensorflow_train.py"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 8
+          - 64
+        dtype : "int"
+  -
+    name : "Optimizer"
+    info :
+        desc : "The Optimizer parameter is a string of the optimizer name when training ANN"
+        get : "cat tensorflow_train/tensorflow_train.py | grep 'OPTIMIZER =' | awk -F '=' '{print $2}' | sed 's/\"//g'"
+        set : "sed -i 's/^OPTIMIZER =\\s*[0-9,a-z,\"]*/OPTIMIZER = \"$value\"/g' tensorflow_train/tensorflow_train.py"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "sgd"
+          - "adagrad"
+          - "adadelta"
+          - "adam" 
+        dtype : "string"
+  -
+    name : "LearningRate"
+    info :
+        desc : "The LearningRate parameter is an integer from 1 to 6 representing (original) learning rate of 1e-1 to 1e-6 when training ANN"
+        get : "cat tensorflow_train/tensorflow_train.py | grep 'LEARNING_RATE =' | awk -F '= 1e-' '{print $2}'"
+        set : "sed -i 's/^LEARNING_RATE = 1e-\\s*[0-9]*/LEARNING_RATE = 1e-$value/g' tensorflow_train/tensorflow_train.py"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 6
+        dtype : "int"
