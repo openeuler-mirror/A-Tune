@@ -1,0 +1,19 @@
+project: "tensorflow_train"
+engine : "gbrt"
+iterations : 30
+random_starts : 10
+
+benchmark : "python3 tensorflow_train/tensorflow_train.py"
+evaluations :
+  -
+    name: "accuracy"
+    info:
+        get: "echo '$out' | grep 'accuracy' | awk '{print $3}'"
+        type: "negative"
+        weight: 90
+  -
+    name: "time"
+    info:
+        get: "echo '$out' | grep 'time' | awk '{print $3}'"
+        type: "positive"
+        weight: 10
