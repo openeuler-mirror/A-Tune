@@ -31,8 +31,8 @@ class AppRest(App):
         """flask app add resource"""
         self.api.add_resource(configurator.Configurator, '/v1/setting', '/setting')
         self.api.add_resource(monitor.Monitor, '/v1/monitor', '/monitor')
-        self.api.add_resource(collector.Collector, '/v1/collector', '/v1/collector')
-        self.api.add_resource(profile.Profile, '/v1/profile', '/v1/profile')
+        self.api.add_resource(collector.Collector, '/v1/collector', '/collector')
+        self.api.add_resource(profile.Profile, '/v1/profile', '/profile')
 
 
 def main(filename):
