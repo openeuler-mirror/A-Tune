@@ -101,11 +101,11 @@ func newRequest(method string, url string, body interface{}) (*http.Request, err
 	}
 
 	request, err := http.NewRequest(method, url, reader)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	if err != nil {
 		return nil, err
 	}
 
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Add("Content-Type", "application/json")
 
 	return request, nil

@@ -14,6 +14,8 @@
 package schedule
 
 import (
+	"context"
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/sched"
@@ -22,8 +24,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sysload"
 	"gitee.com/openeuler/A-Tune/common/topology"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"context"
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -113,12 +113,13 @@ func (s *ScheduleManager) New(strategy string, pids string, opts ...Option) (*ge
 	return scheduler, nil
 }
 
+// start the scheduler instance
 func (s *ScheduleManager) Start() {
 	if s.IsRunning() {
 		return
 	}
 
-	if s.isSchdulerNill() {
+	if s.isSchedulerNil() {
 		return
 	}
 
@@ -139,6 +140,7 @@ func (s *ScheduleManager) setRunning(running bool) {
 	s.running = running
 }
 
+// return whether the scheduler is running
 func (s *ScheduleManager) IsRunning() bool {
 	s.Lock()
 	defer s.Unlock()
@@ -146,7 +148,7 @@ func (s *ScheduleManager) IsRunning() bool {
 	return s.running
 }
 
-func (s *ScheduleManager) isSchdulerNill() bool {
+func (s *ScheduleManager) isSchedulerNil() bool {
 	s.Lock()
 	defer s.Unlock()
 
