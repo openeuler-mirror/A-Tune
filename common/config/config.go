@@ -217,17 +217,17 @@ func (c *Cfg) Load() error {
 	section = cfg.Section("system")
 	Network = section.Key("network").MustString("")
 
-	net, err := getValidNetwork(Network)
+	validNetwork, err := getValidNetwork(Network)
 	if err != nil {
 		return err
 	}
 
-	if Network != net {
-		section.Key("network").SetValue(net)
+	if Network != validNetwork {
+		section.Key("network").SetValue(validNetwork)
 		if err := cfg.SaveTo(defaultConfigFile); err != nil {
 			return err
 		}
-		Network = net
+		Network = validNetwork
 	}
 
 	section = cfg.Section("tuning")

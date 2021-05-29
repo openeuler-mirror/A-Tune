@@ -14,6 +14,8 @@
 package schedule
 
 import (
+	"encoding/json"
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
@@ -22,8 +24,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/utils"
 	"gitee.com/openeuler/A-Tune/common/models"
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"io"
 	"os"

@@ -138,9 +138,10 @@ func NewClient(addr string, port string, opts ...Opt) (*Client, error) {
 	return newClient(address, opts...)
 }
 
+// UnixConnect method creates a connection to given address
 func UnixConnect(ctx context.Context, addr string) (net.Conn, error) {
-	unix_addr, _ := net.ResolveUnixAddr("unix", addr)
-	return net.DialUnix("unix", nil, unix_addr)
+	unixAddr, _ := net.ResolveUnixAddr("unix", addr)
+	return net.DialUnix("unix", nil, unixAddr)
 }
 
 func newClient(address string, opts ...Opt) (*Client, error) {
