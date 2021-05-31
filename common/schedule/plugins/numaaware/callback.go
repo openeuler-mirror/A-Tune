@@ -37,7 +37,7 @@ func (callback *lighterLoadCallback) Callback(node *topology.TopoNode) {
 	}
 }
 
-// SelectTypeNode select most less load with TopoType t
+// SelectTypeNode select node with least load and TopoType t
 func SelectTypeNode(t topology.TopoType) *topology.TopoNode {
 	var callback lighterLoadCallback
 	callback.t = t
@@ -47,6 +47,7 @@ func SelectTypeNode(t topology.TopoType) *topology.TopoNode {
 	return callback.node
 }
 
+// SelectLighterLoadNode select given node's child which has least load and TopoType t
 func SelectLighterLoadNode(node *topology.TopoNode, t topology.TopoType) *topology.TopoNode {
 	var callback lighterLoadCallback
 	callback.t = t
@@ -76,6 +77,7 @@ func (callback *lighterBindCallback) Callback(node *topology.TopoNode) {
 	}
 }
 
+// SelectLighterLoadNode select given node's child which has least bind and TopoType t
 func SelectLighterBindNode(node *topology.TopoNode, t topology.TopoType) *topology.TopoNode {
 	var callback lighterBindCallback
 	callback.t = t

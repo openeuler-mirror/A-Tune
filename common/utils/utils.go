@@ -88,6 +88,7 @@ const (
 	MaxFileSize int64       = 100 * 1024 * 1024
 )
 
+// Rest service host and port
 var RestHost = "localhost"
 var RestPort = "8383"
 
@@ -315,7 +316,7 @@ func DiskByName(disk string) error {
 	return fmt.Errorf("disk %s is not exist", disk)
 }
 
-// common input string validator
+// IsInputStringValid: common input string validator
 func IsInputStringValid(input string) bool {
 	if input != "" {
 		if isOk, _ := regexp.MatchString("^[a-zA-Z0-9/._-]*$", input); isOk {
@@ -325,7 +326,7 @@ func IsInputStringValid(input string) bool {
 	return false
 }
 
-//write or append string to file
+// WriteFile: write or append string to file
 func WriteFile(filename string, data string, perm os.FileMode, wrapper int) error {
 	f, err := os.OpenFile(filename, wrapper, perm)
 	if err != nil {
@@ -341,7 +342,7 @@ func WriteFile(filename string, data string, perm os.FileMode, wrapper int) erro
 	return err
 }
 
-//parse yaml or xml file
+// ParseFile: parse yaml or xml file
 func ParseFile(filePath string, fileFormat string, out interface{}) error {
 	exist, err := PathExist(filePath)
 	if err != nil {
@@ -485,11 +486,11 @@ func Compress(file *os.File, prefix string, tarWrt *tar.Writer) error {
 		}
 	} else {
 		header, err := tar.FileInfoHeader(info, "")
-		if !strings.EqualFold(prefix, "") {
-			header.Name = prefix + "/" + header.Name
-		}
 		if err != nil {
 			return err
+		}
+		if !strings.EqualFold(prefix, "") {
+			header.Name = prefix + "/" + header.Name
 		}
 		err = tarWrt.WriteHeader(header)
 		if err != nil {
@@ -504,11 +505,13 @@ func Compress(file *os.File, prefix string, tarWrt *tar.Writer) error {
 	return nil
 }
 
+// Pair: pair of name and score
 type Pair struct {
 	Name  string
 	Score float64
 }
 
+// SortedPair: Pairs sorted by score
 type SortedPair []Pair
 
 func (p SortedPair) Swap(i, j int) {
@@ -527,6 +530,7 @@ func IsEquals(a, b float64) bool {
 	return math.Abs(a-b) < accurency
 }
 
+// CalculateBenchMark: parse benchmark string
 func CalculateBenchMark(eval string) (float64, error) {
 	kvs := strings.Split(eval, "=")
 	if len(kvs) != 2 {
@@ -568,13 +572,13 @@ func StandardDeviation(data []float64) float64 {
 	return math.Sqrt(Variance(data))
 }
 
-// Change file name
+// ChangeFileName: Change file name
 func ChangeFileName(dataPath string) (string, string, error) {
-	path, fileName := filepath.Split(dataPath)
+	dir, fileName := filepath.Split(dataPath)
 	extension := filepath.Ext(dataPath)
 	name := strings.TrimSuffix(fileName, extension)
 	timestamp := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	newFilePath := path + name + "-" + timestamp + extension
+	newFilePath := dir + name + "-" + timestamp + extension
 	log.Infof("new file path: %s", newFilePath)
 	err := os.Rename(dataPath, newFilePath)
 	if err != nil {
@@ -583,7 +587,7 @@ func ChangeFileName(dataPath string) (string, string, error) {
 	return newFilePath, timestamp, nil
 }
 
-// Get log file path
+// GetLogFilePath: Get log file path
 func GetLogFilePath(dirPath string) (string, error) {
 	dir, err := ioutil.ReadDir(dirPath)
 	if err != nil {
