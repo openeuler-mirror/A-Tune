@@ -166,12 +166,14 @@ func (t *TuningFile) Save(dstFile string) error {
 
 }
 
+// RuleEngine: holds context and knowledge base
 type RuleEngine struct {
 	DataContext   *gContext.DataContext
 	Grool         *engine.Grool
 	KnowledgeBase *model.KnowledgeBase
 }
 
+// NewRuleEngine: builds and returns a new instance of rule engine from source file
 func NewRuleEngine(srcFile string) *RuleEngine {
 	ruleEngine := new(RuleEngine)
 
@@ -189,6 +191,7 @@ func NewRuleEngine(srcFile string) *RuleEngine {
 	return ruleEngine
 }
 
+// AddContext: add context to the rule engine
 func (r *RuleEngine) AddContext(key string, obj interface{}) error {
 	err := r.DataContext.Add(key, obj)
 	if err != nil {
@@ -198,6 +201,7 @@ func (r *RuleEngine) AddContext(key string, obj interface{}) error {
 	return nil
 }
 
+// Execute: rule engine start to execute based on context and knowledge base
 func (r *RuleEngine) Execute() error {
 	if r.Grool == nil {
 		return fmt.Errorf("grool engine is nill")

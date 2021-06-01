@@ -233,7 +233,7 @@ func getChipMask(cpu int) *cpumask.Cpumask {
 }
 
 func getNumaID(cpu int) int {
-	var node int = -1
+	var node = -1
 	var err error
 	cpuDirPath := fmt.Sprintf("%s/cpu%d/", sysCPUPath, cpu)
 
@@ -684,7 +684,7 @@ func GetLoad() int {
 	return tree.root.GetLoad()
 }
 
-// GetLoad return system total idle
+// GetIdle return system total idle
 func GetIdle() int {
 	return tree.root.GetIdle()
 }

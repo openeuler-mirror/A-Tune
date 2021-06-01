@@ -14,10 +14,10 @@
 package sysload
 
 import (
-	"gitee.com/openeuler/A-Tune/common/topology"
 	"bufio"
 	"container/list"
 	"fmt"
+	"gitee.com/openeuler/A-Tune/common/topology"
 	"os"
 	"runtime"
 	"strconv"
@@ -51,6 +51,7 @@ type timeUsage struct {
 	load       int
 }
 
+// cpu stat type enum
 type CPUStatType int
 
 const (
@@ -68,6 +69,7 @@ const (
 	CPUStatMAX       CPUStatType = 11
 )
 
+// data structure containing update time and all cpu stat
 type CPUStat struct {
 	lastUpdate time.Time
 	Fields     [CPUStatMAX]uint64

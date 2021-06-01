@@ -467,7 +467,7 @@ func (o *Optimizer) filterParams() (string, error) {
 	mean := utils.Mean(o.EvalStatistics)
 	sd := utils.StandardDeviation(o.EvalStatistics)
 	log.Infof("Eval statistics: %v, mean: %v, sd: %v", o.EvalStatistics, mean, sd)
-	if float64(sd)/math.Abs(mean) < o.EvalFluctuation {
+	if sd/math.Abs(mean) < o.EvalFluctuation {
 		skipIndex = 0
 	}
 
@@ -586,14 +586,14 @@ func deleteTask(url string) error {
 	return nil
 }
 
-//check server prj
+// CheckServerPrj: check server prj
 func CheckServerPrj(data string, optimizer *Optimizer) error {
 	projects := strings.Split(data, ",")
 
 	log.Infof("client ask project: %s", data)
 	requireProject := make(map[string]struct{})
-	for _, project := range projects {
-		requireProject[strings.TrimSpace(project)] = struct{}{}
+	for _, projectStr := range projects {
+		requireProject[strings.TrimSpace(projectStr)] = struct{}{}
 	}
 
 	var prjs []*project.YamlPrjSvr
@@ -635,7 +635,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	return nil
 }
 
-//sync tuned node
+// SyncTune: sync tuned node
 func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 	log.Infof("setting params is: %s", string(o.Content))
 	commands := strings.Split(string(o.Content), ",")

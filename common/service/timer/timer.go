@@ -14,12 +14,12 @@
 package timer
 
 import (
+	"fmt"
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
 	"io"
 	"strconv"
 	"time"
