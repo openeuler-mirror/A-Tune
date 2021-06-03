@@ -51,3 +51,27 @@ object :
     name : "net.core.somaxconn"
   -
     name : "net.ipv4.tcp_max_tw_buckets"
+  -
+    name : "mysql.innodb_io_capacity"
+  -
+    name : "mysql.innodb_write_io_threads"
+  -
+    name : "mysql.innodb_read_io_threads"
+  -
+    name : "mysql.innodb_spin_wait_delay"
+  -
+    name : "mysql.innodb_sync_spin_loops"
+  -
+    name : "mysql.innodb_log_file_size"
+  -
+    name : "mysql.innodb_log_files_in_group"
+  -
+    name : "mysql.innodb_buffer_pool_instances"
+  -
+    name : "mysql.innodb_log_buffer_size"
+  -
+    name : "mysql.innodb_page_cleaners"
+  -
+    name : "mysql.innodb_lru_scan_depth"
+  -
+    name : "mysql.innodb_thread_concurrency"

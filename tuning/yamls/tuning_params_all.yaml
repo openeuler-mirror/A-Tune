@@ -3881,3 +3881,147 @@ The default value is 2048. You are advised to change the value to 8192."
           - "yes"
           - "no"
         dtype : "string"
+  -
+    name : "mysql.innodb_io_capacity"
+    info :
+        desc : "Defines the number of I/O operations per second (IOPS) available to InnoDB background tasks."
+        get : "cat /etc/my.cnf | grep 'innodb_io_capacity' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_io_capacity.*$/innodb_io_capacity=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 100
+          - 10000
+        dtype : "int"
+  -
+    name : "mysql.innodb_write_io_threads"
+    info :
+        desc : "The number of I/O threads for write operations in InnoDB."
+        get : "cat /etc/my.cnf | grep 'innodb_write_io_threads' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_write_io_threads.*$/innodb_write_io_threads=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 2
+          - 200
+        dtype : "int"
+  -
+    name : "mysql.innodb_read_io_threads"
+    info :
+        desc : "The number of I/O threads for read operations in InnoDB."
+        get : "cat /etc/my.cnf | grep 'innodb_read_io_threads' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_read_io_threads.*$/innodb_read_io_threads=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 2
+          - 30
+        dtype : "int"
+  -
+    name : "mysql.innodb_spin_wait_delay"
+    info :
+        desc : "The maximum delay between polls for a spin lock."
+        get : "cat /etc/my.cnf | grep 'innodb_spin_wait_delay' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_spin_wait_delay.*$/innodb_spin_wait_delay=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 2
+          - 30
+        dtype : "int"
+  -
+    name : "mysql.innodb_sync_spin_loops"
+    info :
+        desc : "The number of times a thread waits for an InnoDB mutex to be freed before the thread is suspended."
+        get : "cat /etc/my.cnf | grep 'innodb_sync_spin_loops' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_sync_spin_loops.*$/innodb_sync_spin_loops=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 10
+          - 500
+        dtype : "int"
+  -
+    name : "mysql.innodb_log_file_size"
+    info :
+        desc : "The size in bytes of each log file in a log group."
+        get : "cat /etc/my.cnf | grep 'innodb_log_file_size' | awk -F '=' '{print $2}' | awk -F 'M' '{print $1}'"
+        set : "sed -i 's/^innodb_log_file_size.*$/innodb_log_file_size=$valueM/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 10
+          - 1024
+        dtype : "int"
+  -
+    name : "mysql.innodb_log_files_in_group"
+    info :
+        desc : "The number of log files in the log group."
+        get : "cat /etc/my.cnf | grep 'innodb_log_files_in_group' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_log_files_in_group.*$/innodb_log_files_in_group=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "mysql.innodb_buffer_pool_instances"
+    info :
+        desc : "The number of regions that the InnoDB buffer pool is divided into."
+        get : "cat /etc/my.cnf | grep 'innodb_buffer_pool_instances' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_buffer_pool_instances.*$/innodb_buffer_pool_instances=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "mysql.innodb_log_buffer_size"
+    info :
+        desc : "The size in bytes of the buffer that InnoDB uses to write to the log files on disk."
+        get : "cat /etc/my.cnf | grep 'innodb_log_buffer_size' | awk -F '=' '{print $2}' | awk -F 'M' '{print $1}'"
+        set : "sed -i 's/^innodb_log_buffer_size.*$/innodb_log_buffer_size=$valueM/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 8
+          - 1024
+        dtype : "int"
+  -
+    name : "mysql.innodb_page_cleaners"
+    info :
+        desc : "The number of page cleaner threads that flush dirty pages from buffer pool instances."
+        get : "cat /etc/my.cnf | grep 'innodb_page_cleaners' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_page_cleaners.*$/innodb_page_cleaners=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "mysql.innodb_lru_scan_depth"
+    info :
+        desc : "A parameter that influences the algorithms and heuristics for the flush operation for the InnoDB buffer pool."
+        get : "cat /etc/my.cnf | grep 'innodb_lru_scan_depth' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_lru_scan_depth.*$/innodb_lru_scan_depth=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 20
+          - 2000
+        dtype : "int"
+  -
+    name : "mysql.innodb_thread_concurrency"
+    info :
+        desc : "Defines the maximum number of threads permitted inside of InnoDB."
+        get : "cat /etc/my.cnf | grep 'innodb_thread_concurrency' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_thread_concurrency.*$/innodb_thread_concurrency=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 300
+        dtype : "int"
