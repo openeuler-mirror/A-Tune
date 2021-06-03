@@ -1,0 +1,13 @@
+project: "mysql_sysbench"
+engine : "gbrt"
+iterations : 30
+random_starts : 10
+
+benchmark : "sh mysql_sysbench/mysql_sysbench_benchmark.sh"
+evaluations :
+  -
+    name: "QPS"
+    info:
+        get: "cat mysql_sysbench/sysbench_oltp_read_write.log  | grep 'queries:' | awk -F '(' '{print $2}' | awk -F ' ' '{print $1}'"
+        type: "negative"
+        weight: 100
