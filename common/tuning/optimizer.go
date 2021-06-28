@@ -597,6 +597,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	}
 
 	var prjs []*project.YamlPrjSvr
+	var yamlPaths []string
 	err := filepath.Walk(config.DefaultTuningPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			prj := new(project.YamlPrjSvr)
@@ -605,6 +606,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 			}
 			log.Infof("project:%s load %s success", prj.Project, path)
 			prjs = append(prjs, prj)
+			yamlPaths = append(yamlPaths, path)
 		}
 		return nil
 	})
@@ -613,12 +615,12 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 		return err
 	}
 
-	for _, prj := range prjs {
+	for idx, prj := range prjs {
 		if _, ok := requireProject[prj.Project]; !ok {
 			continue
 		}
 
-		log.Infof("find Project:%s", prj.Project)
+		log.Infof("find Project:%s from %s", prj.Project, yamlPaths[idx])
 		if optimizer.Prj == nil {
 			optimizer.Prj = prj
 			continue
