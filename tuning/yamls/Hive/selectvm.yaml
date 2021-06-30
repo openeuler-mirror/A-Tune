@@ -1,0 +1,54 @@
+project: selectvm
+maxiterations: 100
+startworkload: ''
+stopworkload: ''
+object:
+  -
+    name : "vm.swappiness"
+
+  -
+    name : "vm.vfs_cache_pressure"
+
+  -
+    name : "vm.dirty_background_ratio"
+
+  -
+    name : "vm.dirty_ratio"
+
+  -
+    name : "vm.stat_interval"
+
+  -
+    name : "vm.dirty_expire_centisecs"
+
+  -
+    name : "vm.dirty_writeback_centisecs"
+
+  -
+    name : "vm.overcommit_ratio"
+
+  -
+    name : "vm.overcommit_memory"
+
+  -
+    name : "vm.min_free_kbytes"
+
+  -
+    name : "vm.page-cluster"
+
+  -
+    name : "vm.max_map_count"
+
+  -
+    name : "vm.zone_reclaim_mode"
+
+  -
+    name : "vm.watermark_scale_factor"
+
+  -
+    name : "vm.numa_stat"
+
+  -
+    name : "vm.drop_caches"
+
+

@@ -1,0 +1,226 @@
+project: selectnet
+maxiterations: 100
+startworkload: ''
+stopworkload: ''
+object:
+
+  -
+    name : "net.netfilter.nf_conntrack_max"
+
+  -
+    name : "net.mtu"
+
+  -
+    name : "net.tx-frames"
+
+  -
+    name : "net.tx-usecs"
+
+  -
+    name : "net.tx-ring buffer size"
+
+  -
+    name : "net.generic-receive-offload"
+
+  -
+    name : "net.generic-segmentation-offload"
+
+  -
+    name : "net.tcp-segmentation-offload"
+
+  -
+    name : "net.core.netdev_budget"
+
+  -
+    name : "net.core.optmem_max"
+
+  -
+    name : "net.core.wmem_max"
+
+  -
+    name : "net.core.wmem_default"
+
+  -
+    name : "net.core.rmem_default"
+
+  -
+    name : "net.core.rmem_max"
+
+  -
+    name : "net.core.netdev_max_backlog"
+
+  -
+    name : "net.ipv4.tcp_thin_linear_timeouts"
+
+  -
+    name : "net.unix.max_dgram_qlen"
+
+  -
+    name : "net.core.somaxconn"
+
+  -
+    name : "net.core.busy_poll"
+
+  -
+    name : "net.core.busy_read"
+
+  -
+    name : "net.core.dev_weight"
+
+  -
+    name : "net.ipv4.tcp_keepalive_intvl"
+
+  -
+    name : "net.ipv4.tcp_keepalive_probes"
+
+  -
+    name : "net.ipv4.tcp_keepalive_time"
+
+  -
+    name : "net.ipv4.tcp_tw_reuse"
+
+  -
+    name : "net.ipv4.tcp_window_scaling"
+
+  -
+    name : "net.ipv4.tcp_fin_timeout"
+
+  -
+    name : "net.ipv4.udp_mem"
+
+  -
+    name : "net.ipv4.tcp_mem"
+
+  -
+    name : "net.ipv4.tcp_rmem"
+
+  -
+    name : "net.ipv4.tcp_wmem"
+
+  -
+    name : "net.ipv4.tcp_fastopen"
+
+  -
+    name : "net.ipv4.tcp_synack_retries"
+
+  -
+    name : "net.ipv4.tcp_syn_retries"
+
+  -
+    name : "net.ipv4.tcp_moderate_rcvbuf"
+
+  -
+    name : "net.ipv4.tcp_timestamps"
+
+  -
+    name : "net.ipv4.tcp_dsack"
+
+  -
+    name : "net.ipv4.tcp_fack"
+
+  -
+    name : "net.ipv4.tcp_sack"
+
+  -
+    name : "net.ipv4.tcp_low_latency"
+
+  -
+    name : "net.ipv4.tcp_adv_win_scale"
+
+  -
+    name : "net.ipv4.route.max_size"
+
+  -
+    name : "net.ipv4.tcp_max_tw_buckets"
+
+  -
+    name : "net.ipv4.tcp_max_syn_backlog"
+
+  -
+    name : "net.ipv4.tcp_max_orphans"
+
+  -
+    name : "net.ipv4.tcp_ecn"
+
+  -
+    name : "net.ipv4.ip_forward"
+
+  -
+    name : "net.ipv4.conf.default.rp_filter"
+
+  -
+    name : "net.ipv4.ip_local_port_range"
+
+  -
+    name : "net.ipv4.tcp_no_metrics_save"
+
+  -
+    name : "net.ipv4.ip_default_ttl"
+
+  -
+    name : "net.ipv4.ip_no_pmtu_disc"
+
+  -
+    name : "net.ipv4.tcp_retries2"
+
+  -
+    name : "net.ipv4.tcp_orphan_retries"
+
+  -
+    name : "net.ipv4.tcp_syncookies"
+
+  -
+    name : "net.ipv4.tcp_reordering"
+
+  -
+    name : "net.ipv4.tcp_retrans_collapse"
+
+  -
+    name : "net.ipv4.tcp_congestion_control"
+
+  -
+    name : "net.ipv4.conf.default.promote_secondaries"
+
+  -
+    name : "net.ipv4.conf.all.promote_secondaries"
+
+  -
+    name : "net.ipv4.conf.all.accept_redirects"
+
+  -
+    name : "net.ipv4.conf.default.accept_redirects"
+
+  -
+    name : "net.ipv4.conf.all.secure_redirects"
+
+  -
+    name : "net.ipv4.conf.default.secure_redirects"
+
+  -
+    name : "net.ipv4.icmp_echo_ignore_broadcasts"
+
+  -
+    name : "net.nf_conntrack_max"
+
+  -
+    name : "net.netfilter.nf_conntrack_tcp_timeout_established"
+    
+  -
+    name : "net.netfilter.nf_conntrack_tcp_timeout_close_wait"
+    
+  -
+    name : "net.netfilter.nf_conntrack_tcp_timeout_fin_wait"
+    
+  -
+    name : "net.netfilter.nf_conntrack_tcp_timeout_time_wait"
+    
+  -
+    name : "net.ipv4.conf.default.forwarding"
+    
+  -
+    name : "net.core.rps_sock_flow_entries"
+
+  -
+    name : "net.ipv4.tcp_min_tso_segs"
+
+

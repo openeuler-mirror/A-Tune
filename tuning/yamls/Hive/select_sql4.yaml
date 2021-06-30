@@ -1,0 +1,128 @@
+project: selectsql4
+maxiterations: 100
+startworkload: ''
+stopworkload: ''
+object:
+
+  -
+    name : "kernel.sched_cfs_bandwidth_slice_us"
+
+  -
+    name : "kernel.sched_nr_migrate"
+
+  -
+    name : "kernel.sched_min_granularity_ns"
+
+  -
+    name : "kernel.sched_tunable_scaling"
+
+  -
+    name : "transparent_hugepage.defrag"
+
+  -
+    name : "kernel.pid_max"
+
+  -
+    name : "kernel.shmmni"
+
+  -
+    name : "kernel.core_uses_pid"
+
+  -
+    name : "kernel.hung_task_timeout_secs"
+
+  -
+    name : "kernel.nmi_watchdog"
+
+  -
+    name : "block.fifo_batch_multidisk"
+
+  -
+    name : "block.front_merges_multidisk"
+
+  -
+    name : "block.read_expire_multidisk"
+
+  -
+    name : "block.writes_starved_multidisk"
+
+  -
+    name : "block.queue_depth_multidisk"
+
+  -
+    name : "block.nr_requests_multidisk"
+
+  -
+    name : "block.rq_affinity_multidisk"
+
+  -
+    name : "block.add_random_multidisk"
+
+  -
+    name : "block.write_cache_multidisk"
+
+  -
+    name : "block.nomerges_multidisk"
+
+  -
+    name : "vm.dirty_ratio"
+
+  -
+    name : "vm.stat_interval"
+
+  -
+    name : "vm.zone_reclaim_mode"
+
+  -
+    name : "vm.max_map_count"
+
+  -
+    name : "vm.vfs_cache_pressure"
+
+  -
+    name : "vm.dirty_expire_centisecs"
+
+  -
+    name : "vm.dirty_writeback_centisecs"
+
+  -
+    name : "vm.overcommit_ratio"
+
+  -
+    name : "vm.dirty_background_ratio"
+
+  -
+    name : "vm.swappiness"
+
+  -
+    name : "net.ipv4.tcp_orphan_retries"
+
+  -
+    name : "net.ipv4.conf.default.promote_secondaries"
+
+  -
+    name : "net.netfilter.nf_conntrack_tcp_timeout_close_wait"
+
+  -
+    name : "net.tx-frames"
+
+  -
+    name : "net.ipv4.tcp_min_tso_segs"
+
+  -
+    name : "net.ipv4.udp_mem"
+
+  -
+    name : "net.ipv4.conf.default.forwarding"
+
+  -
+    name : "net.core.wmem_default"
+
+  -
+    name : "net.ipv4.tcp_adv_win_scale"
+
+  -
+    name : "net.core.dev_weight"
+
+
+
