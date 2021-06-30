@@ -1,0 +1,53 @@
+project: selectdisk
+maxiterations: 100
+startworkload: ''
+stopworkload: ''
+object:
+
+
+  -
+    name : "block.scheduler_multidisk"
+
+  -
+    name : "block.max_sectors_kb_multidisk"
+
+  -
+    name : "block.read_ahead_kb_multidisk"
+
+  -
+    name : "blockdev_multidisk"
+
+  -
+    name : "block.fifo_batch_multidisk"
+
+  -
+    name : "block.front_merges_multidisk"
+
+  -
+    name : "block.read_expire_multidisk"
+
+  -
+    name : "block.writes_starved_multidisk"
+
+  -
+    name : "block.queue_depth_multidisk"
+
+  -
+    name : "block.nr_requests_multidisk"
+
+  -
+    name : "block.rq_affinity_multidisk"
+
+  -
+    name : "block.add_random_multidisk"
+
+  -
+    name : "block.rotational_multidisk"
+
+  -
+    name : "block.write_cache_multidisk"
+
+  -
+    name : "block.nomerges_multidisk"
+
+

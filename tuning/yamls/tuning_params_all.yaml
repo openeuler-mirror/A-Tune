@@ -1089,6 +1089,210 @@ This parameter specifies the number of read requests that can be sent after the 
           - "2"
         dtype : "string"
   -
+    name : "blockdev_multidisk"
+    info :
+        desc : "Disk prefetch settings"
+        get : "/sbin/blockdev --getra /dev/sda"
+        set : "bash set_blockdev.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 2147483648
+        step : 8
+        items : 
+        dtype : "int"
+  -
+    name : "block.fifo_batch_multidisk"
+    info :
+        desc : "This parameter is valid only for the Deadline scheduling policy.
+The number of read or write operations issued in a single batch. The default value is 16. The higher the value, the higher the throughput, but also increases the latency."
+        get : "cat /sys/block/sda/queue/iosched/fifo_batch"
+        set : "bash set_fifo_batch.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1
+          - 128
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "block.front_merges_multidisk"
+    info :
+        desc : "This parameter is valid only for the Deadline scheduling policy.
+When a new request enters the queue, it can be merged if the requested sector is close to the current sector. The merge can be backward or forward. In some scenarios, forward merging is unnecessary. In this case, you can set this parameter to disable forward merging. By default, the deadline supports forward merging. If this parameter is set to 0, forward merging is disabled."
+        get : "cat /sys/block/sda/queue/iosched/front_merges"
+        set : "bash set_front_merges.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "block.read_expire_multidisk"
+    info :
+        desc : "This parameter is valid only for the Deadline scheduling policy.
+This parameter specifies the expiration time of a read request, in milliseconds."
+        get : "cat /sys/block/sda/queue/iosched/read_expire"
+        set : "bash set_read_expire.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100
+          - 1000
+        step : 100
+        items : 
+        dtype : "int"
+  -
+    name : "block.writes_starved_multidisk"
+    info :
+        desc : "This parameter is valid only for the Deadline scheduling policy.
+This parameter specifies the number of read requests that can be sent after the read and write queues are not empty. A larger value indicates a higher priority for read batch processing."
+        get : "cat /sys/block/sda/queue/iosched/writes_starved"
+        set : "bash set_writes_starved.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1
+          - 10
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "block.max_sectors_kb_multidisk"
+    info :
+        desc : "Specifies the maximum size (in kilobytes) of the I/O request. The default value is 512 KB."
+        get : "cat /sys/block/sda/queue/max_sectors_kb"
+        set : "bash set_max_sectors_kb.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 64
+          - 1024
+        step : 64
+        items : 
+        dtype : "int"
+  -
+    name : "block.queue_depth_multidisk"
+    info :
+        desc : "Block device queue depth"
+        get : "cat /sys/block/sda/device/queue_depth"
+        set : "bash set_queue_depth.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 64
+          - 1024
+        step : 64
+        items : 
+        dtype : "int"
+  -
+    name : "block.nr_requests_multidisk"
+    info :
+        desc : "Limits the maximum number of read and write requests queued at the same time."
+        get : "cat /sys/block/sda/queue/nr_requests"
+        set : "bash set_nr_requests.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 128
+          - 2048
+        step : 64
+        items : 
+        dtype : "int"
+  -
+    name : "block.read_ahead_kb_multidisk"
+    info :
+        desc : "Defines the number of kilobytes that the operating system will prefetch during the sequential read operation phase to store information that may be needed immediately in the page cache."
+        get : "cat /sys/block/sda/queue/read_ahead_kb"
+        set : "bash set_read_ahead_kb.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 65536
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "block.rq_affinity_multidisk"
+    info :
+        desc : "Whether I/O can be performed on different processors is not limited to the processor that sends the I/O request."
+        get : "cat /sys/block/sda/queue/rq_affinity"
+        set : "bash set_rq_affinity.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+          - "2"
+        dtype : "string"
+  -
+    name : "block.add_random_multidisk"
+    info :
+        desc : "Some I/O events affect the entropy pool of /dev/random."
+        get : "cat /sys/block/sda/queue/add_random"
+        set : "bash set_add_random.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "block.rotational_multidisk"
+    info :
+        desc : "Whether the storage device is a mechanical hard disk. If the storage device is a solid state disk, set this parameter to 0."
+        get : "cat /sys/block/sda/queue/rotational"
+        set : "bash set_rotational.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "block.scheduler_multidisk"
+    info :
+        desc : "Configure I/O scheduling. Deadline or noop is more suitable for MySQL database scenarios."
+        get : cat /sys/block/sda/queue/scheduler | sed -n 's/.*\[\(.*\)\].*/\1/p'
+        set : "bash set_scheduler.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "mq-deadline"
+          - "kyber"
+          - "bfq"
+          - "none"
+        dtype : "string"
+  -
+    name : "block.write_cache_multidisk"
+    info :
+        desc : "Whether to use the write back or write through cache policy"
+        get : "cat /sys/block/sda/queue/write_cache"
+        set : "bash set_write_cache.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "write back"
+          - "write through"
+        dtype : "string"
+  -
+    name : "block.nomerges_multidisk"
+    info :
+        desc : "Most workloads benefit from request merges. However, disabling merges helps for debugging purposes. You can set this parameter to 0 to disable combination. Enabled by default (set to 1)."
+        get : "cat /sys/block/sda/queue/nomerges"
+        set : "bash set_nomerges.sh $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+          - "2"
+        dtype : "string"
+  -
     name : "net.core.netdev_budget"
     info :
         desc : "Number of network packets processed in each software interrupt"
