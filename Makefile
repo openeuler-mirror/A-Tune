@@ -3,6 +3,7 @@ VERSION = 0.3
 
 PKGPATH=pkg
 CURDIR=$(shell pwd)
+PYDIR=$(shell which python3)
 PREFIX    ?= /usr
 LIBEXEC   ?= libexec
 BINDIR     = $(DESTDIR)$(PREFIX)/bin
@@ -20,7 +21,14 @@ ENGINE_CERT_PATH=$(CERT_PATH)/engine_certs
 REST_IP_ADDR=localhost
 ENGINE_IP_ADDR=localhost
 
-all: modules atune-adm atuned db
+all: abs-python modules atune-adm atuned db
+
+abs-python:
+	@if [ $(PYDIR) ] ; then \
+		sed -i "s?python3?$(PYDIR)?g" $(CURDIR)/misc/atune-engine.service; \
+	else \
+		echo "no python3 exists."; \
+	fi
 
 atune-adm:
 	go build -mod=vendor -v $(GOFLAGS) -o $(PKGPATH)/atune-adm cmd/atune-adm/*.go
