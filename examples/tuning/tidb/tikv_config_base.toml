@@ -1,0 +1,52 @@
+[readpool.unified]
+  
+[readpool.storage]
+
+[readpool.coprocessor]
+
+[server]
+
+[storage]
+
+[storage.block-cache]
+shared = false
+
+[pd]
+
+[raftstore]
+sync-log = false
+
+[coprocessor]
+
+[rocksdb]
+enable-statistics = false
+
+[rocksdb.titan]
+
+[rocksdb.defaultcf]
+
+[rocksdb.defaultcf.titan]
+
+[rocksdb.writecf]
+
+[rocksdb.lockcf]
+
+[raftdb]
+enable-statistics = false
+
+[raftdb.defaultcf]
+
+[raft-engine]
+
+[security]
+
+[security.encryption]
+
+[import]
+
+[backup]
+
+[pessimistic-txn]
+
+[gc]
+
