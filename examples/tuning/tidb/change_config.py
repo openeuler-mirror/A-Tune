@@ -12,19 +12,19 @@
 # Create: 2021-6-03
 #******************************************************************************
 # ******************************************************************************/
-'''
+"""
 Initialize openEuler center-repo.The source is from https://repo.openeuler.org
-'''
+"""
 import os
 import sys
 import argparse
 from configparser import ConfigParser
 
 def set_confi(config_file, source_data_file):
-    '''
+    """
     source_data_file文件格式为(SECTION为配置文件的section名称，CONFIGNAME为该section下待修改的配置KEY，CONFIG_VALUE为待修改的值)：
     SECTION__CONFIGNAME=CONFIG_VALUE
-    '''
+    """
     config_data = ConfigParser()
     config_data.read(config_file)
 
@@ -43,15 +43,16 @@ def set_confi(config_file, source_data_file):
         config_data[config[0]][config[1]] = config[2]
     
     with open(config_file, 'w+') as f:
-        config_data.write(f)
+    config_data.write(f)
+
 
 def main():
-    '''
+    """
     entrypoint
-    '''
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", type=str,help="config file")
-    parser.add_argument("-s", "--source", type=str,help="the source data file")
+    parser.add_argument("-c", "--config", type=str, help="config file")
+    parser.add_argument("-s", "--source", type=str, help="the source data file")
     args = parser.parse_args()
     set_confi(args.config, args.source)
 
