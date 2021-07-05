@@ -43,7 +43,7 @@ def set_confi(config_file, source_data_file):
         config_data[config[0]][config[1]] = config[2]
     
     with open(config_file, 'w+') as f:
-    config_data.write(f)
+        config_data.write(f)
 
 
 def main():
