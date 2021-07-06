@@ -25,7 +25,7 @@ all: abs-python modules atune-adm atuned db
 
 abs-python:
 	@if [ $(PYDIR) ] ; then \
-		sed -i "s?python3?$(PYDIR)?g" $(CURDIR)/misc/atune-engine.service; \
+		sed -i "s?ExecStart=python3?ExecStart=$(PYDIR)?g" $(CURDIR)/misc/atune-engine.service; \
 	else \
 		echo "no python3 exists."; \
 	fi
