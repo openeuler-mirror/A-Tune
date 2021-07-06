@@ -1,0 +1,13 @@
+project: "tidb"
+engine : "gbrt"
+iterations : 20
+random_starts : 5
+
+benchmark : "sh /tmp/tidb.sh"
+evaluations :
+  -
+    name: "queries"
+    info:
+        get: "echo \"$out\" | grep 'queries:' | awk '{print $3}' | awk -F'(' '{print $2}'"
+        type: "negative"
+        weight: 100
