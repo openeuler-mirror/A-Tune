@@ -1,0 +1,34 @@
+project : "stream"
+engine : "gbrt"
+iterations : 20
+random_starts : 10
+
+
+benchmark : "cd stream/; make ;./a.out"
+evaluations :
+        -
+         name : "copy"
+         info :
+                 get : "echo '$out'|grep Copy|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+
+        -
+         name : "scale"
+         info :
+                 get : "echo '$out'|grep Scale|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+        -
+         name : "add"
+         info :
+                 get : "echo '$out'|grep Add|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+
+        -
+         name : "trial"
+         info :
+                 get : "echo '$out'|grep Triad|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
