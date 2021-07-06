@@ -1,5 +1,7 @@
 project: "openGauss_tpcc"
 maxiterations: 2048
+startworkload: "gs_ctl restart tpcc1000"
+stopworkload: "gs_ctl stop tpcc1000"
 object :
   -
     name : "shared_buffers"
