@@ -289,7 +289,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 	paraMap := make(map[string]string)
 	paraSlice := strings.Split(optStr, ",")
 	for _, para := range paraSlice {
-		kvs := strings.Split(para, "=")
+		kvs := strings.SplitN(para, "=", 2)
 		if len(kvs) < 2 {
 			continue
 		}
