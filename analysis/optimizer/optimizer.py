@@ -27,6 +27,7 @@ from skopt import Optimizer as baseOpt
 from skopt.utils import normalize_dimensions
 from skopt.utils import cook_estimator
 
+from analysis.engine.utils import utils
 from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
@@ -43,7 +44,7 @@ class Optimizer(multiprocessing.Process):
                  max_eval=50, sel_feature=False, x0=None, y0=None,
                  n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
         super().__init__(name=name)
-        self.knobs = params
+        self.knobs = self.check_multiple_params(params)
         self.child_conn = child_conn
         self.project_name = prj_name
         self.engine = engine
@@ -396,3 +397,11 @@ class Optimizer(multiprocessing.Process):
         """stop process"""
         self.child_conn.close()
         self.terminate()
+
+    @staticmethod
+    def check_multiple_params(params):
+        """check multiple params"""
+        for ind, param in enumerate(params):
+            if param["options"] is None and param['dtype'] == 'string':
+                params[ind] = utils.get_tuning_options(param)
+        return params
