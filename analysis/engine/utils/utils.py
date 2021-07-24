@@ -110,3 +110,43 @@ def zip_key_value(key, val_array):
     for line in val_array:
         res.append(dict(zip(key, line)))
     return res
+
+
+def get_tuning_options(param):
+    """get options by current env value, range, and step"""
+    if param is None or param["range"] is None or param["step"] == 0 or param["options"] is not None:
+        return param
+
+    values = re.findall(r'[0-9]+', param["ref"])
+    multiples = []
+    for i in range(param["range"][0], param["range"][1] + 1, param["step"]):
+        multiples.append(i)
+    options = []
+    for mul in multiples:
+        options.append(get_multiple_res(values, mul))
+    param["options"] = options
+    param["step"] = 0
+    param["range"] = None
+    return param
+
+
+def get_multiple_res(values, mul):
+    """get string multiple result"""
+    res = ""
+    mul = str(mul)
+    for value in values:
+        val_len = len(value)
+        mul_len = len(mul)
+        res_arr = [0] * (val_len + mul_len)
+        for i in range(val_len - 1, -1, -1):
+            x = int(value[i])
+            for j in range(mul_len - 1, -1, -1):
+                res_arr[i + j + 1] += x * int(mul[j])
+
+        for i in range(val_len + mul_len - 1, 0, -1):
+            res_arr[i - 1] += res_arr[i] // 10
+            res_arr[i] %= 10
+
+        index = 1 if res_arr[0] == 0 else 0
+        res += "".join(str(x) for x in res_arr[index:]) + " "
+    return res[:-1]
