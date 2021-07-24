@@ -621,6 +621,9 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 		}
 
 		log.Infof("find Project:%s from %s", prj.Project, yamlPaths[idx])
+
+		prj.Object = CheckObjectReplace(prj.Object)
+
 		if optimizer.Prj == nil {
 			optimizer.Prj = prj
 			continue
@@ -635,6 +638,43 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	log.Debugf("optimizer objects: %+v", optimizer.Prj)
 	optimizer.Percentage = config.Percent
 	return nil
+}
+
+// Check if object contains {disk} or {network}
+func CheckObjectReplace(objects []*project.YamlPrjObj) []*project.YamlPrjObj {
+    for ind := 0; ind < len(objects); ind++ {
+        if strings.Contains(objects[ind].Info.GetScript, "{disk}") {
+            param := config.Disk
+            objects = ReplaceObject("{disk}", param, objects, ind)
+        }
+        if strings.Contains(objects[ind].Info.GetScript, "{network}") {
+            param := config.Network
+            objects = ReplaceObject("{network}", param, objects, ind)
+        }
+    }
+    return objects
+}
+
+// replace {disk} {network} string in object
+func ReplaceObject(replace string, param string, objects []*project.YamlPrjObj, ind int) []*project.YamlPrjObj {
+    params := strings.Split(param, ",")
+    if len(params) > 1 {
+        for i := 1; i < len(params); i++ {
+            newObj := &project.YamlPrjObj {
+                Name: objects[ind].Name,
+                Info: objects[ind].Info,
+                Relations: objects[ind].Relations,
+            }
+            newObj.Name = newObj.Name + "-" + params[i]
+            newObj.Info.GetScript = strings.Replace(newObj.Info.GetScript, replace, params[i], -1)
+            newObj.Info.SetScript = strings.Replace(newObj.Info.SetScript, replace, params[i], -1)
+            objects = append(objects, newObj)
+        }
+        objects[ind].Name = objects[ind].Name + "-" + params[0]
+    }
+    objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
+    objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
+    return objects
 }
 
 // SyncTune: sync tuned node

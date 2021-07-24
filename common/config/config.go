@@ -138,6 +138,7 @@ var (
 
 // the system config in atuned.cnf
 var (
+	Disk	string
 	Network string
 )
 
@@ -215,6 +216,7 @@ func (c *Cfg) Load() error {
 	}
 
 	section = cfg.Section("system")
+	Disk = section.Key("disk").MustString("")
 	Network = section.Key("network").MustString("")
 
 	validNetwork, err := getValidNetwork(Network)
