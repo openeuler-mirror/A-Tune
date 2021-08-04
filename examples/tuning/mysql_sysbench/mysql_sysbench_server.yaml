@@ -201,3 +201,27 @@ object :
           - 0
           - 300
         dtype : "int"
+  -
+    name : "innodb_flush_log_at_trx_commit"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_flush_log_at_trx_commit'."
+        get : "cat /etc/my.cnf | grep 'innodb_flush_log_at_trx_commit' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^innodb_flush_log_at_trx_commit.*$/innodb_flush_log_at_trx_commit=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 2
+        dtype : "int"
+  -
+    name : "sync_binlog"
+    info :
+        desc : "MySQL [mysqld] parameters 'sync_binlog'."
+        get : "cat /etc/my.cnf | grep 'sync_binlog' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^sync_binlog.*$/sync_binlog=$value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 2
+        dtype : "int"
