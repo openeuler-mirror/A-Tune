@@ -18,13 +18,44 @@ path=$(
   pwd
 )
 
+echo "install MySQL..."
+yum install -y mysql
+rm -f /etc/init.d/mysql
+ln -s /usr/local/mysql/support-files/mysql.server /etc/init.d/mysql
+mkdir -p /usr/local/mysql/{data,tmp,run,log}
+chown -R mysql:mysql /usr/local/mysql
+
 echo "initializing MySQL..."
 rm -f /etc/my.cnf
 cp my.cnf /etc
-service mysql stop
-taskset -c 0,1 service mysql start
-/usr/local/mysql/bin/mysql -uroot -p123456 -e "DROP DATABASE IF EXISTS sbtest;"
-/usr/local/mysql/bin/mysql -uroot -p123456 -e "CREATE DATABASE sbtest;"
+kill -9 `pidof mysqld`
+rm -rf /usr/local/mysql/data/*
+/usr/local/mysql/bin/mysqld --user=root --initialize-insecure
+
+echo "start MySQL..."
+systemctl daemon-reload
+taskset -c 0,1 systemctl restart mysql
+
+echo "create database..."
+/usr/local/mysql/bin/mysql -uroot << EOF
+alter user 'root'@'localhost' identified by '123456';
+flush privileges;
+use mysql;
+update user set host='%' where user='root';
+flush privileges;
+create database sbtest;
+quit
+EOF
+
+echo "install sysbench..."
+yum install -y git
+git clone --depth=1 https://github.com/akopytov/sysbench.git
+cd sysbench
+yum install -y automake libtool
+./autogen.sh
+./configure --with-mysql-libs=/usr/local/mysql/lib/ --with-mysql-includes=/usr/local/mysql/include/
+make -j
+make install
 
 echo "checking sysbench..."
 sysbench --version
