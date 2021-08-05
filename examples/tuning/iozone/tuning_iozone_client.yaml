@@ -1,0 +1,34 @@
+project : "iozone"
+engine : "gbrt"
+iterations : 20       
+random_starts : 10
+
+
+benchmark : "sh iozone/iozone-test.sh" 
+evaluations :
+        - 
+         name : "write"
+         info :
+                 get : "echo '$out'|grep '^\"Writer report' -A 2|sed -n '$p'|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+
+        - 
+         name : "read"
+         info :
+                 get : "echo '$out'|grep '^\"Reader report' -A 2|sed -n '$p'|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+        - 
+         name : "randread"
+         info :
+                 get : "echo '$out'|grep '^\"Random read report' -A 2|sed -n '$p'|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25
+
+        - 
+         name : "randwrite"
+         info :
+                 get : "echo '$out'|grep '^\"Random write report' -A 2|sed -n '$p'|awk '{print $2}'"
+                 type : "negative"
+                 weight : 25

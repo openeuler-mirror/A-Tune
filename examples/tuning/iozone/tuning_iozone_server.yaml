@@ -1,0 +1,64 @@
+project : "iozone"
+maxiterations : 1000
+startworkload : ""
+stopworkload : ""
+object :
+ -
+   name : "scheduler"      
+   info :
+          desc : "scheduler of disk."
+          get : "cat /sys/block/DISKNAME/queue/scheduler |awk  -F '[][]' '{print $2}'"   
+          set : "echo $value > /sys/block/DISKNAME/queue/scheduler"                     
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - "noop"
+                  - "deadline"
+                  - "cfq"
+          dtype : "string"
+
+
+   name : "blocksize"
+   info :
+           desc : "block size."
+           get : "cat iozone/iozone-test.sh |grep ^BLOCKSIZE | awk -F '=' '{print $2}'"  
+           set : "sed -i 's/^BLOCKSIZE=.*/BLOCKSIZE=$value/g'  iozone/iozone-test.sh"    
+           needrestart : "false"
+           type : "discrete"
+           options :
+                   - "4k"          
+                   - "128k"
+                   - "256k"
+                   - "512k"
+                   - "1m"
+                   - "2m"
+                   - "4m"
+                   - "16m"
+           dtype : "string"
+ -
+   name : "rw_mode"
+   info :
+           desc : "rw mode."
+           get : "cat iozone/iozone-test.sh|grep ^RW_MODE | awk -F '=' '{print $2}'"
+           set : "sed -i 's/^RW_MODE=.*/RW_MODE=$value/g' iozone/iozone-test.sh"     
+           needrestart : "false"
+           type : "discrete"
+           options :
+                  - "-i 0"
+                  - "-i 1"
+                  - "-i 2"
+                  - "-i 0 -i 1 -i 2"
+           dtype : "string"
+ -
+   name : "size"
+   info :
+           desc : "file size."
+           get : "cat iozone/iozone-test.sh |grep ^SIZE |awk -F '=' '{print $2}'"  
+           set : "sed -i 's/^SIZE=.*/SIZE=$value/g'  iozone/iozone-test.sh"        
+           needrestart : "true"
+           type : "discrete"
+           options :
+                   - "10G"    
+                   - "100G"
+           dtype : "string"
+

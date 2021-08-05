@@ -1,0 +1,153 @@
+project : "stream"
+maxiterations : 1000
+startworkload : ""
+stopworkload : ""
+object :
+ -
+   name : "Olevel"
+   info :
+          desc : "olevel of compile option."
+          get : "cat  stream/Makefile |grep ^OLEVEL= |awk -F = '{print $2}'"
+          set : "sed -i \"s/^OLEVEL=.*/OLEVEL=$value/g\" stream/Makefile"
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - "-O2"
+                  - "-O3"
+                  - "-Ofast"
+          dtype : "string"
+
+ -
+   name : "DSTREAM_ARRAY_SIZE"
+   info :
+           desc : "DSTREAM_ARRAY_SIZE of compile option."
+           get : "cat  stream/Makefile |grep ^DSTREAM_ARRAY_SIZE= |awk -F = '{print $2}'"
+           set : "sed -i \"s/^DSTREAM_ARRAY_SIZE=.*/DSTREAM_ARRAY_SIZE=$value/g\" stream/Makefile"
+           needrestart : "false"
+           type : "discrete"
+           scope :
+                   - 100000000
+                   - 800000000
+           step : 50000000
+           dtype : "int"
+ -
+   name : "DNTIMES"
+   info :
+           desc : "DNTIMES of compile option."
+           get : "cat  stream/Makefile |grep ^DNTIMES= |awk -F = '{print $2}'"
+           set : "sed -i \"s/^DNTIMES=.*/DNTIMES=$value/g\" stream/Makefile"
+           needrestart : "false"
+           type : "discrete"
+           scope :
+                   - 10
+                   - 100
+           step : 10
+           dtype : "int"
+ -
+   name : "MCMODEL"
+   info :
+           desc : "MCMODEL of compile option."
+           get : "cat  stream/Makefile |grep ^MCMODEL= |awk -F = '{print $2}'"
+           set : "sed -i \"s/^MCMODEL=.*/MCMODEL=$value/g\" stream/Makefile"
+           needrestart : "false"
+           type : "discrete"
+           options :
+                   - "middle"
+                   - "large"
+           dtype : "string"
+
+ -
+   name : "transparent_hugepage_enabled"
+   info :
+           desc : "mode of transparent_hugepage."
+           get : "cat /sys/kernel/mm/transparent_hugepage/enabled|grep -Po '\\[.*\\]'|cut -d '[' -f2 |cut -d ']' -f1"
+           set : "echo $value > /sys/kernel/mm/transparent_hugepage/enabled"
+           needrestart : "false"
+           type : "discrete"
+           options :
+                   - "always"
+                   - "madvise"
+                   - "never"
+           dtype : "string"
+ -
+   name : "transparent_hugepage_defrag"
+   info :
+           desc : "mode of transparent_hugepage_defrag."
+           get : "cat /sys/kernel/mm/transparent_hugepage/defrag|grep -Po '\\[.*\\]'|cut -d '[' -f2 |cut -d ']' -f1"
+           set : "echo $value > /sys/kernel/mm/transparent_hugepage/defrag"
+           needrestart : "false"
+           type : "discrete"
+           options :
+                   - "always"
+                   - "defer"
+                   - "defer+madvise"
+                   - "madvise"
+                   - "never"
+           dtype : "string"
+ -
+   name : "tuning_prefetch_policy"
+   info :
+           desc : "pretch policy."
+           get : "cat /sys/class/misc/prefetch/policy |head -n 1 |awk '{print $2}'  "
+           set : "echo $value > /sys/class/misc/prefetch/policy"
+           needrestart : "false"
+           type : "discrete"
+           scope :
+                   - 0
+                   - 15
+           step : 1
+           dtype : "int"
+
+ -
+   name : "ftree-vectorize"
+   info :
+          desc : "enable ftree-vectorize or not."
+          get : "cat  stream/Makefile |grep ^ftree-vectorize= |awk -F = '{print $2}'"
+          set : "sed -i \"s/^ftree-vectorize=.*/ftree-vectorize=$value/g\" stream/Makefile"
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - ""
+                  - "-ftree-vectorize"
+          dtype : "string"
+
+
+ -
+   name : "ffast-math"
+   info :
+          desc : "enable ffast-math or not."
+          get : "cat  stream/Makefile |grep ^ffast-math= |awk -F = '{print $2}'"
+          set : "sed -i \"s/^ffast-math=.*/ffast-math=$value/g\" stream/Makefile"
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - ""
+                  - "-ffast-math"
+          dtype : "string"
+
+ -
+   name : "fpeel-loops"
+   info :
+          desc : "enable fpeel-loops or not."
+          get : "cat  stream/Makefile |grep ^fpeel-loops= |awk -F = '{print $2}'"
+          set : "sed -i \"s/^fpeel-loops=.*/fpeel-loops=$value/g\" stream/Makefile"
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - ""
+                  - "-fpeel-loops"
+          dtype : "string"
+
+
+ -
+   name : "DAARCH64_QUADMATH"
+   info :
+          desc : "enable DAARCH64_QUADMATH or not."
+          get : "cat  stream/Makefile |grep ^DAARCH64_QUADMATH= |awk -F = '{print $2}'"
+          set : "sed -i \"s/^DAARCH64_QUADMATH=.*/DAARCH64_QUADMATH=$value/g\" stream/Makefile"
+          needrestart : "false"
+          type : "discrete"
+          options :
+                  - ""
+                  - "-DAARCH64_QUADMATH"
+          dtype : "string"
