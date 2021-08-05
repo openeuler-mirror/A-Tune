@@ -28,10 +28,10 @@ object :
            type : "discrete"
            options :
                    - "4k"          
-                   #- 128k
-                   #- 256k
-                   #- 512k
-                   #- 1M
+                   - "128k"
+                   - "256k"
+                   - "512k"
+                   - "1M"
            dtype : "string"
  -
    name : "numjobs"
@@ -56,8 +56,8 @@ object :
            type : "discrete"
            options :
                    - "10G"    
-                   #- "100G"
-                   #- "300G"
+                   - "100G"
+                   - "300G"
            dtype : "string"
  -
    name : "direct"     
@@ -81,11 +81,11 @@ object :
            type : "discrete"
            options :
                    - "read"
-                   #- "write"
-                   #- "rw"
-                   #- "randread"
-                   #- "randwrite"
-                   #- "randrw"
+                   - "write"
+                   - "rw"
+                   - "randread"
+                   - "randwrite"
+                   - "randrw"
            dtype : "string"
 
  -
@@ -112,5 +112,6 @@ object :
            type : "discrete"
            options :
                    - "30"
+                   - "300"
            dtype : "string"          
       

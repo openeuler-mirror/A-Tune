@@ -1,6 +1,6 @@
 project : "iozone"
 engine : "gbrt"
-iterations : 20        # 测试的次数
+iterations : 20       
 random_starts : 10
 
 
@@ -10,7 +10,6 @@ evaluations :
          name : "write"
          info :
                  get : "echo '$out'|grep '^\"Writer report' -A 2|sed -n '$p'|awk '{print $2}'"
-                 #type : "positive"
                  type : "negative"
                  weight : 25
 
@@ -18,14 +17,12 @@ evaluations :
          name : "read"
          info :
                  get : "echo '$out'|grep '^\"Reader report' -A 2|sed -n '$p'|awk '{print $2}'"
-                 #type : "positive"
                  type : "negative"
                  weight : 25
         - 
          name : "randread"
          info :
                  get : "echo '$out'|grep '^\"Random read report' -A 2|sed -n '$p'|awk '{print $2}'"
-                 #type : "positive"
                  type : "negative"
                  weight : 25
 
@@ -33,6 +30,5 @@ evaluations :
          name : "randwrite"
          info :
                  get : "echo '$out'|grep '^\"Random write report' -A 2|sed -n '$p'|awk '{print $2}'"
-                 #type : "positive"
                  type : "negative"
                  weight : 25

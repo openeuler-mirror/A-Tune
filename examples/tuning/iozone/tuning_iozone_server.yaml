@@ -44,9 +44,9 @@ object :
            needrestart : "false"
            type : "discrete"
            options :
-                  #- "-i 0"
-                  #- "-i 1"
-                  #- "-i 2"
+                  - "-i 0"
+                  - "-i 1"
+                  - "-i 2"
                   - "-i 0 -i 1 -i 2"
            dtype : "string"
  -
@@ -58,7 +58,7 @@ object :
            needrestart : "true"
            type : "discrete"
            options :
-                   #- "10G"    
+                   - "10G"    
                    - "100G"
            dtype : "string"
 

@@ -15,4 +15,4 @@ echo "copy the server yaml file to /etc/atuned/tuning/"
 cp tuning_stream_server.yaml /etc/atuned/tuning/
 
 
-wget wget http://www.cs.virginia.edu/stream/FTP/Code/stream.c
+wget http://www.cs.virginia.edu/stream/FTP/Code/stream.c
