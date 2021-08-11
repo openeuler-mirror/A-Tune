@@ -10,6 +10,7 @@ BINDIR     = $(DESTDIR)$(PREFIX)/bin
 SYSTEMDDIR = $(DESTDIR)$(PREFIX)/lib/systemd/system
 SRCVERSION = $(shell git rev-parse --short HEAD 2>/dev/null)
 ATUNEVERSION = $(VERSION)$(if $(SRCVERSION),($(SRCVERSION)))
+SHELL = /bin/bash
 
 GOLDFLAGS += -X gitee.com/openeuler/A-Tune/common/config.Version=$(ATUNEVERSION)
 GOFLAGS = -ldflags '-s -w -extldflags "-static" -extldflags "-zrelro" -extldflags "-znow" -extldflags "-ftrapv" $(GOLDFLAGS)'
