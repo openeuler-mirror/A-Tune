@@ -21,6 +21,7 @@ import shutil
 import logging
 import tarfile
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 from analysis.default_config import TUNING_DATA_PATH, TUNING_DATA_DIRS
@@ -119,8 +120,11 @@ def get_tuning_options(param):
 
     values = re.findall(r'[0-9]+', param["ref"])
     multiples = []
-    for i in range(param["range"][0], param["range"][1] + 1, param["step"]):
+    for i in np.arange(param["range"][0], param["range"][1], param["step"]):
         multiples.append(i)
+    if multiples[len(multiples) - 1] + param["step"] == param["range"][1]:
+        multiples.append(param["range"][1])
+    logging.info("the multiples are: %s", ' '.join(str(x) for x in multiples))
     options = []
     for mul in multiples:
         options.append(get_multiple_res(values, mul))
@@ -134,7 +138,16 @@ def get_multiple_res(values, mul):
     """get string multiple result"""
     res = ""
     mul = str(mul)
+    floats = 0
+    spl = mul.split('.')
+    if len(spl) == 2:
+        floats = len(spl[1])
+        mul = spl[0] + spl[1]
     for value in values:
+        spl_val = value.split('.')
+        if len(spl_val) == 2:
+            floats += len(spl_val[1])
+            value = spl_val[0] + spl_val[1]
         val_len = len(value)
         mul_len = len(mul)
         res_arr = [0] * (val_len + mul_len)
@@ -148,5 +161,9 @@ def get_multiple_res(values, mul):
             res_arr[i] %= 10
 
         index = 1 if res_arr[0] == 0 else 0
-        res += "".join(str(x) for x in res_arr[index:]) + " "
+        if floats != 0:
+            res += "".join(str(x) for x in res_arr[index:]).lstrip('0')[:-floats] + " "
+        else:
+            res += "".join(str(x) for x in res_arr[index:]).lstrip('0') + " "
+    logging.info("The options would be: %s", res[:-1])
     return res[:-1]
