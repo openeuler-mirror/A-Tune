@@ -97,6 +97,7 @@ type YamlObj struct {
 	Type        string    `yaml:"type"`
 	Step        float32   `yaml:"step,omitempty"`
 	Items       []float32 `yaml:"items"`
+	Requires    string    `yaml:"requires"`
 	Options     []string  `yaml:"options"`
 	Scope       []float32 `yaml:"scope,flow"`
 	Dtype       string    `yaml:"dtype"`
@@ -108,6 +109,7 @@ type YamlPrjObj struct {
 	Name      string          `yaml:"name"`
 	Info      YamlObj         `yaml:"info"`
 	Relations []*RelationShip `yaml:"relationships"`
+	Clusters  string
 }
 
 type RelationShip struct {

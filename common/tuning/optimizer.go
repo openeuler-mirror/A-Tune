@@ -72,6 +72,11 @@ type Optimizer struct {
 	PrjId               string
 }
 
+// object set type
+type ObjectSet struct {
+	Objects             []*project.YamlPrjObj
+}
+
 // InitTuned method for iniit tuning
 func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error {
 	o.FeatureFilter = false
@@ -622,7 +627,11 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 
 		log.Infof("find Project:%s from %s", prj.Project, yamlPaths[idx])
 
+		objectSet := new(ObjectSet)
+		objectSet.Objects = append(objectSet.Objects, prj.Object...)
 		prj.Object = CheckObjectReplace(prj.Object)
+		objectSet.CheckObjectDuplicate()
+		prj.Object = objectSet.Objects
 
 		if optimizer.Prj == nil {
 			optimizer.Prj = prj
@@ -675,6 +684,52 @@ func ReplaceObject(replace string, param string, objects []*project.YamlPrjObj, 
     objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
     objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
     return objects
+}
+
+// Check the address value in atuned.cnf
+func (obj *ObjectSet) CheckObjectDuplicate() {
+	if strings.TrimSpace(config.Connect) == "" {
+		return
+	}
+	ipGroups := strings.Split(strings.TrimSpace(config.Connect), ",")
+	for ind := 0; ind < len(obj.Objects); ind++ {
+		if obj.Objects[ind].Clusters != "" {
+			continue
+		}
+		if obj.Objects[ind].Info.Requires == "" {
+			obj.WriteObject(ind, ipGroups)
+		} else if obj.Objects[ind].Info.Requires != "" {
+			reqGroups := utils.DivideToGroups(obj.Objects[ind].Info.Requires, ipGroups)
+			obj.WriteObject(ind, reqGroups)
+		}
+	}
+}
+
+func (obj *ObjectSet) WriteObject(ind int, groups []string) {
+	if len(groups) == 1 {
+		obj.Objects[ind].Clusters = groups[0]
+		return
+	}
+	obj.AppendObject(ind, groups)
+	obj.Objects[ind].Name = obj.Objects[ind].Name + "-0"
+	obj.Objects[ind].Clusters = groups[0]
+}
+
+// append new params in object
+func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
+	for i := 1; i < len(ipGroups); i++ {
+		if ipGroups[i] == "" {
+			continue
+		}
+		newObj := &project.YamlPrjObj{
+			Name:      obj.Objects[ind].Name,
+			Info:      obj.Objects[ind].Info,
+			Relations: obj.Objects[ind].Relations,
+		}
+		newObj.Name = newObj.Name + "-" + strconv.Itoa(i)
+		newObj.Clusters = ipGroups[i]
+		obj.Objects = append(obj.Objects, newObj)
+	}
 }
 
 // SyncTune: sync tuned node

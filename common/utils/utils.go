@@ -612,3 +612,28 @@ func CheckValueInSlice(value string, strList []string) bool {
 	}
 	return false
 }
+
+// Divide requires into groups
+func DivideToGroups(strs string, groups []string) []string {
+	strsArr := strings.Split(strs, ",")
+	div := make([]string, len(groups))
+	for _, val := range strsArr {
+		for ind, group := range groups {
+			if strings.Contains(group, val) {
+				if div[ind] == "" {
+					div[ind] += val
+				} else {
+					div[ind] += " " + val
+				}
+				break
+			}
+		}
+	}
+	divRes := make([]string, 0)
+	for _, val := range div {
+		if val != "" {
+			divRes = append(divRes, val)
+		}
+	}
+	return divRes
+}
