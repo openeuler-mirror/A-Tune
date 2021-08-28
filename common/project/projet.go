@@ -14,6 +14,7 @@
 package project
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 	"os/exec"
@@ -442,6 +443,14 @@ func (y *YamlPrjSvr) MatchRelations(optStr string) bool {
 
 //exec command and get result
 func ExecCommand(script string) ([]byte, error) {
+	var buf bytes.Buffer
 	cmd := exec.Command("sh", "-c", script)
-	return cmd.CombinedOutput()
+	cmd.Stdout = &buf
+	cmd.Stderr = &buf
+	err := cmd.Start()
+	if err != nil {
+		return buf.Bytes(), err
+	}
+	_, err = cmd.Process.Wait()
+	return buf.Bytes(), err
 }
