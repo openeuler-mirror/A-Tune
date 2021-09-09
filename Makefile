@@ -59,11 +59,10 @@ install: libinstall restcerts enginecerts yaml-generator
 
 collector-install:
 	@echo "BEGIN INSTALL A-Tune-Collector..."
-	pip3 uninstall atune-collector -y
+	! pip3 show atune-collector || pip3 uninstall atune-collector -y
 	rm -rf collector
 	git clone https://gitee.com/openeuler/A-Tune-Collector.git collector
 	cd collector && python3 setup.py install
-	cd -
 	@echo "END INSTALL A-Tune-Collector..."
 
 libinstall:
