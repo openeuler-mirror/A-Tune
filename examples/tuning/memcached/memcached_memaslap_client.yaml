@@ -1,0 +1,13 @@
+project: "memcached_memaslap"
+engine : "gbrt"
+iterations : 50
+random_starts : 10
+
+benchmark : "sh memcached/memcached_memaslap_benchmark.sh"
+evaluations :
+  -
+    name: "TPS"
+    info:
+        get: "cat memcached/memaslap_benchmark.log | grep 'TPS' | awk '{print $7}'"
+        type: "negative"
+        weight: 100

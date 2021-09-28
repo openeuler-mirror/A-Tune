@@ -1,0 +1,5 @@
+PORT="11211"
+USER="memcached"
+MAXCONN="1024"
+CACHESIZE="8192"
+OPTIONS="-l local_host_ip -f 1.25 -P /tmp/memcached.pid -n 48 -b 1024 -t 4 -R 20 "

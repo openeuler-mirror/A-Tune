@@ -1,0 +1,489 @@
+project: "memcached_memaslap"
+maxiterations: 2048
+startworkload: "systemctl start memcached.service"
+stopworkload: "systemctl stop memcached.service"
+object : 
+  -
+    name : "cache_size"
+    info :
+        desc : "Memcached parameters CACHESIZE -m."
+        get : cat /etc/sysconfig/memcached | grep 'CACHESIZE' | awk -F '"' '{print $2}'
+        set : sed -i 's/^CACHESIZE.*$/CACHESIZE="$value"/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 10240
+        step : 1024
+        dtype : "int" 
+  -
+    name : "max_conn"
+    info :
+        desc : "-c"
+        get : cat /etc/sysconfig/memcached | grep 'MAXCONN' | awk -F '"' '{print $2}'
+        set : sed -i 's/^MAXCONN.*$/MAXCONN="$value"/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 896
+          - 1536
+        step : 64
+        dtype : "int"
+  -
+    name : "slab_growth_factor"
+    info :
+        desc : "Memcached parameters slab_growth_factor -f. > 1"
+        get : cat /etc/sysconfig/memcached | grep 'OPTIONS' | awk -F ' ' '{print $4}'
+        set : sed -i 's/-f.*-P/-f $value -P/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "1.125"
+          - "1.25"
+          - "1.375"
+          - "1.5"
+          - "1.625"
+          - "1.75"
+          - "1.875"
+          - "2.0"
+          - "2.125"
+          - "2.25"
+          - "2.375"
+          - "2.625"
+          - "2.5"
+          - "2.75"
+          - "2.875"
+          - "3.0"
+        dtype : "string"
+  -
+    name : "chunk_space"
+    info :
+        desc : "Memcached parameters -n. A chunk minimum space"
+        get : cat /etc/sysconfig/memcached | grep 'OPTIONS' | awk -F ' ' '{print $8}'
+        set : sed -i 's/-n.*-b/-n $value -b/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 12
+          - 512
+        step : 2
+        dtype : "int"
+  -
+    name : "backlog_queue_size"
+    info :
+        desc : "Memcached parameters -b. Size of the backlog queue"
+        get : cat /etc/sysconfig/memcached | grep 'OPTIONS' | awk -F ' ' '{print $10}'
+        set : sed -i 's/-b.*-t"/-b $value -t"/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 256
+          - 2048
+        step : 64
+        dtype : "int"   
+  -
+    name : "number_of_threads"
+    info :
+        desc : "Memcached parameters -t."
+        get : cat /etc/sysconfig/memcached | grep 'OPTIONS' | awk -F ' ' '{print $12}'
+        set : sed -i 's/-t.*"/-t $value"/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 4
+          - 16
+        step : 4
+        dtype : "int" 
+  -
+    name : "max_reqs_per_event"
+    info :
+        desc : "Memcached parameters -R. max-reqs-per-event maximum number of requests per event"
+        get : cat /etc/sysconfig/memcached | grep 'OPTIONS' | awk -F ' ' '{print $14}'
+        set : sed -i 's/-R.*"/-R $value "/g' /etc/sysconfig/memcached
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10
+          - 100
+        step : 1
+        dtype : "int" 
+  -
+    name : "kernel.numa_balancing"
+    info :
+        desc : "Specifies whether to enable NUMA automatic balancing."
+        get : "sysctl -n kernel.numa_balancing"
+        set : "sysctl -w kernel.numa_balancing=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "kernel.sched_autogroup_enabled"
+    info :
+        desc : "When enabled, the kernel creates task groups to optimize desktop program scheduling.
+0: disabled
+1: enabled"
+        get : "sysctl -n kernel.sched_autogroup_enabled"
+        set : "sysctl -w kernel.sched_autogroup_enabled=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "kernel.sched_wakeup_granularity_ns"
+    info :
+        desc : "This variable indicates the base of the minimum time that a process should run after it is woken up. The smaller the base, the higher the probability of preemption."
+        get : "sysctl -n kernel.sched_wakeup_granularity_ns"
+        set : "sysctl -w kernel.sched_wakeup_granularity_ns=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1000000
+          - 100000000
+        step : 1000000
+        items : 
+        dtype : "int"
+  -
+    name : "kernel.sched_min_granularity_ns"
+    info :
+        desc : "Minimum running time of a process on the CPU. During this time, the kernel does not proactively select other processes for scheduling (in nanoseconds)."
+        get : "sysctl -n kernel.sched_min_granularity_ns"
+        set : "sysctl -w kernel.sched_min_granularity_ns=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1000000
+          - 100000000
+        step : 1000000
+        items : 
+        dtype : "int"
+  -
+    name : "net.mtu"
+    info :
+        desc : "Indicates the maximum transmission unit of the network,"
+        get : "ifconfig enp1s0 | grep mtu | awk '{print $4}'"
+        set : "ifconfig enp1s0 mtu $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 500
+          - 9000
+        step : 500
+        items : 
+        dtype : "int"
+  -
+    name : "net.generic-receive-offload"
+    info :
+        desc : "Whether reassembling small packets into larger ones"
+        get : ethtool -k enp1s0 | grep "generic-receive-offload" | awk '{print $2}'
+        set : "ethtool -K enp1s0 gro $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "on"
+          - "off"
+        dtype : "string"
+  -
+    name : "net.generic-segmentation-offload"
+    info :
+        desc : "Whether reassembling small packets into larger ones"
+        get : ethtool -k enp1s0 | grep "generic-segmentation-offload" | awk '{print $2}'
+        set : "ethtool -K enp1s0 gso $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "on"
+          - "off"
+        dtype : "string"
+  -
+    name : "net.tcp-segmentation-offload"
+    info :
+        desc : "Wheth allow a device to segment a single frame into multiple frames with a data payload size specified in skb_shinfo()->gso_size."
+        get : ethtool -k enp1s0 | grep "tcp-segmentation-offload" | awk '{print $2}'
+        set : "ethtool -K enp1s0 tso $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "on"
+          - "off"
+        dtype : "string" 
+  -
+    name : "net.core.netdev_budget"
+    info :
+        desc : "Number of network packets processed in each software interrupt"
+        get : "sysctl -n net.core.netdev_budget"
+        set : "sysctl -w net.core.netdev_budget=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100
+          - 1000
+        step : 100
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.optmem_max"
+    info :
+        desc : "Maximum size of the buffer allowed by each socket(in bytes)."
+        get : "sysctl -n net.core.optmem_max"
+        set : "sysctl -w net.core.optmem_max=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 20480
+          - 204800
+        step : 20480
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.wmem_max"
+    info :
+        desc : "The maximum size of the system socket write buffer is increased to prevent buffer overflow caused by a large number of new connections. As a result, connections cannot be established. 
+The default value is 229376. You are advised to change the value to 16777216."
+        get : "sysctl -n net.core.wmem_max"
+        set : "sysctl -w net.core.wmem_max=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 67108864
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.wmem_default"
+    info :
+        desc : "Default TCP send window size (bytes)"
+        get : "sysctl -n net.core.wmem_default"
+        set : "sysctl -w net.core.wmem_default=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 8192
+          - 1048576
+        step : 8192
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.rmem_default"
+    info :
+        desc : "Sets the default buffer size (bytes) of the receive socket."
+        get : "sysctl -n net.core.rmem_default"
+        set : "sysctl -w net.core.rmem_default=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 8192
+          - 1048576
+        step : 8192
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.rmem_max"
+    info :
+        desc : "Maximum system socket read buffer 
+The default value is 229376. You are advised to change the value to 16777216."
+        get : "sysctl -n net.core.rmem_max"
+        set : "sysctl -w net.core.rmem_max=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 67108864
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.netdev_max_backlog"
+    info :
+        desc : "Maximum number of packets that can be sent to the queue when each network interface receives packets faster than the kernel processes them"
+        get : "sysctl -n net.core.netdev_max_backlog"
+        set : "sysctl -w net.core.netdev_max_backlog=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1000
+          - 100000
+        step : 1000
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_thin_linear_timeouts"
+    info :
+        desc : "Check whether the TCP stream is thin after the retransmission times out."
+        get : "sysctl -n net.ipv4.tcp_thin_linear_timeouts"
+        set : "sysctl -w net.ipv4.tcp_thin_linear_timeouts=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "net.unix.max_dgram_qlen"
+    info :
+        desc : "Maximum number of datagrams in a UDP queue"
+        get : "sysctl -n net.unix.max_dgram_qlen"
+        set : "sysctl -w net.unix.max_dgram_qlen=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 128
+          - 1048576
+        step : 128
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.somaxconn"
+    info :
+        desc : "Defines the maximum length of the listening queue of each port in the system. This is a global parameter. 
+The default value is 128. You are advised to change the value to 1024."
+        get : "sysctl -n net.core.somaxconn"
+        set : "sysctl -w net.core.somaxconn=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 128
+          - 65536
+        step : 128
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.busy_poll"
+    info :
+        desc : "Timeout interval for performing the poll and select operations on network devices (us) by default. The value is determined by the number of sockets."
+        get : "sysctl -n net.core.busy_poll"
+        set : "sysctl -w net.core.busy_poll=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 200
+        step : 10
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.busy_read"
+    info :
+        desc : "Timeout interval for reading data frames in the device frame queue (us) by default. The recommended value is 50."
+        get : "sysctl -n net.core.busy_read"
+        set : "sysctl -w net.core.busy_read=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 200
+        step : 10
+        items : 
+        dtype : "int"
+  -
+    name : "net.core.dev_weight"
+    info :
+        desc : "Maximum number of network packets that can be processed by each CPU in an NAPI interrupt"
+        get : "sysctl -n net.core.dev_weight"
+        set : "sysctl -w net.core.dev_weight=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 16
+          - 1024
+        step : 16
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_keepalive_intvl"
+    info :
+        desc : "Indicates the frequency of sending TCP probe packets. The value multiplied by tcp_keepalive_probes indicates the duration when no TCP connection is available."
+        get : "sysctl -n net.ipv4.tcp_keepalive_intvl"
+        set : "sysctl -w net.ipv4.tcp_keepalive_intvl=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 30
+          - 300
+        step : 15
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_keepalive_probes"
+    info :
+        desc : "This file indicates the maximum number of times that TCP keepalive detection is performed before a TCP connection is discarded. Keep-alive connections are sent only when the SO_KEEPALIVE socket option is turned on."
+        get : "sysctl -n net.ipv4.tcp_keepalive_probes"
+        set : "sysctl -w net.ipv4.tcp_keepalive_probes=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 3
+          - 144
+        step : 3
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_keepalive_time"
+    info :
+        desc : "Interval for sending keepalive detection messages(in seconds). This parameter is used to check whether the TCP connection is valid."
+        get : "sysctl -n net.ipv4.tcp_keepalive_time"
+        set : "sysctl -w net.ipv4.tcp_keepalive_time=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 600
+          - 36000
+        step : 600
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_tw_reuse"
+    info :
+        desc : "The value 1 indicates that TIME-WAIT sockets can be used for new TCP connections, and the value 0 indicates that TIME-WAIT sockets are disabled."
+        get : "sysctl -n net.ipv4.tcp_tw_reuse"
+        set : "sysctl -w net.ipv4.tcp_tw_reuse=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+          - "2"
+        dtype : "string"
+  -
+    name : "net.ipv4.tcp_window_scaling"
+    info :
+        desc : "The window scaling defined in RFC 1323 is enabled. To support a TCP window larger than 64 KB, this parameter must be set to 1. The maximum size of a TCP window is 1 GB. This parameter takes effect only when both parties of a TCP connection are enabled."
+        get : "sysctl -n net.ipv4.tcp_window_scaling"
+        set : "sysctl -w net.ipv4.tcp_window_scaling=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "net.ipv4.tcp_fin_timeout"
+    info :
+        desc : "Maximum duration for a socket to remain in the FIN_WAIT_2 state."
+        get : "sysctl -n net.ipv4.tcp_fin_timeout"
+        set : "sysctl -w net.ipv4.tcp_fin_timeout=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1
+          - 120
+        step : 1
+        items : 
+        dtype : "int"
+  -
+    name : "net.ipv4.tcp_mem"
+    info :
+        desc : "TCP overall cache setting, which controls all TCP memory usage (in pages). The parameter indicates the no-pressure value of the TCP overall memory, the threshold for enabling the pressure mode, and the maximum usage value in sequence. This parameter is used to control whether the new cache is successfully allocated."
+        get : "sysctl -n net.ipv4.tcp_mem"
+        set : "sysctl -w net.ipv4.tcp_mem=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "6168306 8224411 12336612"
+          - "12336612 16448822 24673224"
+        dtype : "string"
