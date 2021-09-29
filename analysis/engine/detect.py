@@ -27,7 +27,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class Detecting(Resource):
-    """provide the method of post for detecting"""
+    """provide the method of get for detecting"""
     app_name = "appname"
     detect_path = "detectpath"
     folder_path = "/var/atune_data/analysis/"
