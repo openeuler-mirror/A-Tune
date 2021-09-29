@@ -12,7 +12,7 @@
 # Create: 2020-12-17
 
 """
-Routers for /v1/UI/tuning url.
+Routers for /v1/UI/user url.
 """
 
 import logging
