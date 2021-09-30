@@ -10,12 +10,11 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2021-06-03
 
-PD_DIR=/home/huangduirong/pd
-TIKV_DIR=/home/huangduirong/tikv
-TIDB_DIR=/home/huangduirong/tidb
-DATA_PATH=/home/tidb_data
-CONFIG_PATH=/home/huangduirong/tidb_tunning
-IP_CONFIG=9.82.177.199
+PD_DIR=/tidb-deploy/pd-2379
+TIKV_DIR=/tidb-deploy
+TIDB_DIR=/tidb-deploy/tidb-4000
+DATA_PATH=/tidb-data
+IP_CONFIG=
 
 ps -ef | grep pd-server | grep -v grep | awk '{print $2}' | xargs kill -9
 ps -ef | grep tikv-server | grep -v grep | awk '{print $2}' | xargs kill -9
@@ -29,30 +28,30 @@ $PD_DIR/bin/pd-server --name=pd1 \
     --client-urls="http://$IP_CONFIG:2379" \
     --peer-urls="http://$IP_CONFIG:2380" \
     --initial-cluster="pd1=http://$IP_CONFIG:2380" \
-    --log-file=$DATA_PATH/pd1.log &
+    --log-file=$PD_DIR/log/pd.log &
 sleep 5
-$TIKV_DIR/target/release/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
+$TIKV_DIR/tikv-20160/bin/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
     --addr="$IP_CONFIG:20160" \
-    --status-addr="$IP_CONFIG:20181" \
-    --config=$CONFIG_PATH/tikv_config.toml \
+    --status-addr="$IP_CONFIG:20180" \
+    --config=$TIKV_DIR/tikv-20160/conf/tikv.toml \
     --data-dir=$DATA_PATH/tikv1 \
-    --log-file=$DATA_PATH/tikv1.log &
-$TIKV_DIR/target/release/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
+    --log-file=$TIKV_DIR/tikv-20160/log/tikv.log &
+$TIKV_DIR/tikv-20161/bin/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
     --addr="$IP_CONFIG:20161" \
-    --status-addr="$IP_CONFIG:20182" \
-    --config=$CONFIG_PATH/tikv_config.toml \
+    --status-addr="$IP_CONFIG:20181" \
+    --config=$TIKV_DIR/tikv-20161/conf/tikv.toml \
     --data-dir=$DATA_PATH/tikv2 \
-    --log-file=$DATA_PATH/tikv2.log &
-$TIKV_DIR/target/release/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
+    --log-file=$TIKV_DIR/tikv-20161/log/tikv.log &
+$TIKV_DIR/tikv-20162/bin/tikv-server --pd-endpoints="$IP_CONFIG:2379" \
     --addr="$IP_CONFIG:20162" \
-    --status-addr="$IP_CONFIG:20183" \
-    --config=$CONFIG_PATH/tikv_config.toml \
+    --status-addr="$IP_CONFIG:20182" \
+    --config=$TIKV_DIR/tikv-20162/conf/tikv.toml \
     --data-dir=$DATA_PATH/tikv3 \
-    --log-file=$DATA_PATH/tikv3.log &
+    --log-file=$TIKV_DIR/tikv-20162/log/tikv.log &
 sleep 5
-$TIDB_DIR/bin/tidb-server --store=tikv \
+$TIDB_DIR/bin/tidb-server --store="tikv" \
     --path="$IP_CONFIG:2379" \
-    --log-file=$DATA_PATH/tidb.log \
+    --log-file=$TIDB_DIR/log/tidb.log \
     -L=error \
-    --config=tidb_config.toml &
-sleep 5
+    --config=$TIDB_DIR/conf/tidb.toml &
+sleep 120

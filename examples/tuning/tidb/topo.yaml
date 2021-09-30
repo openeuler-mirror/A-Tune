@@ -1,0 +1,63 @@
+global:
+ arch: "arm64"
+ user: "tidb"
+ ssh_port: 22
+ deploy_dir: "/tidb-deploy"
+ data_dir: "/tidb-data"
+
+# # Monitored variables are applied to all the machines.
+monitored:
+ node_exporter_port: 9100
+ blackbox_exporter_port: 9115
+
+server_configs:
+ tidb:
+   log.slow-threshold: 300
+   binlog.enable: false
+   binlog.ignore-error: false
+
+ tikv:
+   readpool.storage.use-unified-pool: false
+   readpool.coprocessor.use-unified-pool: true
+ pd:
+   replication.enable-placement-rules: true
+   replication.location-labels: ["host"]
+ tiflash:
+   logger.level: "info"
+
+pd_servers:
+ - host: 
+
+tidb_servers:
+ - host: 
+
+tikv_servers:
+ - host: 
+   port: 20160
+   status_port: 20180
+   config:
+     server.labels: { host: "logic-host-1" }
+
+ - host: 
+   port: 20161
+   status_port: 20181
+   config:
+     server.labels: { host: "logic-host-2" }
+
+ - host: 
+   port: 20162
+   status_port: 20182
+   config:
+     server.labels: { host: "logic-host-3" }
+
+#tiflash_servers:
+# - host: 
+
+monitoring_servers:
+ - host: 
+
+grafana_servers:
+ - host: 
+
+
+

@@ -10,7 +10,7 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2020-12-03
 
-CONFIG_PATH=/home/huangduirong/tidb_tunning
+CONFIG_PATH=
 SOURCE_DATA_PATH=$CONFIG_PATH/source_data.ini
 
 cd $CONFIG_PATH
@@ -67,7 +67,8 @@ REMOTE_HOST=`cat auto_run.sh | grep ^DB_HOST= | awk -F'=' '{print $2}'`
 
 scp tikv_config.toml root@$REMOTE_HOST:$CONFIG_PATH
 
-cd /home/huangduirong/tidb_tunning
+
+cd ./
 sh auto_run.sh &> /dev/null
 cat result/last.log | grep -A14 "SQL statistics"
 cd -

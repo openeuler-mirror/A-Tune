@@ -1,0 +1,9 @@
+mysql-host=
+mysql-port=4000
+mysql-user=root
+mysql-password=
+mysql-db=sbtest
+time=600
+threads=256
+report-interval=10
+db-driver=mysql
