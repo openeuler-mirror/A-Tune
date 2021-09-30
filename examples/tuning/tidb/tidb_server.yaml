@@ -5,7 +5,7 @@ stopworkload: ""
 object :
 
   -
-    name : "tikv_config__server__grpc_concurrency"
+    name : "tikv_config__server__grpc_concurrency"  ## 并发
     info :
         desc : "tikv_config__server__grpc_concurrency"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__server__grpc_concurrency=' | awk -F '=' '{print $2}'"
@@ -18,7 +18,7 @@ object :
         dtype : "int"
 
   -
-    name : "tikv_config__server__scheduler_worker_pool_size"
+    name : "tikv_config__server__scheduler_worker_pool_size"  ##调度池大小
     info :
         desc : "tikv_config__server__scheduler_worker_pool_size"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__server__scheduler_worker_pool_size=' | awk -F '=' '{print $2}'"
@@ -31,7 +31,7 @@ object :
         dtype : "int"
 
   -
-    name : "tikv_config__storage_block_cache__capacity"
+    name : "tikv_config__storage_block_cache__capacity"  ## 缓存容量
     info :
         desc : "tikv_config__storage_block_cache__capacity"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__storage_block_cache__capacity=' | awk -F '=' '{print $2}'"
@@ -44,7 +44,7 @@ object :
         dtype : "int"
 
   -
-    name : "tikv_config__raftstore__region_max_size"
+    name : "tikv_config__raftstore__region_max_size"  ## 
     info :
         desc : "tikv_config__raftstore__region_max_size"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__raftstore__region_max_size=' | awk -F '=' '{print $2}'"
@@ -70,7 +70,7 @@ object :
         dtype : "int"
 
   -
-    name : "tikv_config__rocksdb_defaultcf__bloom_filter_bits_per_key"
+    name : "tikv_config__rocksdb_defaultcf__bloom_filter_bits_per_key"  ##过滤
     info :
         desc : "tikv_config__rocksdb_defaultcf__bloom_filter_bits_per_key"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__rocksdb_defaultcf__bloom_filter_bits_per_key=' | awk -F '=' '{print $2}'"
@@ -83,7 +83,7 @@ object :
         dtype : "int"
 
   -
-    name : "tikv_config__rocksdb_defaultcf__disable_auto_compactions"
+    name : "tikv_config__rocksdb_defaultcf__disable_auto_compactions"  ##自动压缩
     info :
         desc : "tikv_config__rocksdb_defaultcf__disable_auto_compactions"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__rocksdb_defaultcf__disable_auto_compactions=' | awk -F '=' '{print $2}'"
@@ -96,7 +96,7 @@ object :
         dtype : "string"
 
   -
-    name : "tikv_config__rocksdb_defaultcf__optimize_filters_for_hits"
+    name : "tikv_config__rocksdb_defaultcf__optimize_filters_for_hits"  ## 优化过滤
     info :
         desc : "tikv_config__rocksdb_defaultcf__optimize_filters_for_hits"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__rocksdb_defaultcf__optimize_filters_for_hits=' | awk -F '=' '{print $2}'"
@@ -238,7 +238,7 @@ object :
         dtype : "string"
 
   -
-    name : "tikv_config__rocksdb__max_sub_compactions"
+    name : "tikv_config__rocksdb__max_sub_compactions" ##最大子压缩
     info :
         desc : "tikv_config__rocksdb__max_sub_compactions"
         get : "cat /tmp/tidb.sh | grep '^tikv_config__rocksdb__max_sub_compactions=' | awk -F '=' '{print $2}'"
