@@ -1,0 +1,17 @@
+project: "etcd"
+maxiterations: 100
+startworkload: "systemctl restart etcd"
+stopworkload: "systemctl stop etcd"
+object : 
+  -
+    name : "etcd.snapshot-count"
+  -
+    name : "etcd.heartbeat-interval"
+  -
+    name : "etcd.election-timeout"
+  -
+    name : "etcd.max-snapshots"
+  -
+    name : "etcd.max-wals"
+  -
+    name : "etcd.log-levels"
