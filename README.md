@@ -4,11 +4,11 @@ English | [简体中文](./README-zh.md)
 
 ## Introduction to A-Tune 
 
-**A-Tune** is an OS tuning engine based on AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system optimization, and maximize optimal application performance.
+**A-Tune** is an OS tuning engine powered by AI. A-Tune uses AI technologies to enable the OS to understand services, simplify IT system tuning, and maximize application performance.
 
 
 I. A-Tune Installation
-----------
+------------
 
 Supported OS: openEuler 20.03 LTS or later
 
@@ -17,7 +17,7 @@ Supported OS: openEuler 20.03 LTS or later
 ```bash
 yum install -y atune
 ```
-For openEuler 20.09 or later, atune-engine is needed
+For openEuler 20.09 or later, atune-engine is needed.
 
 ```bash
 yum install -y atune-engine
@@ -30,9 +30,9 @@ yum install -y atune-engine
 yum install -y golang-bin python3 perf sysstat hwloc-gui
 ```
 
-#### 2. Install Python dependent packages.  
+#### 2. Install Python dependency packages.  
 
-#### 2.1 Install dependency for A-Tune service.
+#### 2.1 Install dependency for the A-Tune service.
 ```bash
 yum install -y python3-dict2xml python3-flask-restful python3-pandas python3-scikit-optimize python3-xgboost python3-pyyaml
 ```
@@ -41,8 +41,8 @@ Or
 pip3 install dict2xml Flask-RESTful pandas scikit-optimize xgboost scikit-learn pyyaml
 ```
 
-#### 2.2 (Optional) Install dependency for database.
-Once user has already installed database application and wants to store A-Tune collection and tuning data to the database, following packages should also be installed:
+#### 2.2 (Optional) Install dependency for the database.
+If you have already installed the database application and want to store A-Tune collection and tuning data to the database, you must also install the following packages:
 ```bash
 yum install -y python3-sqlalchemy python3-cryptography
 ```
@@ -50,8 +50,8 @@ Or
 ```bash
 pip3 install sqlalchemy cryptography
 ```
-To use database, user should also select either of the following methods to install dependency based on the database applications.
-| **Database** | **Install using yum** | **Install using pip** |
+To use the database, you should also select either of the following methods to install dependency for the database application.
+| **Database** | **Install Using yum** | **Install Using pip** |
 | ------------------------------ | ---------- | ------------ |
 | PostgreSQL | yum install -y python3-psycopg2 | pip3 install psycopg2 |
 #### 3. Download the source code.
@@ -77,15 +77,15 @@ II. Quick Guide
 
 ### 1. Configure the A-Tune service.
 
-#### Modify the network and disk configuration in the atuned.cnf.
+#### Modify the network and disk configuration in the atuned.cnf file.
 
-You can run the following command to query the NIC that need to be specified for data collecting or optimizing NIC and change the network configuration item in the /etc/atuned/atuned.cnf to the specified NIC.
+You can run the following command to query the NIC that needs to be specified for data collection or optimization and change the value of the network configuration item in the **/etc/atuned/atuned.cnf** file to the specified NIC.
 
 ```bash
 ip addr
 ```
 
-You can run the following command to query the disk that need to be specified for data collection or disk optimization and change the disk configuration item in the /etc/atuned/atuned.cnf to the specified disk.
+You can run the following command to query the disk that needs to be specified for data collection or optimization and change the value of the disk configuration item in the **/etc/atuned/atuned.cnf** file to the specified disk.
 
 ```bash
 fdisk -l | grep dev
@@ -93,7 +93,7 @@ fdisk -l | grep dev
 
 ### 2. Manage the A-Tune service.
 
-#### Load and start the atuned and atune-engine service.
+#### Load and start the atuned and atune-engine services.
 
 ```bash
 systemctl daemon-reload
@@ -101,16 +101,16 @@ systemctl start atuned
 systemctl start atune-engine
 ```
 
-#### Check the atuned or atune-engine service status.
+#### Check the status of the atuned and atune-engine services.
 
 ```bash
 systemctl status atuned
 systemctl status atune-engine
 ```
 
-### 3、Generate AI models.
+### 3. Generate AI models.
 
-You can save the newly collected data to the A-Tune/analysis/dataset directory and run the model generation tool to update the AI model in the A-Tune/analysis/models directory.
+You can save the newly collected data to the **A-Tune/analysis/dataset** directory and run the model generation tool to update the AI model in the **A-Tune/analysis/models** directory.
 
 **Format**
 
@@ -118,26 +118,26 @@ python3 generate_models.py <OPTIONS>
 
 **Parameter Description**
 
-- OPTIONS
+
 
 | Parameter        | Description                                                  |
 | ---------------- | ------------------------------------------------------------ |
-| --csv_path, -d   | Path for storing CSV files required for model training. The default directory is A-Tune/analysis/dataset. |
-| --model_path, -m | Path for storing the new models generated during training. The default path is A-Tune/analysis/models. |
-| --select, -s     | Indicates whether to generate feature models. The default value is false. |
-| --search, -g     | Indicates whether to enable parameter space search. The default value is false. |
+| --csv_path, -d   | Path for storing CSV files required for model training. The default directory is **A-Tune/analysis/dataset**. |
+| --model_path, -m | Path for storing the new models generated during training. The default path is **A-Tune/analysis/models**. |
+| --select, -s     | Indicates whether to generate feature models. The default value is **false**. |
+| --search, -g     | Indicates whether to enable parameter space search. The default value is **false**. |
 
-Example：
+Example:
 
 ```
 python3 generate_models.py
 ```
 
-### 4. Run the atune-adm command.
+### 4. Run the atune-adm commands.
 
-#### The list command.
+#### list command
 
-This command is used to list the supported profiles, and the values of active.
+This command is used to list the supported profiles as well as active profiles.
 
 Format:
 
@@ -149,9 +149,9 @@ Example:
 atune-adm list
 ```
 
-#### The profile command.
+#### profile command
 
-Manually activate the profile to make it in the active state.
+This command is used to manually activate the profile to make it in the active state.
 
 Format:
 
@@ -163,7 +163,7 @@ Example: Activate the profile corresponding to the web-nginx-http-long-connectio
 atune-adm profile web-nginx-http-long-connection
 ```
 
-#### The analysis command. (Online static tuning)
+#### analysis command (online static tuning)
 
 This command is used to collect real-time statistics from the system to identify and automatically optimize workload types.
 
@@ -177,13 +177,13 @@ Example 1: Use the default model to identify applications and perform automatic 
 atune-adm analysis
 ```
 
-Example 2: Use the user-defined training model for recognition.
+Example 2: Use the user-defined model for recognition.
 
 ```bash
 atune-adm analysis --model /usr/libexec/atuned/analysis/models/new-model.m
 ```
 
-#### The tuning command. (Offline dynamic tuning)
+#### tuning command (offline dynamic tuning)
 
 Use the specified project file to search the dynamic space for parameters and find the optimal solution under the current environment configuration.
 
@@ -198,15 +198,15 @@ For details about other commands, see the atune-adm help information or [A-Tune 
 III. Web UI
 --------
 
-[A-Tune-UI](https://gitee.com/openeuler/A-Tune-UI) is a web project base on A-Tune. Please check A-Tune-UI [README](https://gitee.com/openeuler/A-Tune-UI/blob/master/README.en.md) for details.
+[A-Tune-UI](https://gitee.com/openeuler/A-Tune-UI) is a web project based on A-Tune. Please check A-Tune-UI [README](https://gitee.com/openeuler/A-Tune-UI/blob/master/README.en.md) for details.
 
-IV. How to contribute
+IV. How to Contribute
 --------
 
-We welcome new contributors to participate in the project. And we are happy to provide guidance for new contributors. You need to sign [CLA](https://openeuler.org/en/cla.html) before contribution.
+We welcome new contributors to participate in the project, and we are happy to provide guidance for new contributors. Please sign [CLA](https://openeuler.org/en/cla.html) before contribution.
 
-### Mail list
-Any question or discussion please contact [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/).
+### Mailing list
+If you have any question, please contact [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/).
 
-### Routine Meeting
-Holding SIG Meeting at 10:00-12:00 AM on Friday every two weeks. You can apply topic by [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/) mail list.
+### Routine meeting
+The SIG meeting is hold at 10:00-12:00 AM on Friday every two weeks. Please send your issues to the [A-Tune](https://mailweb.openeuler.org/postorius/lists/a-tune.openeuler.org/) mailing list.
