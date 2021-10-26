@@ -4229,3 +4229,82 @@ The default value is 2048. You are advised to change the value to 8192."
           - 0
           - 300
         dtype : "int"
+  -
+    name : "etcd.snapshot-count"
+    info :
+        desc : "Number of committed transactions to trigger a snapshot to disk."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_SNAPSHOT_COUNT' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_SNAPSHOT_COUNT.*$/ETCD_SNAPSHOT_COUNT="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10000
+          - 300000
+        step : 10000
+        dtype : "int"
+  -
+    name : "etcd.heartbeat-interval"
+    info :
+        desc : "Time (in milliseconds) of a heartbeat interval."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_HEARTBEAT_INTERVAL' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_HEARTBEAT_INTERVAL.*$/ETCD_HEARTBEAT_INTERVAL="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 50
+          - 500
+        step : 50
+        dtype : "int"
+  -
+    name : "etcd.election-timeout"
+    info :
+        desc : "Time (in milliseconds) for an election to timeout."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_ELECTION_TIMEOUT' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_ELECTION_TIMEOUT.*$/ETCD_ELECTION_TIMEOUT="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 500
+          - 3000
+        step : 100
+        dtype : "int"
+  -
+    name : "etcd.max-snapshots"
+    info :
+        desc : "Maximum number of snapshot files to retain (0 is unlimited)."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_MAX_SNAPSHOTS' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_MAX_SNAPSHOTS.*$/ETCD_MAX_SNAPSHOTS="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 30
+        dtype : "int"
+  -
+    name : "etcd.max-wals"
+    info :
+        desc : "Maximum number of wal files to retain (0 is unlimited)."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_MAX_WALS' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_MAX_WALS.*$/ETCD_MAX_WALS="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 30
+        dtype : "int"
+  -
+    name : "etcd.log-levels"
+    info :
+        desc : "Configures log level. Only supports debug, info, warn, error, panic, or fatal."
+        get : cat /etc/etcd/etcd.conf | grep 'ETCD_LOG_LEVEL' | awk -F '"' '{print $2}'
+        set : sed -i 's/^ETCD_LOG_LEVEL.*$/ETCD_LOG_LEVEL="$value"/g' /etc/etcd/etcd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - "debug"
+          - "info"
+          - "warn"
+          - "error"
+          - "panic"
+          - "fatal"
+        dtype : "string"
