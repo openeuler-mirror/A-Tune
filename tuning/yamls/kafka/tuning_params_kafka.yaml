@@ -1,0 +1,23 @@
+project: "kafka"
+maxiterations: 100
+startworkload: "/opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties"
+stopworkload: "/opt/kafka/bin/kafka-server-stop.sh /opt/kafka/config/server.properties"
+object : 
+  -
+    name : "kafka.num_network_threads"
+  -
+    name : "kafka.num_io_threads"
+  -
+    name : "kafka.socket_send_buffer_bytes"
+  -
+    name : "kafka.socket_receive_buffer_bytes"
+  -
+    name : "kafka.socket_request_max_bytes"
+  -
+    name : "kafka.log_flush_interval_messages"
+  -
+    name : "kafka.log_flush_interval_ms"
+  -
+    name : "kafka.log_segment_bytes"
+  -
+    name : "kafka.zookeeper_connection_timeout_ms"
