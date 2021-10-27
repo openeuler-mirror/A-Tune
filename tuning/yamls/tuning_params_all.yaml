@@ -4423,3 +4423,117 @@ The default value is 2048. You are advised to change the value to 8192."
           - 50000
         step : 100
         dtype : "int"
+  -
+    name : "zookeeper.autopurge_purgeInterval"
+    info :
+        desc : "Purge task interval in hours. Set to 0 to disable auto purge feature."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'autopurge.purgeInterval' | awk -F '=' '{print$2}'
+        set : sed -i "s/autopurge.purgeInterval.*/autopurge.purgeInterval=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 5
+        dtype : "int"
+  -
+    name : "zookeeper.autopurge_snapRetainCount"
+    info :
+        desc : "The number of snapshots to retain in dataDir."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'autopurge.snapRetainCount' | awk -F '=' '{print$2}'
+        set : sed -i "s/autopurge.snapRetainCount.*/autopurge.snapRetainCount=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+  -
+    name : "zookeeper.tickTime"
+    info :
+        desc : "The number of milliseconds of each tick."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'tickTime' | awk -F '=' '{print$2}'
+        set : sed -i "s/tickTime.*/tickTime=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 500
+          - 10000
+        step : 500
+        dtype : "int"
+  -
+    name : "zookeeper.initLimit"
+    info :
+        desc : "The number of ticks that the initial synchronization phase can take."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'initLimit' | awk -F '=' '{print$2}'
+        set : sed -i "s/initLimit.*/initLimit=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 5
+          - 50
+        dtype : "int"
+  -
+    name : "zookeeper.syncLimit"
+    info :
+        desc : "The number of ticks that can pass between sending a request and getting an acknowledgement."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'syncLimit' | awk -F '=' '{print$2}'
+        set : sed -i "s/syncLimit.*/syncLimit=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 50
+        dtype : "int"
+  -
+    name : "zookeeper.maxClientCnxns"
+    info :
+        desc : "The maximum number of client connections.."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'maxClientCnxns' | awk -F '=' '{print$2}'
+        set : sed -i "s/maxClientCnxns.*/maxClientCnxns=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 5
+          - 5000
+        step : 5
+        dtype : "int"
+  -
+    name : "zookeeper.maxSessionTimeout"
+    info :
+        desc : "The maximum number of session timeout."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'maxSessionTimeout' | awk -F '=' '{print$2}'
+        set : sed -i "s/maxSessionTimeout.*/maxSessionTimeout=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100000
+          - 100000000
+        step : 100000
+        dtype : "int"
+  -
+    name : "zookeeper.preAllocSize"
+    info :
+        desc : "Pre-provisioned disk space for subsequent writes to the transaction log."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'preAllocSize' | awk -F '=' '{print$2}'
+        set : sed -i "s/preAllocSize.*/preAllocSize=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 65536
+          - 5242880
+        step : 65536
+        dtype : "int"
+  -
+    name : "zookeeper.snapCount"
+    info :
+        desc : "Trigger a snapshot after every snapCount transaction log output."
+        get : cat /opt/zookeeper/conf/zoo.cfg | grep 'snapCount' | awk -F '=' '{print$2}'
+        set : sed -i "s/snapCount.*/snapCount=$value/" /opt/zookeeper/conf/zoo.cfg
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 10000
+          - 10000000
+        step : 10000
+        dtype : "int"
+

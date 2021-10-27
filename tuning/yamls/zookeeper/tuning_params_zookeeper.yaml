@@ -1,0 +1,23 @@
+project: "zookeeper"
+maxiterations: 100
+startworkload: "/opt/zookeeper/bin/zkServer.sh restart"
+stopworkload: "/opt/zookeeper/bin/zkServer.sh stop"
+object : 
+  -
+    name : "zookeeper.autopurge_purgeInterval"
+  -
+    name : "zookeeper.autopurge_snapRetainCount"
+  -
+    name : "zookeeper.tickTime"
+  -
+    name : "zookeeper.initLimit"
+  -
+    name : "zookeeper.syncLimit"
+  -
+    name : "zookeeper.maxClientCnxns"
+  -
+    name : "zookeeper.maxSessionTimeout"
+  -
+    name : "zookeeper.preAllocSize"
+  -
+    name : "zookeeper.snapCount"
