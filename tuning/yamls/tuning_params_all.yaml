@@ -4603,3 +4603,65 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
+  -
+    name : "karaf.defaultServiceLog_level"
+    desc : "Log level when the pax-logging service is not available."
+        get : cat $KARAF_HOME/etc/system.properties | grep "org.ops4j.pax.logging.DefaultServiceLog.level" | awk -F "=" '{print$2}'
+        set : sed -i "s/org.ops4j.pax.logging.DefaultServiceLog.level.*/org.ops4j.pax.logging.DefaultServiceLog.level=$value/" $KARAF_HOME/etc/system.properties
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "FATAL"
+          - "ERROR"
+          - "WARN"
+          - "INFO"
+          - "DEBUG"
+          - "TRACE"
+        dtype : "string"
+  -
+    name : "karaf.shell_histroy_maxSize"
+    desc : "Sets the maximum size of the shell command history."
+        get : cat $KARAF_HOME/etc/system.properties | grep "karaf.shell.history.maxSize" | awk -F "=" '{print$2}'
+        set : sed -i "s/karaf.shell.history.maxSize.*/karaf.shell.history.maxSize=$value/" $KARAF_HOME/etc/system.properties
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 0
+          - 1000
+        step : 50
+        dtype : "int"
+  -
+    name : "karaf.shell_histroy_file_maxSize"
+    desc : "Sets the maximum size of the local shell command history file."
+        get : cat $KARAF_HOME/etc/system.properties | grep "karaf.shell.history.file.maxSize" | awk -F "=" '{print$2}'
+        set : sed -i "s/karaf.shell.history.file.maxSize.*/karaf.shell.history.file.maxSize=$value/" $KARAF_HOME/etc/system.properties
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1000
+          - 100000
+        step : 1000
+        dtype : "int"
+  -
+    name : "karaf.cleanAll"
+    desc : "Deletes the entire karaf.data directory at every start."
+        get : cat $KARAF_HOME/etc/system.properties | grep "karaf.clean.all" | awk -F "=" '{print$2}'
+        set : sed -i "s/karaf.clean.all.*/karaf.clean.all=$value/" $KARAF_HOME/etc/system.properties
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "karaf.cleanCache"
+    desc : "Deletes the karaf.data/cache directory at every start."
+        get : cat $KARAF_HOME/etc/system.properties | grep "karaf.clean.cache" | awk -F "=" '{print$2}'
+        set : sed -i "s/karaf.clean.cache.*/karaf.clean.cache=$value/" $KARAF_HOME/etc/system.properties
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+
