@@ -1,0 +1,16 @@
+project: "karaf"
+maxiterations: 100
+startworkload: "$KARAF_HOME/bin/start"
+stopworkload: "$KARAF_HOME/bin/stop"
+object : 
+  -
+    name : "karaf.defaultServiceLog_level"
+  -
+    name : "karaf.shell_histroy_maxSize"
+  -
+    name : "karaf.shell_histroy_file_maxSize"
+  -
+    name : "karaf.cleanAll"
+  -
+    name : "karaf.cleanCache"
+
