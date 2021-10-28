@@ -1,0 +1,16 @@
+project: "sqlite"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "sqlite.synchronous"
+  -
+    name : "sqlite.journal_mode"
+  -
+    name : "sqlite.cache_size"
+  -
+    name : "sqlite.temp_store"
+  -
+    name : "sqlite.case_sensitive_like"
+

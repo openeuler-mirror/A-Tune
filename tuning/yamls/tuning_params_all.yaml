@@ -4536,4 +4536,70 @@ The default value is 2048. You are advised to change the value to 8192."
           - 10000000
         step : 10000
         dtype : "int"
-
+  -
+    name : "sqlite.synchronous"
+    info :
+        desc : "Query or change the setting of the 'synchronous' flag."
+        get : cat /root/.sqliterc | grep "synchronous" | awk -F "=" '{print$2}'
+        set : sed -i "s/synchronous.*/synchronous=$value/" /root/.sqliterc
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "OFF"
+          - "NORMAL"
+          - "FULL"
+          - "EXTRA"
+        dtype : "string"
+  -
+    name : "sqlite.journal_mode"
+    info :
+        desc : "Queries or sets the journal mode for databases associated with the current database connection."
+        get : cat /root/.sqliterc | grep "journal_mode" | awk -F "=" '{print$2}'
+        set : sed -i "s/journal_mode.*/journal_mode=$value/" /root/.sqliterc
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "DELETE"
+          - "TRUNCATE"
+          - "PERSIST"
+          - "MEMORY"
+          - "WAL"
+          - "OFF"
+        dtype : "string"
+  -
+    name : "sqlite.cache_size"
+    info :
+        desc : "Query or change the suggested maximum number of database disk pages that SQLite will hold in memory at once per open database file."
+        get : cat /root/.sqliterc | grep "temp_store" | awk -F "=" '{print$2}'
+        set : sed -i "s/temp_store.*/temp_store=$value/" /root/.sqliterc
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 10
+          - 200
+        dtype : "int"
+  -
+    name : "sqlite.temp_store"
+    info :
+        desc : "Query or change the setting of the 'temp_store' parameter."
+        get : cat /root/.sqliterc | grep "temp_store" | awk -F "=" '{print$2}'
+        set : sed -i "s/temp_store.*/temp_store=$value/" /root/.sqliterc
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "DEFAULT"
+          - "FILE"
+          - "MEMORY"
+        dtype : "string"
+  -
+    name : "sqlite.case_sensitive_like"
+    info :
+        desc : "This pragma uses sqlite3_create_function() to overload the LIKE and GLOB functions, which may override previous implementations of LIKE and GLOB registered by the application."
+        get : cat /root/.sqliterc | grep "journal_mode" | awk -F "=" '{print$2}'
+        set : sed -i "s/journal_mode.*/journal_mode=$value/" /root/.sqliterc
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
