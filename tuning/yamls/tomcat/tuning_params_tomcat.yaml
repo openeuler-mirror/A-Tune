@@ -1,0 +1,30 @@
+project: "tomcat"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "vm.drop_caches"
+  -
+    name : "net.ipv4.tcp_tw_reuse"
+  -
+    name : "net.ipv4.tcp_keepalive"
+  -
+    name : "net.ipv4.tcp_fin_timeout"
+  -
+    name : "net.ipv4.tcp_max_tw_buckets"
+  -
+    name : "net.ipv4.ip_local_port_range"
+  -
+    name : "net.core.somaxconn"
+  -
+    name : "net.ipv4.tcp_max_syn_backlog"
+  -
+    name : "net.core_netdev_max_backlog"
+  -
+    name : "net.core.rmem_max"
+  -
+    name : "net.core.wmem_max"
+  -
+    name : "ulimit.nofile"
+
