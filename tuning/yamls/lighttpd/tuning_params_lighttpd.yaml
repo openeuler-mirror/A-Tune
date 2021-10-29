@@ -1,0 +1,20 @@
+project: "lighttpd"
+maxiterations: 100
+startworkload: "systemctl restart lighttpd"
+stopworkload: "systemctl stop lighttpd"
+object : 
+  -
+    name : "lighttpd.server_network_backend"
+  -
+    name : "lighttpd.server_max_fds"
+  -
+    name : "lighttpd.server_listen_backlog"
+  -
+    name : "lighttpd.server_stat_cache_engine"
+  -
+    name : "lighttpd.server_max_keep_alive_idle"
+  -
+    name : "lighttpd.server_max_read_idle"
+  -
+    name : "lighttpd.server_max_write_idle"
+

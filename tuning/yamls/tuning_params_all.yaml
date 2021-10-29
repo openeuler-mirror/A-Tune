@@ -4664,4 +4664,91 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
+  -
+    name : "lighttpd.server_network_backend"
+    info :
+        desc : "The basic network interface for all platforms at the syscalls read() and write()."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.network-backend' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.network-backend.*$/server.network-backend="$value"/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - "sendfile"
+          - "writev"
+        dtype : "string"
+  -
+    name : "lighttpd.server_max_fds"
+    info :
+        desc : "The max fds value for lighttpd."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.max-fds' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.max-fds.*$/server.max-fds=$value/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 510
+          - 5120
+        step : 512
+        dtype : "int"
+  -
+    name : "lighttpd.server_listen_backlog"
+    info :
+        desc : "Listen-backlog is the size of the listen() backlog queue requested when the lighttpd server ask the kernel to listen() on the provided network address."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.listen-backlog' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.listen-backlog.*$/server.listen-backlog=$value/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 128
+          - 2048
+        step : 128
+        dtype : "int"
+  -
+    name : "lighttpd.server_stat_cache_engine"
+    info :
+        desc : "Stat() call caching."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.stat-cache-engine' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.stat-cache-engine.*$/server.stat-cache-engine="$value"/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - "disable"
+          - "simple"
+          - "fam"
+        dtype : "string"
+  -
+    name : "lighttpd.server_max_keep_alive_idle"
+    info :
+        desc : "How many seconds to keep a keep-alive connection open, until we consider it idle."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.max-keep-alive-idle' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.max-keep-alive-idle.*$/server.max-keep-alive-idle=$value/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "lighttpd.server_max_read_idle"
+    info :
+        desc : "Time to read from a socket before we consider it idle."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.max-read-idle' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.max-read-idle.*$/server.max-read-idle=$value/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 100
+        dtype : "int"
+  -
+    name : "lighttpd.server_max_write_idle"
+    info :
+        desc : "Time to write from a socket before we consider it idle."
+        get : cat /etc/lighttpd/lighttpd.conf | grep 'server.max-write-idle' | awk -F '"' '{print $2}'
+        set : sed -i 's/^server.max-write-idle.*$/server.max-write-idle=$value/g' /etc/lighttpd/lighttpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 100
+        dtype : "int"
 
