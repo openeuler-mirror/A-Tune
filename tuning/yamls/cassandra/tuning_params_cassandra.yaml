@@ -1,0 +1,20 @@
+project: "cassandra"
+maxiterations: 100
+startworkload: "$CASSANDRA_HOME/bin/cassandra -f -R"
+stopworkload: "pgrep -u $USER -f cassandra | xargs kill -9"
+object : 
+  -
+    name : "cassandra.num_tokens"
+  -
+    name : "cassandra.hinted_handoff_enabled"
+  -
+    name : "cassandra.max_hint_window_in_ms"
+  -
+    name : "cassandra.hinted_handoff_throttle_in_kb"
+  -
+    name : "cassandra.max_hints_delivery_threads"
+  -
+    name : "cassandra.credentials_validity_in_ms"
+  -
+    name : "cassandra.key_cache_save_period"
+
