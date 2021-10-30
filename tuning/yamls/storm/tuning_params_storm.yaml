@@ -1,0 +1,20 @@
+project: "storm"
+maxiterations: 100
+startworkload: "systemctl restart storm-nimbus && systemctl restart storm-supervisor"
+stopworkload: "systemctl stop storm-nimbus && systemctl stop storm-supervisor"
+object : 
+  -
+    name : "storm.topology_workerSharedThreadPoolSize"
+  -
+    name : "storm.messagingNettySocketBacklog"
+  -
+    name : "storm.topology_transferBufferSize"
+  -
+    name : "storm.messagingNettyBufferSize"
+  -
+    name : "storm.topology_disruptorBatchSize"
+  -
+    name : "storm.messagingNettyTransferBatchSize"
+  -
+    name : "storm.topology_fallBackOnJavaSerialization"
+
