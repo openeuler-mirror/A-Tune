@@ -4300,7 +4300,7 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i 's/^ETCD_LOG_LEVEL.*$/ETCD_LOG_LEVEL="$value"/g' /etc/etcd/etcd.conf
         needrestart : "true"
         type : "discrete"
-        scope :
+        options :
           - "debug"
           - "info"
           - "warn"
@@ -4677,7 +4677,7 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i 's/^server.network-backend.*$/server.network-backend="$value"/g' /etc/lighttpd/lighttpd.conf
         needrestart : "true"
         type : "discrete"
-        scope :
+        options :
           - "sendfile"
           - "writev"
         dtype : "string"
@@ -4715,7 +4715,7 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i 's/^server.stat-cache-engine.*$/server.stat-cache-engine="$value"/g' /etc/lighttpd/lighttpd.conf
         needrestart : "true"
         type : "discrete"
-        scope :
+        options :
           - "disable"
           - "simple"
           - "fam"
@@ -4836,7 +4836,7 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i 's/^topology.disruptor.batch.size.*$/topology.disruptor.batch.size=$value/g' /etc/storm/storm.config
         needrestart : "true"
         type : "discrete"
-        scope :
+        options :
           - "true"
           - "false"
         dtype : "string"
@@ -4884,7 +4884,7 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i "s/query.timeout.*/query.timeout=$value/" /etc/default/prometheus
         needrestart : "false"
         type : "discrete"
-        scope :
+        options :
           - "10s"
           - "30s"
           - "1m"
@@ -4912,10 +4912,98 @@ The default value is 2048. You are advised to change the value to 8192."
         set : sed -i "s/log.level.*/log.level=$value/" /etc/default/prometheus
         needrestart : "false"
         type : "discrete"
-        scope :
+        options :
           - "debug"
           - "info"
           - "warn"
           - "error"
         dtype : "string"
+  -
+    name : "cassandra.num_tokens"
+    info :
+        desc : "The more tokens, relative to other nodes, the larger the proportion of data that this node will store."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "num_tokens" | awk -F ":" '{print $2}'
+        set : sed -i "s/num_tokens.*/num_tokens:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 1024
+        dtype : "int"
+  -
+    name : "cassandra.hinted_handoff_enabled"
+    info :
+        desc : "Hinted handoff is a Cassandra feature that optimizes the cluster consistency process and anti-entropy when a replica-owning node is not available, due to network issues or other problems, to accept a replica from a successful write operation."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "hinted_handoff_enabled" | awk -F ":" '{print $2}'
+        set : sed -i "s/hinted_handoff_enabled.*/hinted_handoff_enabled:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "cassandra.max_hint_window_in_ms"
+    info :
+        desc : "Defines the maximum amount of time a dead host will have hints generated."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "max_hint_window_in_ms" | awk -F ":" '{print $2}'
+        set : sed -i "s/max_hint_window_in_ms.*/max_hint_window_in_ms:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100000
+          - 108000000
+        step : 100000
+        dtype : "int"
+  -
+    name : "cassandra.hinted_handoff_throttle_in_kb"
+    info :
+        desc : "Maximum throttle in KBs per second, per delivery thread."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "hinted_handoff_throttle_in_kb" | awk -F ":" '{print $2}'
+        set : sed -i "s/hinted_handoff_throttle_in_kb.*/hinted_handoff_throttle_in_kb:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 128
+          - 102400
+        step : 128
+        dtype : "int"
+  -
+    name : "cassandra.max_hints_delivery_threads"
+    info :
+        desc : "Number of threads with which to deliver hints."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "max_hints_delivery_threads" | awk -F ":" '{print $2}'
+        set : sed -i "s/max_hints_delivery_threads.*/max_hints_delivery_threads:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "cassandra.credentials_validity_in_ms"
+    info :
+        desc : "Validity period for credentials cache."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "credentials_validity_in_ms" | awk -F ":" '{print $2}'
+        set : sed -i "s/credentials_validity_in_ms.*/credentials_validity_in_ms:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100
+          - 10000
+        step : 100
+        dtype : "int"
+  -
+    name : "cassandra.key_cache_save_period"
+    info :
+        desc : "Duration in seconds after which Cassandra should save the key cach."
+        get : cat $CASSANDRA_HOME/conf/cassandra.yaml | grep "key_cache_save_period" | awk -F ":" '{print $2}'
+        set : sed -i "s/key_cache_save_period.*/key_cache_save_period:value/" $CASSANDRA_HOME/conf/cassandra.yaml
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 86400
+        step : 600
+        dtype : "int"
 
