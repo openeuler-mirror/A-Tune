@@ -4756,4 +4756,88 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 100
         dtype : "int"
+  -
+    name : "storm.topology_workerSharedThreadPoolSize"
+    info :
+        desc : "Size of the shared thread pool used by Workers."
+        get : cat /etc/storm/storm.config | grep "topology.worker.shared.thread.pool.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^topology.worker.shared.thread.pool.size.*$/topology.worker.shared.thread.pool.size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.messagingNettySocketBacklog"
+    info :
+        desc : "Sets the TCP backlog parameter to specify the maximum number of connections in the socket queue."
+        get : cat /etc/storm/storm.config | grep "storm.messaging.netty.socket.backlog" | awk -F "=" '{print $2}'
+        set : sed -i 's/^storm.messaging.netty.socket.backlog.*$/storm.messaging.netty.socket.backlog=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.topology_transferBufferSize"
+    info :
+        desc : "Size of the shared thread pool used by Workers."
+        get : cat /etc/storm/storm.config | grep "topology.transfer.buffer.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^topology.transfer.buffer.size.*$/topology.transfer.buffer.size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.messagingNettyBufferSize"
+    info :
+        desc : "Size of the transmit/receive buffer in bytes."
+        get : cat /etc/storm/storm.config | grep "storm.messaging.netty.buffer_size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^storm.messaging.netty.buffer_size.*$/storm.messaging.netty.buffer_size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.topology_disruptorBatchSize"
+    info :
+        desc : "Number of messages sent in a batch in the internal message queue."
+        get : cat /etc/storm/storm.config | grep "topology.disruptor.batch.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^topology.disruptor.batch.size.*$/topology.disruptor.batch.size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.messagingNettyTransferBatchSize"
+    info :
+        desc : "If the Netty message layer is busy, the Netty client attempts to collect as many messages as possible, up to the specified size in bytes."
+        get : cat /etc/storm/storm.config | grep "storm.messaging.netty.transfer.batch.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^storm.messaging.netty.transfer.batch.size.*$/storm.messaging.netty.transfer.batch.size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 2147483647
+        dtype : "int"
+  -
+    name : "storm.topology_fallBackOnJavaSerialization"
+    info :
+        desc : "Whether to use Java serialization in the topology."
+        get : cat /etc/storm/storm.config | grep "topology.disruptor.batch.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^topology.disruptor.batch.size.*$/topology.disruptor.batch.size=$value/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - "true"
+          - "false"
+        dtype : "string"
 
