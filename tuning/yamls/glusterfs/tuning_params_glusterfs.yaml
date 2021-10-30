@@ -1,0 +1,18 @@
+project: "glusterfs"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "glusterfs.nfs_disabled"
+  -
+    name : "glusterfs.changelog"
+  -
+    name : "glusterfs.client_eventThreads"
+  -
+    name : "glusterfs.cluster_granularEntryHeal"
+  -
+    name : "glusterfs.cluster_readFreqThreshold"
+  -
+    name : "glusterfs.cluster_dataSelfHeal"
+

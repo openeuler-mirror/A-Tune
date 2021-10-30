@@ -5006,4 +5006,76 @@ The default value is 2048. You are advised to change the value to 8192."
           - 86400
         step : 600
         dtype : "int"
+  -
+    name : "glusterfs.nfs_disabled"
+    info :
+        desc : "Specifies whether to disable NFS exports of individual volumes."
+        get : "gluster volumn info $VOL_NAME | grep 'nfs.disabled' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME nfs.disabled $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "off"
+          - "on"
+        dtype : "string"
+  -
+    name : "glusterfs.changelog"
+    info :
+        desc : "Enables the changelog translator to record all the file operations."
+        get : "gluster volumn info $VOL_NAME | grep 'changelog' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME changelog $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "off"
+          - "on"
+        dtype : "string"
+  -
+    name : "glusterfs.client_eventThreads"
+    info :
+        desc : "Specifies the number of network connections to be handled simultaneously by the client processes accessing a Red Hat Gluster Storage node."
+        get : "gluster volumn info $VOL_NAME | grep 'client.event-threads' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME client.event-threads $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "off"
+          - "on"
+        dtype : "string"
+  -
+    name : "glusterfs.cluster_granularEntryHeal"
+    info :
+        desc : "If set to enable, stores more granular information about the entries which were created or deleted from a directory while a brick in a replica was down."
+        get : "gluster volumn info $VOL_NAME | grep 'cluster.granular-entry-heal' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME cluster.granular-entry-heal $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "enable"
+          - "disable"
+        dtype : "string"
+  -
+    name : "glusterfs.cluster_readFreqThreshold"
+    info :
+        desc : "If set to enable, stores more granular information about the entries which were created or deleted from a directory while a brick in a replica was down."
+        get : "gluster volumn info $VOL_NAME | grep 'cluster.read-freq-threshold' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME cluster.read-freq-threshold $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 20
+        dtype : "int"
+  -
+    name : "glusterfs.cluster_dataSelfHeal"
+    info :
+        desc : "Specifies whether proactive data self-healing on replicated volumes is activated."
+        get : "gluster volumn info $VOL_NAME | grep 'cluster.data-self-heal' | awk -F ':' '{print $2}'"
+        set : "gluster volumn set $VOL_NAME cluster.data-self-heal $value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "off"
+          - "on"
+        dtype : "string"
 
