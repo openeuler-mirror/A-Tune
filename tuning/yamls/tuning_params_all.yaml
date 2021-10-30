@@ -4840,4 +4840,82 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
+  -
+    name : "prometheus.web_maxConnections"
+    info :
+        desc : "Maximum number of simultaneous connections."
+        get : cat /etc/default/prometheus | grep "web.max-connections" | awk -F "=" '{print $2}'
+        set : sed -i "s/web.max-connections.*/web.max-connections=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 1024
+        dtype : "int"
+  -
+    name : "prometheus.storage_remote_flushDeadline"
+    info :
+        desc : "How long to wait flushing sample on shutdown or config reload."
+        get : cat /etc/default/prometheus | grep "storage.remote.flush-deadline" | awk -F "=" '{print $2}'
+        set : sed -i "s/storage.remote.flush-deadline.*/storage.remote.flush-deadline=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 1024
+        dtype : "int"
+  -
+    name : "prometheus.storage_remote_readConcurrentLimit"
+    info :
+        desc : "Maximum number of concurrent remote read calls. 0 means no limit."
+        get : cat /etc/default/prometheus | grep "storage.remote.read-concurrent-limit" | awk -F "=" '{print $2}'
+        set : sed -i "s/storage.remote.read-concurrent-limit.*/storage.remote.read-concurrent-limit=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 100
+        dtype : "int"
+  -
+    name : "prometheus.query_timeout"
+    info :
+        desc : "Maximum time a query may take before being aborted."
+        get : cat /etc/default/prometheus | grep "query.timeout" | awk -F "=" '{print $2}'
+        set : sed -i "s/query.timeout.*/query.timeout=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - "10s"
+          - "30s"
+          - "1m"
+          - "2m"
+          - "5m"
+        dtype : "string"
+  -
+    name : "prometheus.query_maxSamples"
+    info :
+        desc : "Maximum number of samples a single query can load into memory. Note that queries will fail if they try to load more samples than this into memory, so this also limits the number of samples a query can return."
+        get : cat /etc/default/prometheus | grep "query.max-samples" | awk -F "=" '{print $2}'
+        set : sed -i "s/query.max-samples.*/query.max-samples=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100000
+          - 100000000
+        step : 100000
+        dtype : "int"
+  -
+    name : "prometheus.log_level"
+    info :
+        desc : "Only log messages with the given severity or above."
+        get : cat /etc/default/prometheus | grep "log.level" | awk -F "=" '{print $2}'
+        set : sed -i "s/log.level.*/log.level=$value/" /etc/default/prometheus
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - "debug"
+          - "info"
+          - "warn"
+          - "error"
+        dtype : "string"
 

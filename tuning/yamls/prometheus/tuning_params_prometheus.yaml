@@ -1,0 +1,18 @@
+project: "prometheus"
+maxiterations: 100
+startworkload: "systemctl restart prometheus"
+stopworkload: "systemctl stop prometheus"
+object : 
+  -
+    name : "prometheus.web_maxConnections"
+  -
+    name : "prometheus.storage_remote_flushDeadline"
+  -
+    name : "prometheus.storage_remote_readConcurrentLimit"
+  -
+    name : "prometheus.query_timeout"
+  -
+    name : "prometheus.query_maxSamples"
+  -
+    name : "prometheus.log_level"
+
