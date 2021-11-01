@@ -5126,4 +5126,76 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
+  -
+    name : "httpd.StartServers"
+    info :
+        desc : "Number of started subprocesses."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "StartServers" | awk -F " " '{print $2}'
+        set : sed -i 's/^StartServers.*$/StartServers $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "httpd.MinSpareThreads"
+    info :
+        desc : "Minimum number of worker threads reserved for spare."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "MinSpareThreads" | awk -F " " '{print $2}'
+        set : sed -i 's/^MinSpareThreads.*$/MinSpareThreads $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "httpd.MaxSpareThreads"
+    info :
+        desc : "Maximum number of worker threads reserved for spare."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "MaxSpareThreads" | awk -F " " '{print $2}'
+        set : sed -i 's/^MaxSpareThreads.*$/MaxSpareThreads $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "httpd.ThreadsPerChild"
+    info :
+        desc : "Number of worker threads for the server process."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "ThreadsPerChild" | awk -F " " '{print $2}'
+        set : sed -i 's/^ThreadsPerChild.*$/ThreadsPerChild $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "httpd.MaxRequestWorkers"
+    info :
+        desc : "Maximum number of worker threads on the server."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "MaxRequestWorkers" | awk -F " " '{print $2}'
+        set : sed -i 's/^MaxRequestWorkers.*$/MaxRequestWorkers $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "httpd.MaxConnectionsPerChild"
+    info :
+        desc : "Maximum number of process connections on the server. The value 0 indicates that the number is not limited."
+        get : cat /etc/httpd/conf.modules.d/01-cgi.conf | grep "MaxConnectionsPerChild" | awk -F " " '{print $2}'
+        set : sed -i 's/^MaxConnectionsPerChild.*$/MaxConnectionsPerChild $valuem/g' /etc/httpd/conf.modules.d/01-cgi.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 128
+        dtype : "int"
 
