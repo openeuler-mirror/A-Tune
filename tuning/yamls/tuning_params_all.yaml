@@ -5078,4 +5078,52 @@ The default value is 2048. You are advised to change the value to 8192."
           - "off"
           - "on"
         dtype : "string"
+  -
+    name : "puppet.autoflush"
+    info :
+        desc : "Whether to refresh logs to disks in real time."
+        get : cat /etc/puppetlabs/puppet/puppet.conf | grep "autoflush" | awk -F "=" '{print $2}'
+        set : sed -i 's/^autoflush.*$/autoflush=$value/g' /etc/puppetlabs/puppet/puppet.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "puppet.autosign"
+    info :
+        desc : "Whether to auto-authorize signature profile."
+        get : cat /etc/puppetlabs/puppet/puppet.conf | grep "autosign" | awk -F "=" '{print $2}'
+        set : sed -i 's/^autosign.*$/autosign=$value/g' /etc/puppetlabs/puppet/puppet.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "puppet.runinterval"
+    info :
+        desc : "Client execution interval. The default value is 30m."
+        get : cat /etc/storm/storm.config | grep "runinterval" | awk -F "=" '{print $2}'
+        set : sed -i 's/^runinterval.*$/runinterval=$valuem/g' /etc/storm/storm.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 60
+        dtype : "int"
+  -
+    name : "puppet.ignorecache"
+    info :
+        desc : "Whether to ignore local cache."
+        get : cat /etc/puppetlabs/puppet/puppet.conf | grep "ignorecache" | awk -F "=" '{print $2}'
+        set : sed -i 's/^ignorecache.*$/ignorecache=$value/g' /etc/puppetlabs/puppet/puppet.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
 

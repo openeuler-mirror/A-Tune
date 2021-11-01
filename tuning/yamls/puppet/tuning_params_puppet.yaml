@@ -1,0 +1,14 @@
+project: "puppet"
+maxiterations: 100
+startworkload: "systemctl restart puppetserver && systemctl restart puppet"
+stopworkload: "systemctl stop puppetserver && systemctl stop puppet"
+object : 
+  -
+    name : "puppet.autoflush"
+  -
+    name : "puppet.autosign"
+  -
+    name : "puppet.runinterval"
+  -
+    name : "puppet.ignorecache"
+
