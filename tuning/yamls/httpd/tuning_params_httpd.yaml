@@ -1,0 +1,18 @@
+project: "httpd"
+maxiterations: 100
+startworkload: "systemctl restart httpd"
+stopworkload: "systemctl stop httpd"
+object : 
+  -
+    name : "httpd.StartServers"
+  -
+    name : "httpd.MinSpareThreads"
+  -
+    name : "httpd.MaxSpareThreads"
+  -
+    name : "httpd.ThreadsPerChild"
+  -
+    name : "httpd.MaxRequestWorkers"
+  -
+    name : "httpd.MaxConnectionsPerChild"
+
