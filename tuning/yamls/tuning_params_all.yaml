@@ -5198,4 +5198,53 @@ The default value is 2048. You are advised to change the value to 8192."
           - 0
           - 128
         dtype : "int"
+  -
+    name : "ansible.forks"
+    info :
+        desc : "Number of concurrent ansible executions."
+        get : cat /etc/ansible/ansible.cfg | grep 'forks' | awk -F '=' '{print $2}'
+        set : sed -i 's/^forks.*$/forks=$value/g' /etc/ansible/ansible.cfg
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "ansible.gathering"
+    info :
+        desc : "Plays will gather facts by default, which contain information about the remote system."
+        get : cat /etc/ansible/ansible.cfg | grep "gathering.*=" | awk -F "=" '{print $2}'
+        set : sed -i 's/^gathering.*$/gathering=$value/g' /etc/ansible/ansible.cfg
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "smart"
+          - "implicit"
+          - "explicit"
+        dtype : "string"
+  -
+    name : "ansible.hash_behaviour"
+    info :
+        desc : "Set behaviour when inventory variables overlap."
+        get : cat /etc/ansible/ansible.cfg | grep "hash_behaviour" | awk -F "=" '{print $2}'
+        set : sed -i 's/^hash_behaviour.*$/hash_behaviour=$value/g' /etc/ansible/ansible.cfg
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "replace"
+          - "merge"
+        dtype : "string"
+  -
+    name : "ansible.log_path"
+    info :
+        desc : "Path of log file."
+        get : cat /etc/ansible/ansible.cfg | grep "log_path" | awk -F "=" '{print $2}'
+        set : sed -i 's/^log_path.*$/log_path=$value/g' /etc/ansible/ansible.cfg
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "/dev/null"
+          - "/var/log/ansible.log"
+        dtype : "string"
 

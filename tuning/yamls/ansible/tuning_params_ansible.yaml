@@ -1,0 +1,14 @@
+project: "ansible"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "ansible.forks"
+  -
+    name : "ansible.gathering"
+  -
+    name : "ansible.hash_behaviour"
+  -
+    name : "ansible.log_path"
+
