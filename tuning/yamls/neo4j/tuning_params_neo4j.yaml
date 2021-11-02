@@ -1,0 +1,13 @@
+project: "neo4j"
+maxiterations: 100
+startworkload: "$NEO4J_HOME/bin/neo4j restart"
+stopworkload: "$NEO4J_HOME/bin/neo4j stop"
+object : 
+  -
+    name : "neo4j.logs_httpRotationKeepNumber"
+  -
+    name : "neo4j.logs_debugLevel"
+  -
+    name : "neo4j.memory_heapMaxSize"
+  -
+    name : "neo4j.memory_pageCacheSize"
