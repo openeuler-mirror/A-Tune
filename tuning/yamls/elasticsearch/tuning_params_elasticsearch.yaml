@@ -1,0 +1,16 @@
+project: "elasticsearch"
+maxiterations: 100
+startworkload: "$ES_HOME/bin/elasticsearch -d"
+stopworkload: "kill -9 `pidof elasticsearch`"
+object : 
+  -
+    name : "elasticsearch.transport_tcp_compress"
+  -
+    name : "elasticsearch.http_max_content_length"
+  -
+    name : "elasticsearch.gateway_recover_after_time"
+  -
+    name : "elasticsearch.discovery_zen_ping_multicast_enabled"
+  -
+    name : "elasticsearch.gateway_recover_after_nodes"
+
