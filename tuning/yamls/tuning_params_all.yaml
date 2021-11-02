@@ -5335,4 +5335,62 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
-
+  -
+    name : "neo4j.logs_httpRotationKeepNumber"
+    info :
+        desc : "Number of HTTP logs to keep."
+        get : cat $NEO4J_HOME/conf/neo4j.conf | grep 'dbms.logs.http.rotation.keep_number' | awk -F '=' '{print $2}'
+        set : sed -i 's/^dbms.logs.http.rotation.keep_number.*$/dbms.logs.http.rotation.keep_number=$value/g' $NEO4J_HOME/conf/neo4j.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+  -
+    name : "neo4j.logs_debugLevel"
+    info :
+        desc : "Log level for the debug log."
+        get : cat $NEO4J_HOME/conf/neo4j.conf | grep "dbms.logs.debug.level" | awk -F "=" '{print $2}'
+        set : sed -i 's/^dbms.logs.debug.level.*$/dbms.logs.debug.level=$value/g' $NEO4J_HOME/conf/neo4j.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "DEBUG"
+          - "INFO"
+          - "WARN"
+          - "ERROR"
+        dtype : "string"
+  -
+    name : "neo4j.memory_heapMaxSize"
+    info :
+        desc : "Java Heap Size: by default the Java heap size is dynamically calculated based on available system resources."
+        get : cat $NEO4J_HOME/conf/neo4j.conf | grep "dbms.memory.heap.max_size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^dbms.memory.heap.max_size.*$/dbms.memory.heap.max_size=$value/g' $NEO4J_HOME/conf/neo4j.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "128m"
+          - "256m"
+          - "512m"
+          - "1g"
+          - "2g"
+          - "4g"
+        dtype : "string"
+  -
+    name : "neo4j.memory_pageCacheSize"
+    info :
+        desc : "The amount of memory to use for mapping the store files."
+        get : cat $NEO4J_HOME/conf/neo4j.conf | grep "dbms.memory.pagecache.size" | awk -F "=" '{print $2}'
+        set : sed -i 's/^dbms.memory.pagecache.size.*$/dbms.memory.pagecache.size=$value/g' $NEO4J_HOME/conf/neo4j.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "256m"
+          - "512m"
+          - "1g"
+          - "2g"
+          - "4g"
+          - "8g"
+          - "16g"
+        dtype : "string"
