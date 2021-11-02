@@ -1,0 +1,20 @@
+project: "infinispan"
+maxiterations: 100
+startworkload: "$INFINISPAN_HOME/bin/server.sh"
+stopworkload: "$INFINISPAN_HOME/bin/cli.sh shutdown server"
+object : 
+  -
+    name : "infinispan.shutdown_hookBehavior"
+  -
+    name : "infinispan.locking_useLockStriping"
+  -
+    name : "infinispan.locking_isolationLevel"
+  -
+    name : "infinispan.locking_concurrencyLevel"
+  -
+    name : "infinispan.jmxStatistics"
+  -
+    name : "infinispan.invocationBatching"
+  -
+    name : "infinispan.lazyDeserialization"
+
