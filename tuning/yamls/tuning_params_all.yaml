@@ -5247,4 +5247,92 @@ The default value is 2048. You are advised to change the value to 8192."
           - "/dev/null"
           - "/var/log/ansible.log"
         dtype : "string"
+  -
+    name : "infinispan.shutdown_hookBehavior"
+    info :
+        desc : "Behavior when JVM shutdown JVM."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "shutdown" | grep "hookBehavior" | awk -F 'hookBehavior' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/hookBehavior="[^\"]*"/hookBehavior="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "DEFAULT"
+          - "REGISTER"
+          - "DONT_REGISTER"
+        dtype : "string"
+  -
+    name : "infinispan.locking_useLockStriping"
+    info :
+        desc : "If set to true, a shared lock is placed on each entry."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "locking" -A3 | grep "useLockStriping" | awk -F 'useLockStriping' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/useLockStriping="[^\"]*"/useLockStriping="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "infinispan.locking_isolationLevel"
+    info :
+        desc : "Level of isolation."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "locking" -A3 | grep "isolationLevel" | awk -F 'isolationLevel' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/isolationLevel="[^\"]*"/isolationLevel="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "NONE"
+          - "SERIALIZABLE"
+          - "REPEATABLE_READ"
+          - "READ_COMMITTED"
+          - "READ_UNCOMMITTED"
+        dtype : "string"
+  -
+    name : "infinispan.locking_concurrencyLevel"
+    info :
+        desc : "Level of concurrency."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "locking" -A3 | grep "concurrencyLevel" | awk -F 'concurrencyLevel' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/concurrencyLevel="[^\"]*"/concurrencyLevel="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "infinispan.jmxStatistics"
+    info :
+        desc : "JMX statistics."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "jmxStatistics" | awk -F 'enabled' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/jmxStatistics enabled="[^\"]*"/jmxStatistics enabled="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "infinispan.invocationBatching"
+    info :
+        desc : "Invocation batching."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "invocationBatching" | awk -F 'enabled' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/invocationBatching enabled="[^\"]*"/invocationBatching enabled="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "infinispan.lazyDeserialization"
+    info :
+        desc : "lazy deserialization."
+        get : cat $INFINISPAN_HOME/server/conf/infinispan.xml | grep "lazyDeserialization" | awk -F 'enabled' '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/lazyDeserialization enabled="[^\"]*"/lazyDeserialization enabled="$value"/g' $INFINISPAN_HOME/server/conf/infinispan.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
 
