@@ -1,0 +1,16 @@
+project: "questdb"
+maxiterations: 100
+startworkload: "$QUESTDB_HOME/bin/questdb.sh start"
+stopworkload: "$QUESTDB_HOME/bin/questdb.sh stop"
+object : 
+  -
+    name : "questdb.http_multipart_header_buffer_size"
+  -
+    name : "questdb.http_receive_buffer_size"
+  -
+    name : "questdb.http_request_header_buffer_size"
+  -
+    name : "questdb.http_send_buffer_size"
+  -
+    name : "questdb.http_keepAlive_timeout"
+

@@ -5451,4 +5451,60 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 10
         dtype : "int"
+  -
+    name : "questdb.http_multipart_header_buffer_size"
+    info :
+        desc : "HeaderParser buffer size in bytes."
+        get : cat $QUESTDB_HOME/conf/server.conf | grep "http.multipart.header.buffer.size" | awk -F '=' '{print $2}'
+        set : sed -i 's/^http.multipart.header.buffer.size.*$/http.multipart.header.buffer.size=$value/g' $QUESTDB_HOME/conf/server.conf
+        type : "discrete"
+        scope :
+          - 8
+          - 1028
+        step : 8
+        dtype : "int"
+  -
+    name : "questdb.http_receive_buffer_size"
+    info :
+        desc : "Size of receive buffer."
+        get : cat $QUESTDB_HOME/conf/server.conf | grep "http.receive.buffer.size" | awk -F '=' '{print $2}' | awk -F 'm' '{print $1}'
+        set : sed -i 's/^http.receive.buffer.size.*$/http.receive.buffer.size=$valuem/g' $QUESTDB_HOME/conf/server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+  -
+    name : "questdb.http_request_header_buffer_size"
+    info :
+        desc : "Size of request header buffer."
+        get : cat $QUESTDB_HOME/conf/server.conf | grep "http.request.header.buffer.size" | awk -F '=' '{print $2}' | awk -F 'k' '{print $1}'
+        set : sed -i 's/^http.request.header.buffer.size.*$/http.request.header.buffer.size=$valuek/g' $QUESTDB_HOME/conf/server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "questdb.http_send_buffer_size"
+    info :
+        desc : "Size of send data buffer."
+        get : cat $QUESTDB_HOME/conf/server.conf | grep "http.send.buffer.size" | awk -F '=' '{print $2}' | awk -F 'm' '{print $1}'
+        set : sed -i 's/^http.send.buffer.size.*$/http.send.buffer.size=$valuem/g' $QUESTDB_HOME/conf/server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 64
+        dtype : "int"
+  -
+    name : "questdb.http_keepAlive_timeout"
+    info :
+        desc : "Size of send data buffer."
+        get : cat $QUESTDB_HOME/conf/server.conf | grep "http.keep-alive.timeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^http.keep-alive.timeout.*$/http.keep-alive.timeout=$value/g' $QUESTDB_HOME/conf/server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 1000
+        dtype : "int"
 
