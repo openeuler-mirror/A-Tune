@@ -5394,3 +5394,61 @@ The default value is 2048. You are advised to change the value to 8192."
           - "8g"
           - "16g"
         dtype : "string"
+  -
+    name : "elasticsearch.transport_tcp_compress"
+    info :
+        desc : "Specifies to compress data or not during TCP transmission."
+        get : cat $ES_HOME/config/elasticsearch.yml | grep "transport.tcp.compress" | awk -F ':' '{print $2}'
+        set : sed -i 's/transport.tcp.compress.*$/transport.tcp.compress:$value/g' $ES_HOME/config/elasticsearch.yml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "elasticsearch.http_max_content_length"
+    info :
+        desc : "Setting the maximum content capacity."
+        get : cat $ES_HOME/config/elasticsearch.yml | grep "http.max_content_length" | awk -F ':' '{print $2}' | awk -F 'mb' '{print $1}'
+        set : sed -i 's/http.max_content_length.*$/http.max_content_length:$valuem/g' $ES_HOME/config/elasticsearch.yml
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "elasticsearch.gateway_recover_after_time"
+    info :
+        desc : "Setting the Timeout Period for Initializing the Data Recovery Process."
+        get : cat $ES_HOME/config/elasticsearch.yml | grep "gateway.recover_after_time" | awk -F ':' '{print $2}' | awk -F 'm' '{print $1}'
+        set : sed -i 's/gateway.recover_after_time.*$/gateway.recover_after_time:$value/g' $ES_HOME/config/elasticsearch.yml
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+  -
+    name : "elasticsearch.discovery_zen_ping_multicast_enabled"
+    info :
+        desc : "Setting Whether to Enable Multicast Discovery Nodes."
+        get : cat $ES_HOME/config/elasticsearch.yml | grep "discovery.zen.ping.multicast.enabled" | awk -F ':' '{print $2}'
+        set : sed -i 's/discovery.zen.ping.multicast.enabled.*$/discovery.zen.ping.multicast.enabled:$value/g' $ES_HOME/config/elasticsearch.yml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "elasticsearch.gateway_recover_after_nodes"
+    info :
+        desc : "Configuring Data Restoration When N Nodes in a Cluster Are Started."
+        get : cat $ES_HOME/config/elasticsearch.yml | grep "gateway.recover_after_nodes" | awk -F ':' '{print $2}'
+        set : sed -i 's/gateway.recover_after_nodes.*$/gateway.recover_after_nodes:$value/g' $ES_HOME/config/elasticsearch.yml
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+
