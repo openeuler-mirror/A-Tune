@@ -5507,4 +5507,61 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 1000
         dtype : "int"
+  -
+    name : "postfix.smtpd_client_connection_rate_limit"
+    info :
+        desc : "Frequency control of IP address connections."
+        get : cat /etc/postfix/main.cf | grep "smtpd_client_connection_rate_limit" | awk -F '=' '{print $2}'
+        set : sed -i 's/^smtpd_client_connection_rate_limit.*$/smtpd_client_connection_rate_limit=$value/g' /etc/postfix/main.cf
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+  -
+    name : "postfix.default_process_limit"
+    info :
+        desc : "Maximum number of processes that can run concurrently in the postfix system."
+        get : cat /etc/postfix/main.cf | grep "default_process_limit" | awk -F '=' '{print $2}'
+        set : sed -i 's/^default_process_limit.*$/default_process_limit=$value/g' /etc/postfix/main.cf
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
+  -
+    name : "postfix.default_destination_concurrency_limit"
+    info :
+        desc : "Setting the maximum number of concurrent connections to the same destination host after the connection is initialized."
+        get : cat /etc/postfix/main.cf | grep "default_destination_concurrency_limit" | awk -F '=' '{print $2}'
+        set : sed -i 's/^default_destination_concurrency_limit.*$/default_destination_concurrency_limit=$value/g' /etc/postfix/main.cf
+        type : "continuous"
+        scope :
+          - 1
+          - 64
+        dtype : "int"
+  -
+    name : "postfix.default_destination_recipient_limit"
+    info :
+        desc : "Controls the number of recipients that a postfix delivery agent can send the same email to."
+        get : cat /etc/postfix/main.cf | grep "default_destination_recipient_limit" | awk -F '=' '{print $2}'
+        set : sed -i 's/^default_destination_recipient_limit.*$/default_destination_recipient_limit=$value/g' /etc/postfix/main.cf
+        type : "discrete"
+        scope :
+          - 5
+          - 500
+        step : 5
+        dtype : "int"
+  -
+    name : "postfix.queue_run_delay"
+    info :
+        desc : "Set how often queue management scans the deferred mail queue."
+        get : cat /etc/postfix/main.cf | grep "queue_run_delay" | awk -F '=' '{print $2}'
+        set : sed -i 's/^queue_run_delay.*$/queue_run_delay=$value/g' /etc/postfix/main.cf
+        type : "discrete"
+        scope :
+          - 100
+          - 10000
+        step : 100
+        dtype : "int"
 

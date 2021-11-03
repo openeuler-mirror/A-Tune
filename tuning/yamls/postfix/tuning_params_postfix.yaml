@@ -1,0 +1,16 @@
+project: "postfix"
+maxiterations: 100
+startworkload: "systemctl restart postfix"
+stopworkload: "systemctl stop postfix"
+object : 
+  -
+    name : "postfix.smtpd_client_connection_rate_limit"
+  -
+    name : "postfix.default_process_limit"
+  -
+    name : "postfix.default_destination_concurrency_limit"
+  -
+    name : "postfix.default_destination_recipient_limit"
+  -
+    name : "postfix.queue_run_delay"
+
