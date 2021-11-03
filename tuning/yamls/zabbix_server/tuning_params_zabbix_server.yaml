@@ -1,0 +1,16 @@
+project: "zabbix_server"
+maxiterations: 100
+startworkload: "zabbix_server"
+stopworkload: "kill -9 `pidof zabbix_server`"
+object : 
+  -
+    name : "zabbix_server.LogFileSize"
+  -
+    name : "zabbix_server.DebugLevel"
+  -
+    name : "zabbix_server.HistoryStorageDateIndex"
+  -
+    name : "zabbix_server.StartPreprocessors"
+  -
+    name : "zabbix_server.CacheUpdateFrequency"
+

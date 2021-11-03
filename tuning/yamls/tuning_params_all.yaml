@@ -5564,4 +5564,59 @@ The default value is 2048. You are advised to change the value to 8192."
           - 10000
         step : 100
         dtype : "int"
+  -
+    name : "zabbix_server.LogFileSize"
+    info :
+        desc : "Maximum size of log file in MB."
+        get : cat /etc/zabbix/zabbix_server.conf | grep "LogFileSize" | awk -F '=' '{print $2}'
+        set : sed -i 's/^LogFileSize.*$/LogFileSize=$value/g' /etc/zabbix/zabbix_server.conf
+        type : "continuous"
+        scope :
+          - 0
+          - 1024
+        dtype : "int"
+  -
+    name : "zabbix_server.DebugLevel"
+    info :
+        desc : "Specifies debug level."
+        get : cat /etc/zabbix/zabbix_server.conf | grep "DebugLevel" | awk -F '=' '{print $2}'
+        set : sed -i 's/^DebugLevel.*$/DebugLevel=$value/g' /etc/zabbix/zabbix_server.conf
+        type : "continuous"
+        scope :
+          - 0
+          - 5
+        dtype : "int"
+  -
+    name : "zabbix_server.HistoryStorageDateIndex"
+    info :
+        desc : "Enable preprocessing of history values in history storage to store values in different indices based on date."
+        get : cat /etc/zabbix/zabbix_server.conf | grep "HistoryStorageDateIndex" | awk -F '=' '{print $2}'
+        set : sed -i 's/^HistoryStorageDateIndex.*$/HistoryStorageDateIndex=$value/g' /etc/zabbix/zabbix_server.conf
+        type : "continuous"
+        scope :
+          - 0
+          - 1
+        dtype : "int"
+  -
+    name : "zabbix_server.StartPreprocessors"
+    info :
+        desc : "Number of pre-forked instances of preprocessing workers."
+        get : cat /etc/zabbix/zabbix_server.conf | grep "StartPreprocessors" | awk -F '=' '{print $2}'
+        set : sed -i 's/^StartPreprocessors.*$/StartPreprocessors=$value/g' /etc/zabbix/zabbix_server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 1000
+        dtype : "int"
+  -
+    name : "zabbix_server.CacheUpdateFrequency"
+    info :
+        desc : "How often Zabbix will perform update of configuration cache, in seconds."
+        get : cat /etc/zabbix/zabbix_server.conf | grep "CacheUpdateFrequency" | awk -F '=' '{print $2}'
+        set : sed -i 's/^CacheUpdateFrequency.*$/CacheUpdateFrequency=$value/g' /etc/zabbix/zabbix_server.conf
+        type : "continuous"
+        scope :
+          - 1
+          - 3600
+        dtype : "int"
 
