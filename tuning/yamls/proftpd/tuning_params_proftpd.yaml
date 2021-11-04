@@ -1,0 +1,12 @@
+project: "proftpd"
+maxiterations: 100
+startworkload: "systemctl start proftpd"
+stopworkload: "systemctl stop proftpd"
+object : 
+  -
+    name : "proftpd.ftpd_full_access"
+  -
+    name : "proftpd.ftpd_use_fusefs"
+  -
+    name : "proftpd.ftpd_use_passive_mode"
+
