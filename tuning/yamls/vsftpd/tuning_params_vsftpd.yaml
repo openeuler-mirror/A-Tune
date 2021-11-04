@@ -1,0 +1,16 @@
+project: "vsftpd"
+maxiterations: 100
+startworkload: "systemctl start vsftpd"
+stopworkload: "systemctl stop vsftpd"
+object : 
+  -
+    name : "vsftpd.anonymous_enable"
+  -
+    name : "vsftpd.xferlog_enable"
+  -
+    name : "vsftpd.accept_timeout"
+  -
+    name : "vsftpd.connect_timeout"
+  -
+    name : "vsftpd.data_connection_timeout"
+

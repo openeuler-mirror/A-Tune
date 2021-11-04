@@ -5680,3 +5680,64 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 128
         dtype : "int"
+  -
+    name : "vsftpd.anonymous_enable"
+    info :
+        desc : "Allow anonymous FTP or not."
+        get : cat /etc/squid/squid.conf | grep "anonymous_enable" | awk -F '=' '{print $2}'
+        set : sed -i 's/^anonymous_enable.*$/anonymous_enable=$value/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "NO"
+          - "YES"
+        dtype : "string"
+  -
+    name : "vsftpd.xferlog_enable"
+    info :
+        desc : "Activate logging of uploads/downloads."
+        get : cat /etc/squid/squid.conf | grep "xferlog_enable" | awk -F '=' '{print $2}'
+        set : sed -i 's/^xferlog_enable.*$/xferlog_enable=$value/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "NO"
+          - "YES"
+        dtype : "string"
+  -
+    name : "vsftpd.accept_timeout"
+    info :
+        desc : "Timeout interval for accepting an FTP data connection."
+        get : cat /etc/vsftpd/vsftpd.conf | grep "connect_timeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^connect_timeout.*$/connect_timeout=$value/g' /etc/vsftpd/vsftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 3600
+        dtype : "int"
+  -
+    name : "vsftpd.connect_timeout"
+    info :
+        desc : "Timeout interval for establishing a data connection in port mode."
+        get : cat /etc/vsftpd/vsftpd.conf | grep "connect_timeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^connect_timeout.*$/connect_timeout=$value/g' /etc/vsftpd/vsftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 3600
+        dtype : "int"
+  -
+    name : "vsftpd.data_connection_timeout"
+    info :
+        desc : "Timeout interval for establishing an FTP data connection."
+        get : cat /etc/vsftpd/vsftpd.conf | grep "data_connection_timeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^data_connection_timeout.*$/data_connection_timeout=$value/g' /etc/vsftpd/vsftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 3600
+        dtype : "int"
+
