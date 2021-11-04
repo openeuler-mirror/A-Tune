@@ -5619,4 +5619,64 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 3600
         dtype : "int"
-
+  -
+    name : "squid.half_closed_clients"
+    info :
+        desc : "Half closed clients."
+        get : cat /etc/squid/squid.conf | grep "half_closed_clients" | awk -F ' ' '{print $2}'
+        set : sed -i 's/^half_closed_clients.*$/half_closed_clients $value/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "on"
+          - "off"
+        dtype : "string"
+  -
+    name : "squid.cache_swap_high"
+    info :
+        desc : "Maximum percentage of cache swap."
+        get : cat /etc/squid/squid.conf | grep "cache_swap_high" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^cache_swap_high.*$/cache_swap_high $value%/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 100
+        dtype : "int"
+  -
+    name : "squid.cache_swap_low"
+    info :
+        desc : "Minimum percentage of cache swap."
+        get : cat /etc/squid/squid.conf | grep "cache_swap_low" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^cache_swap_low.*$/cache_swap_low $value%/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 100
+        dtype : "int"
+  -
+    name : "squid.maximum_object_size"
+    info :
+        desc : "Maximun of object size in kb."
+        get : cat /etc/squid/squid.conf | grep "maximum_object_size" | awk -F ' ' '{print $2}' | awk -F 'KB' '{print $1}'
+        set : sed -i 's/^maximum_object_size.*$/maximum_object_size $valueKB/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 128
+          - 2048
+        step : 64
+        dtype : "int"
+  -
+    name : "squid.cache_mem"
+    info :
+        desc : "Size of the physical memory of the hot object of the demand user."
+        get : cat /etc/squid/squid.conf | grep "cache_mem" | awk -F ' ' '{print $2}' | awk -F 'MB' '{print $1}'
+        set : sed -i 's/^cache_mem.*$/cache_mem $valueMB/g' /etc/squid/squid.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 128
+        dtype : "int"
