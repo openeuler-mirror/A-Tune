@@ -1,0 +1,16 @@
+project: "squid"
+maxiterations: 100
+startworkload: "systemctl start squid"
+stopworkload: "systemctl stop squid"
+object : 
+  -
+    name : "squid.half_closed_clients"
+  -
+    name : "squid.cache_swap_high"
+  -
+    name : "squid.cache_swap_low"
+  -
+    name : "squid.maximum_object_size"
+  -
+    name : "squid.cache_mem"
+
