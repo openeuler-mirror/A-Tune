@@ -1,0 +1,16 @@
+project: "rabbitmq-server"
+maxiterations: 100
+startworkload: "systemctl start rabbitmq-server"
+stopworkload: "systemctl stop rabbitmq-server"
+object : 
+  -
+    name : "rabbitmq-server.num_tcp_acceptors"
+  -
+    name : "rabbitmq-server.num_ssl_acceptors"
+  -
+    name : "rabbitmq-server.handshake_timeout"
+  -
+    name : "rabbitmq-server.ssl_handshake_timeout"
+  -
+    name : "rabbitmq-server.heartbeat"
+
