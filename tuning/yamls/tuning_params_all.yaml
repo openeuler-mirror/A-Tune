@@ -5848,4 +5848,64 @@ The default value is 2048. You are advised to change the value to 8192."
           - 0
           - 99
         dtype : "int"
-
+  -
+    name : "influxdb.logging_enabled"
+    info :
+        desc : "If log messages are printed for the meta service."
+        get : cat /etc/influxdb/influxdb.conf | grep "logging-enabled" | awk -F "=" '{print $2}'
+        set : sed -i "s/logging-enabled.*/logging-enabled=$value/" /etc/influxdb/influxdb.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "influxdb.wal_logging_enabled"
+    info :
+        desc : "These are the WAL settings for the storage engine >= 0.9.3."
+        get : cat /etc/influxdb/influxdb.conf | grep "wal-logging-enabled" | awk -F "=" '{print $2}'
+        set : sed -i "s/wal-logging-enabled.*/wal-logging-enabled=$value/" /etc/influxdb/influxdb.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "influxdb.trace_logging_enabled"
+    info :
+        desc : "Trace logging provides more verbose output around the tsm engine."
+        get : cat /etc/influxdb/influxdb.conf | grep "trace-logging-enabled" | awk -F "=" '{print $2}'
+        set : sed -i "s/trace-logging-enabled.*/trace-logging-enabled=$value/" /etc/influxdb/influxdb.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "influxdb.query_log_enabled"
+    info :
+        desc : "Whether queries should be logged before execution."
+        get : cat /etc/influxdb/influxdb.conf | grep "query-log-enabled" | awk -F "=" '{print $2}'
+        set : sed -i "s/query-log-enabled.*/query-log-enabled=$value/" /etc/influxdb/influxdb.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "influxdb.cache_max_memory_size"
+    info :
+        desc : "CacheMaxMemorySize is the maximum size a shard's cache can reach before it starts rejecting writes."
+        get : cat /etc/influxdb/influxdb.conf | grep "cache-max-memory-size" | awk -F '=' '{print $2}'
+        set : sed -i 's/cache-max-memory-size.*$/cache-max-memory-size=$value/g' /etc/influxdb/influxdb.conf 
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 524288
+          - 524288000
+        step : 524288
+        dtype : "int"

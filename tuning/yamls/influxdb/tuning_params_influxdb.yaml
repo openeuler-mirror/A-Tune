@@ -1,0 +1,16 @@
+project: "influxdb"
+maxiterations: 100
+startworkload: "systemctl start influxdb"
+stopworkload: "systemctl stop influxdb"
+object : 
+  -
+    name : "influxdb.logging_enabled"
+  -
+    name : "influxdb.wal_logging_enabled"
+  -
+    name : "influxdb.trace_logging_enabled"
+  -
+    name : "influxdb.query_log_enabled"
+  -
+    name : "influxdb.cache_max_memory_size"
+
