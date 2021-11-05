@@ -5740,4 +5740,40 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 3600
         dtype : "int"
+  -
+    name : "proftpd.ftpd_full_access"
+    info :
+        desc : "Allows the ftp daemon to read and write all files on the system."
+        get : cat /etc/proftpd.conf | grep "ftpd_full_access" | awk -F '=' '{print $2}'
+        set : sed -i 's/ftpd_full_access.*$/ftpd_full_access=$value/g' /etc/proftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 1
+        dtype : "int"
+  -
+    name : "proftpd.ftpd_use_fusefs"
+    info :
+        desc : "Allows the ftp daemon to read and write files on ntfs/fusefs-mounted filesystems."
+        get : cat /etc/proftpd.conf | grep "ftpd_use_fusefs" | awk -F '=' '{print $2}'
+        set : sed -i 's/ftpd_use_fusefs.*$/ftpd_use_fusefs=$value/g' /etc/proftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 1
+        dtype : "int"
+  -
+    name : "proftpd.ftpd_use_passive_mode"
+    info :
+        desc : "Allows the ftp daemon to bind to all unreserved ports for passive mode."
+        get : cat /etc/proftpd.conf | grep "ftpd_use_passive_mode" | awk -F '=' '{print $2}'
+        set : sed -i 's/ftpd_use_passive_mode.*$/ftpd_use_passive_mode=$value/g' /etc/proftpd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 1
+        dtype : "int"
 
