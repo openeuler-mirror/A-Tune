@@ -5776,4 +5776,76 @@ The default value is 2048. You are advised to change the value to 8192."
           - 0
           - 1
         dtype : "int"
+  -
+    name : "cachefilesd.brun"
+    info :
+        desc : "If the amount of free space in the cache is higher than this value, culling stops."
+        get : cat /etc/cachefilesd.conf | grep "brun" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^brun.*$/brun $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
+  -
+    name : "cachefilesd.bcull"
+    info :
+        desc : "If the number of free space in the cache is less than this value, culling starts."
+        get : cat /etc/cachefilesd.conf | grep "bcull" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^bcull.*$/bcull $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
+  -
+    name : "cachefilesd.bstop"
+    info :
+        desc : "If the number of free space in the cache falls below this value, no new disk space or files are allocated for the cache until sufficient space is culled."
+        get : cat /etc/cachefilesd.conf | grep "bstop" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^bstop.*$/bstop $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
+  -
+    name : "cachefilesd.frun"
+    info :
+        desc : "If the number of available files in the cache is greater than this value, culling stops."
+        get : cat /etc/cachefilesd.conf | grep "frun" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^frun.*$/frun $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
+  -
+    name : "cachefilesd.fcull"
+    info :
+        desc : "If the number of available files in the cache is less than this value, culling starts."
+        get : cat /etc/cachefilesd.conf | grep "fcull" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^fcull.*$/fcull $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
+  -
+    name : "cachefilesd.fstop"
+    info :
+        desc : "If the number of available files in the cache falls below this value, no new disk space or files are allocated for the cache until sufficient space is culled."
+        get : cat /etc/cachefilesd.conf | grep "fstop" | awk -F ' ' '{print $2}' | awk -F '%' '{print $1}'
+        set : sed -i 's/^fstop.*$/fstop $value%/g' /etc/cachefilesd.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 0
+          - 99
+        dtype : "int"
 

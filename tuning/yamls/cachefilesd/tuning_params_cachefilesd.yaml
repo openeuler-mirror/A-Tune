@@ -1,0 +1,18 @@
+project: "cachefilesd"
+maxiterations: 100
+startworkload: "systemctl start cachefilesd"
+stopworkload: "systemctl stop cachefilesd"
+object : 
+  -
+    name : "cachefilesd.brun"
+  -
+    name : "cachefilesd.bcull"
+  -
+    name : "cachefilesd.bstop"
+  -
+    name : "cachefilesd.frun"
+  -
+    name : "cachefilesd.fcull"
+  -
+    name : "cachefilesd.fstop"
+
