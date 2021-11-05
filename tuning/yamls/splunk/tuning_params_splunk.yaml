@@ -1,0 +1,16 @@
+project: "splunk"
+maxiterations: 100
+startworkload: "systemctl start splunk"
+stopworkload: "systemctl stop splunk"
+object : 
+  -
+    name : "splunk.connectionTimeout"
+  -
+    name : "splunk.readTimeout"
+  -
+    name : "splunk.writeTimeout"
+  -
+    name : "splunk.heartbeatFrequency"
+  -
+    name : "splunk.maxFailuresPerInterval"
+

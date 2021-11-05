@@ -5909,3 +5909,68 @@ The default value is 2048. You are advised to change the value to 8192."
           - 524288000
         step : 524288
         dtype : "int"
+  -
+    name : "splunk.connectionTimeout"
+    info :
+        desc : "Connection timeout."
+        get : cat $SPLUNK_HOME/etc/system/default/outputs.conf | grep "connectionTimeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^connectionTimeout.*$/connectionTimeout=$value%/g' $SPLUNK_HOME/etc/system/default/outputs.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 30
+          - 600
+        step : 30
+        dtype : "int"
+  -
+    name : "splunk.readTimeout"
+    info :
+        desc : "Read timeout."
+        get : cat $SPLUNK_HOME/etc/system/default/outputs.conf | grep "readTimeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^readTimeout.*$/readTimeout=$value%/g' $SPLUNK_HOME/etc/system/default/outputs.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 30
+          - 600
+        step : 30
+        dtype : "int"
+  -
+    name : "splunk.writeTimeout"
+    info :
+        desc : "Write timeout."
+        get : cat $SPLUNK_HOME/etc/system/default/outputs.conf | grep "writeTimeout" | awk -F '=' '{print $2}'
+        set : sed -i 's/^writeTimeout.*$/writeTimeout=$value%/g' $SPLUNK_HOME/etc/system/default/outputs.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 30
+          - 600
+        step : 30
+        dtype : "int"
+  -
+    name : "splunk.heartbeatFrequency"
+    info :
+        desc : "Heart beat frequency."
+        get : cat $SPLUNK_HOME/etc/system/default/outputs.conf | grep "heartbeatFrequency" | awk -F '=' '{print $2}'
+        set : sed -i 's/^heartbeatFrequency.*$/heartbeatFrequency=$value%/g' $SPLUNK_HOME/etc/system/default/outputs.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 5
+          - 60
+        step : 5
+        dtype : "int"
+  -
+    name : "splunk.maxFailuresPerInterval"
+    info :
+        desc : "Max failures per interval."
+        get : cat $SPLUNK_HOME/etc/system/default/outputs.conf | grep "maxFailuresPerInterval" | awk -F '=' '{print $2}'
+        set : sed -i 's/^maxFailuresPerInterval.*$/maxFailuresPerInterval=$value%/g' $SPLUNK_HOME/etc/system/default/outputs.conf
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 10
+        dtype : "int"
+
