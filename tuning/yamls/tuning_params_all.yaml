@@ -5973,4 +5973,67 @@ The default value is 2048. You are advised to change the value to 8192."
           - 1
           - 10
         dtype : "int"
+  -
+    name : "rabbitmq-server.num_tcp_acceptors"
+    info :
+        desc : "Number of Erlang processes that will accept connections for the TCP listeners."
+        get : cat /etc/rabbitmq/rabbitmq.config | grep "num_tcp_acceptors" | awk -F ',' '{print $2}' | awk -F '}' '{print $1}'
+        set : sed -i 's/{num_tcp_acceptors,.*}/{num_tcp_acceptors, $value}/g' /etc/rabbitmq/rabbitmq.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "rabbitmq-server.num_ssl_acceptors"
+    info :
+        desc : "Number of Erlang processes that will accept connections for the TLS listeners."
+        get : cat /etc/rabbitmq/rabbitmq.config | grep "num_ssl_acceptors" | awk -F ',' '{print $2}' | awk -F '}' '{print $1}'
+        set : sed -i 's/{num_ssl_acceptors,.*}/{num_ssl_acceptors, $value}/g' /etc/rabbitmq/rabbitmq.config
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 20
+        dtype : "int"
+  -
+    name : "rabbitmq-server.handshake_timeout"
+    info :
+        desc : "Maximum time for AMQP 0-8/0-9/0-9-1 handshake."
+        get : cat /etc/rabbitmq/rabbitmq.config | grep "handshake_timeout" | awk -F ',' '{print $2}' | awk -F '}' '{print $1}'
+        set : sed -i 's/{handshake_timeout,.*}/{handshake_timeout, $value}/g' /etc/rabbitmq/rabbitmq.config
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100
+          - 10000
+        step : 100
+        dtype : "int"
+  -
+    name : "rabbitmq-server.ssl_handshake_timeout"
+    info :
+        desc : "Maximum time for AMQP 0-8/0-9/0-9-1 handshake."
+        get : cat /etc/rabbitmq/rabbitmq.config | grep "handshake_timeout" | awk -F ',' '{print $2}' | awk -F '}' '{print $1}'
+        set : sed -i 's/{handshake_timeout,.*}/{handshake_timeout, $value}/g' /etc/rabbitmq/rabbitmq.config
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 100
+          - 10000
+        step : 100
+        dtype : "int"
+  -
+    name : "rabbitmq-server.heartbeat"
+    info :
+        desc : "Sets the default AMQP 0-9-1 heartbeat timeout in seconds."
+        get : cat /etc/rabbitmq/rabbitmq.config | grep "heartbeat" | awk -F ',' '{print $2}' | awk -F '}' '{print $1}'
+        set : sed -i 's/{heartbeat,.*}/{heartbeat, $value}/g' /etc/rabbitmq/rabbitmq.config
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 5
+          - 100
+        step : 5
+        dtype : "int"
 
