@@ -6097,4 +6097,54 @@ The default value is 2048. You are advised to change the value to 8192."
           - "true"
           - "false"
         dtype : "string"
+  -
+    name : "rocketmq.mapedFileSizeCommitLog"
+    info :
+        desc : "Size of commit log files."
+        get : cat $ROCKETMQ_HOME/distribution/conf/broker.conf | grep "mapedFileSizeCommitLog" | awk -F "=" '{print $2}'
+        set : sed -i 's/^mapedFileSizeCommitLog.*$/mapedFileSizeCommitLog=$value/' $ROCKETMQ_HOME/distribution/conf/broker.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 2147483648
+        step : 1048576
+        dtype : "int"
+  -
+    name : "rocketmq.mapedFileSizeConsumeQueue"
+    info :
+        desc : "ConsumeQueue Default Storage Quantity of Each File."
+        get : cat $ROCKETMQ_HOME/distribution/conf/broker.conf | grep "mapedFileSizeConsumeQueue" | awk -F "=" '{print $2}'
+        set : sed -i 's/^mapedFileSizeConsumeQueue.*$/mapedFileSizeConsumeQueue=$value/' $ROCKETMQ_HOME/distribution/conf/broker.conf
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1000
+          - 100000
+        step : 1000
+        dtype : "int"
+  -
+    name : "rocketmq.autoCreateTopicEnable"
+    info :
+        desc : "Allow Broker to Automatically Create Topics."
+        get : cat $ROCKETMQ_HOME/distribution/conf/broker.conf | grep "autoCreateTopicEnable" | awk -F "=" '{print $2}'
+        set : sed -i 's/^autoCreateTopicEnable.*$/autoCreateTopicEnable=$value/' $ROCKETMQ_HOME/distribution/conf/broker.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "rocketmq.autoCreateSubscriptionGroup"
+    info :
+        desc : "Allow Broker to Automatically Create Subscription Groups."
+        get : cat $ROCKETMQ_HOME/distribution/conf/broker.conf | grep "autoCreateSubscriptionGroup" | awk -F "=" '{print $2}'
+        set : sed -i 's/^autoCreateSubscriptionGroup.*$/autoCreateSubscriptionGroup=$value/' $ROCKETMQ_HOME/distribution/conf/broker.conf
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
 
