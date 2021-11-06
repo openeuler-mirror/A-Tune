@@ -1,0 +1,14 @@
+project: "rocketmq"
+maxiterations: 100
+startworkload: "$ROCKETMQ_HOME/distribution/bin/mqbroker"
+stopworkload: "$ROCKETMQ_HOME/distribution/bin/mqshutdown"
+object : 
+  -
+    name : "rocketmq.mapedFileSizeCommitLog"
+  -
+    name : "rocketmq.mapedFileSizeConsumeQueue"
+  -
+    name : "rocketmq.autoCreateTopicEnable"
+  -
+    name : "rocketmq.autoCreateSubscriptionGroup"
+
