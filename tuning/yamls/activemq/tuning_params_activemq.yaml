@@ -1,0 +1,16 @@
+project: "activemq"
+maxiterations: 100
+startworkload: "$ACTIVEMQ_HOME/bin/activemq start"
+stopworkload: "$ACTIVEMQ_HOME/bin/activemq stop"
+object : 
+  -
+    name : "activemq.persistent"
+  -
+    name : "activemq.maxPageSize"
+  -
+    name : "activemq.enableAudit"
+  -
+    name : "activemq.useCache"
+  -
+    name : "activemq.sendFailIfNoSpace"
+

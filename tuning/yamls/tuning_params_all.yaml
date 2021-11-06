@@ -6036,4 +6036,65 @@ The default value is 2048. You are advised to change the value to 8192."
           - 100
         step : 5
         dtype : "int"
+  -
+    name : "activemq.persistent"
+    info :
+        desc : "Persistent message."
+        get : cat $ACTIVEMQ_HOME/conf/activemq.xml | grep "persistent" | awk -F "persistent=" '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/persistent="[^\"]*"/persistent="$value"/' $ACTIVEMQ_HOME/conf/activemq.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "activemq.maxPageSize"
+    info :
+        desc : "The maximum number of messages to page in from the store at one time."
+        get : cat $ACTIVEMQ_HOME/conf/activemq.xml | grep "maxPageSize" | awk -F "maxPageSize=" '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/maxPageSize="[^\"]*"/maxPageSize="$value"/' $ACTIVEMQ_HOME/conf/activemq.xml
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 5
+          - 500
+        step : 5
+        dtype : "int"
+  -
+    name : "activemq.enableAudit"
+    info :
+        desc : "When true the broker will track duplicate messages."
+        get : cat $ACTIVEMQ_HOME/conf/activemq.xml | grep "enableAudit" | awk -F "enableAudit=" '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/enableAudit="[^\"]*"/enableAudit="$value"/' $ACTIVEMQ_HOME/conf/activemq.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "activemq.useCache"
+    info :
+        desc : "If true persistent messages are cached for fast retrieval from store."
+        get : cat $ACTIVEMQ_HOME/conf/activemq.xml | grep "useCache" | awk -F "useCache=" '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/useCache="[^\"]*"/useCache="$value"/' $ACTIVEMQ_HOME/conf/activemq.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
+  -
+    name : "activemq.sendFailIfNoSpace"
+    info :
+        desc : "If true, will cause a send to fail with a javax.jms.ResourceAllocationException when the destination has reached is resource limits (memory or storage)."
+        get : cat $ACTIVEMQ_HOME/conf/activemq.xml | grep "sendFailIfNoSpace" | awk -F "sendFailIfNoSpace=" '{print $2}' | awk -F '"' '{print $2}'
+        set : sed -i 's/sendFailIfNoSpace="[^\"]*"/sendFailIfNoSpace="$value"/' $ACTIVEMQ_HOME/conf/activemq.xml
+        needrestart : "true"
+        type : "discrete"
+        options :
+          - "true"
+          - "false"
+        dtype : "string"
 
