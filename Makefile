@@ -55,7 +55,7 @@ cleanall: clean
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
 
-install: libinstall restcerts enginecerts yaml-generator
+install: libinstall models restcerts enginecerts yaml-generator
 
 collector-install:
 	@echo "BEGIN INSTALL A-Tune-Collector..."
@@ -84,7 +84,7 @@ libinstall:
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/profiles
 	mkdir -p $(DESTDIR)$(PREFIX)/lib/atuned/training
 	mkdir -p $(DESTDIR)$(PREFIX)/share/atuned
-	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis
+	mkdir -p $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/models
 	mkdir -p $(DESTDIR)/var/lib/atuned
 	mkdir -p $(DESTDIR)/var/run/atuned
 	mkdir -p $(DESTDIR)/var/atuned
@@ -112,12 +112,10 @@ rpm:
 	rpmbuild -ba misc/atune.spec
 
 models:
-	rm -rf ${CURDIR}/analysis/models/*
-	cd ${CURDIR}/tools/ && python3 generate_models.py
+	cd ${CURDIR}/tools/ && python3 generate_models.py --model_path $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/models 
 
 search:
-	rm -rf ${CURDIR}/analysis/models/*
-	cd ${CURDIR}/tools/ && python3 generate_models.py --search=True
+	cd ${CURDIR}/tools/ && python3 generate_models.py --search=True --model_path $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/analysis/models
 
 grpccerts:
 	@echo "BEGIN GENERATE GRPC CERTS..."
