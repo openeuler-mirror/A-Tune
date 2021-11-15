@@ -80,14 +80,14 @@ class Optimizer(multiprocessing.Process):
                         r_range[1] = int(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an integer value"
-                                         .format(p_nob['name'])) from None
+                                         .format(p_nob['name']))
                 elif p_nob['dtype'] == 'float':
                     try:
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
                     except ValueError:
                         raise ValueError("the range value of {} is not an float value"
-                                         .format(p_nob['name'])) from None
+                                         .format(p_nob['name']))
 
                 if len(self.ref) > 0:
                     if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
@@ -118,7 +118,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = int(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not an integer value"
-                                     .format(p_nob['name'])) from None
+                                     .format(p_nob['name']))
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -140,7 +140,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = float(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not a float value"
-                                     .format(p_nob['name'])) from None
+                                     .format(p_nob['name']))
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -151,7 +151,7 @@ class Optimizer(multiprocessing.Process):
                     ref_value = str(self.ref[index])
                 except ValueError:
                     raise ValueError("the ref value of {} is not a string value"
-                                     .format(p_nob['name'])) from None
+                                     .format(p_nob['name']))
                 if ref_value not in items:
                     items.append(ref_value)
             return items

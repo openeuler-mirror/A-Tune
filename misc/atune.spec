@@ -3,8 +3,8 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 0.3
-Release: 0.2
+Version: 1.0.0
+Release: 1
 License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
 Source: https://gitee.com/openeuler/A-Tune/repository/archive/v%{version}.tar.gz
@@ -27,6 +27,7 @@ Requires: perf
 Requires: sysstat
 Requires: hwloc-gui
 Requires: psmisc
+Requires: atune-collector
 
 %define  debug_package %{nil}
 
@@ -55,7 +56,7 @@ Requires: python3-xgboost
 Requires: python3-flask-restful
 Requires: python3-pandas
 Requires: python3-lhsmdu
-Conflicts: atune < 0.3-0.1
+Conflicts: atune < 0.3-0.3
 
 %description engine
 atune engine tool for manage atuned AI tuning system.
@@ -118,11 +119,9 @@ make models
 %license License/LICENSE
 %defattr(0640,root,root,-)
 %attr(0640,root,root) %{_unitdir}/atune-engine.service
-%attr(0640,root,root) %{_unitdir}/atune-web.service
 %attr(0750,root,root) /usr/libexec/atuned/analysis/*
 %attr(0750,root,root) /etc/atuned/*
 %exclude /usr/libexec/atuned/analysis/app_rest.py
-%exclude /usr/libexec/atuned/analysis/plugin/
 %exclude /usr/libexec/atuned/analysis/atuned/
 %exclude /usr/libexec/atuned/analysis/dataset/
 %attr(0750,root,root) %dir /usr/libexec/atuned/analysis
@@ -142,6 +141,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Mon Nov 15 2021 hanxinke<hanxinke@huawei.com> - 1.0.0-1
+- upgrade to v1.0.0
+
 * Sat Dec 26 2020 gaoruoshu<gaoruoshu@huawei.com> - 0.3-0.3
 - add security Go compile flags
 

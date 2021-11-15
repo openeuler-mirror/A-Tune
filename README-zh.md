@@ -62,7 +62,6 @@ git clone https://gitee.com/openeuler/A-Tune.git
 #### 4、编译
 ```bash
 cd A-Tune
-make models
 make
 ```
 
