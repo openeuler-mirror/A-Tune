@@ -62,7 +62,6 @@ git clone https://gitee.com/openeuler/A-Tune.git
 #### 4. Compile.
 ```bash
 cd A-Tune
-make models
 make
 ```
 
