@@ -22,7 +22,6 @@ from flask_restful import reqparse, Resource
 
 from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
 from analysis.engine.utils import task_cache, utils
-from analysis.optimizer import optimizer
 from analysis.engine.config import EngineConfig
 
 LOGGER = logging.getLogger(__name__)
@@ -62,15 +61,15 @@ class Optimizer(Resource):
         x_ref = args.get("x_ref")
         y_ref = args.get("y_ref")
         result = {}
-        engine = optimizer.Optimizer(task_id, args["knobs"], child_conn, args["prj_name"],
-                                     engine=args.get("engine"),
-                                     max_eval=args.get("max_eval"),
-                                     n_random_starts=args.get("random_starts"),
-                                     x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
-                                     noise=args.get("noise"),
-                                     sel_feature=args.get("feature_filter") or \
-                                                 args.get("sel_feature"),
-                                     feature_selector=args.get("feature_selector"))
+        engine = self.initial_optimizer(task_id, args["knobs"], child_conn, args["prj_name"],
+                                        engine=args.get("engine"),
+                                        max_eval=args.get("max_eval"),
+                                        n_random_starts=args.get("random_starts"),
+                                        x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
+                                        noise=args.get("noise"),
+                                        sel_feature=args.get("feature_filter") or \
+                                                    args.get("sel_feature"),
+                                        feature_selector=args.get("feature_selector"))
         engine.start()
 
         value = {}
@@ -165,3 +164,33 @@ class Optimizer(Resource):
 
         task_cache.TasksCache.get_instance().delete(task_id)
         return {}, 200
+
+    @staticmethod
+    def initial_optimizer(name, params, child_conn, prj_name, engine="bayes",
+                          max_eval=50, sel_feature=False, x0=None, y0=None,
+                          n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
+        if engine == 'random' or engine == 'forest' \
+                or engine == 'gbrt' or engine == 'bayes' or engine == 'extraTrees':
+            from analysis.optimizer.bayes_tuning_manager import Bayes
+            return Bayes(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+        if engine == 'abtest':
+            from analysis.optimizer.abtest_tuning_manager import ABTest
+            return ABTest(name, params, child_conn, prj_name, engine, max_eval,
+                          sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+        if engine == 'gridsearch':
+            from analysis.optimizer.gridsearch_tuning_manager import GridSearch
+            return GridSearch(name, params, child_conn, prj_name, engine, max_eval,
+                              sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+        if engine == 'lhs':
+            from analysis.optimizer.lhs_tuning_manager import LHS
+            return LHS(name, params, child_conn, prj_name, engine, max_eval,
+                       sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+        if engine == 'tpe':
+            from analysis.optimizer.tpe_optimizer import TPE
+            return TPE(name, params, child_conn, prj_name, engine, max_eval,
+                       sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+        if engine == 'traverse':
+            from analysis.optimizer.traverse_tuning_manager import Traverse
+            return Traverse(name, params, child_conn, prj_name, engine, max_eval,
+                            sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)

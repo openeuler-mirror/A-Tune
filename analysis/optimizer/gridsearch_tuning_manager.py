@@ -15,11 +15,50 @@
 This class is used to perform gridsearch tuning and generate optimized profile
 """
 
-import logging
 import copy
+import logging
+
 import numpy as np
 
+from analysis.optimizer.optimizer import Optimizer
+
 LOGGER = logging.getLogger(__name__)
+
+
+class GridSearch(Optimizer):
+    """gridsearch tuning initialize"""
+
+    def __init__(self, name, params, child_conn, prj_name, engine="bayes",
+                 max_eval=50, sel_feature=False, x0=None, y0=None,
+                 n_random_starts=20, split_count=5, noise=0.00001 ** 2,
+                 feature_selector="wefs"):
+        super().__init__(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count,
+                         noise, feature_selector)
+
+    def run(self):
+        """start the tuning process"""
+        try:
+            num_done = 0
+            if self.y_ref is not None:
+                num_done = len(self.y_ref)
+            gstuning_manager = GridSearchTuningManager(self.knobs, self.child_conn)
+            options, performance = gstuning_manager.do_gridsearch(num_done)
+            params, labels = gstuning_manager.get_best_params()
+            # convert string option into index
+            options = gstuning_manager.get_options_index(options)
+            LOGGER.info("Minimization procedure has been completed.")
+        except RuntimeError as runtime_error:
+            LOGGER.error('Runtime Error: %s', repr(runtime_error))
+            self.child_conn.send(runtime_error)
+            return None
+        except Exception as err:
+            LOGGER.error('Unexpected Error: %s', repr(err))
+            self.child_conn.send(Exception("Unexpected Error:", repr(err)))
+            return None
+
+        bayes = {'estimator': None, 'ret': None, 'labels': []}
+        return self.generate_optimizer_param(bayes, params, options, performance)
 
 
 class GridSearchTuning:
@@ -82,7 +121,7 @@ class GridSearchTuningManager:
                 config[key] = val
                 ret_para.append(copy.deepcopy(config))
         return ret_para
-        
+
     def do_gridsearch(self, num_done):
         """do the gridsearch on the spaces"""
         spaces = self.expand_parameters(self._dict_para)
@@ -97,7 +136,7 @@ class GridSearchTuningManager:
                 option.append(space[key])
                 name.append(key)
                 LOGGER.info('key: %s,  value: %s, type: %s', key,
-                             space[key], self._dict_para_type[key])
+                            space[key], self._dict_para_type[key])
                 if self._dict_para_type[key] == 'int':
                     params[key] = int(space[key])
                 elif self._dict_para_type[key] == 'float':
