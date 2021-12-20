@@ -17,10 +17,43 @@ This class is used to perform tpe tuning optimizer with hyperopt lib
 """
 
 import logging
+
 import numpy as np
 from hyperopt import fmin, tpe, space_eval, hp
 
+from analysis.optimizer.optimizer import Optimizer
+
 LOGGER = logging.getLogger(__name__)
+
+
+class TPE(Optimizer):
+    """tpe tuning initialize"""
+
+    def __init__(self, name, params, child_conn, prj_name, engine="bayes",
+                 max_eval=50, sel_feature=False, x0=None, y0=None,
+                 n_random_starts=20, split_count=5, noise=0.00001 ** 2,
+                 feature_selector="wefs"):
+        super().__init__(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count,
+                         noise, feature_selector)
+
+    def run(self):
+        """start the tuning process"""
+        try:
+            from analysis.optimizer.tpe_optimizer import TPEOptimizer
+            tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
+            best_params = tpe_opt.tpe_minimize_tuning()
+            final_param = {"finished": True, "param": best_params}
+            self.child_conn.send(final_param)
+            return best_params
+        except RuntimeError as runtime_error:
+            LOGGER.error('Runtime Error: %s', repr(runtime_error))
+            self.child_conn.send(runtime_error)
+            return None
+        except Exception as err:
+            LOGGER.error('Unexpected Error: %s', repr(err))
+            self.child_conn.send(Exception("Unexpected Error:", repr(err)))
+            return None
 
 
 class TPEDiscreteKnob:

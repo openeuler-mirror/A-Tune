@@ -16,20 +16,12 @@ This class is used to find optimal settings and generate optimized profile.
 """
 
 import logging
-import numbers
 import multiprocessing
-import collections
 import numpy as np
 from sklearn.linear_model import Lasso
 from sklearn.preprocessing import StandardScaler
 
-from skopt import Optimizer as baseOpt
-from skopt.utils import normalize_dimensions
-from skopt.utils import cook_estimator
-
 from analysis.engine.utils import utils
-from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
-from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
 
@@ -61,101 +53,6 @@ class Optimizer(multiprocessing.Process):
             self.ref = []
         self._n_random_starts = 20 if n_random_starts is None else n_random_starts
         self.feature_selector = feature_selector
-
-    def build_space(self):
-        """build space"""
-        objective_params_list = []
-        for i, p_nob in enumerate(self.knobs):
-            if p_nob['type'] == 'discrete':
-                items = self.handle_discrete_data(p_nob, i)
-                objective_params_list.append(items)
-            elif p_nob['type'] == 'continuous':
-                r_range = p_nob['range']
-                if r_range is None or len(r_range) != 2:
-                    raise ValueError("the item of the scope value of {} must be 2"
-                                     .format(p_nob['name']))
-                if p_nob['dtype'] == 'int':
-                    try:
-                        r_range[0] = int(r_range[0])
-                        r_range[1] = int(r_range[1])
-                    except ValueError:
-                        raise ValueError("the range value of {} is not an integer value"
-                                         .format(p_nob['name']))
-                elif p_nob['dtype'] == 'float':
-                    try:
-                        r_range[0] = float(r_range[0])
-                        r_range[1] = float(r_range[1])
-                    except ValueError:
-                        raise ValueError("the range value of {} is not an float value"
-                                         .format(p_nob['name']))
-
-                if len(self.ref) > 0:
-                    if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
-                        raise ValueError("the ref value of {} is out of range"
-                                         .format(p_nob['name']))
-                objective_params_list.append((r_range[0], r_range[1]))
-            else:
-                raise ValueError("the type of {} is not supported".format(p_nob['name']))
-        return objective_params_list
-
-    def handle_discrete_data(self, p_nob, index):
-        """handle discrete data"""
-        if p_nob['dtype'] == 'int':
-            items = p_nob['items']
-            if items is None:
-                items = []
-            r_range = p_nob['range']
-            step = 1
-            if 'step' in p_nob.keys():
-                step = 1 if p_nob['step'] < 1 else p_nob['step']
-            if r_range is not None:
-                length = len(r_range) if len(r_range) % 2 == 0 else len(r_range) - 1
-                for i in range(0, length, 2):
-                    items.extend(list(np.arange(r_range[i], r_range[i + 1] + 1, step=step)))
-            items = list(set(items))
-            if len(self.ref) > 0:
-                try:
-                    ref_value = int(self.ref[index])
-                except ValueError:
-                    raise ValueError("the ref value of {} is not an integer value"
-                                     .format(p_nob['name']))
-                if ref_value not in items:
-                    items.append(ref_value)
-            return items
-        if p_nob['dtype'] == 'float':
-            items = p_nob['items']
-            if items is None:
-                items = []
-            r_range = p_nob['range']
-            step = 0.1
-            if 'step' in p_nob.keys():
-                step = 0.1 if p_nob['step'] <= 0 else p_nob['step']
-            if r_range is not None:
-                length = len(r_range) if len(r_range) % 2 == 0 else len(r_range) - 1
-                for i in range(0, length, 2):
-                    items.extend(list(np.arange(r_range[i], r_range[i + 1], step=step)))
-            items = list(set(items))
-            if len(self.ref) > 0:
-                try:
-                    ref_value = float(self.ref[index])
-                except ValueError:
-                    raise ValueError("the ref value of {} is not a float value"
-                                     .format(p_nob['name']))
-                if ref_value not in items:
-                    items.append(ref_value)
-            return items
-        if p_nob['dtype'] == 'string':
-            items = p_nob['options']
-            if len(self.ref) > 0:
-                try:
-                    ref_value = str(self.ref[index])
-                except ValueError:
-                    raise ValueError("the ref value of {} is not a string value"
-                                     .format(p_nob['name']))
-                if ref_value not in items:
-                    items.append(ref_value)
-            return items
-        raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
 
     @staticmethod
     def feature_importance(options, performance, labels):
@@ -210,189 +107,6 @@ class Optimizer(multiprocessing.Process):
         list_ref_y = [float(y) for y in self.y_ref]
         return (list_ref_x, list_ref_y)
 
-    def run(self):
-        """start the tuning process"""
-
-        def objective(var):
-            """objective method receive the benchmark result and send the next parameters"""
-            iter_result = {}
-            option = []
-            for i, knob in enumerate(self.knobs):
-                params[knob['name']] = var[i]
-                if knob['dtype'] == 'string':
-                    option.append(knob['options'].index(var[i]))
-                else:
-                    option.append(var[i])
-
-            iter_result["param"] = params
-            self.child_conn.send(iter_result)
-            result = self.child_conn.recv()
-            x_num = 0.0
-            eval_list = result.split(',')
-            for value in eval_list:
-                num = float(value)
-                x_num = x_num + num
-            options.append(option)
-            performance.append(x_num)
-            return x_num
-
-        params = {}
-        options = []
-        performance = []
-        labels = []
-        estimator = None
-
-        try:
-            if self.engine == 'random' or self.engine == 'forest' or \
-                    self.engine == 'gbrt' or self.engine == 'bayes' or self.engine == 'extraTrees':
-                params_space = self.build_space()
-                ref_x, ref_y = self.transfer()
-                if len(ref_x) == 0:
-                    if len(self.ref) == 0:
-                        ref_x = None
-                    else:
-                        ref_x = self.ref
-                    ref_y = None
-                if ref_x is not None and not isinstance(ref_x[0], (list, tuple)):
-                    ref_x = [ref_x]
-                LOGGER.info('x0: %s', ref_x)
-                LOGGER.info('y0: %s', ref_y)
-
-                if ref_x is not None and isinstance(ref_x[0], (list, tuple)):
-                    self._n_random_starts = 0 if len(ref_x) >= self._n_random_starts \
-                        else self._n_random_starts - len(ref_x) + 1
-
-                LOGGER.info('n_random_starts parameter is: %d', self._n_random_starts)
-                LOGGER.info("Running performance evaluation.......")
-                if self.engine == 'random':
-                    estimator = 'dummy'
-                elif self.engine == 'forest':
-                    estimator = 'RF'
-                elif self.engine == 'extraTrees':
-                    estimator = 'ET'
-                elif self.engine == 'gbrt':
-                    estimator = 'GBRT'
-                elif self.engine == 'bayes':
-                    params_space = normalize_dimensions(params_space)
-                    estimator = cook_estimator("GP", space=params_space, noise=self.noise)
-
-                LOGGER.info("base_estimator is: %s", estimator)
-                optimizer = baseOpt(
-                    dimensions=params_space,
-                    n_random_starts=self._n_random_starts,
-                    random_state=1,
-                    base_estimator=estimator
-                )
-                n_calls = self.max_eval
-                # User suggested points at which to evaluate the objective first
-                if ref_x and ref_y is None:
-                    ref_y = list(map(objective, ref_x))
-                    LOGGER.info("ref_y is: %s", ref_y)
-
-                # Pass user suggested initialisation points to the optimizer
-                if ref_x:
-                    if not isinstance(ref_y, (collections.Iterable, numbers.Number)):
-                        raise ValueError("`ref_y` should be an iterable or a scalar, "
-                                         "got %s" % type(ref_y))
-                    if len(ref_x) != len(ref_y):
-                        raise ValueError("`ref_x` and `ref_y` should "
-                                         "have the same length")
-                    LOGGER.info("ref_x: %s", ref_x)
-                    LOGGER.info("ref_y: %s", ref_y)
-                    n_calls -= len(ref_y)
-                    ret = optimizer.tell(ref_x, ref_y)
-
-                for i in range(n_calls):
-                    next_x = optimizer.ask()
-                    LOGGER.info("next_x: %s", next_x)
-                    LOGGER.info("Running performance evaluation.......")
-                    next_y = objective(next_x)
-                    LOGGER.info("next_y: %s", next_y)
-                    ret = optimizer.tell(next_x, next_y)
-                    LOGGER.info("finish (ref_x, ref_y) tell")
-
-            elif self.engine == 'abtest':
-                abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn,
-                                                       self.split_count)
-                options, performance = abtuning_manager.do_abtest_tuning_abtest()
-                params = abtuning_manager.get_best_params()
-                # convert string option into index
-                options = abtuning_manager.get_options_index(options)
-            elif self.engine == 'gridsearch':
-                num_done = 0
-                if self.y_ref is not None:
-                    num_done = len(self.y_ref)
-                gstuning_manager = GridSearchTuningManager(self.knobs, self.child_conn)
-                options, performance = gstuning_manager.do_gridsearch(num_done)
-                params, labels = gstuning_manager.get_best_params()
-                # convert string option into index
-                options = gstuning_manager.get_options_index(options)
-            elif self.engine == 'lhs':
-                from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
-                knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn,
-                                                           self.max_eval, self.split_count)
-                options = knobsampling_manager.get_knob_samples()
-                performance = knobsampling_manager.do_knob_sampling_test(options)
-                params = knobsampling_manager.get_best_params(options, performance)
-                options = knobsampling_manager.get_options_index(options)
-            elif self.engine == 'tpe':
-                from analysis.optimizer.tpe_optimizer import TPEOptimizer
-                tpe_opt = TPEOptimizer(self.knobs, self.child_conn, self.max_eval)
-                best_params = tpe_opt.tpe_minimize_tuning()
-                final_param = {}
-                final_param["finished"] = True
-                final_param["param"] = best_params
-                self.child_conn.send(final_param)
-                return best_params
-            elif self.engine == 'traverse':
-                from analysis.optimizer.knob_traverse_manager import KnobTraverseManager
-                default_values = [p_nob['ref'] for _, p_nob in enumerate(self.knobs)]
-                knobtraverse_manager = KnobTraverseManager(self.knobs, self.child_conn, default_values)
-                traverse_list = knobtraverse_manager.get_traverse_list()
-                performance = knobtraverse_manager.get_traverse_performance(traverse_list)
-                rank = knobtraverse_manager.get_traverse_rank(performance)
-                final_param = {"rank": rank, "param": knobtraverse_manager.get_default_values(), "finished": True}
-                self.child_conn.send(final_param)
-                return final_param["param"]
-
-            LOGGER.info("Minimization procedure has been completed.")
-        except ValueError as value_error:
-            LOGGER.error('Value Error: %s', repr(value_error))
-            self.child_conn.send(value_error)
-            return None
-        except RuntimeError as runtime_error:
-            LOGGER.error('Runtime Error: %s', repr(runtime_error))
-            self.child_conn.send(runtime_error)
-            return None
-        except Exception as err:
-            LOGGER.error('Unexpected Error: %s', repr(err))
-            self.child_conn.send(Exception("Unexpected Error:", repr(err)))
-            return None
-
-        for i, knob in enumerate(self.knobs):
-            if estimator is not None:
-                params[knob['name']] = ret.x[i]
-            if self.engine != 'gridsearch':
-                labels.append(knob['name'])
-
-        LOGGER.info("Optimized result: %s", params)
-        LOGGER.info("The optimized profile has been generated.")
-        final_param = {}
-        if self.sel_feature is True:
-            if self.feature_selector == "wefs":
-                wefs = WeightedEnsembleFeatureSelector()
-                rank = wefs.get_ensemble_feature_importance(options, performance, labels)
-            elif self.feature_selector == "vrfs":
-                vrfs = VarianceReductionFeatureSelector()
-                rank = vrfs.get_ensemble_feature_importance(options, performance, labels)
-            final_param["rank"] = rank
-            LOGGER.info("The feature importances of current evaluation are: %s", rank)
-
-        final_param["param"] = params
-        final_param["finished"] = True
-        self.child_conn.send(final_param)
-        return params
-
     def stop_process(self):
         """stop process"""
         self.child_conn.close()
@@ -404,4 +118,30 @@ class Optimizer(multiprocessing.Process):
         for ind, param in enumerate(params):
             if param["options"] is None and param['dtype'] == 'string':
                 params[ind] = utils.get_tuning_options(param)
+        return params
+
+    def generate_optimizer_param(self, bayes, params, options, performance):
+        """generate optimizer paramters"""
+        for i, knob in enumerate(self.knobs):
+            if bayes['estimator'] is not None:
+                params[knob['name']] = bayes['ret'].x[i]
+            if self.engine != 'gridsearch':
+                bayes['labels'].append(knob['name'])
+
+        LOGGER.info("Optimized result: %s", params)
+        LOGGER.info("The optimized profile has been generated.")
+        final_param = {}
+        if self.sel_feature is True:
+            if self.feature_selector == "wefs":
+                wefs = WeightedEnsembleFeatureSelector()
+                rank = wefs.get_ensemble_feature_importance(options, performance, bayes['labels'])
+            elif self.feature_selector == "vrfs":
+                vrfs = VarianceReductionFeatureSelector()
+                rank = vrfs.get_ensemble_feature_importance(options, performance, bayes['labels'])
+            final_param["rank"] = rank
+            LOGGER.info("The feature importances of current evaluation are: %s", rank)
+
+        final_param["param"] = params
+        final_param["finished"] = True
+        self.child_conn.send(final_param)
         return params

@@ -16,9 +16,46 @@ This class is used to perform white box tuning and generate optimized profile
 """
 
 import logging
+
 import numpy as np
 
+from analysis.optimizer.optimizer import Optimizer
+
 LOGGER = logging.getLogger(__name__)
+
+
+class ABTest(Optimizer):
+    """ABTest tuning initialize"""
+
+    def __init__(self, name, params, child_conn, prj_name, engine="bayes",
+                 max_eval=50, sel_feature=False, x0=None, y0=None,
+                 n_random_starts=20, split_count=5, noise=0.00001 ** 2,
+                 feature_selector="wefs"):
+        super().__init__(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count,
+                         noise, feature_selector)
+
+    def run(self):
+        """start the tuning process"""
+        try:
+            abtuning_manager = ABtestTuningManager(self.knobs, self.child_conn,
+                                                   self.split_count)
+            options, performance = abtuning_manager.do_abtest_tuning_abtest()
+            params = abtuning_manager.get_best_params()
+            # convert string option into index
+            options = abtuning_manager.get_options_index(options)
+            LOGGER.info("Minimization procedure has been completed.")
+        except RuntimeError as runtime_error:
+            LOGGER.error('Runtime Error: %s', repr(runtime_error))
+            self.child_conn.send(runtime_error)
+            return None
+        except Exception as err:
+            LOGGER.error('Unexpected Error: %s', repr(err))
+            self.child_conn.send(Exception("Unexpected Error:", repr(err)))
+            return None
+
+        bayes = {'estimator': None, 'ret': None, 'labels': []}
+        return self.generate_optimizer_param(bayes, params, options, performance)
 
 
 class ABtestTuning:
