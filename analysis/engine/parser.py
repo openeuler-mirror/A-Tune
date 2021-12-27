@@ -23,8 +23,8 @@ OPTIMIZER_POST_PARSER.add_argument('max_eval', type=int, required=True,
 OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
                                    help="knobs list cannot be null")
 OPTIMIZER_POST_PARSER.add_argument('engine',
-                                   choices=('random', 'forest', 'gbrt', 'extraTrees',
-                                            'bayes', 'abtest', 'lhs', 'tpe', 'gridsearch', 'traverse'),
+                                   choices=('random', 'forest', 'gbrt', 'extraTrees', 'bayes', 'abtest',
+                                            'lhs', 'tpe', 'gridsearch', 'traverse', 'etpe', 'smac', 'batch'),
                                    help='engine choice: {error_msg}')
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json',
                                    help="random_starts cannot be null")
@@ -74,16 +74,22 @@ TRAIN_POST_PARSER.add_argument('modelpath', required=True,
                                help="The model path can not be null")
 
 DETECT_POST_PARSER = reqparse.RequestParser()
-DETECT_POST_PARSER.add_argument('appname', required=True, help="The appname path can not be null")
-DETECT_POST_PARSER.add_argument('detectpath', type=str, help="The path of file to be detect")
+DETECT_POST_PARSER.add_argument(
+    'appname', required=True, help="The appname path can not be null")
+DETECT_POST_PARSER.add_argument(
+    'detectpath', type=str, help="The path of file to be detect")
 
 TRANSFER_PUT_PARSER = reqparse.RequestParser()
-TRANSFER_PUT_PARSER.add_argument('type', type=str, required=True, help="type of data can not be null")
+TRANSFER_PUT_PARSER.add_argument(
+    'type', type=str, required=True, help="type of data can not be null")
 TRANSFER_PUT_PARSER.add_argument('collect_id', type=int, required=True,
-        help="Collection id can not be null")
-TRANSFER_PUT_PARSER.add_argument('status', type=str, required=True, help="Status can not be null")
-TRANSFER_PUT_PARSER.add_argument('collect_data', type=str, required=False, help="Collection data")
-TRANSFER_PUT_PARSER.add_argument('workload_type', type=str, required=False, help="Workload type")
+                                 help="Collection id can not be null")
+TRANSFER_PUT_PARSER.add_argument(
+    'status', type=str, required=True, help="Status can not be null")
+TRANSFER_PUT_PARSER.add_argument(
+    'collect_data', type=str, required=False, help="Collection data")
+TRANSFER_PUT_PARSER.add_argument(
+    'workload_type', type=str, required=False, help="Workload type")
 
 UI_TUNING_GET_PARSER = reqparse.RequestParser()
 UI_TUNING_GET_PARSER.add_argument('uid', type=int, help="user id")
@@ -95,7 +101,8 @@ UI_TUNING_GET_PARSER.add_argument('line', type=str, help="tuning round")
 UI_ANALYSIS_GET_PARSER = reqparse.RequestParser()
 UI_ANALYSIS_GET_PARSER.add_argument('uid', type=int, help="user id")
 UI_ANALYSIS_GET_PARSER.add_argument('name', type=str, help="analysis name")
-UI_ANALYSIS_GET_PARSER.add_argument('newName', type=str, help="new analysis name")
+UI_ANALYSIS_GET_PARSER.add_argument(
+    'newName', type=str, help="new analysis name")
 UI_ANALYSIS_GET_PARSER.add_argument('csvLine', type=str, help="analysis round")
 UI_ANALYSIS_GET_PARSER.add_argument('logLine', type=str, help="analysis round")
 
@@ -105,4 +112,5 @@ UI_USER_GET_PARSER.add_argument('name', type=str, help="user name")
 UI_USER_GET_PARSER.add_argument('password', type=str, help="user password")
 UI_USER_GET_PARSER.add_argument('userId', type=int, help="user id")
 UI_USER_GET_PARSER.add_argument('ipAddrs', type=str, help="ip address")
-UI_USER_GET_PARSER.add_argument('newPasswd', type=str, help="new password for changing")
+UI_USER_GET_PARSER.add_argument(
+    'newPasswd', type=str, help="new password for changing")

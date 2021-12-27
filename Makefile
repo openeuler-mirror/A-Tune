@@ -95,6 +95,7 @@ libinstall:
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 misc/engine.cnf $(DESTDIR)/etc/atuned/
+	install -m 640 misc/batch_algo.yaml $(DESTDIR)/etc/atuned/
 	install -m 640 rules/tuning/tuning_rules.grl $(DESTDIR)/etc/atuned/rules
 	install -m 640 misc/atune-engine.service $(SYSTEMDDIR)
 	install -m 640 database/atuned.db $(DESTDIR)/var/lib/atuned/

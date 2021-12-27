@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# Copyright (c) 2021 Huawei Technologies Co., Ltd.
+# A-Tune is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+# Create: 2021-12-03
+
+# User should update the tuning knobs and values according the benchmark
+
+{
+    "candidate_config_1": {
+        "net.core.netdev_max_backlog": 100000,
+        "net.core.rmem_max": 67108864,
+        "net.core.somaxconn": 65536,
+        "net.core.wmem_max": 8388608,
+        "net.ipv4.ip_local_port_range": "32768 60999",
+        "net.ipv4.tcp_fin_timeout": 46,
+        "net.ipv4.tcp_keepalive_time": 600,
+        "net.ipv4.tcp_max_syn_backlog": 262144,
+        "net.ipv4.tcp_max_tw_buckets": 1048576,
+        "net.ipv4.tcp_tw_reuse": "0"
+    },
+    "candidate_config_2": {
+        "net.core.netdev_max_backlog": 100000,
+        "net.core.rmem_max": 67108864,
+        "net.core.somaxconn": 65536,
+        "net.core.wmem_max": 8388608,
+        "net.ipv4.ip_local_port_range": "32768 60999",
+        "net.ipv4.tcp_fin_timeout": 46,
+        "net.ipv4.tcp_keepalive_time": 600,
+        "net.ipv4.tcp_max_syn_backlog": 262144,
+        "net.ipv4.tcp_max_tw_buckets": 1048576,
+        "net.ipv4.tcp_tw_reuse": "0"
+    },
+    "candidate_config_3": {
+        "net.core.netdev_max_backlog": 1000,
+        "net.core.rmem_max": 22020096,
+        "net.core.somaxconn": 65536,
+        "net.core.wmem_max": 1048576,
+        "net.ipv4.ip_local_port_range": "32768 60999",
+        "net.ipv4.tcp_fin_timeout": 89,
+        "net.ipv4.tcp_keepalive_time": 36000,
+        "net.ipv4.tcp_max_syn_backlog": 262144,
+        "net.ipv4.tcp_max_tw_buckets": 688128,
+        "net.ipv4.tcp_tw_reuse": "0"
+    }
+}
