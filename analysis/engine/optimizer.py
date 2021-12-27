@@ -45,7 +45,8 @@ class Optimizer(Resource):
         else:
             task = task_cache.TasksCache.get_instance().get(task_id)
             if not task:
-                abort(404, "{0} {1} not found".format(self.task_id_info, task_id))
+                abort(404, "{0} {1} not found".format(
+                    self.task_id_info, task_id))
             result.append(task_id)
         return result, 200
 
@@ -64,11 +65,13 @@ class Optimizer(Resource):
         engine = self.initial_optimizer(task_id, args["knobs"], child_conn, args["prj_name"],
                                         engine=args.get("engine"),
                                         max_eval=args.get("max_eval"),
-                                        n_random_starts=args.get("random_starts"),
-                                        x0=x_ref, y0=y_ref, split_count=args.get("split_count"),
+                                        n_random_starts=args.get(
+                                            "random_starts"),
+                                        x0=x_ref, y0=y_ref, split_count=args.get(
+                                            "split_count"),
                                         noise=args.get("noise"),
-                                        sel_feature=args.get("feature_filter") or \
-                                                    args.get("sel_feature"),
+                                        sel_feature=args.get("feature_filter") or
+                                        args.get("sel_feature"),
                                         feature_selector=args.get("feature_selector"))
         engine.start()
 
@@ -98,15 +101,18 @@ class Optimizer(Resource):
         LOGGER.info(args)
         if args["iterations"] == -1:
             value = args["line"][:-1].split(" ")
-            utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
+            utils.add_data_to_file(
+                value[2] + "," + value[3], "w", args["prj_name"])
             if EngineConfig.db_enable:
                 from analysis.engine.database import trigger_tuning
                 client_ip = request.remote_addr
-                trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'], client_ip)
+                trigger_tuning.add_new_tuning(
+                    args['prj_name'], value[2], args['max_iter'], client_ip)
             return {}, 200
         if args["iterations"] == 0:
             total_eval = args["line"].split("|")[3].split("=")[1]
-            utils.add_data_to_file(utils.get_opposite_num(total_eval, True), "a", args["prj_name"])
+            utils.add_data_to_file(utils.get_opposite_num(
+                total_eval, True), "a", args["prj_name"])
             params = utils.get_string_split(args["line"], 5, 0, "")
             params += utils.get_string_split(args["line"], 4, 0, "evaluation-")
             if len(args["line"].split("|")[4].split(",")) > 1:
@@ -116,7 +122,7 @@ class Optimizer(Resource):
             if EngineConfig.db_enable:
                 from analysis.engine.database import trigger_tuning
                 trigger_tuning.change_tuning_baseline(args['prj_name'],
-                        utils.get_opposite_num(total_eval, True))
+                                                      utils.get_opposite_num(total_eval, True))
                 trigger_tuning.create_tuning_data_table(args['line'])
 
         out_queue = task[self.pipe]
@@ -126,16 +132,19 @@ class Optimizer(Resource):
             params += "," + utils.get_string_split(args["line"], 5, 1, "")
             if len(args["line"].split("|")[4].split(",")) > 1:
                 for each_eval in args["line"].split("|")[4].split(","):
-                    params += utils.get_opposite_num(each_eval.split("=")[1], False) + ","
+                    params += utils.get_opposite_num(
+                        each_eval.split("=")[1], False) + ","
             total_eval = args["line"].split("|")[3].split("=")[1]
             params += utils.get_opposite_num(total_eval, True)
             utils.add_data_to_file(params, "a", args["prj_name"])
             out_queue.send(args.get("value"))
             if EngineConfig.db_enable:
                 from analysis.engine.database import trigger_tuning
-                table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'], args['line'])
+                table_name = trigger_tuning.add_tuning_data(
+                    args['prj_name'], args['iterations'], args['line'])
                 if table_name is not None:
-                    trigger_tuning.change_tuning_status(table_name, args['prj_name'])
+                    trigger_tuning.change_tuning_status(
+                        table_name, args['prj_name'])
 
         if args["iterations"] == args["max_iter"]:
             utils.add_data_to_file("END", "a", args["prj_name"])
@@ -194,3 +203,13 @@ class Optimizer(Resource):
             from analysis.optimizer.traverse_tuning_manager import Traverse
             return Traverse(name, params, child_conn, prj_name, engine, max_eval,
                             sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+
+        if engine == 'etpe' or engine == 'smac':
+            from analysis.optimizer.ultra_optimizer import Ultra
+            return Ultra(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
+
+        if engine == 'batch':
+            from analysis.optimizer.batch_optimizer import Batch
+            return Batch(name, params, child_conn, prj_name, engine, max_eval,
+                         sel_feature, x0, y0, n_random_starts, split_count, noise, feature_selector)
