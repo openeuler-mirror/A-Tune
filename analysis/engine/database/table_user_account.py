@@ -16,7 +16,7 @@ Mapping for user_account table.
 """
 
 from sqlalchemy import Column, VARCHAR, Integer, UniqueConstraint, PrimaryKeyConstraint
-from sqlalchemy import func, select, insert, update
+from sqlalchemy import func, select, insert, update, delete
 
 from analysis.engine.database.tables import BASE
 
@@ -39,7 +39,8 @@ class UserAccount(BASE):
 
     def __repr__(self):
         return "<user_account(user_id='%s', info='%s %s', limitaion='%s')>" % (self.user_id,
-                self.account_name, self.email, self.limitation)
+                                                                               self.account_name, self.email,
+                                                                               self.limitation)
 
     @staticmethod
     def find_user(uid, session):
@@ -66,7 +67,7 @@ class UserAccount(BASE):
     def insert_new_user(uid, email, name, pwd, session, role='user'):
         """insert new user into user_account table"""
         sql = insert(UserAccount).values(user_id=uid, account_name=name, email=email,
-                password=pwd, role=role)
+                                         password=pwd, role=role)
         res = session.execute(sql)
         return res is not None
 
@@ -74,5 +75,27 @@ class UserAccount(BASE):
     def update_password(uid, pwd, session):
         """update password"""
         sql = update(UserAccount).where(UserAccount.user_id == uid).values(password=pwd)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def delete_user(uid, session):
+        """update user by id"""
+        sql = delete(UserAccount).where(UserAccount.user_id == uid)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def find_all_user(session):
+        """find uid in user_account table"""
+        sql = select([UserAccount])
+        res = session.execute(sql).scalar()
+        return res is not None
+
+    @staticmethod
+    def update_user(uid, pwd, name, role, session):
+        """update user details"""
+        sql = update(UserAccount).where(UserAccount.user_id == uid).values(account_name=name,
+                                                                           password=pwd, role=role)
         res = session.execute(sql)
         return res is not None

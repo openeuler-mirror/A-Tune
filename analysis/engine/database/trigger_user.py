@@ -182,3 +182,55 @@ def create_admin(pwd):
     finally:
         session.close()
     return {'success': True}
+
+
+def get_user_list():
+    """get user details in user_account table"""
+    session = tables.get_session()
+    if session is None:
+        return {'success': False, 'reason': 'failed'}
+    try:
+        user_account = UserAccount()
+        user_account.find_all_user(session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get user details failed: %s', err)
+        return {'success': False, 'reason': 'failed'}
+    finally:
+        session.close()
+    return {'success': True}
+
+
+def delete_user(uid):
+    """delete user account by uid"""
+    session = tables.get_session()
+    if session is None:
+        return {'success': False, 'reason': 'failed'}
+    response = {}
+    try:
+        user_account = UserAccount()
+        user_account.delete_user(uid, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('delete user account failed: %s', err)
+        return response
+    finally:
+        session.close()
+    return response
+
+
+def update_user(uid, pwd, name, role):
+    """delete user account by uid"""
+    session = tables.get_session()
+    if session is None:
+        return {'success': False, 'reason': 'failed'}
+    response = {}
+    try:
+        user_account = UserAccount()
+        user_account.update_user(uid, pwd, name, role, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('update user account failed: %s', err)
+        return response
+    finally:
+        session.close()
+    return response

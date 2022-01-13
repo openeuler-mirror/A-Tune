@@ -55,7 +55,7 @@ def decrypted_code(code, key, iv):
     iv = convert_to_bytes(iv)
 
     decrypts = Cipher(algorithms.AES(key), modes.GCM(iv),
-            backend=default_backend()).decryptor()
+                      backend=default_backend()).decryptor()
     res = decrypts.update(code)
     return res.decode('utf-8')
 
@@ -73,9 +73,11 @@ def get_db_url():
     url = ''
     if EngineConfig.database.lower() == 'postgresql':
         url += 'postgresql://'
+    elif EngineConfig.database.lower() == 'mysql':
+        url += 'mysql+pymysql://'
     else:
         return None
     pwd = decrypted_code(EngineConfig.user_passwd, EngineConfig.passwd_key, EngineConfig.passwd_iv)
     url += EngineConfig.user_name + ':' + pwd + '@' + EngineConfig.db_host + ':' \
-            + EngineConfig.db_port + '/' + EngineConfig.db_name
+           + EngineConfig.db_port + '/' + EngineConfig.db_name
     return url
