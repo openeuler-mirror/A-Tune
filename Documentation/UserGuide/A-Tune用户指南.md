@@ -4,7 +4,7 @@
 
 ## 法律申明
 
-**版权所有 © 2020** **华为技术有限公司。**
+**版权所有 © 2020** **openEuler**
 
 您对“本文档”的复制，使用，修改及分发受知识共享(Creative Commons)署名—相同方式共享4.0国际公共许可协议(以下简称“CC BY-SA 4.0”)的约束。为了方便用户理解，您可以通过访问https://creativecommons.org/licenses/by-sa/4.0/ 了解CC BY-SA 4.0的概要 (但不是替代)。CC BY-SA 4.0的完整协议内容您可以访问如下网址获取：https://creativecommons.org/licenses/by-sa/4.0/legalcode。
 
@@ -64,30 +64,236 @@ A-Tune支持的主要特性、特性成熟度以及使用建议请参见表1-1�
 
 | **特性**                       | **成熟度** | **使用建议** |
 | ------------------------------ | ---------- | ------------ |
-| 11大类15款应用负载类型自动优化 | 已测试     | 试用         |
+| 14大类50款应用负载类型自动优化 | 已测试     | 试用         |
 | 自定义profile和业务模型        | 已测试     | 试用         |
 | 参数自调优                     | 已测试     | 试用         |
 
 - 支持业务模型
 
-根据应用的负载特征，A-Tune将业务分为11大类，各类型的瓶颈点和A-Tune支持的应用请参见表1-2。
+根据应用的负载特征，A-Tune将业务分为14大类，各类型的瓶颈点和A-Tune支持的应用请参见表1-2。
 
 表1-2 支持的业务类型和应用
 
-| **业务大类**       | **业务类型** | **瓶颈点**                                 | **支持的应用**                      |
-| ------------------ | ------------ | ------------------------------------------ | ----------------------------------- |
-| default            | 默认类型     | 算力、内存、网络、IO各维度资源使用率都不高 | N/A                                 |
-| webserver          | web应用      | 算力瓶颈、网络瓶颈                         | Nginx、Apache Traffic Server        |
-| database           | 数据库       | 算力瓶颈、内存瓶颈、IO瓶颈                 | Mongodb、Mysql、Postgresql、Mariadb |
-| big-data           | 大数据       | 算力瓶颈、内存瓶颈                         | Hadoop-hdfs、Hadoop-spark           |
-| middleware         | 中间件框架   | 算力瓶颈、网络瓶颈                         | Dubbo                               |
-| in-memory-database | 内存数据库   | 内存瓶颈、IO瓶颈                           | Redis                               |
-| basic-test-suite   | 基础测试套   | 算力瓶颈、内存瓶颈                         | SPECCPU2006、SPECjbb2015            |
-| hpc                | 人类基因组   | 算力瓶颈、内存瓶颈、IO瓶颈                 | Gatk4                               |
-| storage            | 存储         | 网络瓶颈、IO瓶颈                           | Ceph                                |
-| virtualization     | 虚拟化       | 算力瓶颈、内存瓶颈、IO瓶颈                 | Consumer-cloud、Mariadb             |
-| docker             | 容器         | 算力瓶颈、内存瓶颈、IO瓶颈                 | Mariadb                             |
-
+<a name="table2819164611311"></a>
+<table>
+    <thead align="left">
+        <tr id="row49114466133">
+	    <th class="cellrowborder" valign="top" width="22.12%" id="mcps1.2.5.1.1">
+	        <p id="p09116467130"><a name="p09116467130"></a><a name="p09116467130"></a><strong
+        id="b20879355579"><a name="b20879355579"></a><a name="b20879355579"></a>业务大类</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="12.959999999999999%" id="mcps1.2.5.1.2">
+                <p id="p953251510111"><a name="p953251510111"></a><a name="p953251510111"></a><strong
+                        id="b11881145155715"><a name="b11881145155715"></a><a name="b11881145155715"></a>业务类型</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="37.269999999999996%" id="mcps1.2.5.1.3">
+                <p id="p169111846181310"><a name="p169111846181310"></a><a name="p169111846181310"></a><strong
+                        id="b1213516721612"><a name="b1213516721612"></a><a name="b1213516721612"></a>瓶颈点</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="27.650000000000002%" id="mcps1.2.5.1.4">
+                <p id="p1591144617135"><a name="p1591144617135"></a><a name="p1591144617135"></a><strong
+                        id="b31363721611"><a name="b31363721611"></a><a name="b31363721611"></a>支持的应用</strong></p>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="row17911114651318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1791124631317"><a name="p1791124631317"></a><a name="p1791124631317"></a>default</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p45321515191120"><a name="p45321515191120"></a><a name="p45321515191120"></a>默认类型</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p691184671312"><a name="p691184671312"></a><a name="p691184671312"></a>算力、内存、网络、IO各维度资源使用率都不高</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p69111946131318"><a name="p69111946131318"></a><a name="p69111946131318"></a>N/A</p>
+            </td>
+        </tr>
+        <tr id="row791164631318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p179110461137"><a name="p179110461137"></a><a name="p179110461137"></a>webserver</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p20532111512117"><a name="p20532111512117"></a><a name="p20532111512117"></a>web应用</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1191117469133"><a name="p1191117469133"></a><a name="p1191117469133"></a>算力瓶颈、网络瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p159111546161317"><a name="p159111546161317"></a><a name="p159111546161317"></a>Nginx、Apache Traffic Server、Tomcat、Apache Http Server、Squid、Postfix、lighttpd</p>
+            </td>
+        </tr>
+        <tr id="row791164631318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p179110461137"><a name="p179110461137"></a><a name="p179110461137"></a>ftp server</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p20532111512117"><a name="p20532111512117"></a><a name="p20532111512117"></a>ftp应用</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1191117469133"><a name="p1191117469133"></a><a name="p1191117469133"></a>算力瓶颈、网络瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p159111546161317"><a name="p159111546161317"></a><a name="p159111546161317"></a>vsftpd、proftpd</p>
+            </td>
+        </tr>
+        <tr id="row13911946141311">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p2911164610134"><a name="p2911164610134"></a><a name="p2911164610134"></a>database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p4532111561119"><a name="p4532111561119"></a><a name="p4532111561119"></a>数据库</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <a name="ul3724104521013"></a><a name="ul3724104521013"></a><a name="p14911124612131"></a>算力瓶颈、内存瓶颈、IO瓶颈
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1091134671313"><a name="p1091134671313"></a><a name="p1091134671313"></a>Mongodb、Mysql、Postgresql、Mariadb、openGauss、tidb、sqlite、QuestDB、influxdb、splunk、Cassandra、Neo4j</p>
+            </td>
+        </tr>
+        <tr id="row13911946141311">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p2911164610134"><a name="p2911164610134"></a><a name="p2911164610134"></a>distributed data store</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p4532111561119"><a name="p4532111561119"></a><a name="p4532111561119"></a>分布式存储</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <a name="ul3724104521013"></a><a name="ul3724104521013"></a><a name="p14911124612131"></a>算力瓶颈、内存瓶颈、IO瓶颈
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1091134671313"><a name="p1091134671313"></a><a name="p1091134671313"></a>storm、glusterFS、Ceph、Infinispan、ElasticSearch</p>
+            </td>
+        </tr>
+        <tr id="row3911174641312">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p491144611319"><a name="p491144611319"></a><a name="p491144611319"></a>big-data</p>
+            </td>
+                <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p953261521112"><a name="p953261521112"></a><a name="p953261521112"></a>大数据</p>
+            </td>
+                <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p129111046151315"><a name="p129111046151315"></a><a name="p129111046151315"></a>算力瓶颈、内存瓶颈</p>
+            </td>
+                <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p119111946161317"><a name="p119111946161317"></a><a name="p119111946161317"></a>Hadoop-hdfs、Hadoop-spark、hive</p>
+            </td>
+        </tr>
+        <tr id="row591112462132">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1791104661313"><a name="p1791104661313"></a><a name="p1791104661313"></a>middleware</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p453291517111"><a name="p453291517111"></a><a name="p453291517111"></a>中间件框架</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p591184671318"><a name="p591184671318"></a><a name="p591184671318"></a>算力瓶颈、网络瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p2912846121315"><a name="p2912846121315"></a><a name="p2912846121315"></a>Dubbo、Zookeeper、kafka、rabbitMQ、activeMQ、rocketMQ、etcd、karaf</p>
+            </td>
+        </tr>
+        <tr id="row59121246181320">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1391204619130"><a name="p1391204619130"></a><a name="p1391204619130"></a>in-memory-database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p65328153111"><a name="p65328153111"></a><a name="p65328153111"></a>内存数据库</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p3912164617133"><a name="p3912164617133"></a><a name="p3912164617133"></a>内存瓶颈、IO瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1691254621313"><a name="p1691254621313"></a><a name="p1691254621313"></a>Redis、Memcached、cachefilesd</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>operation</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>运维工具</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>算力瓶颈、网络瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>prometheus、ansible、puppet、zabbix</p>
+            </td>
+        </tr>
+        <tr id="row1891264641315">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 "><p id="p391214621312"><a name="p391214621312"></a><a name="p391214621312"></a>basic-test-suite</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p55324155117"><a name="p55324155117"></a><a name="p55324155117"></a>基础测试套</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1912164651319"><a name="p1912164651319"></a><a name="p1912164651319"></a>算力瓶颈、内存瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p9912746121311"><a name="p9912746121311"></a><a name="p9912746121311"></a>SPECCPU2006、SPECjbb2015</p>
+            </td>
+        </tr>
+        <tr id="row2912184671312">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1391213464130"><a name="p1391213464130"></a><a name="p1391213464130"></a>hpc</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p153210159118"><a name="p153210159118"></a><a name="p153210159118"></a>人类基因组</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p591214460137"><a name="p591214460137"></a><a name="p591214460137"></a>算力瓶颈、内存瓶颈、IO瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p391214619139"><a name="p391214619139"></a><a name="p391214619139"></a>Gatk4</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>virtualization</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>虚拟化</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>算力瓶颈、内存瓶颈、IO瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Consumer-cloud、Mariadb</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>docker</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>容器</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>算力瓶颈、内存瓶颈、IO瓶颈</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Mariadb</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>others</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>其他</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>-</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Encryption</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 
 # 2 安装与部署

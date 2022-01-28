@@ -4,7 +4,7 @@ English | [简体中文](./A-Tune用户指南.md)
 
 # Legal Statement
 
-**Copyright © Huawei Technologies Co., Ltd. 2020. All rights reserved.**
+**Copyright © openEuler 2020. All rights reserved.**
 
 Your replication, use, modification, and distribution of this document are governed by the Creative Commons License Attribution-ShareAlike 4.0 International Public License (CC BY-SA 4.0). You can visit https://creativecommons.org/licenses/by-sa/4.0/ to view a human-readable summary of (and not a substitute for) CC BY-SA 4.0. For the complete CC BY-SA 4.0, visit https://creativecommons.org/licenses/by-sa/4.0/legalcode.
 
@@ -64,29 +64,262 @@ Table 1-1 describes the main features supported by A-Tune, feature maturity, and
 
 | Feature                                                    | Maturity | Usage Suggestion |
 | ---------------------------------------------------------- | -------- | ---------------- |
-| Auto optimization of 15 applications in  11 workload types | Tested   | Pilot            |
+| Auto optimization of 50 applications in 14 workload types  | Tested   | Pilot            |
 | User-defined profile and service  models                   | Tested   | Pilot            |
 | Automatic parameter optimization                           | Tested   | Pilot            |
 
 **Supported Service Models**
 
-Based on the workload characteristics of applications, A-Tune classifies services into 11 types. For details about the bottleneck of each type and the applications supported by A-Tune, see Table 1-2.
+Based on the workload characteristics of applications, A-Tune classifies services into 14 types. For details about the bottleneck of each type and the applications supported by A-Tune, see Table 1-2.
 
 **Table 1-2** Supported workload types and applications
 
-| Service category   | Type                 | Bottleneck                                                   | Supported Application               |
-| ------------------ | -------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| default            | Default type         | Low resource usage in terms of cpu, memory, network, and I/O | N/A                                 |
-| webserver          | Web application      | Bottlenecks of cpu and network                               | Nginx, Apache Traffic Server        |
-| database           | Database             | Bottlenecks of cpu, memory, and I/O                          | Mongodb, Mysql, Postgresql, Mariadb |
-| big-data           | Big data             | Bottlenecks of cpu and memory                                | Hadoop-hdfs, Hadoop-spark           |
-| middleware         | Middleware framework | Bottlenecks of cpu and network                               | Dubbo                               |
-| in-memory-database | Memory database      | Bottlenecks of memory and I/O                                | Redis                               |
-| basic-test-suite   | Basic test suite     | Bottlenecks of cpu and memory                                | SPECCPU2006, SPECjbb2015            |
-| hpc                | Human genome         | Bottlenecks of cpu, memory, and I/O                          | Gatk4                               |
-| storage            | Storage              | Bottlenecks of network, and I/O                              | Ceph                                |
-| virtualization     | Virtualization       | Bottlenecks of cpu, memory, and I/O                          | Consumer-cloud, Mariadb             |
-| docker             | Docker               | Bottlenecks of cpu, memory, and I/O                          | Mariadb                             |
+<a name="table2819164611311"></a>
+<table>
+    <thead align="left">
+        <tr id="row49114466133">
+            <th class="cellrowborder" valign="top" width="22.12%" id="mcps1.2.5.1.1">
+                <p id="p09116467130"><a name="p09116467130"></a><a name="p09116467130"></a><strong
+                        id="b15640174472810"><a name="b15640174472810"></a><a name="b15640174472810"></a>Service
+                        category</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="12.959999999999999%" id="mcps1.2.5.1.2">
+                <p id="p953251510111"><a name="p953251510111"></a><a name="p953251510111"></a><strong
+                        id="b155287539280"><a name="b155287539280"></a><a name="b155287539280"></a>Type</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="37.269999999999996%" id="mcps1.2.5.1.3">
+                <p id="p169111846181310"><a name="p169111846181310"></a><a name="p169111846181310"></a><strong
+                        id="b1378654312217"><a name="b1378654312217"></a><a
+                        name="b1378654312217"></a>Bottleneck</strong></p>
+            </th>
+            <th class="cellrowborder" valign="top" width="27.650000000000002%" id="mcps1.2.5.1.4">
+                <p id="p1591144617135"><a name="p1591144617135"></a><a name="p1591144617135"></a><strong
+                        id="b1191411502021"><a name="b1191411502021"></a><a name="b1191411502021"></a>Supported
+                        Application</strong></p>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr id="row17911114651318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1791124631317"><a name="p1791124631317"></a><a name="p1791124631317"></a>default</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p45321515191120"><a name="p45321515191120"></a><a name="p45321515191120"></a>Default type</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p691184671312"><a name="p691184671312"></a><a name="p691184671312"></a>Low resource usage in
+                        terms of cpu, memory, network, and I/O</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p69111946131318"><a name="p69111946131318"></a><a name="p69111946131318"></a>N/A</p>
+            </td>
+        </tr>
+        <tr id="row791164631318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p179110461137"><a name="p179110461137"></a><a name="p179110461137"></a>webserver</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p20532111512117"><a name="p20532111512117"></a><a name="p20532111512117"></a>Web application</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1191117469133"><a name="p1191117469133"></a><a name="p1191117469133"></a>Bottlenecks of cpu and
+                        network</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p159111546161317"><a name="p159111546161317"></a><a name="p159111546161317"></a>Nginx, Apache Traffic Server, 
+                        Tomcat, Apache Http Server, Squid, Postfix, lighttpd</p>
+            </td>
+        </tr>
+        <tr id="row791164631318">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p179110461137"><a name="p179110461137"></a><a name="p179110461137"></a>ftp server</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p20532111512117"><a name="p20532111512117"></a><a name="p20532111512117"></a>ftp application</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1191117469133"><a name="p1191117469133"></a><a name="p1191117469133"></a>Bottlenecks of cpu and
+                        network</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p159111546161317"><a name="p159111546161317"></a><a name="p159111546161317"></a>vsftpd, proftpd</p>
+            </td>
+        </tr>
+        <tr id="row13911946141311">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p2911164610134"><a name="p2911164610134"></a><a name="p2911164610134"></a>database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p4532111561119"><a name="p4532111561119"></a><a name="p4532111561119"></a>Database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 "><a
+                    name="ul3724104521013"></a><a name="ul3724104521013"></a><a name="p1491144619136"></a>Bottlenecks of
+                    cpu, memory, and I/O
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1091134671313"><a name="p1091134671313"></a><a name="p1091134671313"></a>Mongodb, Mysql, Postgresql,
+                        Mariadb, openGauss, tidb, sqlite, QuestDB, influxdb, splunk, Cassandra, Neo4j
+                </p>
+            </td>
+        </tr>
+        <tr id="row13911946141311">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p2911164610134"><a name="p2911164610134"></a><a name="p2911164610134"></a>DDS</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p4532111561119"><a name="p4532111561119"></a><a name="p4532111561119"></a>distributed data store</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <a name="ul3724104521013"></a><a name="ul3724104521013"></a><a name="p14911124612131"></a>Bottlenecks of
+                        cpu, memory, and I/O
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1091134671313"><a name="p1091134671313"></a><a name="p1091134671313"></a>storm, glusterFS, Ceph, 
+                        Infinispan, ElasticSearch</p>
+            </td>
+        </tr>
+        <tr id="row3911174641312">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p491144611319"><a name="p491144611319"></a><a name="p491144611319"></a>big_data</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p953261521112"><a name="p953261521112"></a><a name="p953261521112"></a>Big data</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p129111046151315"><a name="p129111046151315"></a><a name="p129111046151315"></a>Bottlenecks of
+                        cpu and memory</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p119111946161317"><a name="p119111946161317"></a><a name="p119111946161317"></a>Hadoop-hdfs,
+                        Hadoop-spark, hive</p>
+            </td>
+        </tr>
+        <tr id="row591112462132">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1791104661313"><a name="p1791104661313"></a><a name="p1791104661313"></a>middleware</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p453291517111"><a name="p453291517111"></a><a name="p453291517111"></a>Middleware framework</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p591184671318"><a name="p591184671318"></a><a name="p591184671318"></a>Bottlenecks of cpu and
+                        network</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p2912846121315"><a name="p2912846121315"></a><a name="p2912846121315"></a>Dubbo, Zookeeper,
+                        kafka, rabbitMQ, activeMQ, rocketMQ, etcd, karaf</p>
+            </td>
+        </tr>
+        <tr id="row59121246181320">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1391204619130"><a name="p1391204619130"></a><a name="p1391204619130"></a>in-memory_database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p65328153111"><a name="p65328153111"></a><a name="p65328153111"></a>Memory database</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p3912164617133"><a name="p3912164617133"></a><a name="p3912164617133"></a>Bottlenecks of memory
+                        and I/O</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p1691254621313"><a name="p1691254621313"></a><a name="p1691254621313"></a>Redis, Memcached, cachefilesd</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>operation</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>O&M tools</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>Bottlenecks of cpu and
+                        network</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>prometheus, ansible,
+                        puppet, zabbix</p>
+            </td>
+        </tr>
+        <tr id="row1891264641315">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p391214621312"><a name="p391214621312"></a><a name="p391214621312"></a>basic-test-suite</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p55324155117"><a name="p55324155117"></a><a name="p55324155117"></a>Basic test suite</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p1912164651319"><a name="p1912164651319"></a><a name="p1912164651319"></a>Bottlenecks of cpu and
+                        memory</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p9912746121311"><a name="p9912746121311"></a><a name="p9912746121311"></a>SPECCPU2006,
+                        SPECjbb2015</p>
+            </td>
+        </tr>
+        <tr id="row2912184671312">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p1391213464130"><a name="p1391213464130"></a><a name="p1391213464130"></a>hpc</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p153210159118"><a name="p153210159118"></a><a name="p153210159118"></a>Human genome</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p591214460137"><a name="p591214460137"></a><a name="p591214460137"></a>Bottlenecks of cpu,
+                        memory, and I/O</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p391214619139"><a name="p391214619139"></a><a name="p391214619139"></a>Gatk4</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>virtualization</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>Virtualization</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>Bottlenecks of cpu,
+                        memory, and I/O</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Consumer-cloud,
+                        Mariadb</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>docker</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>Docker</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>Bottlenecks of cpu,
+                        memory, and I/O</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Mariadb</p>
+            </td>
+        </tr>
+        <tr id="row1991224641317">
+            <td class="cellrowborder" valign="top" width="22.12%" headers="mcps1.2.5.1.1 ">
+                <p id="p5912154613139"><a name="p5912154613139"></a><a name="p5912154613139"></a>others</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="12.959999999999999%" headers="mcps1.2.5.1.2 ">
+                <p id="p12532161561115"><a name="p12532161561115"></a><a name="p12532161561115"></a>others</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="37.269999999999996%" headers="mcps1.2.5.1.3 ">
+                <p id="p10912154631311"><a name="p10912154631311"></a><a name="p10912154631311"></a>-</p>
+            </td>
+            <td class="cellrowborder" valign="top" width="27.650000000000002%" headers="mcps1.2.5.1.4 ">
+                <p id="p11912164617133"><a name="p11912164617133"></a><a name="p11912164617133"></a>Encryption</p>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 
 
