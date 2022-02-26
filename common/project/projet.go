@@ -15,6 +15,7 @@ package project
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"math"
 	"os/exec"
@@ -361,7 +362,8 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		scripts = append(scripts, newScript)
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)
-	return nil, strings.Join(scripts, ",")
+	scriptsJson, _ := json.Marshal(scripts)
+	return nil, string(scriptsJson)
 }
 
 // RestartProject method call the StartWorkload and StopWorkload script to restart the service
@@ -397,7 +399,8 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 		scripts = append(scripts, startWorkload)
 	}
 
-	return nil, strings.Join(scripts, ",")
+	scriptsJson, _ := json.Marshal(scripts)
+	return nil, string(scriptsJson)
 }
 
 // MergeProject two yaml project to one object

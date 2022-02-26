@@ -15,6 +15,7 @@ package tuning
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -735,8 +736,15 @@ func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
 // SyncTune: sync tuned node
 func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 	log.Infof("setting params is: %s", string(o.Content))
-	commands := strings.Split(string(o.Content), ",")
+	var commands []string
+	err := json.Unmarshal([]byte(string(o.Content)), &commands)
+	if err != nil {
+		fmt.Errorf("invalid setting params! err: %v", err)
+		return err
+	}
+
 	for _, command := range commands {
+		log.Infof("execute setting command: %s", string(command))
 		_, err := project.ExecCommand(command)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", command, err)
