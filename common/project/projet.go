@@ -124,7 +124,7 @@ type RelationShip struct {
 // BenchMark method call the benchmark script
 func (y *YamlPrjCli) BenchMark() (string, string, error) {
 	benchStr := make([]string, 0)
-	benchOutByte, err := ExecCommand(y.Benchmark)
+	benchOutByte, err := ExecGetOutput(y.Benchmark)
 	if err != nil {
 		fmt.Println(string(benchOutByte))
 		return "", "", fmt.Errorf("failed to run benchmark, err: %v", err)
@@ -133,7 +133,7 @@ func (y *YamlPrjCli) BenchMark() (string, string, error) {
 	var sum float64
 	for index, evaluation := range y.Evaluations {
 		newScript := strings.Replace(evaluation.Info.Get, "$out", string(benchOutByte), -1)
-		bout, err := ExecCommand(newScript)
+		bout, err := ExecGetOutput(newScript)
 		if err != nil {
 			err = fmt.Errorf("failed to exec %s, err: %v", newScript, err)
 			return "", "", err
@@ -335,7 +335,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 			continue
 		}
 
-		out, err := ExecCommand(obj.Info.GetScript)
+		out, err := ExecGetOutput(obj.Info.GetScript)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", obj.Info.GetScript, err), ""
 		}
@@ -458,4 +458,10 @@ func ExecCommand(script string) ([]byte, error) {
 	}
 	_, err = cmd.Process.Wait()
 	return buf.Bytes(), err
+}
+
+//exec command and get complete output including subprocess 
+func ExecGetOutput(script string) ([]byte, error) {
+	cmd := exec.Command("sh", "-c", script)
+	return cmd.CombinedOutput()
 }
