@@ -845,7 +845,7 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	o.BackupFlag = true
 	initConfigure := make([]string, 0)
 	for _, item := range o.Prj.Object {
-		out, err := project.ExecCommand(item.Info.GetScript)
+		out, err := project.ExecGetOutput(item.Info.GetScript)
 		if err != nil {
 			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
 		}
