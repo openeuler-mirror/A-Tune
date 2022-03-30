@@ -55,7 +55,7 @@ cleanall: clean
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
 
-install: libinstall models restcerts enginecerts yaml-generator
+install: libinstall models restcerts enginecerts yaml-generator autoconfig
 
 collector-install:
 	@echo "BEGIN INSTALL A-Tune-Collector..."
@@ -104,6 +104,11 @@ libinstall:
 	\cp -rf profiles/* $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	chmod -R 750 $(DESTDIR)$(PREFIX)/lib/atuned/profiles/
 	@echo "END INSTALL A-Tune"
+
+autoconfig:
+	@echo "START UPDATE ATUNED CONFIG..."
+	@sh scripts/update_atuned_config.sh
+	@echo "END UPDATE ATUNED CONFIG"
 
 rpm:
 	cd .. && tar -zcvf v$(VERSION).tar.gz A-Tune
