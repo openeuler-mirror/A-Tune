@@ -78,6 +78,8 @@ II. Quick Guide
 
 #### Modify the network and disk configuration in the atuned.cnf file.
 
+Note: If the atuned service is installed by 'make install', NIC and disk have been automatically updated to the default device in current machine. If you need to collect data from other devices, configure atuned service according to following step.
+
 You can run the following command to query the NIC that needs to be specified for data collection or optimization and change the value of the network configuration item in the **/etc/atuned/atuned.cnf** file to the specified NIC.
 
 ```bash
@@ -165,6 +167,8 @@ atune-adm profile web-nginx-http-long-connection
 #### analysis command (online static tuning)
 
 This command is used to collect real-time statistics from the system to identify and automatically optimize workload types.
+
+Note: Some data collected by the analysis command are from the hard disk and network card configured in the atuned service configuration file (/etc/atuned/atuned.cnf). Before executing the command, check whether the configuration items are as expected. To collect data from other network cards or hard disk, you need to update the atuned service configuration file and restart the atuned service.
 
 Format:
 
