@@ -78,6 +78,8 @@ make install
 
 #### 修改atuned.cnf配置文件中网卡和磁盘的信息
 
+注：如果通过'make install'安装了atuned服务，网卡和磁盘已经自动更新为当前机器中的默认设备。如果需要从其他设备收集数据，请按照以下步骤配置 atuned 服务。
+
 通过以下命令可以查找当前需要采集或者执行网卡相关优化时需要指定的网卡，并修改/etc/atuned/atuned.cnf中的network配置选项为对应的指定网卡。
 
 ```shell
@@ -164,6 +166,8 @@ atune-adm profile web-nginx-http-long-connection
 #### analysis命令（在线静态调优）
 
 实时采集系统的信息进行负载类型的识别，并自动执行对应的优化。
+
+注：analysis命令采集的部分数据来源是 atuned 服务配置文件(/etc/atuned/atuned.cnf) 中配置的硬盘和网卡，执行命令前先检查其中的配置项是否符合预期，若需从其他网卡或硬盘采集数据，则需更新 atuned 服务配置文件，并重启 atuned 服务。
 
 接口语法：
 
