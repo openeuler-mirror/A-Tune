@@ -16,9 +16,10 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
-	"io/ioutil"
 )
 
 // Profile : the data that send to http backup and resume service

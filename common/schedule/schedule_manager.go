@@ -16,6 +16,11 @@ package schedule
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/sched"
@@ -24,10 +29,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sysload"
 	"gitee.com/openeuler/A-Tune/common/topology"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"strconv"
-	"strings"
-	"sync"
-	"time"
 )
 
 const period = 10

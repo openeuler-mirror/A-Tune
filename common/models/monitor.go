@@ -16,11 +16,12 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strings"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	HTTP "gitee.com/openeuler/A-Tune/common/http"
 	"gitee.com/openeuler/A-Tune/common/log"
-	"io/ioutil"
-	"strings"
 )
 
 // MonitorBody :the body send to monitor service

@@ -14,15 +14,6 @@
 package profile
 
 import (
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/http"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/models"
-	"gitee.com/openeuler/A-Tune/common/registry"
-	"gitee.com/openeuler/A-Tune/common/schedule"
-	"gitee.com/openeuler/A-Tune/common/sqlstore"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -35,6 +26,16 @@ import (
 	"time"
 
 	"github.com/go-ini/ini"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	"gitee.com/openeuler/A-Tune/common/schedule"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // Profile :profile implement setting profile

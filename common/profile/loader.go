@@ -15,9 +15,6 @@ package profile
 
 import (
 	"fmt"
-	CONF "gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"os"
 	"path"
 	"path/filepath"
@@ -25,6 +22,10 @@ import (
 	"strings"
 
 	"github.com/go-ini/ini"
+	
+	CONF "gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
 )
 
 func filter(vs []string) []string {

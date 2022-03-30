@@ -14,8 +14,6 @@
 package topology
 
 import (
-	"gitee.com/openeuler/A-Tune/common/cpumask"
-	"gitee.com/openeuler/A-Tune/common/log"
 	"container/list"
 	"fmt"
 	"io/ioutil"
@@ -24,6 +22,8 @@ import (
 	"strconv"
 	"strings"
 
+	"gitee.com/openeuler/A-Tune/common/cpumask"
+	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
 )
 

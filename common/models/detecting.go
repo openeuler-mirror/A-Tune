@@ -15,9 +15,10 @@ package models
 
 import (
 	"fmt"
+	"io/ioutil"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
-	"io/ioutil"
 )
 
 // Detecting : The data that send to http service for detecting

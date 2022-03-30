@@ -14,6 +14,10 @@
 package monitors
 
 import (
+	"os"
+	"path"
+	"strings"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/models"
@@ -21,9 +25,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/registry"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"os"
-	"path"
-	"strings"
 )
 
 func init() {

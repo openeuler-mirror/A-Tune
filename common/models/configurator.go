@@ -16,10 +16,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
 	"gitee.com/openeuler/A-Tune/common/log"
-	"io/ioutil"
 )
 
 // Configurator :body send to cpi service

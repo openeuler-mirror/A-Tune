@@ -14,9 +14,10 @@
 package filters
 
 import (
+	"errors"
+	
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/system"
-	"errors"
 )
 
 // IrqSchedule : irq schedule filter

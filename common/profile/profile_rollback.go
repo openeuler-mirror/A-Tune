@@ -15,16 +15,17 @@ package profile
 
 import (
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/models"
-	"gitee.com/openeuler/A-Tune/common/sqlstore"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"os"
 	"sort"
 	"strings"
 
 	"github.com/go-ini/ini"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // HistoryProfile :load profile history type

@@ -14,9 +14,10 @@
 package sqlstore
 
 import (
-	"gitee.com/openeuler/A-Tune/common/log"
 	"errors"
 	"strings"
+	
+	"gitee.com/openeuler/A-Tune/common/log"
 )
 
 // GetClasses method return item of table class_profile

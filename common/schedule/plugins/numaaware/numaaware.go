@@ -14,6 +14,10 @@
 package numaaware
 
 import (
+	"fmt"
+	"io/ioutil"
+	"strconv"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/schedule/framework"
@@ -21,9 +25,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/system"
 	"gitee.com/openeuler/A-Tune/common/topology"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
-	"io/ioutil"
-	"strconv"
 )
 
 // NumaAware pick node concerning NUMA topology

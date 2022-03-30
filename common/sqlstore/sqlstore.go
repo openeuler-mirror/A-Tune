@@ -14,14 +14,15 @@
 package sqlstore
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
 	"fmt"
 	"os"
 	"path"
 
 	"github.com/go-xorm/xorm"
 	_ "github.com/mattn/go-sqlite3" //import go-sqlite3 engine
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
 )
 
 var globalEngine *xorm.Engine

@@ -14,10 +14,6 @@
 package system
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/models"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"bufio"
 	"encoding/xml"
 	"fmt"
@@ -26,6 +22,11 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/models"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 type cpu struct {

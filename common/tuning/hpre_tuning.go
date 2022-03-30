@@ -16,14 +16,15 @@ package tuning
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/http"
-	"gitee.com/openeuler/A-Tune/common/log"
 	"io/ioutil"
 	"strings"
 
 	"github.com/caibirdme/yql"
 	"github.com/mitchellh/mapstructure"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/http"
+	"gitee.com/openeuler/A-Tune/common/log"
 )
 
 // Event : the content of response

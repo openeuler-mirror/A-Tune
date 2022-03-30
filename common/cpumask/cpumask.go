@@ -14,8 +14,9 @@
 package cpumask
 
 import (
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"strconv"
+	
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 const cpumaskNum = 10

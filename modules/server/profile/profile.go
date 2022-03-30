@@ -33,6 +33,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-ini/ini"
+	"github.com/mitchellh/mapstructure"
+	"github.com/urfave/cli"
+	"google.golang.org/grpc"
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	_ "gitee.com/openeuler/A-Tune/common/checker"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -46,11 +51,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/tuning"
 	"gitee.com/openeuler/A-Tune/common/utils"
-
-	"github.com/go-ini/ini"
-	"github.com/mitchellh/mapstructure"
-	"github.com/urfave/cli"
-	"google.golang.org/grpc"
 )
 
 // Monitor : the body send to monitor service

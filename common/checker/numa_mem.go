@@ -15,10 +15,11 @@ package checker
 
 import (
 	"bufio"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"os"
 	"strconv"
 	"strings"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
 )
 
 // NumaMem represent the memory topology type

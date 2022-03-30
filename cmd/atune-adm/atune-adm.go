@@ -14,14 +14,15 @@
 package main
 
 import (
-	"gitee.com/openeuler/A-Tune/common/config"
-	SVC "gitee.com/openeuler/A-Tune/common/service"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 	"os"
 	"sort"
 
 	"github.com/urfave/cli"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 const (

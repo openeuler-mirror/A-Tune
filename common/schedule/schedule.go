@@ -16,6 +16,13 @@ package schedule
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"io"
+	"os"
+	"strings"
+
+	"github.com/go-ini/ini"
+	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
@@ -24,12 +31,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/registry"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"io/ioutil"
-	"io"
-	"os"
-	"strings"
-
-	"github.com/go-ini/ini"
 )
 
 func sendChanToAdm(ch chan *PB.AckCheck, item string, status string, description string) {

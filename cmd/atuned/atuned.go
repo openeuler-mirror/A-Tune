@@ -17,12 +17,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/registry"
-	SVC "gitee.com/openeuler/A-Tune/common/service"
-	"gitee.com/openeuler/A-Tune/common/sqlstore"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"io/ioutil"
 	"net"
 	"os"
@@ -32,6 +26,13 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
+
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/registry"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/sqlstore"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 const (

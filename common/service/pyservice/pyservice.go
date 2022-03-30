@@ -15,9 +15,6 @@ package pyservice
 
 import (
 	"bufio"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/registry"
 	"io"
 	"os"
 	"os/exec"
@@ -25,6 +22,10 @@ import (
 	"path"
 	"strings"
 	"syscall"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/registry"
 )
 
 func init() {

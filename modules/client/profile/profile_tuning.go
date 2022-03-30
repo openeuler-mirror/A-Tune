@@ -15,12 +15,6 @@ package profile
 
 import (
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/client"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/project"
-	SVC "gitee.com/openeuler/A-Tune/common/service"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"io"
 	"strconv"
 	"strings"
@@ -28,6 +22,13 @@ import (
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/project"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 var profileTunningCommand = cli.Command{
