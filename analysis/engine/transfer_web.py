@@ -247,6 +247,6 @@ def get_file_list(file_type, res):
         modify = os.path.getmtime(filepath)
         times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
         current = {'name': each.rsplit('.', 1)[0], 'status': file_type, 'date': times,
-                'info': EngineConfig.engine_host}
+                   'info': EngineConfig.engine_host}
         res.append(current)
     return res, len(filelist)

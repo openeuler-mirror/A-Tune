@@ -104,7 +104,7 @@ class Optimizer(Resource):
                 from analysis.engine.database import trigger_tuning
                 client_ip = request.remote_addr
                 trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'],
-                        client_ip)
+                                              client_ip)
             return {}, 200
         if args["iterations"] == 0:
             total_eval = args["line"].split("|")[3].split("=")[1]
@@ -118,7 +118,7 @@ class Optimizer(Resource):
             if EngineConfig.db_enable:
                 from analysis.engine.database import trigger_tuning
                 trigger_tuning.change_tuning_baseline(args['prj_name'],
-                        utils.get_opposite_num(total_eval, True))
+                                                      utils.get_opposite_num(total_eval, True))
                 trigger_tuning.create_tuning_data_table(args['line'])
 
         out_queue = task[self.pipe]
@@ -136,7 +136,7 @@ class Optimizer(Resource):
             if EngineConfig.db_enable:
                 from analysis.engine.database import trigger_tuning
                 table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'],
-                        args['line'])
+                                                            args['line'])
                 if table_name is not None:
                     trigger_tuning.change_tuning_status(table_name, args['prj_name'])
 

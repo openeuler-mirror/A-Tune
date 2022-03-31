@@ -97,7 +97,7 @@ class GridSearchTuningManager:
                 option.append(space[key])
                 name.append(key)
                 LOGGER.info('key: %s,  value: %s, type: %s', key,
-                             space[key], self._dict_para_type[key])
+                            space[key], self._dict_para_type[key])
                 if self._dict_para_type[key] == 'int':
                     params[key] = int(space[key])
                 elif self._dict_para_type[key] == 'float':

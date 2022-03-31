@@ -125,15 +125,15 @@ class WorkloadCharacterization:
         model = svm.SVC(kernel=kernel, C=100, class_weight='balanced', gamma='auto')
         if search:
             tuned_parameters = [
-                    {'C': range(10, 200, 20), 'kernel':['poly'],
-                     'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
-                    {'C': range(10, 200, 20), 'kernel':['rbf'],
-                     'gamma':['scale', 'auto']},
-                    {'C': range(10, 200, 20), 'kernel':['sigmoid'],
-                     'gamma':['scale', 'auto']},
-                    ]
+                {'C': range(10, 200, 20), 'kernel':['poly'],
+                 'degree': range(1, 10, 2), 'gamma':['scale', 'auto']},
+                {'C': range(10, 200, 20), 'kernel':['rbf'],
+                 'gamma':['scale', 'auto']},
+                {'C': range(10, 200, 20), 'kernel':['sigmoid'],
+                 'gamma':['scale', 'auto']},
+            ]
             model = GridSearchCV(estimator=model, param_grid=tuned_parameters,
-                    cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
+                                 cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
         model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
         print("the accuracy of svc classifier is %f" % accuracy_score(y_test, y_pred))
@@ -150,7 +150,7 @@ class WorkloadCharacterization:
         """
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
         model = RandomForestClassifier(n_estimators=150, class_weight='balanced',
-                oob_score=True, random_state=0, n_jobs=-1)
+                                       oob_score=True, random_state=0, n_jobs=-1)
         if search:
             tuned_parameters = {'n_estimators': range(100, 400, 50),
                     'criterion':['gini', 'entropy'], 'max_features': ['sqrt', 'log2']}

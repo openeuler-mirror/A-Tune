@@ -80,9 +80,9 @@ DETECT_POST_PARSER.add_argument('detectpath', type=str, help="The path of file t
 
 TRANSFER_PUT_PARSER = reqparse.RequestParser()
 TRANSFER_PUT_PARSER.add_argument('type', type=str, required=True,
-        help="type of data can not be null")
+                                 help="type of data can not be null")
 TRANSFER_PUT_PARSER.add_argument('collect_id', type=int, required=True,
-        help="Collection id can not be null")
+                                 help="Collection id can not be null")
 TRANSFER_PUT_PARSER.add_argument('status', type=str, required=True, help="Status can not be null")
 TRANSFER_PUT_PARSER.add_argument('collect_data', type=str, required=False, help="Collection data")
 TRANSFER_PUT_PARSER.add_argument('workload_type', type=str, required=False, help="Workload type")

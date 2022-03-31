@@ -38,8 +38,8 @@ class UserAccount(BASE):
     )
 
     def __repr__(self):
-        return "<user_account(user_id='%s', info='%s %s', limitaion='%s')>" % (self.user_id,
-                self.account_name, self.email,self.limitation)
+        return "<user_account(user_id='%s', info='%s %s', limitaion='%s')>" % \
+                (self.user_id, self.account_name, self.email,self.limitation)
 
     @staticmethod
     def find_user(uid, session):

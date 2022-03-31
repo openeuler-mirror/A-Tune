@@ -69,7 +69,7 @@ def create_tuning_data_table(line):
         table_name = 'tuning_' + str(tid)
         metadata = MetaData()
         table, init_key, init_val, pairs = table_tuning_data.initial_table(table_name, metadata,
-                line)
+                                                                           line)
         if table is None:
             LOGGER.info('Data in tuning_data does not match what desired')
             return
@@ -198,12 +198,12 @@ def get_tuning_info(status, name):
         response['status'] = status
         response['file_name'] = name
         response['engine'] = tuning_table.get_field_by_name(TuningTable.tuning_engine, name,
-                session)
+                                                            session)
         response['round'] = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
         response['base'] = tuning_table.get_field_by_name(TuningTable.baseline, name, session)
         tid = tuning_table.get_field_by_name(TuningTable.tuning_id, name, session)
         response['parameter'] = table_tuning_data.get_param_by_table_name('tuning_' + str(tid),
-                session)
+                                                                          session)
         response['line'] = 0
     except SQLAlchemyError as err:
         LOGGER.error('Get tuning info failed: %s', err)

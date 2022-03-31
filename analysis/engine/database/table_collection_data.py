@@ -37,10 +37,10 @@ def initial_table(table_name, session):
     """initial collection data table"""
     metadata = MetaData()
     table = Table(table_name, metadata,
-            Column('collection_id', Integer, primary_key=True, nullable=False),
-            Column('round', Integer, primary_key=True, nullable=False),
-            Column('timestamp', VARCHAR(255), nullable=True)
-            )
+                  Column('collection_id', Integer, primary_key=True, nullable=False),
+                  Column('round', Integer, primary_key=True, nullable=False),
+                  Column('timestamp', VARCHAR(255), nullable=True)
+                 )
     engine = create_engine(get_db_url())
     metadata.create_all(engine)
     sql = 'insert into ' + table_name + ' values (-1, -1, \'timeStamp\')'
