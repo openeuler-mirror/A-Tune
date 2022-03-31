@@ -4,7 +4,7 @@ startworkload : ""
 stopworkload : ""
 object :
  -
-   name : "scheduler"    
+   name : "scheduler"
    info :
           desc : "The scheduler of disk."
           get : "cat /sys/block/sda/queue/scheduler |awk  -F '[][]' '{print $2}'"    #get the scheduler of the disk
@@ -22,12 +22,12 @@ object :
    name : "bs"
    info :
            desc : "Block size."
-           get : "cat fio/fio-test.sh |grep ^BLOCKSIZE |awk -F '=' '{print $2}'" 
+           get : "cat fio/fio-test.sh |grep ^BLOCKSIZE |awk -F '=' '{print $2}'"
            set : "sed -i 's/^BLOCKSIZE=.*/BLOCKSIZE=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "discrete"
            options :
-                   - "4k"          
+                   - "4k"
                    - "128k"
                    - "256k"
                    - "512k"
@@ -37,7 +37,7 @@ object :
    name : "numjobs"
    info :
            desc : "Number of jobs for the test."
-           get : "cat fio/fio-test.sh |grep ^NUMJOBS |awk -F '=' '{print $2}'"      
+           get : "cat fio/fio-test.sh |grep ^NUMJOBS |awk -F '=' '{print $2}'"
            set : "sed -i 's/^NUMJOBS=.*/NUMJOBS=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "continuous"
@@ -50,20 +50,20 @@ object :
    name : "size"
    info :
            desc : "Test file size."
-           get : "cat fio/fio-test.sh |grep ^SIZE |awk -F '=' '{print $2}'" 
+           get : "cat fio/fio-test.sh |grep ^SIZE |awk -F '=' '{print $2}'"
            set : "sed -i 's/^SIZE=.*/SIZE=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "discrete"
            options :
-                   - "10G"    
+                   - "10G"
                    - "100G"
                    - "300G"
            dtype : "string"
  -
-   name : "direct"     
+   name : "direct"
    info :
            desc : "Whether use cache or not."
-           get : "cat fio/fio-test.sh |grep ^DIRECT |awk -F '=' '{print $2}'" 
+           get : "cat fio/fio-test.sh |grep ^DIRECT |awk -F '=' '{print $2}'"
            set : "sed -i 's/^DIRECT=.*/DIRECT=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "discrete"
@@ -75,7 +75,7 @@ object :
    name : "rw"
    info :
            desc : "Test type."
-           get : "cat fio/fio-test.sh |grep ^RW |awk -F '=' '{print $2}'" 
+           get : "cat fio/fio-test.sh |grep ^RW |awk -F '=' '{print $2}'"
            set : "sed -i 's/^RW=.*/RW=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "discrete"
@@ -92,7 +92,7 @@ object :
    name : "iodepth"
    info :
            desc : "Iodepth of the test."
-           get : "cat fio/fio-test.sh |grep ^IODEPTH |awk -F '=' '{print $2}'"      
+           get : "cat fio/fio-test.sh |grep ^IODEPTH |awk -F '=' '{print $2}'"
            set : "sed -i 's/^IODEPTH=.*/IODEPTH=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "continuous"
@@ -106,12 +106,12 @@ object :
    name : "runtime"
    info :
            desc : "Time of the test."
-           get : "cat fio/fio-test.sh |grep ^RUNTIME |awk -F '=' '{print $2}'" 
+           get : "cat fio/fio-test.sh |grep ^RUNTIME |awk -F '=' '{print $2}'"
            set : "sed -i 's/^RUNTIME=.*/RUNTIME=$value/g'  fio/fio-test.sh"
            needrestart : "false"
            type : "discrete"
            options :
                    - "30"
                    - "300"
-           dtype : "string"          
-      
+           dtype : "string"
+
