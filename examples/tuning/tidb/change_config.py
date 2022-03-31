@@ -37,11 +37,11 @@ def set_confi(config_file, source_data_file):
                 key = str_line.split("=")[0].split("__")[1]
                 value = str_line.split("=")[1]
                 set_list.append([section, key, value])
-    
+
     for config in set_list:
         #config_data.set(config[0], config[1], config[2])
         config_data[config[0]][config[1]] = config[2]
-    
+
     with open(config_file, 'w+') as f:
         config_data.write(f)
 

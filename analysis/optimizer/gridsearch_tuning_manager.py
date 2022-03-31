@@ -82,7 +82,7 @@ class GridSearchTuningManager:
                 config[key] = val
                 ret_para.append(copy.deepcopy(config))
         return ret_para
-        
+
     def do_gridsearch(self, num_done):
         """do the gridsearch on the spaces"""
         spaces = self.expand_parameters(self._dict_para)
