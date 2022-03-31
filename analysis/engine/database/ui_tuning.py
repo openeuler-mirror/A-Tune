@@ -67,7 +67,8 @@ class UiTuning(Resource):
                 if not transfer_web.tuning_exist('finished', name):
                     response_obj['isExist'] = False
                     return json.dumps(response_obj), 200, CORS
-                return json.dumps(transfer_web.get_file_data('finished', name, line, response_obj)), 200, CORS
+                return json.dumps(transfer_web.get_file_data('finished', name, line, \
+                        response_obj)), 200, CORS
 
             if cmd == 'getTuningData':
                 name = args.get('name')
@@ -78,7 +79,8 @@ class UiTuning(Resource):
                 if not transfer_web.tuning_exist(status, name):
                     response_obj['isExist'] = False
                     return json.dumps(response_obj), 200, CORS
-                return json.dumps(transfer_web.get_file_data(status, name, line, response_obj)), 200, CORS
+                return json.dumps(transfer_web.get_file_data(status, name, line, \
+                        response_obj)), 200, CORS
 
             if cmd == 'getTuningStatus':
                 name = args.get('name')

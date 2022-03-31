@@ -24,7 +24,8 @@ OPTIMIZER_POST_PARSER.add_argument('knobs', type=list, location='json',
                                    help="knobs list cannot be null")
 OPTIMIZER_POST_PARSER.add_argument('engine',
                                    choices=('random', 'forest', 'gbrt', 'extraTrees',
-                                            'bayes', 'abtest', 'lhs', 'tpe', 'gridsearch', 'traverse'),
+                                            'bayes', 'abtest', 'lhs', 'tpe', 'gridsearch',
+                                            'traverse'),
                                    help='engine choice: {error_msg}')
 OPTIMIZER_POST_PARSER.add_argument('random_starts', type=int, location='json',
                                    help="random_starts cannot be null")
@@ -78,7 +79,8 @@ DETECT_POST_PARSER.add_argument('appname', required=True, help="The appname path
 DETECT_POST_PARSER.add_argument('detectpath', type=str, help="The path of file to be detect")
 
 TRANSFER_PUT_PARSER = reqparse.RequestParser()
-TRANSFER_PUT_PARSER.add_argument('type', type=str, required=True, help="type of data can not be null")
+TRANSFER_PUT_PARSER.add_argument('type', type=str, required=True,
+        help="type of data can not be null")
 TRANSFER_PUT_PARSER.add_argument('collect_id', type=int, required=True,
         help="Collection id can not be null")
 TRANSFER_PUT_PARSER.add_argument('status', type=str, required=True, help="Status can not be null")

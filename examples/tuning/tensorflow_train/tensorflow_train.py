@@ -57,7 +57,8 @@ elif OPTIMIZER == "adadelta":
         metrics=['sparse_categorical_accuracy'])
 
 start = time.time()
-history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=1, validation_data=(x_test, y_test), verbose=0)
+history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=1,
+        validation_data=(x_test, y_test), verbose=0)
 end = time.time()
 
 print("accuracy = %f" % history.history['sparse_categorical_accuracy'][0])

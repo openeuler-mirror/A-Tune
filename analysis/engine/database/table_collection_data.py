@@ -102,7 +102,8 @@ def exist_column(table_name, col_name, session):
 
 def insert_new_column(table_name, col_name, param, session):
     """insert new column to collection_data table"""
-    sql = 'alter table ' + table_name + ' add column if not exists ' + col_name + ' varchar(255) default null'
+    sql = 'alter table ' + table_name + ' add column if not exists ' + col_name + \
+        ' varchar(255) default null'
     session.execute(sql)
     update_sql = 'update ' + table_name + ' set ' + col_name + ' = :param where collection_id = -1'
     session.execute(text(update_sql), {'param': param})
@@ -118,7 +119,8 @@ def get_table_name(ip):
 def get_line(cip, cid, start, end, session):
     """get selected line by cid and line range, return data & round"""
     table_name = get_table_name(cip)
-    sql = 'select * from ' + table_name + ' where collection_id = :id and round > :round1 and round <= :round2'
+    sql = 'select * from ' + table_name + \
+        ' where collection_id = :id and round > :round1 and round <= :round2'
     res = session.execute(text(sql), {'id': cid, 'round1': start, 'round2': end}).fetchall()
     if len(res) == 0:
         return [], []

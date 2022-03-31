@@ -148,7 +148,8 @@ def get_analysis_list():
                 filepath = ANALYSIS_DATA_PATH + each
                 modify = os.path.getmtime(filepath)
                 times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
-                temp = {'name': filename, 'status': 'finished', 'date': times, 'info': EngineConfig.engine_host}
+                temp = {'name': filename, 'status': 'finished', 'date': times,
+                        'info': EngineConfig.engine_host}
                 res.append(temp)
     res = sorted(res, key=(lambda x:x['date']), reverse=True)
     response_object['analysis'] = res
@@ -245,6 +246,7 @@ def get_file_list(file_type, res):
         filepath = path + '/' + each
         modify = os.path.getmtime(filepath)
         times = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(modify))
-        current = {'name': each.rsplit('.', 1)[0], 'status': file_type, 'date': times, 'info': EngineConfig.engine_host}
+        current = {'name': each.rsplit('.', 1)[0], 'status': file_type, 'date': times,
+                'info': EngineConfig.engine_host}
         res.append(current)
     return res, len(filelist)

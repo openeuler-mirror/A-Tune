@@ -115,7 +115,8 @@ def zip_key_value(key, val_array):
 
 def get_tuning_options(param):
     """get options by current env value, range, and step"""
-    if param is None or param["range"] is None or param["step"] == 0 or param["options"] is not None:
+    if param is None or param["range"] is None or param["step"] == 0 or \
+            param["options"] is not None:
         return param
 
     values = re.findall(r'[0-9]+', param["ref"])
