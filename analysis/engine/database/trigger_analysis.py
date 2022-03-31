@@ -90,7 +90,8 @@ def change_collection_status(cid, cip, status, types):
     try:
         collection_table = CollectionTable()
         curr_status = collection_table.get_field_by_key(CollectionTable.collection_status,
-                CollectionTable.collection_id, cid, session)
+                                                        CollectionTable.collection_id,
+                                                        cid, session)
         if curr_status != status:
             collection_table.update_status(cid, status, session)
 
@@ -115,7 +116,8 @@ def change_collection_info(cid, workload):
     try:
         collection_table = CollectionTable()
         curr_workload = collection_table.get_field_by_key(CollectionTable.workload_type,
-                CollectionTable.collection_id, cid, session)
+                                                          CollectionTable.collection_id,
+                                                          cid, session)
         if curr_workload is None or curr_workload == '':
             names = collection_table.get_field_by_key(CollectionTable.collection_name,
                     CollectionTable.collection_id, cid, session)
@@ -191,7 +193,7 @@ def get_collection_data_dirs(cip, cid, csv_line, response, session):
     """get collection data"""
     header, _ = table_collection_data.get_line(cip, -1, -2, -1, session)
     data, response['round'] = table_collection_data.get_line(cip, cid, csv_line, csv_line + 10,
-            session)
+                                                             session)
     for i, val in enumerate(data):
         if val[0] is None:
             del data[i]
@@ -220,9 +222,9 @@ def get_analysis_data(name, csv_line, log_line):
     try:
         collection_table = CollectionTable()
         cid = collection_table.get_field_by_key(CollectionTable.collection_id,
-                CollectionTable.collection_name, name, session)
+                                                CollectionTable.collection_name, name, session)
         cip = collection_table.get_field_by_key(CollectionTable.collection_ip,
-                CollectionTable.collection_name, name, session)
+                                                CollectionTable.collection_name, name, session)
         get_collection_data_dirs(cip, cid, csv_line, response, session)
         get_analysis_log_dirs(cid, log_line, response, session)
         workload = collection_table.get_field_by_key(CollectionTable.workload_type,
@@ -230,7 +232,7 @@ def get_analysis_data(name, csv_line, log_line):
         if workload is not None:
             response['workload'] = workload
         status = collection_table.get_field_by_key(CollectionTable.collection_status,
-                CollectionTable.collection_id, cid, session)
+                                                   CollectionTable.collection_id, cid, session)
         if csv_line < response['nextCsv'] or log_line < response['nextLog']:
             response['hasNext'] = True
             response['interval'] = 0
@@ -257,9 +259,9 @@ def get_compare_collection(name, csv_line):
     try:
         collection_table = CollectionTable()
         cid = collection_table.get_field_by_key(CollectionTable.collection_id,
-                CollectionTable.collection_name, name, session)
+                                                CollectionTable.collection_name, name, session)
         cip = collection_table.get_field_by_key(CollectionTable.collection_ip,
-                CollectionTable.collection_name, name, session)
+                                                CollectionTable.collection_name, name, session)
         get_collection_data_dirs(cip, cid, csv_line, response, session)
         if csv_line < response['nextCsv']:
             response['hasNext'] = True

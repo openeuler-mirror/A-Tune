@@ -41,24 +41,24 @@ model = tf.keras.models.Sequential([
 
 if OPTIMIZER == "adam":
     model.compile(optimizer= tf.keras.optimizers.Adam(lr = LEARNING_RATE),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-        metrics=['sparse_categorical_accuracy'])
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['sparse_categorical_accuracy'])
 elif OPTIMIZER == "sgd":
     model.compile(optimizer= tf.keras.optimizers.SGD(lr = LEARNING_RATE),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-        metrics=['sparse_categorical_accuracy'])
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['sparse_categorical_accuracy'])
 elif OPTIMIZER == "adagrad":
     model.compile(optimizer= tf.keras.optimizers.Adagrad(lr = LEARNING_RATE),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-        metrics=['sparse_categorical_accuracy'])
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['sparse_categorical_accuracy'])
 elif OPTIMIZER == "adadelta":
     model.compile(optimizer= tf.keras.optimizers.Adadelta(lr = LEARNING_RATE),
-        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-        metrics=['sparse_categorical_accuracy'])
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['sparse_categorical_accuracy'])
 
 start = time.time()
 history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=1,
-        validation_data=(x_test, y_test), verbose=0)
+                    validation_data=(x_test, y_test), verbose=0)
 end = time.time()
 
 print("accuracy = %f" % history.history['sparse_categorical_accuracy'][0])

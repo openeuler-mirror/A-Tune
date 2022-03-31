@@ -39,9 +39,9 @@ class AnalysisLog(BASE):
     )
 
     def __repr__(self):
-        return "<analysis_log(analysis='%s %s %s %s %s %s', id='%s')>" % (self.round_num,
-                self.section, self.status, self.analysis_key, self.analysis_value,
-                self.notes, self.fk_analysis)
+        return "<analysis_log(analysis='%s %s %s %s %s %s', id='%s')>" % \
+                (self.round_num, self.section, self.status, self.analysis_key, self.analysis_value,
+                 self.notes, self.fk_analysis)
 
     @staticmethod
     def insert_log(aid, rounds, data, session):

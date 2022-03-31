@@ -34,7 +34,7 @@ def encrypt_code(code):
     files.close()
 
     encrypts = Cipher(algorithms.AES(key), modes.GCM(iv),
-            backend=default_backend()).encryptor()
+                      backend=default_backend()).encryptor()
     res = encrypts.update(code)
     print('pwd: ', convert_to_base64(res))
     print('key: ', convert_to_base64(key))

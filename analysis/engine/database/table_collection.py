@@ -40,9 +40,9 @@ class CollectionTable(BASE):
     def __repr__(self):
         return "<collection_table(collection='%s %s %s %s %s', round='%s %s')>" \
                 % (self.collection_id, self.collection_name, self.collection_status,
-                        self.collection_date, self.collection_ip,
-                        0 if self.total_round is None else self.total_round,
-                        0 if self.total_log is None else self.total_log)
+                   self.collection_date, self.collection_ip,
+                   0 if self.total_round is None else self.total_round,
+                   0 if self.total_log is None else self.total_log)
 
     @staticmethod
     def insert_new_collection(cid, cip, session):
@@ -51,7 +51,7 @@ class CollectionTable(BASE):
         times = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
         name = int(time.mktime(localtime))
         sql = insert(CollectionTable).values(collection_id=cid, collection_status='running',
-                collection_ip=cip, collection_date=times, collection_name=str(name))
+                     collection_ip=cip, collection_date=times, collection_name=str(name))
         res = session.execute(sql)
         return res is not None
 
@@ -82,9 +82,9 @@ class CollectionTable(BASE):
     def get_all_collection_by_ip(cip, session):
         """get all collections by cip as a list"""
         sql = select([CollectionTable.collection_name, CollectionTable.collection_status,
-            CollectionTable.collection_date, CollectionTable.collection_ip]) \
-                    .where(CollectionTable.collection_ip == cip) \
-                    .order_by(CollectionTable.collection_id.desc())
+                     CollectionTable.collection_date, CollectionTable.collection_ip]) \
+                     .where(CollectionTable.collection_ip == cip) \
+                     .order_by(CollectionTable.collection_id.desc())
         res = session.execute(sql).fetchall()
         dicts = ['name', 'status', 'date', 'info']
         return utils.zip_key_value(dicts, res)

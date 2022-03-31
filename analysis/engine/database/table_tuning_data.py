@@ -29,9 +29,9 @@ LOGGER = logging.getLogger(__name__)
 def initial_table(table_name, metadata, line):
     """initial columns in tuning table"""
     table = Table(table_name, metadata,
-            Column('_round', Integer, primary_key=True),
-            Column('_cost', VARCHAR(255), nullable=False)
-            )
+                  Column('_round', Integer, primary_key=True),
+                  Column('_cost', VARCHAR(255), nullable=False)
+                 )
     init_key = '(_round, _cost'
     init_val = '(:_round, :_cost'
     pairs = {'_round': 0, '_cost': 'cost'}
@@ -79,7 +79,7 @@ def execute_tuning_data(table, iteration, line, session):
     keys = '(_round, _cost'
     vals = '(:_round, :_cost'
     pairs = {'_round': iteration,
-            '_cost': utils.get_time_difference(line.split('|')[2], line.split('|')[1])}
+             '_cost': utils.get_time_difference(line.split('|')[2], line.split('|')[1])}
     params = line.split('|')[-2:]
     if len(params) != 2:
         return None, '', ''

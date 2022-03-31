@@ -183,9 +183,9 @@ class KnobTraverseManager:
                     param_differ_perform_map[param_name] = abs(performance[index] - performance[0])
                 else:
                     param_differ_perform_map[param_name] = abs(performance[index] - 
-                            performance[index + 1])
+                                                               performance[index + 1])
                     param_performance_map[param_name] = min(param_performance_map[param_name],
-                            performance[index + 1])
+                                                            performance[index + 1])
                     index += 1
 
             index += 1

@@ -67,34 +67,37 @@ class AtunedConfig:
         AtunedConfig.port = get_or_default(config, 'server', 'port', None)
         AtunedConfig.grpc_tls = get_or_default_bool(config, 'server', 'grpc_tls', False)
         if AtunedConfig.grpc_tls:
-            AtunedConfig.grpc_ca_file = get_or_default(config, 'server',
-                    'tlsservercafile', GRPC_CERT_PATH + 'ca.crt')
-            AtunedConfig.grpc_server_cert = get_or_default(config, 'server',
-                    'tlsservercertfile', GRPC_CERT_PATH + 'server.crt')
-            AtunedConfig.grpc_server_key = get_or_default(config, 'server',
-                    'tlsserverkeyfile', GRPC_CERT_PATH + 'server.key')
+            AtunedConfig.grpc_ca_file = get_or_default(config, 'server', 'tlsservercafile',
+                                                       GRPC_CERT_PATH + 'ca.crt')
+            AtunedConfig.grpc_server_cert = get_or_default(config, 'server', 'tlsservercertfile',
+                                                           GRPC_CERT_PATH + 'server.crt')
+            AtunedConfig.grpc_server_key = get_or_default(config, 'server', 'tlsserverkeyfile',
+                                                          GRPC_CERT_PATH + 'server.key')
         AtunedConfig.sample_num = get_or_default(config, 'server', 'sample_num', '20')
         AtunedConfig.interval = get_or_default(config, 'server', 'interval', '5')
         AtunedConfig.rest_host = get_or_default(config, 'server', 'rest_host', 'localhost')
         AtunedConfig.rest_port = get_or_default(config, 'server', 'rest_port', '8383')
         AtunedConfig.rest_tls = get_or_default_bool(config, 'server', 'rest_tls', False)
         if AtunedConfig.rest_tls:
-            AtunedConfig.rest_ca_file = get_or_default(config, 'server',
-                    'tlsrestcacertfile', REST_CERT_PATH + 'ca.crt')
+            AtunedConfig.rest_ca_file = get_or_default(config, 'server', 'tlsrestcacertfile',
+                                                       REST_CERT_PATH + 'ca.crt')
             AtunedConfig.rest_server_cert = get_or_default(config, 'server',
-                    'tlsrestservercertfile', REST_CERT_PATH + 'server.crt')
-            AtunedConfig.rest_server_key = get_or_default(config, 'server',
-                    'tlsrestserverkeyfile', REST_CERT_PATH + 'server.key')
+                                                           'tlsrestservercertfile',
+                                                           REST_CERT_PATH + 'server.crt')
+            AtunedConfig.rest_server_key = get_or_default(config, 'server', 'tlsrestserverkeyfile',
+                                                          REST_CERT_PATH + 'server.key')
         AtunedConfig.engine_host = get_or_default(config, 'server', 'engine_host', 'localhost')
         AtunedConfig.engine_port = get_or_default(config, 'server', 'engine_port', '3838')
         AtunedConfig.engine_tls = get_or_default_bool(config, 'server', 'engine_tls', False)
         if AtunedConfig.engine_tls:
-            AtunedConfig.engine_ca_file = get_or_default(config, 'server',
-                    'tlsenginecacertfile', ENGINE_CERT_PATH + 'ca.crt')
+            AtunedConfig.engine_ca_file = get_or_default(config, 'server', 'tlsenginecacertfile',
+                                                         ENGINE_CERT_PATH + 'ca.crt')
             AtunedConfig.engine_client_cert = get_or_default(config, 'server',
-                    'tlsengineclientcertfile', ENGINE_CERT_PATH + 'client.crt')
+                                                             'tlsengineclientcertfile',
+                                                             ENGINE_CERT_PATH + 'client.crt')
             AtunedConfig.engine_client_key = get_or_default(config, 'server',
-                    'tlsengineclientkeyfile', ENGINE_CERT_PATH + 'client.key')
+                                                            'tlsengineclientkeyfile',
+                                                            ENGINE_CERT_PATH + 'client.key')
         AtunedConfig.level = get_or_default(config, 'log', 'level', 'info')
         AtunedConfig.module = get_or_default(config, 'monitor', 'module', 'mem_topo, cpu_topo')
         AtunedConfig.disk = get_or_default(config, 'system', 'disk', 'sda')

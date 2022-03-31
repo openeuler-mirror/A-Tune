@@ -49,7 +49,7 @@ def add_data(path, cip, uid, session):
             for index, col in enumerate(headers):
                 if not table_collection_data.exist_column(table_name, col, session):
                     table_collection_data.insert_new_column(table_name, col, real_headers[index],
-                            session)
+                                                            session)
             keys = '(collection_id, round, ' + ', '.join(col for col in headers)
             vals = '(:collection_id, :round, :' + ', :'.join(col for col in headers)
             keys = keys + ')'
@@ -80,12 +80,12 @@ def find_or_initial_ip(uid, ip, session):
 if __name__ == '__main__':
     ARG_PARSER = argparse.ArgumentParser(description='Offer path and IP to save data to database')
     ARG_PARSER.add_argument('-p', '--path', required=True,
-            help='Path of csv file that contains data')
+                            help='Path of csv file that contains data')
     ARG_PARSER.add_argument('-i', '--host', required=True, help='IP that generated file')
     ARG_PARSER.add_argument('-e', '--user_email',
-            help='User email for user that can view this data')
+                            help='User email for user that can view this data')
     ARG_PARSER.add_argument('-w', '--password',
-            help='User password for user that can view this data')
+                            help='User password for user that can view this data')
     ARGS = ARG_PARSER.parse_args()
 
     if (not ARGS.user_email and ARGS.password) or (ARGS.user_email and not ARGS.password):

@@ -104,7 +104,7 @@ class WeightedEnsembleFeatureSelector:
             sorted_index_queue = multiprocessing.Queue()
             prediction_queue = multiprocessing.Queue()
             fs_thread = FeatureSelectorProcess(regressor, list_sample_x, list_sample_y,
-                    labels, index, sorted_index_queue, prediction_queue)
+                                               labels, index, sorted_index_queue, prediction_queue)
             fs_thread_list.append(fs_thread)
             sorted_index_queue_list.append(sorted_index_queue)
             prediction_queue_list.append(prediction_queue)
