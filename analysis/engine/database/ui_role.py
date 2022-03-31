@@ -22,7 +22,6 @@ from flask_restful import Resource
 
 from analysis.engine.parser import UI_ROLE_GET_PARSER
 from analysis.engine.config import EngineConfig
-from analysis.engine import transfer_web
 from analysis.engine.database import trigger_user
 
 LOGGER = logging.getLogger(__name__)

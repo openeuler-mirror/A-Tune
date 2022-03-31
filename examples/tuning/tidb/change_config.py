@@ -15,7 +15,6 @@
 """
 Initialize openEuler center-repo.The source is from https://repo.openeuler.org
 """
-import os
 import sys
 import argparse
 from configparser import ConfigParser
