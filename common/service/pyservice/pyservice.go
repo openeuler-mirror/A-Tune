@@ -55,6 +55,7 @@ func (p *PyEngine) Run() error {
 	cmdSlice = append(cmdSlice, path.Join(config.DefaultConfPath, "atuned.cnf"))
 
 	cmdStr := strings.Join(cmdSlice, " ")
+	log.Debugf("start pyservice: %s", cmdStr)
 	cmd := exec.Command("sh", "-c", cmdStr)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 

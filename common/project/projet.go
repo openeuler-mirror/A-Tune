@@ -124,6 +124,7 @@ type RelationShip struct {
 // BenchMark method call the benchmark script
 func (y *YamlPrjCli) BenchMark() (string, string, error) {
 	benchStr := make([]string, 0)
+	log.Debugf("run benchmark script: %s", y.Benchmark)
 	benchOutByte, err := ExecGetOutput(y.Benchmark)
 	if err != nil {
 		fmt.Println(string(benchOutByte))
@@ -141,7 +142,9 @@ func (y *YamlPrjCli) BenchMark() (string, string, error) {
 
 		floatOut, err := strconv.ParseFloat(strings.Replace(string(bout), "\n", "", -1), 64)
 		if err != nil {
-			err = fmt.Errorf("failed to parse float, err: %v", err)
+			log.Debugf("output of benchmark script: %s", string(benchOutByte))
+			log.Debugf("output of evaluation script for %s: %s", evaluation.Name, string(bout))
+			err = fmt.Errorf("failed to parse result of the evaluation of %s, err: %v", evaluation.Name, err)
 			return "", "", err
 		}
 
@@ -354,7 +357,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		}
 
 		newScript = strings.Replace(newScript, "$name", objName, -1)
-		log.Info("set script:", newScript)
+		log.Infof("set script for %s: %s", obj.Name, newScript)
 		_, err = ExecCommand(newScript)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", newScript, err), ""
@@ -382,6 +385,7 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 
 	scripts := make([]string, 0)
 	if needRestart {
+		log.Debugf("stop workload script is: %s", stopWorkload)
 		out, err := ExecCommand(stopWorkload)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", stopWorkload, err), ""
