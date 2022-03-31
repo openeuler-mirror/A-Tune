@@ -16,14 +16,15 @@ package module
 import (
 	"context"
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"google.golang.org/grpc/peer"
 	"net"
 	"strings"
 	"sync"
 
 	"github.com/urfave/cli"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/peer"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
 )
 
 // OptServices :the global value to store grpc service

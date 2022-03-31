@@ -28,6 +28,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/net/context"
+	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -36,7 +38,6 @@ import (
 	"gitee.com/openeuler/A-Tune/common/models"
 	"gitee.com/openeuler/A-Tune/common/project"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"golang.org/x/net/context"
 )
 
 // Optimizer : the type implement the bayes serch service

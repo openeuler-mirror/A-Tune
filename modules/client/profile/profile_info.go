@@ -14,14 +14,16 @@
 package profile
 
 import (
+	"fmt"
+	"io"
+	
+	"github.com/urfave/cli"
+	CTX "golang.org/x/net/context"
+	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"fmt"
-	"github.com/urfave/cli"
-	CTX "golang.org/x/net/context"
-	"io"
 )
 
 var profileInfoCommand = cli.Command{

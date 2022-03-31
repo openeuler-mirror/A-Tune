@@ -17,7 +17,6 @@ import (
 	"bufio"
 	"container/list"
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/topology"
 	"os"
 	"runtime"
 	"strconv"
@@ -25,6 +24,7 @@ import (
 	"time"
 
 	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/topology"
 	"gitee.com/openeuler/A-Tune/common/utils"
 )
 

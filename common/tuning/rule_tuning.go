@@ -16,15 +16,16 @@ package tuning
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"github.com/caibirdme/yql"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/profile"
 	"gitee.com/openeuler/A-Tune/common/sqlstore"
-	"io/ioutil"
-	"strings"
-
-	"github.com/caibirdme/yql"
 )
 
 // RuleBody : the body send to monitor service

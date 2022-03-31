@@ -16,17 +16,18 @@ package checker
 import (
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"regexp"
+	"strconv"
+	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/models"
 	"gitee.com/openeuler/A-Tune/common/registry"
 	"gitee.com/openeuler/A-Tune/common/utils"
-	"io/ioutil"
-	"os"
-	"path"
-	"regexp"
-	"strconv"
 )
 
 func init() {

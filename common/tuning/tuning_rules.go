@@ -15,11 +15,6 @@ package tuning
 
 import (
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/project"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 	"path/filepath"
@@ -29,6 +24,12 @@ import (
 	"github.com/newm4n/grool/engine"
 	"github.com/newm4n/grool/model"
 	"github.com/newm4n/grool/pkg"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/project"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // TuningData : the struct which store the collection data

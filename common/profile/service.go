@@ -15,14 +15,16 @@ package profile
 
 import (
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/config"
-	"gitee.com/openeuler/A-Tune/common/utils"
-	"github.com/go-ini/ini"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/go-ini/ini"
+	
+	"gitee.com/openeuler/A-Tune/common/config"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 // ExistProfile method return true if profile exist otherwise return false

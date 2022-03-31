@@ -14,14 +14,15 @@
 package profile
 
 import (
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/client"
-	SVC "gitee.com/openeuler/A-Tune/common/service"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"fmt"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/client"
+	SVC "gitee.com/openeuler/A-Tune/common/service"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 var profileDeleteCommand = cli.Command{

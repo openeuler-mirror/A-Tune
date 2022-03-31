@@ -15,13 +15,14 @@ package config
 
 import (
 	"fmt"
-	"gitee.com/openeuler/A-Tune/common/log"
-	"gitee.com/openeuler/A-Tune/common/utils"
 	"net"
 	"path"
 	"strings"
 
 	"github.com/go-ini/ini"
+	
+	"gitee.com/openeuler/A-Tune/common/log"
+	"gitee.com/openeuler/A-Tune/common/utils"
 )
 
 var Version = "no version specified"

@@ -20,8 +20,6 @@ import (
 	"encoding/csv"
 	"encoding/xml"
 	"fmt"
-	PB "gitee.com/openeuler/A-Tune/api/profile"
-	"gitee.com/openeuler/A-Tune/common/log"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
@@ -39,6 +37,9 @@ import (
 	"time"
 
 	"github.com/urfave/cli"
+	
+	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/log"
 )
 
 // disk filename

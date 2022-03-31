@@ -16,9 +16,10 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
-	"io/ioutil"
 )
 
 // OptimizerPostBody send to the service to create a optimizer task
