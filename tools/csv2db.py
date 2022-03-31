@@ -27,7 +27,8 @@ from sqlalchemy.exc import SQLAlchemyError
 sys.path.insert(0, "./../")
 from analysis.engine.database import tables, table_collection_data
 from analysis.engine.database.trigger_user import user_exist
-from analysis.engine.database.trigger_analysis import add_new_collection, change_collection_status, change_collection_info
+from analysis.engine.database.trigger_analysis import add_new_collection,\
+        change_collection_status, change_collection_info
 from analysis.engine.database.table_ip_addrs import IpAddrs
 
 
@@ -47,7 +48,8 @@ def add_data(path, cip, uid, session):
             headers = [re.sub(r'[^\w]', '_', col.lower()) for col in real_headers]
             for index, col in enumerate(headers):
                 if not table_collection_data.exist_column(table_name, col, session):
-                    table_collection_data.insert_new_column(table_name, col, real_headers[index], session)
+                    table_collection_data.insert_new_column(table_name, col, real_headers[index],
+                            session)
             keys = '(collection_id, round, ' + ', '.join(col for col in headers)
             vals = '(:collection_id, :round, :' + ', :'.join(col for col in headers)
             keys = keys + ')'
@@ -77,10 +79,13 @@ def find_or_initial_ip(uid, ip, session):
 
 if __name__ == '__main__':
     ARG_PARSER = argparse.ArgumentParser(description='Offer path and IP to save data to database')
-    ARG_PARSER.add_argument('-p', '--path', required=True, help='Path of csv file that contains data')
+    ARG_PARSER.add_argument('-p', '--path', required=True,
+            help='Path of csv file that contains data')
     ARG_PARSER.add_argument('-i', '--host', required=True, help='IP that generated file')
-    ARG_PARSER.add_argument('-e', '--user_email', help='User email for user that can view this data')
-    ARG_PARSER.add_argument('-w', '--password', help='User password for user that can view this data')
+    ARG_PARSER.add_argument('-e', '--user_email',
+            help='User email for user that can view this data')
+    ARG_PARSER.add_argument('-w', '--password',
+            help='User password for user that can view this data')
     ARGS = ARG_PARSER.parse_args()
 
     if (not ARGS.user_email and ARGS.password) or (ARGS.user_email and not ARGS.password):

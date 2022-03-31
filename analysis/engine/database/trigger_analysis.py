@@ -190,14 +190,18 @@ def collection_exist(name):
 def get_collection_data_dirs(cip, cid, csv_line, response, session):
     """get collection data"""
     header, _ = table_collection_data.get_line(cip, -1, -2, -1, session)
-    data, response['round'] = table_collection_data.get_line(cip, cid, csv_line, csv_line + 10, session)
+    data, response['round'] = table_collection_data.get_line(cip, cid, csv_line, csv_line + 10,
+            session)
     for i, val in enumerate(data):
         if val[0] is None:
             del data[i]
             del header[i]
     response['table_header'] = header
     response['csv_data'] = data
-    response['nextCsv'] = csv_line + 0 if len(response['csv_data']) == 0 else len(response['csv_data'][0])
+    if len(response['csv_data']) == 0:
+        response['nextCsv'] = csv_line + 0
+    else:
+        response['nextCsv'] = len(response['csv_data'][0])
 
 
 def get_analysis_log_dirs(cid, log_line, response, session):

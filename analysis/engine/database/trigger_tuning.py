@@ -68,7 +68,8 @@ def create_tuning_data_table(line):
         tid = tuning_table.get_max_tid(session)
         table_name = 'tuning_' + str(tid)
         metadata = MetaData()
-        table, init_key, init_val, pairs = table_tuning_data.initial_table(table_name, metadata, line)
+        table, init_key, init_val, pairs = table_tuning_data.initial_table(table_name, metadata,
+                line)
         if table is None:
             LOGGER.info('Data in tuning_data does not match what desired')
             return
@@ -115,7 +116,8 @@ def change_tuning_status(table_name, name):
     try:
         tuning_table = TuningTable()
         total_round = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
-        data_round = session.execute('select max(' + table_name + '._round) from ' + table_name).scalar()
+        data_round = session.execute('select max(' + table_name + '._round) from ' + \
+                table_name).scalar()
         if total_round is not None and total_round == data_round:
             tuning_table.update_status(name, 'finished', session)
         session.commit()
@@ -195,11 +197,13 @@ def get_tuning_info(status, name):
         tuning_table = TuningTable()
         response['status'] = status
         response['file_name'] = name
-        response['engine'] = tuning_table.get_field_by_name(TuningTable.tuning_engine, name, session)
+        response['engine'] = tuning_table.get_field_by_name(TuningTable.tuning_engine, name,
+                session)
         response['round'] = tuning_table.get_field_by_name(TuningTable.total_round, name, session)
         response['base'] = tuning_table.get_field_by_name(TuningTable.baseline, name, session)
         tid = tuning_table.get_field_by_name(TuningTable.tuning_id, name, session)
-        response['parameter'] = table_tuning_data.get_param_by_table_name('tuning_' + str(tid), session)
+        response['parameter'] = table_tuning_data.get_param_by_table_name('tuning_' + str(tid),
+                session)
         response['line'] = 0
     except SQLAlchemyError as err:
         LOGGER.error('Get tuning info failed: %s', err)

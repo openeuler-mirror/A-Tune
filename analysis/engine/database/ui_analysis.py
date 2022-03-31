@@ -56,7 +56,8 @@ class UiAnalysis(Resource):
                 log_line = int(args.get('logLine'))
                 if not transfer_web.analysis_exist(name):
                     return json.dumps({'isExist': False}), 200, CORS
-                return json.dumps(transfer_web.get_analysis_details(name, csv_line, log_line)), 200, CORS
+                return json.dumps(transfer_web.get_analysis_details(name, csv_line, log_line)), \
+                        200, CORS
 
             if cmd == 'compareWith':
                 name = args.get('name')

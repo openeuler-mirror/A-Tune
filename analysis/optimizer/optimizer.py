@@ -347,11 +347,13 @@ class Optimizer(multiprocessing.Process):
             elif self.engine == 'traverse':
                 from analysis.optimizer.knob_traverse_manager import KnobTraverseManager
                 default_values = [p_nob['ref'] for _, p_nob in enumerate(self.knobs)]
-                knobtraverse_manager = KnobTraverseManager(self.knobs, self.child_conn, default_values)
+                knobtraverse_manager = KnobTraverseManager(self.knobs, self.child_conn,
+                        default_values)
                 traverse_list = knobtraverse_manager.get_traverse_list()
                 performance = knobtraverse_manager.get_traverse_performance(traverse_list)
                 rank = knobtraverse_manager.get_traverse_rank(performance)
-                final_param = {"rank": rank, "param": knobtraverse_manager.get_default_values(), "finished": True}
+                final_param = {"rank": rank, "param": knobtraverse_manager.get_default_values(),
+                        "finished": True}
                 self.child_conn.send(final_param)
                 return final_param["param"]
 

@@ -44,7 +44,8 @@ if __name__ == '__main__':
 
     print("start test...")
     retcode, benchmark_csv = get_output(
-        f"redis-benchmark -h {redis_server_ip} -p {redis_server_port} -t set,get,incr,rpop,sadd,hset,lrange_600 --csv")
+        f"redis-benchmark -h {redis_server_ip} -p {redis_server_port} -t set,get,incr,rpop,sadd,\
+                hset,lrange_600 --csv")
 
     total_queries = 0
     for line in benchmark_csv.splitlines():

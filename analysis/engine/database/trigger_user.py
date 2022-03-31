@@ -36,10 +36,13 @@ def user_exist(email, pwd):
         return uid, account_name
     try:
         user_account = UserAccount()
-        password = user_account.get_field_by_key(UserAccount.password, UserAccount.email, email, session)
+        password = user_account.get_field_by_key(UserAccount.password, UserAccount.email, email,
+                session)
         if password is not None and password == pwd:
-            uid = user_account.get_field_by_key(UserAccount.user_id, UserAccount.email, email, session)
-            account_name = user_account.get_field_by_key(UserAccount.account_name, UserAccount.email, email, session)
+            uid = user_account.get_field_by_key(UserAccount.user_id, UserAccount.email, email,
+                    session)
+            account_name = user_account.get_field_by_key(UserAccount.account_name,
+                    UserAccount.email, email, session)
     except SQLAlchemyError as err:
         LOGGER.error('User login failed: %s', err)
         return -1, account_name
@@ -55,7 +58,8 @@ def create_user(email, pwd, name):
         return False, False
     try:
         user_account = UserAccount()
-        password = user_account.get_field_by_key(UserAccount.password, UserAccount.email, email, session)
+        password = user_account.get_field_by_key(UserAccount.password, UserAccount.email, email,
+                session)
         if password is not None:
             return False, True
         uid = user_account.get_max_uid(session) + 1
@@ -133,7 +137,8 @@ def change_user_pwd(uid, pwd, new_pwd):
     response = {}
     try:
         user_account = UserAccount()
-        password = user_account.get_field_by_key(UserAccount.password, UserAccount.user_id, uid, session)
+        password = user_account.get_field_by_key(UserAccount.password, UserAccount.user_id, uid,
+                session)
         if password is None or password != pwd:
             return {'oldMatch': False}
         response['oldMatch'] = True

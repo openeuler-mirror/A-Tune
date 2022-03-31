@@ -175,14 +175,17 @@ class KnobTraverseManager:
                 next_item_param_name = 'None'
                 if (index + 1) < len(self._performIndex_knobsIndex):  # avoid out of range
                     next_item_param_name = knobs[self._performIndex_knobsIndex[index + 1]]['name']
-                # If the default value is already the maximum or minimum value, the parameter has only one performance,
-                # which is directly subtracted from the default value, otherwise,
-                # the maximum value (performance) is subtracted from the minimum value (performance)
+                # If the default value is already the maximum or minimum value, the parameter has
+                # only one performance, which is directly subtracted from the default value,
+                # otherwise, the maximum value (performance) is subtracted from the minimum value
+                # (performance)
                 if next_item_param_name != param_name:
                     param_differ_perform_map[param_name] = abs(performance[index] - performance[0])
                 else:
-                    param_differ_perform_map[param_name] = abs(performance[index] - performance[index + 1])
-                    param_performance_map[param_name] = min(param_performance_map[param_name], performance[index + 1])
+                    param_differ_perform_map[param_name] = abs(performance[index] - 
+                            performance[index + 1])
+                    param_performance_map[param_name] = min(param_performance_map[param_name],
+                            performance[index + 1])
                     index += 1
 
             index += 1
