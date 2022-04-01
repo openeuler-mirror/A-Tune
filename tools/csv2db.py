@@ -62,7 +62,7 @@ def add_data(path, cip, uid, session):
                 sql = 'insert into ' + table_name + ' ' + keys + ' values ' + vals
                 session.execute(text(sql), pairs)
         session.commit()
-    except SQLAlchemyError as err:
+    except SQLAlchemyError:
         return 'Failed to add collection data to database', -1
     finally:
         session.close()

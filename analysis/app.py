@@ -14,7 +14,6 @@
 """
 Flask application initialization, including log configuration, restful api registration.
 """
-import os
 import ssl
 import logging
 from logging.handlers import SysLogHandler

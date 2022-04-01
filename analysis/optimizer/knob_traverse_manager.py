@@ -12,8 +12,6 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2021-01-04
 
-import sys
-import re
 import logging
 import copy
 from functools import cmp_to_key
