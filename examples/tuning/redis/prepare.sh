@@ -68,5 +68,3 @@ echo "modify bind port to 0.0.0.0 to allow redis-benchmark access."
 sed -i 's/bind 127.0.0.1/bind 0.0.0.0/g' /etc/redis.conf
 systemctl restart redis.service
 
-echo "copy the server yaml file to /etc/atuned/tuning/"
-cp ./redis_benchmark_server.yaml /etc/atuned/tuning/
