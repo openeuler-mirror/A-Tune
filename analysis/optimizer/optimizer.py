@@ -327,6 +327,10 @@ class Optimizer(multiprocessing.Process):
                 params, labels = gstuning_manager.get_best_params()
                 # convert string option into index
                 options = gstuning_manager.get_options_index(options)
+            elif self.engine == 'GA':
+                from analysis.optimizer.gatuning_manager import GATuning
+                gatuning_manager = GATuning(self.knobs,self.child_conn)
+                params = gatuning_manager.GA()
             elif self.engine == 'lhs':
                 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
                 knobsampling_manager = KnobSamplingManager(self.knobs, self.child_conn,
