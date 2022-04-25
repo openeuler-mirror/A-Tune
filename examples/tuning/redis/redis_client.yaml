@@ -1,0 +1,10 @@
+project: "redis"
+engine: "gbrt"
+iterations: 100
+benchmark: "bash ./redis_benchmark.sh"
+evaluations:
+  - name: "QPS"
+    info:
+      get: grep 'total queries' ./redis_benchmark.log | awk '{print $3}'
+      type: "negative"
+      weight: 100

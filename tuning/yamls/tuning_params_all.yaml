@@ -4086,6 +4086,83 @@ The default value is 2048. You are advised to change the value to 8192."
           - "no"
         dtype : "string"
   -
+    name: "redis.client-timeout"
+    info:
+      desc: "close idle connections for specific seconds"
+      get: grep -P '^timeout' /etc/redis.conf | awk '{print $2}'
+      set: sed -i "s/^timeout.*/timeout $value/g" /etc/redis.conf
+      needrestart: "true"
+      type: "continuous"
+      dtype: "int"
+      scope:
+        - 0
+        - 100
+      step: 1
+      ref: 0
+  -
+    name: "redis.maxmemory"
+    info:
+      desc: "sets maximum host’s memory limit to be allocated to the Redis."
+      get: grep -P '^maxmemory' /etc/redis.conf | awk '{print $2}'
+      set: if grep -P '^maxmemory' /etc/redis.conf; then sed  -i "s/^maxmemory.*/maxmemory ${value}gb/g" /etc/redis.conf; else sed -i "/# maxmemory <bytes>/a maxmemory ${value}gb" /etc/redis.conf; fi
+      needrestart: "true"
+      type: "continuous"
+      dtype: "int"
+      scope:
+        - 0
+        - 8
+      step: 1
+  -
+    name: "redis.RDB"
+    info:
+      desc: "save DB on disk, could be disabled if just for cache."
+      get: grep -P '^save' /etc/redis.conf | awk '{print $1 $2}'
+      set: if [ "${value}" = "off" ]; then sed -i "s/^save.*/#&/g" /etc/redis.conf; fi
+      needrestart: "true"
+      type: "discreate"
+      dtype: "string"
+      options:
+        - "on"
+        - "off"
+  -
+    name: "redis.AOF"
+    info:
+      desc: "logs every write operation received by the server."
+      get: grep -P '^appendonly' /etc/redis.conf | awk '{print $2}'
+      set: sed -i "s/^appendonly.*/appendonly $value/g" /etc/redis.conf
+      needrestart: "true"
+      type: "discreate"
+      dtype: "string"
+      options:
+        - "yes"
+        - "no"
+      ref: "no"
+  -
+    name: "redis.unixsocket"
+    info:
+      desc: "use unix domain sockets to communicate.(benefit when client and server running on same box)"
+      get: value="not set"; if grep -P '^maxclients' /etc/redis.conf; then value="$(grep -P '^unixsocket' /etc/redis.conf)"; fi ;echo "${value}"
+      set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" ./test; sed -i "/^unixsocket /a unixsocketperm 700" ./test; fi
+      needrestart: "true"
+      type: "discreate"
+      dtype: "string"
+      options:
+        - "no"
+  -
+    name: "redis.loglevel"
+    info:
+      desc: "Redis loglevel, most detailed and thus more expensive for host’s resources."
+      get: grep 'loglevel' /etc/redis.conf | awk '{print $2}'
+      set: sed -i "s/^loglevel.*/loglevel $value/g" ./test
+      needrestart: "true"
+      type: "discreate"
+      dtype: "string"
+      options:
+        - "debug"
+        - "verbose"
+        - "notice"
+        - "warning"
+  -
     name : "mysql.innodb_io_capacity"
     info :
         desc : "Defines the number of I/O operations per second (IOPS) available to InnoDB background tasks."
