@@ -1,0 +1,10 @@
+project: "kafka"
+engine: "gbrt"
+iterations: 100
+benchmark: "bash ./launcher_on_server.sh"
+evaluations:
+  - name: "QPS"
+    info:
+      get: cat ./kafka_benchmark.log 
+      type: "negative"
+      weight: 100
