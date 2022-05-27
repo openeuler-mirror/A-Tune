@@ -8,7 +8,7 @@ object :
     info :
         desc : "tcp backlog"
         get : cat /etc/redis.conf | grep tcp-backlog | awk '{print $2}'
-        set : sed -i 's/tcp-backlog.*/tcp-backlog $value/g' /etc/redis
+        set : sed -i 's/tcp-backlog.*/tcp-backlog $value/g' /etc/redis.conf
         needrestart : "false"
         type : "continuous"
         scope :
@@ -60,12 +60,13 @@ object :
     info :
         desc : "whether to compress character strings using LZF when backing up .rdb files"
         get : cat /etc/redis.conf | grep rdbcompression  | awk '{print $2}'
-        set : ed -i 's/rdbcompression .*/rdbcompression  $value/g' /etc/redis.conf
+        set : sed -i 's/rdbcompression .*/rdbcompression  $value/g' /etc/redis.conf
         needrestart : "false"
         type : "discrete"
         options :
           - 'yes'
         dtype : "string" 
+  -
   -
     name : "net.core.netdev_budget"
     info :
@@ -136,3 +137,54 @@ The default value is 128. You are advised to change the value to 1024."
           - "0"
           - "1"
         dtype : "string"   
+  -
+    name : "redis hz"
+    info :
+        desc : "Redis checks for tasks to perform according to the specified 'hz' value."
+        get : cat /etc/redis.conf | grep hz | sed -n '4p' | awk '{print $2}' 
+        set : sed -i 's/^hz.*/hz $value/g' /etc/redis.conf
+        needrestart : "false"
+        type : "discrete"   
+        scope :
+            - 1
+            - 500
+        dtype : "int"
+   - 
+     name : "lowlog-log-slower-than"
+     info :
+         desc : "The Redis Slow Log is a system to log queries that exceeded a specified execution time"
+         get : cat /etc/redis.conf | grep slowlog-log-slower-than | awk '{print $2}'
+         set : sed -i  's/^slowlog-log-slower-than.*/slowlog-log-slower-than $value/g' /etc/redis.conf
+         needrestart : "false"
+         type : "discrete"
+         scope :
+             - 0
+             - 10000
+         dtype : "int"
+   -
+     name : "slowlog-max-len"
+     info :
+         desc : "Length of the slow log"
+         get : cat /etc/redis.conf | grep slowlog-log-slower-than | awk '{print $2}'
+         set : sed -i 's/^slowlog-max-len.*/slowlog-max-len $value/g' /etc/redis.conf
+         needrestart : "false"
+         type : "discrete"
+         scope :
+             - 0
+             - 1024
+         step : 64
+         dtype : "int"
+   - 
+     name : "loglevel"
+     info :
+         desc : "Specify the server verbosity level"
+         get : cat /etc/redis.conf | grep loglevel | awk '{print $2}'
+         set : sed -i 's/^loglevel.*/loglevel $value/g' /etc/redis.conf
+         needrestart : "false"
+         type : "discrete"
+         options : 
+             - "debug"
+             - "verbose"
+             - "notice"
+             - "warning"
+         dtype : "string"
