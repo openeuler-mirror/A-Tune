@@ -112,6 +112,7 @@ RUN cd ~ && \
     apt install -y --no-install-recommends git && \
     git -c http.sslVerify=false clone https://gitee.com/openeuler/A-Tune.git --depth=1 && \
     cd ~/A-Tune/tools && \
+    mkdir -p ../analysis/models/ && \
     python3 generate_models.py && \
     mkdir -p /usr/libexec/atuned/analysis && \
     mv ~/A-Tune/analysis/models /usr/libexec/atuned/analysis/ && \
