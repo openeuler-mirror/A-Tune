@@ -17,6 +17,7 @@ This class is used to find optimal settings and generate optimized profile.
 
 import logging
 import numbers
+import random
 import multiprocessing
 import collections
 import numpy as np
@@ -280,7 +281,7 @@ class Optimizer(multiprocessing.Process):
                 optimizer = baseOpt(
                     dimensions=params_space,
                     n_random_starts=self._n_random_starts,
-                    random_state=1,
+                    random_state=random.randint(0, 1000),
                     base_estimator=estimator
                 )
                 n_calls = self.max_eval
