@@ -24,3 +24,23 @@ Running `prepare.sh` to deploy, follow the hint. The script will create a new ss
 - `launcher_on_server.sh`, launch the `benchmark_on_client.sh` on the client, and copy the result log back to the server.
 - `benchmark_on_client.sh`, do Kafka producer and consumer test, generate result log.
 - `manager.sh`, control the Kafka service.
+
+## Tuning 🔧
+
+After running the deployment script, copy the server-side YAML which you want to use to **/etc/atuned/tuning/**
+
+### Start to tuning
+
+atune-adm tuning --project PROJECT --detail ./CLIENT.yaml
+
+eg: atune-adm tuning --project kafka --detail ./kafka.yaml
+
+### Restore the environment
+
+atune-adm tuning --restore --project PROJECT
+eg: atune-adm tuning --restore --project kafka
+
+## To contact ✉️
+
+- Email: me@shangcode.cn
+- Gitee: https://gitee.com/shangyingjie
