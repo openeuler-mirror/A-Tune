@@ -30,7 +30,6 @@ from sklearn.model_selection import train_test_split as tts
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.utils import class_weight
 from sklearn.model_selection import GridSearchCV
-from xgboost import XGBClassifier
 
 
 class WorkloadCharacterization:
@@ -170,6 +169,7 @@ class WorkloadCharacterization:
         """
         XGb_clf: XGBoost classifier
         """
+        from xgboost import XGBClassifier
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
         weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
         class_weights = dict(zip(np.unique(y_train), weights))
