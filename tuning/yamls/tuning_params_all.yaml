@@ -4102,7 +4102,7 @@ The default value is 2048. You are advised to change the value to 8192."
   -
     name: "redis.maxmemory"
     info:
-      desc: "sets maximum host’s memory limit to be allocated to the Redis."
+      desc: "sets maximum host's memory limit to be allocated to the Redis."
       get: grep -P '^maxmemory' /etc/redis.conf | awk '{print $2}'
       set: if grep -P '^maxmemory' /etc/redis.conf; then sed  -i "s/^maxmemory.*/maxmemory ${value}gb/g" /etc/redis.conf; else sed -i "/# maxmemory <bytes>/a maxmemory ${value}gb" /etc/redis.conf; fi
       needrestart: "true"
@@ -4142,7 +4142,7 @@ The default value is 2048. You are advised to change the value to 8192."
     info:
       desc: "use unix domain sockets to communicate.(benefit when client and server running on same box)"
       get: value="not set"; if grep -P '^maxclients' /etc/redis.conf; then value="$(grep -P '^unixsocket' /etc/redis.conf)"; fi ;echo "${value}"
-      set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" ./test; sed -i "/^unixsocket /a unixsocketperm 700" ./test; fi
+      set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" /etc/redis.conf; sed -i "/^unixsocket /a unixsocketperm 700" /etc/redis.conf; fi
       needrestart: "true"
       type: "discreate"
       dtype: "string"
@@ -4151,9 +4151,9 @@ The default value is 2048. You are advised to change the value to 8192."
   -
     name: "redis.loglevel"
     info:
-      desc: "Redis loglevel, most detailed and thus more expensive for host’s resources."
+      desc: "Redis loglevel, most detailed and thus more expensive for host's resources."
       get: grep 'loglevel' /etc/redis.conf | awk '{print $2}'
-      set: sed -i "s/^loglevel.*/loglevel $value/g" ./test
+      set: sed -i "s/^loglevel.*/loglevel $value/g" /etc/redis.conf
       needrestart: "true"
       type: "discreate"
       dtype: "string"
