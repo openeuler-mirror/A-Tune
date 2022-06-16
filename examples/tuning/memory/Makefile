@@ -20,6 +20,6 @@ CFLAGS = $(OPENMP)  $(OLEVEL) -DSTREAM_ARRAY_SIZE=$(DSTREAM_ARRAY_SIZE) -DNTIMES
 
 all:  stream_c.exe
 stream_c.exe: stream.c
-                $(CC) $(CFLAGS) stream.c
+	$(CC) $(CFLAGS) stream.c
 clean:
-                rm -f stream_f.exe stream_c.exe *.o
+	rm -f stream_f.exe stream_c.exe *.o
