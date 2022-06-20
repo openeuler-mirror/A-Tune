@@ -1,6 +1,8 @@
 project: "redis"
 engine: "gbrt"
 iterations: 100
+random_starts: 10
+
 benchmark: "bash ./redis_benchmark.sh"
 evaluations:
   - name: "QPS"
