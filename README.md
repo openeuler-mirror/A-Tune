@@ -22,6 +22,18 @@ For openEuler 20.09 or later, atune-engine is needed.
 ```bash
 yum install -y atune-engine
 ```
+**Note:** After running `systemctl start atuned`, an error message may displayed because of the authentication certificate is not configured. There are two ways to solve the problem:
+1. Configure the certificate and use HTTPS for secure connection
+ - Generate the certificate files of the server and client, then
+ - Change lines 60~62 and 67~69 in `/etc/anined/anined.cnf` to the absolute path of the certificate file
+ - Change lines 23~25 in `/etc/atuned/engine.cnf` to the absolute path of the certificate file
+ - For details about how to generate certificates, see `restcerts` and `enginecerts` in `A-Tune/Makefile`
+2. Cancel certificate authentication and use HTTP insecure connection
+ - In scenarios with low security requirements (for example, local tests), you can use the HTTP connection
+ - Change the values of `rest_tls(L59)` and `engine_tls(L66)` in `/etc/atuned/atuned.cnf` to false
+ - Change the value of `engine_tls(L22)` in `/etc/atuned/engine.cnf` to false
+<br>
+No matter which method is used, one should restart services after the setting is complete. For details, see "II. Quick Guide - 2. Manage the A-Tune service - Load and start the atuned and atune-engine services".
 
 ### Method 2 (applicable to developers): Use the source code of the local repository for installation.
 
