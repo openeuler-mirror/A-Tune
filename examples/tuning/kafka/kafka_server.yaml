@@ -1,0 +1,204 @@
+project: "kafka"
+maxiterations: 100
+startworkload: "bash working_dir/manager.sh --start"
+stopworkload: "bash working_dir/manager.sh --stop"
+object:
+  - name: "kafka.batch_size"
+    info:
+      desc: "Controls how many bytes of data to collect before sending messages to the Kafka broker."
+      get: grep 'batch.size' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/batch.size=[[:digit:]]*/batch.size=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 16384
+        - 1048576
+      step: 1024
+  - name: "kafka.buffer_memory"
+    info:
+      desc: "Total bytes of memory the producer can use to buffer records waiting to be sent to the server."
+      get: grep 'buffer.memory' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/buffer.memory=[[:digit:]]*/buffer.memory=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 33554432
+        - 67108864
+      step: 1048576
+  - name: "kafka.compression_type"
+    info:
+      desc: "Specify the final compression type for a given topic."
+      get: grep 'compression.type' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/compression.type=[[:digit:]]*/compression.type=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "string"
+      options:
+        - "gzip"
+        - "snappy"
+        - "lz4"
+        - "zstd"
+  - name: "kafka.delivery_timeout_ms"
+    info:
+      desc: "An upper bound on the time to report success or failure after a call to send() returns."
+      get: grep 'buffer.memory' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/buffer.memory=[[:digit:]]*/buffer.memory=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 100000
+        - 120000
+      step: 1000
+  - name: "kafka.linger_ms"
+    info:
+      desc: "The maximum time to buffer data in asynchronous mode."
+      get: grep 'linger.ms' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/linger.ms=[[:digit:]]*/linger.ms=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "continuous"
+      scope:
+        - 0
+        - 30
+  - name: "kafka.log_segment_bytes"
+    info:
+      desc: "The maximum size of a single log file"
+      get: grep 'log.segment.bytes' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/log.segment.bytes=[[:digit:]]*/log.segment.bytes=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 1048576
+        - 1073741824
+      step: 1048576
+  - name: "kafka.log_flush_interval_messages"
+    info:
+      desc: "The number of messages to accept before forcing a flush of data to disk."
+      get: grep 'log.flush.interval.messages' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^log.flush.interval.messages.*$/log.flush.interval.messages=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 5000
+        - 50000
+      step: 1000
+      dtype: "int"
+  - name: "kafka.log_flush_interval_ms"
+    info:
+      desc: "The maximum amount of time a message can sit in a log before we force a flush."
+      get: grep 'log.flush.interval.ms' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^log.flush.interval.ms.*$/log.flush.interval.ms=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 500
+        - 5000
+      step: 100
+      dtype: "int"
+  - name: "kafka.max_in_flight_requests_per_connection"
+    info:
+      desc: "The maximum number of unacknowledged requests the client will send on a single connection before blocking."
+      get: grep 'max.in.flight.requests.per.connection' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/max.in.flight.requests.per.connection=[[:digit:]]*/max.in.flight.requests.per.connection=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "continuous"
+      scope:
+        - 1
+        - 5
+  - name: "kafka.message_max_bytes"
+    info:
+      desc: "The maximum message size the broker accepts."
+      get: grep 'message.max.bytes' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/message.max.bytes=[[:digit:]]*/message.max.bytes=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 0
+        - 10485760
+      step: 1048576
+  - name: "kafka.num_io_threads"
+    info:
+      desc: "The number of threads that the server uses for processing requests, which may include disk I/O."
+      get: grep 'num.io.threads' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/num.io.threads=[[:digit:]]*/num.io.threads=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "continuous"
+      dtype: "int"
+      scope:
+        - 1
+        - 16
+  - name: "kafka.num_network_threads"
+    info:
+      desc: "The number of threads that the server uses for receiving requests from the network and sending responses to the network"
+      get: grep 'num.network.threads' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/num.network.threads=[[:digit:]]*/num.network.threads=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "continuous"
+      dtype: "int"
+      scope:
+        - 1
+        - 10
+  - name: "kafka.replica_fetch_max.bytes"
+    info:
+      desc: "The number of bytes of messages to attempt to fetch for each partition."
+      get: grep 'replica.fetch.max.bytes' working_dir/config/server.properties | cut -d '=' -f 2
+      set: sed -i "s/replica.fetch.max.bytes=[[:digit:]]*/replica.fetch.max.bytes=$value/" working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      dtype: "int"
+      scope:
+        - 1048576
+        - 1073741824
+      step: 1048576
+  - name: "kafka.socket_send_buffer_bytes"
+    info:
+      desc: "The send buffer (SO_SNDBUF) used by the socket server."
+      get: grep 'socket.send.buffer.bytes' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^socket.send.buffer.bytes.*$/socket.send.buffer.bytes=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 10240
+        - 1024000
+      step: 10240
+      dtype: "int"
+  - name: "kafka.socket_receive_buffer_bytes"
+    info:
+      desc: "The receive buffer (SO_RCVBUF) used by the socket server."
+      get: grep 'socket.receive.buffer.bytes' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^socket.receive.buffer.bytes.*$/socket.receive.buffer.bytes=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 10240
+        - 1024000
+      step: 10240
+      dtype: "int"
+  - name: "kafka.socket_request_max_bytes"
+    info:
+      desc: "The maximum size of a request that the socket server will accept (protection against OOM)."
+      get: grep 'socket.request.max.bytes' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^socket.request.max.bytes.*$/socket.request.max.bytes=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 1048576
+        - 1048576000
+      step: 1048576
+      dtype: "int"
+  - name: "kafka.zookeeper_connection_timeout_ms"
+    info:
+      desc: "Timeout in ms for connecting to zookeeper."
+      get: grep 'zookeeper.connection.timeout.ms' working_dir/config/server.properties | awk -F '=' '{print $2}'
+      set: sed -i 's/^zookeeper.connection.timeout.ms.*$/zookeeper.connection.timeout.ms=$value/g' working_dir/config/server.properties
+      needrestart: "true"
+      type: "discrete"
+      scope:
+        - 500
+        - 50000
+      step: 100
+      dtype: "int"

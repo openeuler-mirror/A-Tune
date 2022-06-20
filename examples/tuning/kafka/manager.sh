@@ -27,7 +27,7 @@ USAGE="Usage: task_manager [OPTION]
 --delete-topic delete topic: kafka-benchmark
 --help         output this usage"
 
-KAFKA_DIR=./kafka_2.13-3.2.0
+KAFKA_DIR="will be replaced after running prepare.sh"
 ZOOKEEPER_SERVER_START_SCRPIT=$KAFKA_DIR/bin/zookeeper-server-start.sh
 ZOOKEEPER_SERVER_STOP_SCRPIT=$KAFKA_DIR/bin/zookeeper-server-stop.sh
 ZOOKEEPER_CONFIG=$KAFKA_DIR/config/zookeeper.properties
@@ -35,8 +35,6 @@ KAFKA_SERVER_START_SCRPIT=$KAFKA_DIR/bin/kafka-server-start.sh
 KAFKA_SERVER_STOP_SCRPIT=$KAFKA_DIR/bin/kafka-server-stop.sh
 KAFKA_SERVER_CONFIG=$KAFKA_DIR/config/server.properties
 KAFKA_TOPIC_SCRIPT=$KAFKA_DIR/bin/kafka-topics.sh
-
-cd "$(dirname "$0")"
 
 if [[ $# -gt 0 ]]; then
   case $1 in
