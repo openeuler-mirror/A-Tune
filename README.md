@@ -25,8 +25,8 @@ yum install -y atune-engine
 **Note:** After running `systemctl start atuned`, an error message may displayed because of the authentication certificate is not configured. There are two ways to solve the problem:
 1. Configure the certificate and use HTTPS for secure connection
  - Generate the certificate files of the server and client, then
- - Change lines 60~62 and 67~69 in `/etc/anined/anined.cnf` to the absolute path of the certificate file
- - Change lines 23~25 in `/etc/atuned/engine.cnf` to the absolute path of the certificate file
+ - Change lines 60 ~ 62 and 67 ~ 69 in `/etc/anined/anined.cnf` to the absolute path of the certificate file
+ - Change lines 23 ~ 25 in `/etc/atuned/engine.cnf` to the absolute path of the certificate file
  - For details about how to generate certificates, see `restcerts` and `enginecerts` in `A-Tune/Makefile`
 2. Cancel certificate authentication and use HTTP insecure connection
  - In scenarios with low security requirements (for example, local tests), you can use the HTTP connection
@@ -39,7 +39,7 @@ No matter which method is used, one should restart services after the setting is
 
 #### 1. Install dependent system software packages.
 ```bash
-yum install -y golang-bin python3 perf sysstat hwloc-gui
+yum install -y golang-bin python3 perf sysstat hwloc-gui lshw
 ```
 
 #### 2. Install Python dependency packages.  
