@@ -14,11 +14,11 @@ object :
   -
     name : "redis.rdbcompression"
   -
-    name: "redis.maxmemory"
+    name : "redis.maxmemory"
   - 
-    name: "redis.client-timemout"
+    name : "redis.client-timeout"
   -
-    name: "redis.unixsocket"
+    name : "redis.unixsocket"
   -
     name : "net.core.netdev_budget"
   -
