@@ -3,7 +3,7 @@ engine: "gbrt"
 iterations: 50
 random_starts: 10
 
-benchmark: "bash redis/redis_benchmark.sh"
+benchmark: "bash ./redis_benchmark.sh"
 
 evaluations :
   -
