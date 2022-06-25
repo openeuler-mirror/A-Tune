@@ -59,7 +59,7 @@ class Transfer(Resource):
         if not EngineConfig.db_enable:
             return -1, 200
 
-        from analysis.engine.database import trigger_analysis
+        from analysis.ui.database import trigger_analysis
         args = TRANSFER_PUT_PARSER.parse_args()
         LOGGER.info(args)
 

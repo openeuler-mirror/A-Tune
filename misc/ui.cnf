@@ -1,0 +1,55 @@
+# Copyright (c) 2020 Huawei Technologies Co., Ltd.
+# A-Tune is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+# Create: 2022-6-25
+
+#################################### ui ###############################
+[server]
+# the tuning optimizer host and port, start by ui.service
+# if ui_host is same as rest_host, two ports cannot be same
+# the port can be set between 0 to 65535 which not be used
+ui_host = localhost
+ui_port = 3839
+
+# enable ui server authentication SSL/TLS
+# default is true
+ui_tls = false
+tlsuicacertfile = /etc/atuned/ui_certs/ca.crt
+tlsuiservercertfile = /etc/atuned/ui_certs/server.crt
+tlsuiserverkeyfile = /etc/atuned/ui_certs/server.key
+
+#################################### log ###############################
+[log]
+# either "debug", "info", "warn", "error", "critical", default is "info"
+level = info
+
+#################################### database ###############################
+[database]
+# enable database server
+# default is false
+db_enable = false
+
+# information about database
+# currently support for PostgreSQL database
+database = PostgreSQL
+
+# the database service listening host and port
+db_host = localhost
+db_port = 5432
+
+# database name
+db_name = atune_db
+
+# database user info
+# user_passwd should be encrypted according to Advanced Encryption Standard (AES)
+# you can use ./tools/encrypt.py to encrypt your password
+# user_name = admin
+# passwd_key = 
+# passwd_iv = 
+# user_passwd =
