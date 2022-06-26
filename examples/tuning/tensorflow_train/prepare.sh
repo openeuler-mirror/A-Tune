@@ -17,7 +17,7 @@ path=$(
 )
 
 echo "install tensorflow"
-pip3 install tensorflow==2.4.1
+pip3 install tensorflow -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 echo "first run the python script to download the MNIST dataset"
 python3 $path/tensorflow_train.py
