@@ -101,7 +101,7 @@ class Optimizer(Resource):
             value = args["line"][:-1].split(" ")
             utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
             if EngineConfig.db_enable:
-                from analysis.engine.database import trigger_tuning
+                from analysis.ui.database import trigger_tuning
                 client_ip = request.remote_addr
                 trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'],
                                               client_ip)
@@ -116,7 +116,7 @@ class Optimizer(Resource):
             params = params[:-1]
             utils.add_data_to_file(params, "a", args["prj_name"])
             if EngineConfig.db_enable:
-                from analysis.engine.database import trigger_tuning
+                from analysis.ui.database import trigger_tuning
                 trigger_tuning.change_tuning_baseline(args['prj_name'],
                                                       utils.get_opposite_num(total_eval, True))
                 trigger_tuning.create_tuning_data_table(args['line'])
@@ -134,7 +134,7 @@ class Optimizer(Resource):
             utils.add_data_to_file(params, "a", args["prj_name"])
             out_queue.send(args.get("value"))
             if EngineConfig.db_enable:
-                from analysis.engine.database import trigger_tuning
+                from analysis.ui.database import trigger_tuning
                 table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'],
                                                             args['line'])
                 if table_name is not None:

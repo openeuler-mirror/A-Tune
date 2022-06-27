@@ -18,6 +18,7 @@ Default path config.
 LOCAL_ADDRS = '/var/run/atuned/atuned.sock'
 REST_CERT_PATH = '/etc/atuned/rest_certs/'
 ENGINE_CERT_PATH = '/etc/atuned/engine_certs/'
+UI_CERT_PATH = '/etc/atuned/ui_certs/'
 GRPC_CERT_PATH = '/etc/atuned/grpc_certs'
 ANALYSIS_DATA_PATH = '/var/atune_data/analysis/'
 TUNING_DATA_PATH = '/var/atune_data/tuning/'
