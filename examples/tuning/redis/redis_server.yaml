@@ -35,7 +35,7 @@ object:
       get: grep -P '^save' /etc/redis.conf | awk '{print $1 $2}'
       set: if [ "${value}" = "off" ]; then sed -i "s/^save.*/#&/g" /etc/redis.conf; fi
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "on"
@@ -46,7 +46,7 @@ object:
       get: grep -P '^appendonly' /etc/redis.conf | awk '{print $2}'
       set: sed -i "s/^appendonly.*/appendonly $value/g" /etc/redis.conf
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "yes"
@@ -70,7 +70,7 @@ object:
       get: value="not set"; if grep -P '^maxclients' /etc/redis.conf; then value="$(grep -P '^unixsocket' /etc/redis.conf)"; fi ;echo "${value}"
       set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" ./test; sed -i "/^unixsocket /a unixsocketperm 700" ./test; fi
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "no"
@@ -81,7 +81,7 @@ object:
       get: grep 'loglevel' /etc/redis.conf | awk '{print $2}'
       set: sed -i "s/^loglevel.*/loglevel $value/g" ./test
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "debug"
@@ -94,7 +94,7 @@ object:
       get: grep -o '\[.*\]' /sys/kernel/mm/transparent_hugepage/enabled | tr -d '[]'
       set: sed -i "s/^loglevel.*/loglevel $value/g" ./test
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "always"

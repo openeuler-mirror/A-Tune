@@ -4119,7 +4119,7 @@ The default value is 2048. You are advised to change the value to 8192."
       get: grep -P '^save' /etc/redis.conf | awk '{print $1 $2}'
       set: if [ "${value}" = "off" ]; then sed -i "s/^save.*/#&/g" /etc/redis.conf; fi
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "on"
@@ -4131,7 +4131,7 @@ The default value is 2048. You are advised to change the value to 8192."
       get: grep -P '^appendonly' /etc/redis.conf | awk '{print $2}'
       set: sed -i "s/^appendonly.*/appendonly $value/g" /etc/redis.conf
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "yes"
@@ -4144,7 +4144,7 @@ The default value is 2048. You are advised to change the value to 8192."
       get: value="not set"; if grep -P '^maxclients' /etc/redis.conf; then value="$(grep -P '^unixsocket' /etc/redis.conf)"; fi ;echo "${value}"
       set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" /etc/redis.conf; sed -i "/^unixsocket /a unixsocketperm 700" /etc/redis.conf; fi
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "no"
@@ -4155,7 +4155,7 @@ The default value is 2048. You are advised to change the value to 8192."
       get: grep 'loglevel' /etc/redis.conf | awk '{print $2}'
       set: sed -i "s/^loglevel.*/loglevel $value/g" /etc/redis.conf
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "debug"
