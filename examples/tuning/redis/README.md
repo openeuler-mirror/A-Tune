@@ -17,7 +17,7 @@ That is all you need to interact with the script.
 
 ## Benchmark ⏱️
 
-To start the benchmark, execute `bash benchmark.sh`, the localhost will access the benchmark host and trigger it.
+To start the benchmark, execute `bash redis_benchmark.sh`, the localhost will access the benchmark host and trigger it.
 
 The benchmark host will transfer the log file to localhost after the benchmark.
 
@@ -47,7 +47,7 @@ So, if you want to enable this parameter, add a "yes" option to it.
       get: value="not set"; if grep -P '^maxclients' /etc/redis.conf; then value="$(grep -P '^unixsocket' /etc/redis.conf)"; fi ;echo "${value}"
       set: if [ "$value" = "yes" ]; then sed -i "/# unixsocketperm /a unixsocket /tmp/redis.sock" ./test; sed -i "/^unixsocket /a unixsocketperm 700" ./test; fi
       needrestart: "true"
-      type: "discreate"
+      type: "discrete"
       dtype: "string"
       options:
         - "no"
@@ -62,6 +62,7 @@ eg: atune-adm tuning --project redis --detail ./redis_client.yaml
 
 ### Restore the environment
 atune-adm tuning --restore --project PROJECT
+
 eg: atune-adm tuning --restore --project redis
 
 
