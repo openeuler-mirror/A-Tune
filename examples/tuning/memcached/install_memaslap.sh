@@ -33,6 +33,9 @@ cd libmemcached-1.0.18
 echo "fix install bugs(when gcc --version > 7)..."
 sed -i 's/if (opt_servers == false)/if (opt_servers == NULL)/g' ./clients/memflush.cc
 sed -i '2937c LDFLAGS = -L/lib64 -lpthread' ./Makefile
+if [[ -n "`gcc --version | awk '/gcc/ && ($3+0)>=10 {print 1}'`" ]]; then
+	sed -i 's/^CFLAGS = /CFLAGS = -fcommon /g' ./Makefile
+fi
 
 make
 make install
