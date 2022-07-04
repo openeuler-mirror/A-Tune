@@ -10,4 +10,5 @@
 # See the Mulan PSL v2 for more details.
 # Create: 2021-01-04
 
-sh benchmark/runBenchmark.sh props.opengauss.1000w
+cd $benchmark_path
+./runBenchmark.sh props.opengauss

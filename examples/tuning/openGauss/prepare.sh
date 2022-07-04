@@ -19,11 +19,16 @@ echo "update the openGauss yaml"
 gausspath=$(ps -ef | grep gaussdb | grep -v grep | awk '{ $1=NULL; print $10 }')
 sed -i "s#cat .*/postgresql.conf#cat $gausspath/postgresql.conf#g" "$path"/openGauss_server.yaml
 sed -i "s#g' .*/postgresql.conf#g' $gausspath/postgresql.conf#g" "$path"/openGauss_server.yaml
+sed -i "s/^#shared_buffers =/shared_buffers =/g" $gausspath/postgresql.conf
+sed -i "s/^#work_mem =/work_mem =/g" $gausspath/postgresql.conf
+sed -i "s/^#commit_siblings =/commit_siblings =/g" $gausspath/postgresql.conf
+sed -i "s/^#commit_delay =/commit_delay =/g" $gausspath/postgresql.conf
+sed -i "s/^#checkpoint_completion_target =/checkpoint_completion_target =/g" $gausspath/postgresql.conf
 
 echo "copy the server yaml file to /etc/atuned/tuning/"
 cp "$path"/openGauss_server.yaml /etc/atuned/tuning/
 
-benchmark=$(find / -name props.opengauss.1000w)
-benchmark_path=${benchmark%/*}
-sed -i "s#sh .*/runBenchmark.sh#sh $benchmark_path/runBenchmark.sh#g" "$path"/openGauss_benchmark.sh
+benchmark_props=$(find $path -name props.opengauss)
+benchmark_path=${benchmark_props%/*}
+sed -i "s#^cd .*#cd $benchmark_path#g" "$path"/openGauss_benchmark.sh
 sed -i "s#sh .*/openGauss_benchmark.sh#sh $path/openGauss_benchmark.sh#g" "$path"/openGauss_client.yaml
