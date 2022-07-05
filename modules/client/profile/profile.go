@@ -15,6 +15,7 @@ package profile
 
 import (
 	"fmt"
+	"errors"
 	"io"
 	"math/rand"
 	"strings"
@@ -91,7 +92,11 @@ func profile(ctx *cli.Context) error {
 		}
 
 		if err != nil {
-			return err
+			var errStr = err.Error()
+			if strings.Contains(errStr, "desc = ") {
+				errStr = strings.Split(errStr, "desc = ")[1]
+			}
+			return errors.New(errStr)
 		}
 
 		utils.Print(reply)
