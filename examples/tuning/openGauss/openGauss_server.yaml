@@ -7,7 +7,7 @@ object :
     name : "shared_buffers"
     info :
         desc : ""
-        get : "cat install/data/db1/postgresql.conf | grep '^shared_buffers ='| awk '{ $1=NULL; print $3 }'"
+        get : "cat install/data/db1/postgresql.conf | grep '^shared_buffers =' | awk '{ $1=NULL; print $3 }'"
         set : "sed -i 's/^shared_buffers.*$/shared_buffers = $valuekB/g' install/data/db1/postgresql.conf"
         needrestart: "true"
         type : "continuous"
@@ -20,7 +20,7 @@ object :
     name : "work_mem"
     info :
         desc : ""
-        get : "cat install/data/db1/postgresql.conf | grep '^work_mem ='"
+        get : "cat install/data/db1/postgresql.conf | grep '^work_mem =' | awk '{ $1=NULL; print $3 }"
         set : "sed -i 's/^work_mem.*$/work_mem = $valuekB/g' install/data/db1/postgresql.conf"
         needrestart: "false"
         type : "continuous"
@@ -33,7 +33,7 @@ object :
     name : "commit_siblings"
     info :
         desc : ""
-        get : "cat install/data/db1/postgresql.conf | grep '^commit_siblings'"
+        get : "cat install/data/db1/postgresql.conf | grep '^commit_siblings' | awk '{ $1=NULL; print $3 }"
         set : "sed -i 's/^commit_siblings.*$/commit_siblings = $value/g' install/data/db1/postgresql.conf"
         needrestart: "false"
         type : "continuous"
@@ -46,7 +46,7 @@ object :
     name : "commit_delay"
     info :
         desc : ""
-        get : "cat install/data/db1/postgresql.conf | grep '^commit_delay'"
+        get : "cat install/data/db1/postgresql.conf | grep '^commit_delay' | awk '{ $1=NULL; print $3 }"
         set : "sed -i 's/^commit_delay.*$/commit_delay = $value/g' install/data/db1/postgresql.conf"
         needrestart: "false"
         type : "continuous"
@@ -59,7 +59,7 @@ object :
     name : "checkpoint_completion_target"
     info :
         desc : ""
-        get : "cat install/data/db1/postgresql.conf | grep '^checkpoint_completion_target'"
+        get : "cat install/data/db1/postgresql.conf | grep '^checkpoint_completion_target' | awk '{ $1=NULL; print $3 }"
         set : "sed -i 's/^checkpoint_completion_target.*$/checkpoint_completion_target = $value/g' install/data/db1/postgresql.conf"
         needrestart: "false"
         type : "continuous"
