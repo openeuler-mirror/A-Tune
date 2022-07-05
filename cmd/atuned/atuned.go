@@ -108,7 +108,7 @@ func doBeforeJob(ctx *cli.Context) error {
 	// Load conf file
 	cfg := config.NewCfg()
 	if err := cfg.Load(); err != nil {
-		log.Errorf("Faild to load config file, error: %v", err)
+		log.Errorf("Failed to load config file, error: %v", err)
 		return fmt.Errorf("failed to load config file, error: %v", err)
 	}
 

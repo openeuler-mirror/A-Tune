@@ -305,7 +305,7 @@ func (s *ProfileServer) ListWorkload(profileInfo *PB.ProfileInfo, stream PB.Prof
 		classProfile := &sqlstore.GetClass{Class: activeName}
 		err = sqlstore.GetClasses(classProfile)
 		if err != nil {
-			return fmt.Errorf("inquery workload type table faild %v", err)
+			return fmt.Errorf("inquery workload type table failed %v", err)
 		}
 		if len(classProfile.Result) > 0 {
 			activeName = classProfile.Result[0].ProfileType
@@ -916,7 +916,7 @@ func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo,
 	classProfile := &sqlstore.GetClass{Class: activeName}
 	err = sqlstore.GetClasses(classProfile)
 	if err != nil {
-		return fmt.Errorf("inquery workload type table faild %v", err)
+		return fmt.Errorf("inquery workload type table failed %v", err)
 	}
 	if len(classProfile.Result) > 0 {
 		activeName = classProfile.Result[0].ProfileType
@@ -926,8 +926,8 @@ func (s *ProfileServer) CheckActiveProfile(profileInfo *PB.ProfileInfo,
 	profile, ok := profile.LoadFromProfile(activeName)
 
 	if !ok {
-		log.WithField("profile", activeName).Errorf("Load profile %s Faild", activeName)
-		return fmt.Errorf("load profile %s Faild", activeName)
+		log.WithField("profile", activeName).Errorf("Load profile %s failed", activeName)
+		return fmt.Errorf("load profile %s Failed", activeName)
 	}
 
 	ch := make(chan *PB.AckCheck)

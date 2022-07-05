@@ -114,7 +114,7 @@ func (t TuningFile) Load() error {
 		if !info.IsDir() {
 			prj := new(project.YamlPrjSvr)
 			if err := utils.ParseFile(path, "yaml", &prj); err != nil {
-				return fmt.Errorf("load %s faild, err: %v", path, err)
+				return fmt.Errorf("load %s failed, err: %v", path, err)
 			}
 			log.Infof("project:%s load %s success", prj.Project, path)
 			*t.prjs = append(*t.prjs, *prj)
