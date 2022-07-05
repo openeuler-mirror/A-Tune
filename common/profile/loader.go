@@ -178,23 +178,23 @@ func LoadFromWorkloadType(workloadType string) (Profile, bool) {
 	profileType := classProfile.Result[0].ProfileType
 	profileNames := strings.Split(profileType, ",")
 
-	pro, exist := Load(profileNames)
-	return pro, exist
+	pro, errMsg := Load(profileNames)
+	return pro, errMsg == ""
 }
 
 // LoadFromProfile method load the profile content depend the profile name
 func LoadFromProfile(profiles string) (Profile, bool) {
 	profileNames := strings.Split(profiles, ",")
-	pro, exist := Load(profileNames)
-	return pro, exist
+	pro, errMsg := Load(profileNames)
+	return pro, errMsg == ""
 }
 
 // Load method load the profile content depned the profile names list
-func Load(profileNames []string) (Profile, bool) {
+func Load(profileNames []string) (Profile, string) {
 	profileNames = filter(profileNames)
 	if len(profileNames) == 0 {
 		fmt.Println("No profile or invaild profiles were specified.")
-		return Profile{}, false
+		return Profile{}, "no valid profile specified"
 	}
 
 	profiles := make([]Profile, 0)
@@ -202,7 +202,7 @@ func Load(profileNames []string) (Profile, bool) {
 	profiles, _ = loadProfile(profileNames, profiles, processedProfiles, false)
 
 	if len(profiles) == 0 {
-		return Profile{}, false
+		return Profile{}, "profile not found"
 	}
 	finalProfile := merge(profiles)
 
@@ -211,7 +211,7 @@ func Load(profileNames []string) (Profile, bool) {
 	finalProfile.inputs = cfg.Section("system")
 
 	finalProfile.name = strings.Join(profileNames, ",")
-	return finalProfile, true
+	return finalProfile, ""
 }
 
 func loadConfigData(name string) (*ini.File, error) {

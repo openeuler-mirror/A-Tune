@@ -258,11 +258,11 @@ func Post(serviceType, paramName, path string) (string, error) {
 func (s *ProfileServer) Profile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_ProfileServer) error {
 	profileNamesStr := profileInfo.GetName()
 	profileNames := strings.Split(profileNamesStr, ",")
-	profile, ok := profile.Load(profileNames)
+	profile, errMsg := profile.Load(profileNames)
 
-	if !ok {
-		fmt.Println("Failure Load ", profileInfo.GetName())
-		return fmt.Errorf("load profile %s Faild", profileInfo.GetName())
+	if errMsg != "" {
+		fmt.Println("Failed to load profile:", profileInfo.GetName())
+		return fmt.Errorf("load profile %s failed: %s", profileInfo.GetName(), errMsg)
 	}
 	ch := make(chan *PB.AckCheck)
 	ctx, cancel := context.WithCancel(context.Background())
