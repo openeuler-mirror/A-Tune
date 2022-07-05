@@ -13,7 +13,7 @@
 #
 # Create: 2021-09-29
 echo "install telnet..."
-yum install telnet -y
+yum install telnet gcc-c++ -y
 
 echo "close firewalld..."
 systemctl stop firewalld
