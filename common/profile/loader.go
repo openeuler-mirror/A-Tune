@@ -55,7 +55,7 @@ func loadProfile(profileNames []string, profiles []Profile,
 
 		config, err := loadConfigData(name)
 		if err != nil {
-			fmt.Println("Failure to load_config_data")
+			fmt.Println("Failed to loadConfigData")
 			continue
 		}
 		profile := Create(name, name, config)

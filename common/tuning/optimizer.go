@@ -848,7 +848,7 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	for _, item := range o.Prj.Object {
 		out, err := project.ExecGetOutput(item.Info.GetScript)
 		if err != nil {
-			return fmt.Errorf("faild to exec %s, err: %v", item.Info.GetScript, err)
+			return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
 		}
 		initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+string(out)))
 	}
