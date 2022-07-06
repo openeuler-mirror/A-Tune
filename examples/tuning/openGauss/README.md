@@ -1,7 +1,10 @@
-1. Install openGauss according to the guide (https://opengauss.org/zh/docs/1.1.0/docs/installation/installation.html)
+1. Install openGauss according to the guide (https://opengauss.org/zh/docs/2.1.0/docs/installation/installation.html)
 ```bash
 # install dependency
 yum install -y libaio-devel flex bison ncurses-devel glibc-devel patch libnsl openeuler-lsb-core readline-devel
+
+# opengauss depends on libreadline7, but openEuler 22.03LTS only provides libreadline8, here manually create a libreadline7 soft link
+ln -s /usr/lib64/libreadline.so.8 /usr/lib64/libreadline.so.7
 
 # download software package from official website
 [[ `arch` == "x86_64" ]] && wget https://opengauss.obs.cn-south-1.myhuaweicloud.com/2.1.0/x86_openEuler/openGauss-2.1.0-openEuler-64bit.tar.bz2
@@ -11,8 +14,12 @@ yum install -y libaio-devel flex bison ncurses-devel glibc-devel patch libnsl op
 mkdir -p /opt/software/openGauss
 tar -xf openGauss-2.1.0-openEuler-64bit.tar.bz2 -C /opt/software/openGauss
 
-# create user for opengauss usage
-adduser opengauss
+# create user and group for opengauss
+mkdir -p /var/lib/opengauss/
+groupadd -r opengauss
+adduser -M -N -g opengauss -r -d /var/lib/opengauss -s /bin/bash opengauss
+chown -R opengauss /var/lib/opengauss/
+chgrp -R opengauss /var/lib/opengauss/
 chown -R opengauss /opt/software/openGauss
 chgrp -R opengauss /opt/software/openGauss
 
@@ -21,8 +28,10 @@ su - opengauss
 cd /opt/software/openGauss/simpleInstall
 sh install.sh -w "password@123"
 
-# verify install result
+# load opengauss environment variable
 source ~/.bashrc
+
+# verify install result, opengauss has started
 gs_ctl quary -D /opt/software/openGauss/data/single_node
 
 # create benchmark database as tpcc
