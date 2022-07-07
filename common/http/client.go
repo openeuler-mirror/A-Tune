@@ -18,6 +18,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -36,6 +38,30 @@ type httpClient struct {
 func (c *httpClient) Do(req *http.Request) (*http.Response, error) {
 	response, err := c.client.Do(req)
 	return response, err
+}
+
+// VerifyCertificate checks whether certificate file is valid and unexpired
+func VerifyCertificate(certFile string, pool *x509.CertPool) error {
+	certBytes, err := ioutil.ReadFile(certFile)
+	if err != nil {
+		return err
+	}
+	block, _ := pem.Decode(certBytes)
+	if block == nil {
+		return errors.New("failed to decode certificate")
+	}
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return errors.New("failed to parse certificate: " + err.Error())
+	}
+	opts := x509.VerifyOptions{
+		Roots: pool,
+	}
+	_, err = cert.Verify(opts)
+	if err != nil {
+		return errors.New("failed to verify certificate: " + err.Error())
+	}
+	return nil
 }
 
 // NewhttpClient create an http client
@@ -58,12 +84,21 @@ func NewhttpClient(url string) (*httpClient, error) {
 		}
 		pool.AppendCertsFromPEM(caCrt)
 
+		if err = VerifyCertificate(caFile, pool); err != nil {
+			return nil, err
+		}
+
 		clientCertFile := config.TLSEngineClientCertFile
 		clientKeyFile := config.TLSEngineClientKeyFile
 		if !config.IsEnginePort(uri) {
 			clientCertFile = config.TLSRestServerCertFile
 			clientKeyFile = config.TLSRestServerKeyFile
 		}
+
+		if err = VerifyCertificate(clientCertFile, pool); err != nil {
+			return nil, err
+		}
+
 		clientCrt, err := tls.LoadX509KeyPair(clientCertFile, clientKeyFile)
 		if err != nil {
 			return nil, err
