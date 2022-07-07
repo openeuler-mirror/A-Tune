@@ -1,7 +1,7 @@
 1. Install openGauss according to the guide (https://opengauss.org/zh/docs/2.1.0/docs/installation/installation.html)
 ```bash
 # install dependency
-yum install -y libaio-devel flex bison ncurses-devel glibc-devel patch libnsl openeuler-lsb-core readline-devel
+yum install -y net-tools libaio-devel flex bison ncurses-devel glibc-devel patch libnsl openeuler-lsb-core readline-devel
 
 # opengauss depends on libreadline7, but openEuler 22.03LTS only provides libreadline8, here manually create a libreadline7 soft link
 ln -s /usr/lib64/libreadline.so.8 /usr/lib64/libreadline.so.7
@@ -18,10 +18,8 @@ tar -xf openGauss-2.1.0-openEuler-64bit.tar.bz2 -C /opt/software/openGauss
 mkdir -p /var/lib/opengauss/
 groupadd -r opengauss
 adduser -M -N -g opengauss -r -d /var/lib/opengauss -s /bin/bash opengauss
-chown -R opengauss /var/lib/opengauss/
-chgrp -R opengauss /var/lib/opengauss/
-chown -R opengauss /opt/software/openGauss
-chgrp -R opengauss /opt/software/openGauss
+chown -R opengauss:opengauss /var/lib/opengauss/
+chown -R opengauss:opengauss /opt/software/openGauss
 
 # run install script, with password "password@123"
 su - opengauss
@@ -37,7 +35,7 @@ gs_ctl quary -D /opt/software/openGauss/data/single_node
 # create benchmark database as tpcc
 gsql -d postgres -r -c 'create database tpcc; create user tpcc with password "password@123"; grant all privileges to tpcc;'
 
-# quit opengauss user
+# quit opengauss user and get back to opengauss example dir
 exit
 ```
 
@@ -51,7 +49,7 @@ wget https://udomain.dl.sourceforge.net/project/benchmarksql/benchmarksql-5.0.zi
 unzip -q benchmark-5.0.zip
 cd benchmarksql-5.0
 
-# install opengauss jdbc driver for benchmarksql
+# install opengauss jdbc driver for benchmarksql and recompile benchmarksql
 [[ `arch` == "x86_64" ]] && wget https://opengauss.obs.cn-south-1.myhuaweicloud.com/2.1.0/x86_openEuler/openGauss-2.1.0-JDBC.tar.gz
 [[ `arch` == "aarch64" ]] && wget https://opengauss.obs.cn-south-1.myhuaweicloud.com/2.1.0/arm/openGauss-2.1.0-JDBC.tar.gz
 tar -xvf openGauss-2.1.0-JDBC.tar.gz
@@ -59,15 +57,17 @@ rm ./lib/postgres/postgresql*.jar
 mv ./postgresql.jar ./lib/postgres/gsjdbc4.jar
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/lib/postgres/gsjdbc4.jar
 echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:`pwd`/lib/postgres/gsjdbc4.jar" >> /etc/profile
+ant
 
 # create benchmark configuration file props.opengauss
 cd run/
 cp props.pg props.opengauss
 vim props.opengauss
 ```
-edit as following:
+
+update following properties(adjust for your own machine according to comment):
 ```
-// connection parameters
+// connection parameters, conn url should point to the tpcc database we have created
 db=postgres
 driver=org.postgresql.Driver
 conn=jdbc:postgresql://localhost:5432/tpcc
@@ -80,20 +80,22 @@ warehouses=20
 loadWorkers=4
 // concurrent terminal count, usually not more than cpu core number
 terminals=4
-// To run specified transactions per terminal - runMins must equal zero
+
+// To run specified transactions per terminal - if this is set nonzero, runMins must equal zero
 runTxnsPerTerminal=0
-// To run benchmark for specified minutes - runTxnsPerTerminal must equal zero
+// To run benchmark for specified minutes - if this is set nonzero, runTxnsPerTerminal must equal zero
 runMins=5
+
 // number of total transactions per minute, 0 means no limit
 limitTxnsPerMin=0
 // binding mode for terminal and warehouse, usually set true for TPCC
 terminalWarehouseFixed=true
 
-// comment following options
-//osCollectorScript=...
-//osCollectorInterval=...
-//osCollectorSSHAddr=...
-//osCollectorDevices=...
+// no need to collect os information, just comment following options if they are not commented
+// osCollectorScript=
+// osCollectorInterval=
+// osCollectorSSHAddr=
+// osCollectorDevices=
 ```
 
 build benchmark database:
