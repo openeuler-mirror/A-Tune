@@ -46,7 +46,7 @@ yum install -y java ant
 
 # download software package and extract files
 wget https://udomain.dl.sourceforge.net/project/benchmarksql/benchmarksql-5.0.zip
-unzip -q benchmark-5.0.zip
+unzip -q benchmarksql-5.0.zip
 cd benchmarksql-5.0
 
 # install opengauss jdbc driver for benchmarksql and recompile benchmarksql
