@@ -181,7 +181,7 @@ class WorkloadCharacterization:
                               scale_pos_weight=1, random_state=27, slient=0, alpha=100)
         model.fit(x_train, y_train, sample_weight=w_array)
         y_pred = model.predict(x_test)
-        print("the accuracy of xgboost classifier is %f" % accuracy_score(y_test, y_pred))
+        print(f"the accuracy of xgboost classifier is {accuracy_score(y_test, y_pred)}")
         if clfpath is not None:
             joblib.dump(model, clfpath)
         return model

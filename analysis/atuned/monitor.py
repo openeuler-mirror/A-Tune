@@ -47,7 +47,7 @@ class Monitor(Resource):
         para = None if para.strip() == "" else para
         monitors = MPI_INSTANCE.get_monitors(module, purpose)
         if len(monitors) < 1:
-            result["status"] = "module: {}, purpose:{} is not exist".format(module, purpose)
+            result["status"] = f"module: {module}, purpose:{purpose} is not exist"
             return result, 200
 
         monitor = monitors[0]

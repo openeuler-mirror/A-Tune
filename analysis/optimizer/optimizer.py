@@ -73,30 +73,26 @@ class Optimizer(multiprocessing.Process):
             elif p_nob['type'] == 'continuous':
                 r_range = p_nob['range']
                 if r_range is None or len(r_range) != 2:
-                    raise ValueError("the item of the scope value of {} must be 2"
-                                     .format(p_nob['name']))
+                    raise ValueError(f"the item of the scope value of {p_nob['name']} must be 2")
                 if p_nob['dtype'] == 'int':
                     try:
                         r_range[0] = int(r_range[0])
                         r_range[1] = int(r_range[1])
                     except ValueError:
-                        raise ValueError("the range value of {} is not an integer value"
-                                         .format(p_nob['name']))
+                        raise ValueError(f"the range value of {p_nob['name']} is not an integer value")
                 elif p_nob['dtype'] == 'float':
                     try:
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
                     except ValueError:
-                        raise ValueError("the range value of {} is not an float value"
-                                         .format(p_nob['name']))
+                        raise ValueError(f"the range value of {p_nob['name']} is not an float value")
 
                 if len(self.ref) > 0:
                     if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
-                        raise ValueError("the ref value of {} is out of range"
-                                         .format(p_nob['name']))
+                        raise ValueError(f"the ref value of {p_nob['name']} is out of range")
                 objective_params_list.append((r_range[0], r_range[1]))
             else:
-                raise ValueError("the type of {} is not supported".format(p_nob['name']))
+                raise ValueError(f"the type of {p_nob['name']} is not supported")
         return objective_params_list
 
     def handle_discrete_data(self, p_nob, index):
@@ -118,8 +114,7 @@ class Optimizer(multiprocessing.Process):
                 try:
                     ref_value = int(self.ref[index])
                 except ValueError:
-                    raise ValueError("the ref value of {} is not an integer value"
-                                     .format(p_nob['name']))
+                    raise ValueError(f"the ref value of {p_nob['name']} is not an integer value")
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -140,8 +135,7 @@ class Optimizer(multiprocessing.Process):
                 try:
                     ref_value = float(self.ref[index])
                 except ValueError:
-                    raise ValueError("the ref value of {} is not a float value"
-                                     .format(p_nob['name']))
+                    raise ValueError(f"the ref value of {p_nob['name']} is not a float value")
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -151,12 +145,11 @@ class Optimizer(multiprocessing.Process):
                 try:
                     ref_value = str(self.ref[index])
                 except ValueError:
-                    raise ValueError("the ref value of {} is not a string value"
-                                     .format(p_nob['name']))
+                    raise ValueError(f"the ref value of {p_nob['name']} is not a string value")
                 if ref_value not in items:
                     items.append(ref_value)
             return items
-        raise ValueError("the dtype of {} is not supported".format(p_nob['name']))
+        raise ValueError(f"the dtype of {p_nob['name']} is not supported")
 
     @staticmethod
     def feature_importance(options, performance, labels):
@@ -167,9 +160,9 @@ class Optimizer(multiprocessing.Process):
         result = zip(lasso.coef_, labels)
         total_sum = sum(map(abs, lasso.coef_))
         if total_sum == 0:
-            return ", ".join("%s: 0" % label for label in labels)
+            return ", ".join(f"{label}: 0" for label in labels)
         result = sorted(result, key=lambda x: -np.abs(x[0]))
-        rank = ", ".join("%s: %s%%" % (label, round(coef * 100 / total_sum, 2))
+        rank = ", ".join(f"{label}: {round(coef * 100 / total_sum, 2)}%%"
                          for coef, label in result)
         return rank
 
@@ -177,7 +170,7 @@ class Optimizer(multiprocessing.Process):
         x_each = []
         for p_nob in self.knobs:
             if p_nob['name'] not in kev.keys():
-                raise ValueError("the param {} is not in the x0 ref".format(p_nob['name']))
+                raise ValueError(f"the param {p_nob['name']} is not in the x0 ref")
             if p_nob['dtype'] == 'int':
                 x_each.append(int(kev[p_nob['name']]))
             elif p_nob['dtype'] == 'float':
@@ -201,7 +194,7 @@ class Optimizer(multiprocessing.Process):
             for val in x_value:
                 params = val.split("=")
                 if len(params) != 2:
-                    raise ValueError("the param format of {} is not correct".format(params))
+                    raise ValueError(f"the param format of {params} is not correct")
                 kev[params[0]] = params[1]
 
             ref_x = self._get_value_from_knobs(kev)
@@ -293,8 +286,7 @@ class Optimizer(multiprocessing.Process):
                 # Pass user suggested initialisation points to the optimizer
                 if ref_x:
                     if not isinstance(ref_y, (collections.Iterable, numbers.Number)):
-                        raise ValueError("`ref_y` should be an iterable or a scalar, "
-                                         "got %s" % type(ref_y))
+                        raise ValueError(f"`ref_y` should be an iterable or a scalar, got {type(ref_y)}")
                     if len(ref_x) != len(ref_y):
                         raise ValueError("`ref_x` and `ref_y` should "
                                          "have the same length")

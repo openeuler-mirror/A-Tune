@@ -47,7 +47,7 @@ class VarianceReductionFeatureSelector:
         index = list(range(len(labels)))
         ensemble_result = zip(list_pi, labels, index)
         ensemble_result = sorted(ensemble_result, key=lambda x: -x[0])
-        rank = ", ".join("%s: %s" % (label, round(score, 3)) for score, label, i in ensemble_result)
+        rank = ", ".join(f"{label}: {round(score, 3)}" for score, label, i in ensemble_result)
         sorted_index = [i for score, label, i in ensemble_result]
         LOGGER.info('ensemble rank: %s', rank)
         LOGGER.info('ensemble sorted_index: %s', sorted_index)

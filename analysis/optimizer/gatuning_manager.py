@@ -20,7 +20,7 @@ import geatpy as ea
 LOGGER = logging.getLogger(__name__)
 class GATuning:
     """ genetic algorithm tuning  """
-    def __init__(self,knobs,child_conn):   
+    def __init__(self,knobs,child_conn):
         dict_para = []
         para_lb = []
         para_ub= []
@@ -55,7 +55,7 @@ class GATuning:
                 para_ub.append(r_range[1])
                 para_type.append(int(1))
         self._para_name = para_name
-       
+
         self._dict_para = dict_para
         self._pt = pt
         self._para_lb = para_lb
@@ -63,7 +63,7 @@ class GATuning:
         self._para_type = para_type
         self._child_conn = child_conn
 
-    def evalVars(self,Vars): 
+    def evalVars(self,Vars):
         """ fitness function for genetic algorithm tuning  """
         iter_result ={}
         params = {}
@@ -92,21 +92,21 @@ class GATuning:
     def GA(self):
         """ genetic algorithm tuning manager """
         problem = ea.Problem(name='genetic algorithm for atune',
-                            M=1,  
-                            maxormins=[-1],  
-                            Dim=int(len(self._para_lb)),  
-                            varTypes = self._para_type,  
-                            lb = self._para_lb, 
-                            ub = self._para_ub, 
+                            M=1,
+                            maxormins=[-1],
+                            Dim=int(len(self._para_lb)),
+                            varTypes = self._para_type,
+                            lb = self._para_lb,
+                            ub = self._para_ub,
                             evalVars=self.evalVars)
-    
+
         algorithm = ea.soea_SEGA_templet(problem,
                                         ea.Population(Encoding='RI', NIND=5),
-                                        MAXGEN=10,  
-                                        logTras=1,  
-                                        trappedValue=1e-6,  
-                                        maxTrappedCount=10)  
-                                        
+                                        MAXGEN=10,
+                                        logTras=1,
+                                        trappedValue=1e-6,
+                                        maxTrappedCount=10)
+
         res = ea.optimize(algorithm, seed=1, verbose=False, drawing=0, outputMsg=False, drawLog=False)
         best_result_list = res['Vars'].tolist()[0]
         best_result = {}

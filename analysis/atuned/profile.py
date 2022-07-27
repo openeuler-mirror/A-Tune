@@ -70,7 +70,7 @@ class Profile(Resource):
 
         if len(configurators) < 1:
             result["status"] = "FAILED"
-            result["value"] = "module: {}, submodule: {} is not exist".format(modules[0], submodule)
+            result["value"] = f"module: {modules[0]}, submodule: {submodule} is not exist"
             return result, 200
 
         configurator = configurators[0]

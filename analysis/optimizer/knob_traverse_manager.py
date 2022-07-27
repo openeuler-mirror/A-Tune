@@ -210,6 +210,6 @@ class KnobTraverseManager:
         rank_list = list(zip(list(rank_map), list(rank_map.values())))
         rank_list = sorted(rank_list, key=cmp_to_key(self.rank_list_compare))
         length = len(rank_list)
-        rank = ", ".join("%s: %s" % (rank_list[i][0], str(length - i)) for i in range(length))
+        rank = ", ".join(f"{rank_list[i][0]}: {str(length - i)}" for i in range(length))
         LOGGER.debug("traverse rank is %s", rank)
         return rank

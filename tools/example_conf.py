@@ -26,16 +26,16 @@ GLOBAL_SECTIONS = (("main", "list it's parent profile"),
                    ("check", "check the environment"))
 
 for i in GLOBAL_SECTIONS:
-    print("[{}]".format(i[0]))
-    print("# {}".format(i[1]))
+    print(f"[{i[0]}]")
+    print(f"# {i[1]}")
     print("\n")
 
 CPI_INSTANCE = CPI()
 CPIS = CPI_INSTANCE.get_configurators()
 for i in CPIS:
     if i.module() == i.submod():
-        print("[{}]".format(i.module().lower()))
+        print(f"[{i.module().lower()}]")
     else:
-        print("[{}.{}]".format(i.module().lower(), i.submod().lower()))
-    print("# {}".format(i.__doc__.lower()))
+        print(f"[{i.module().lower()}.{i.submod().lower()}]")
+    print(f"# {i.__doc__.lower()}")
     print("\n")

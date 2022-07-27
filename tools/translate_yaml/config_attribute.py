@@ -101,8 +101,7 @@ class ConfigAttribute:
                 cmd_fail = True
 
         if cmd_fail:
-            print('Warning: %s invalid Value %s, make sure the value is in valid range.'
-                  % (self.name, value))
+            print(f'Warning: {self.name} invalid Value {value}, make sure the value is in valid range.')
             return False
         return True
 
@@ -139,8 +138,7 @@ class ConfigAttribute:
                 if not result:
                     return False
         else:
-            print("Warning: %s invalid dtype %s, only support int and string"
-                  % (self.name, self.dtype))
+            print(f"Warning: {self.name} invalid dtype {self.dtype}, only support int and string")
             return False
         return True
 
@@ -196,10 +194,8 @@ class ConfigAttribute:
                         fstr.write('          - ' + item + '\n')
                 fstr.write('        dtype : \"int\"\n')
             else:
-                print("Warning: %s invalid dtype %s, only support int and string"
-                      % (self.name, self.dtype))
+                print(f"Warning: {self.name} invalid dtype {self.dtype}, only support int and string")
         else:
-            print("Warning: %s invalid type %s, only support continuous and discrete"
-                  % (self.name, self.type))
+            print(f"Warning: {self.name} invalid type {self.type}, only support continuous and discrete")
 
         return fstr.getvalue()
