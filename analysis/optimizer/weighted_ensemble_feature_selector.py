@@ -165,7 +165,7 @@ class WeightedEnsembleFeatureSelector:
                     en_weight * (feature_num - i)  # the larger, the better
         ensemble_result = zip(ensemble_scores, labels, index)
         ensemble_result = sorted(ensemble_result, key=lambda x: -x[0])
-        rank = ", ".join("%s: %s" % (label, round(score, 3))
+        rank = ", ".join(f"{label}: {round(score, 3)}"
                          for score, label, i in ensemble_result)
 
         sorted_index = [i for score, label, i in ensemble_result]

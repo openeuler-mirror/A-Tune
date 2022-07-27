@@ -84,7 +84,7 @@ class TranslateYaml:
         self.out_file.write(self.get_head())
         obj_list = self.read_line(content, line)
         if not obj_list:
-            print("Empty workbook, stop translating %s" % self.out_file)
+            print(f"Empty workbook, stop translating {self.out_file}")
             return False
 
         while obj_list:

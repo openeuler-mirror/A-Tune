@@ -39,13 +39,13 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev, test
     :return: None
     """
     if iterations <= 10:
-        print('Failed: Iterations must be > 10, the input is %s' % iterations)
+        print(f"Failed: Iterations must be > 10, the input is {iterations}")
         return
     if not os.path.exists(in_dir):
-        print("Failed: The input directory (%s) is not existed" % in_dir)
+        print(f"Failed: The input directory ({in_dir}) is not existed")
         return
     if not os.path.exists(out_dir):
-        print("Failed: The output directory (%s) is not existed" % out_dir)
+        print(f"Failed: The output directory ({out_dir}) is not existed")
         return
     if not file_extension in ("xlsx", "csv"):
         print("Failed: The file extension must be be xlsx or csv")
@@ -53,7 +53,7 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev, test
 
     in_file_list = glob.glob((str(in_dir) + "*." + file_extension))
     if not in_file_list:
-        print("Warning: No %s files exist in the directory" % file_extension)
+        print(f"Warning: No {file_extension} files exist in the directory")
         return
 
     for file in in_file_list:
@@ -61,8 +61,7 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev, test
         in_file_basename = os.path.basename(file)
         out_file_name = in_file_basename.replace("." + file_extension, ".yaml")
         if os.path.exists(str(out_dir) + out_file_name):
-            print("Warning: The output yaml file (%s) is already exist,"
-                  " overwrite it!--" % out_file_name)
+            print(f"Warning: The output yaml file ({out_file_name}) is already exist, overwrite it!--")
 
         if file_extension == "xlsx":
             translate_yaml = TranslateXlsx2Yaml(os.path.join(in_dir, in_file_name),
@@ -75,9 +74,9 @@ def main(in_dir, out_dir, iterations, project_name, block_dev, network_dev, test
                                                project_name, iterations,
                                                block_dev, network_dev, test)
         if translate_yaml.translate():
-            print('Translating %s SUCCEEDED!' % str(file))
+            print(f'Translating {str(file)} SUCCEEDED!')
         else:
-            print('Translating %s FAILED!' % str(file))
+            print(f'Translating {str(file)} FAILED!')
 
 
 if __name__ == '__main__':

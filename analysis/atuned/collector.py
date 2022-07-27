@@ -48,8 +48,7 @@ class Collector(Resource):
             opts = monitor["field"].split(";")[1].split()
             for opt in opts:
                 if opt.split("=")[0] in "--fields":
-                    field_name.append("%s.%s.%s" % (monitor["module"], monitor["purpose"],
-                                                    opt.split("=")[1]))
+                    field_name.append(f"{monitor['module']}.{monitor['purpose']}.{opt.split('=')[1]}")
         field_key = field_name[:]
         data_type = args.get("data_type")
         if data_type != "":

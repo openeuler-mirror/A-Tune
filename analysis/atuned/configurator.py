@@ -50,7 +50,7 @@ class Configurator(Resource):
             submodule = modules[1]
         configurators = CPI_INSTANCE.get_configurators(modules[0], submodule)
         if len(configurators) < 1:
-            result["status"] = "module %s is not exist" % (section)
+            result["status"] = f"module {section} is not exist"
             return result, 200
         configurator = configurators[0]
 

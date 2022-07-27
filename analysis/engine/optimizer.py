@@ -46,7 +46,7 @@ class Optimizer(Resource):
         else:
             task = task_cache.TasksCache.get_instance().get(task_id)
             if not task:
-                abort(404, "{0} {1} not found".format(self.task_id_info, task_id))
+                abort(404, f"{self.task_id_info} {task_id} not found")
             result.append(task_id)
         return result, 200
 
@@ -93,8 +93,7 @@ class Optimizer(Resource):
             abort(404, "task id does not exist")
         task = task_cache.TasksCache.get_instance().get(task_id)
         if not task:
-            abort(404, "taskid {0} not found".format(task_id))
-
+            abort(404, f"taskid {task_id} not found")
         args = OPTIMIZER_PUT_PARSER.parse_args()
         LOGGER.info(args)
         if args["iterations"] == -1:
@@ -147,8 +146,8 @@ class Optimizer(Resource):
         result = {}
         opt_params = out_queue.recv()
         if isinstance(opt_params, Exception):
-            abort(404, "failed to get optimization results, err: {}".format(opt_params))
-        params = ["%s=%s" % (k, v) for k, v in opt_params["param"].items()]
+            abort(404, f"failed to get optimization results, err: {opt_params}")
+        params = [f"{k}={v}" for k, v in opt_params["param"].items()]
         result["param"] = ",".join(params)
         result["rank"] = opt_params.get("rank", None)
         result["finished"] = opt_params.get("finished", None)
@@ -161,7 +160,7 @@ class Optimizer(Resource):
             abort(404, "task id does not exist")
         process = task_cache.TasksCache.get_instance().get(task_id)
         if not process:
-            abort(404, "{0} {1} not found".format(self.task_id_info, task_id))
+            abort(404, f"{self.task_id_info} {task_id} not found")
         process["process"].stop_process()
         task_cache.TasksCache.get_instance().get(task_id)[self.pipe].close()
 
