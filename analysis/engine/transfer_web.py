@@ -41,7 +41,7 @@ def get_file_info(status, file_name):
     response_object['file_name'] = file_name
     path = TUNING_DATA_PATH + status + '/' + file_name + '.txt'
     params = []
-    with open(path, 'r') as tuning_file:
+    with open(path, 'r', encoding='utf-8') as tuning_file:
         infos = tuning_file.readline()[:-1].split(',')
         base = tuning_file.readline()[:-1]
         params = tuning_file.readline()[:-1].split(',')
@@ -74,7 +74,7 @@ def get_file_data(status, file_name, line, response_object):
     count = 0
     params = []
     eof = False
-    with open(path, 'r') as tuning_file:
+    with open(path, 'r', encoding='utf-8') as tuning_file:
         _ = tuning_file.readline()
         _ = tuning_file.readline()
         params = tuning_file.readline()[:-1].split(',')
@@ -192,7 +192,7 @@ def get_analysis_details(file_name, csv_line, log_line):
         return response_object
     log_res = []
     log_count = 0
-    with open(path + ".log", 'r') as analysis_log:
+    with open(path + ".log", 'r', encoding='utf-8') as analysis_log:
         workload = analysis_log.readline()[:-1]
         lines = analysis_log.readlines()
         while log_line + log_count < len(lines):
@@ -226,7 +226,7 @@ def get_analysis_csv(path, line):
     """get analysis csv"""
     count = 0
     res = []
-    with open(path, 'r') as analysis_file:
+    with open(path, 'r', encoding='utf-8') as analysis_file:
         table_header = analysis_file.readline()[:-1].split(',')
         lines = analysis_file.readlines()
         while line + count < len(lines):

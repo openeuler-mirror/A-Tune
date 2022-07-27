@@ -29,7 +29,7 @@ class TranslateCsv2Yaml(TranslateYaml):
                  iterations, block_dev, network_dev, test):
         super().__init__(out_file_name, project_name,
                          iterations, block_dev, network_dev, test)
-        with open(in_file_name) as file:
+        with open(in_file_name, encoding='utf-8') as file:
             reader = csv.reader(file)
             self.rows = list(reader)
 

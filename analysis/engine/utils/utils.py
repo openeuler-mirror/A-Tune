@@ -34,7 +34,7 @@ def read_from_csv(path):
     if not path.endswith('.csv'):
         return None
 
-    with open(path, 'r') as file:
+    with open(path, 'r', encoding='utf-8') as file:
         data = pd.read_csv(file, header=0)
 
     return data
@@ -56,7 +56,7 @@ def add_data_to_file(data, mode, filename):
     if not Path(path).exists():
         create_dir()
     path = path + filename + ".txt"
-    with open(path, mode) as file_handle:
+    with open(path, mode, encoding='utf-8') as file_handle:
         file_handle.write(str(data))
         file_handle.write("\n")
         file_handle.close()
