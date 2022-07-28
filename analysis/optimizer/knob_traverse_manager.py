@@ -26,7 +26,7 @@ class KnobTraverseManager:
         self._knobs = knobs
         self._child_conn = child_conn
         self._default_values = self.default_values_to_dict(default_values)
-        self._param_performance_map = dict()
+        self._param_performance_map = {}
         self._name_list = []
         self._performIndex_knobsIndex = []
         self._max_eval = 0
@@ -39,7 +39,7 @@ class KnobTraverseManager:
 
     def default_values_to_dict(self, default_values):
         """change list format to dictionary format """
-        default_value_dict = dict()
+        default_value_dict = {}
         knobs = self._knobs
         for i in range(len(knobs)):
             name = knobs[i]['name']
@@ -147,7 +147,7 @@ class KnobTraverseManager:
         """get the rank of parameters according to the performance"""
         knobs = self._knobs
         param_performance_map = self._param_performance_map
-        param_differ_perform_map = dict()
+        param_differ_perform_map = {}
 
         index = 1
         while index < len(self._performIndex_knobsIndex):
@@ -195,7 +195,7 @@ class KnobTraverseManager:
         sorted_param_differ_perform_pair = sorted(
             param_differ_perform_map.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
 
-        rank_map = dict()
+        rank_map = {}
         for i in range(len(sorted_param_performance_pair)):
             if sorted_param_performance_pair[i][0] in rank_map.keys():
                 rank_map[sorted_param_performance_pair[i][0]] += (i + 1)

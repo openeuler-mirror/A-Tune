@@ -76,7 +76,7 @@ class ConfigAttribute:
         """
         if 'echo ' in self.set and '>' in self.set:
             cmd1, cmd2 = cmd.split('>')
-            with open(cmd2.strip(), 'w') as file:
+            with open(cmd2.strip(), 'w', encoding='utf-8') as file:
                 process = subprocess.Popen(shlex.split(cmd1), stdout=file, shell=False)
                 process.wait()
                 result = str(process.returncode)

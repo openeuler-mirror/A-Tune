@@ -43,7 +43,7 @@ def add_data(path, cip, uid, session):
         if uid != -1:
             find_or_initial_ip(uid, cip, session)
         table_name = table_collection_data.get_table_name(cip)
-        with open(path, 'r') as analysis_file:
+        with open(path, 'r', encoding='utf-8') as analysis_file:
             real_headers = analysis_file.readline()[:-1].split(',')
             headers = [re.sub(r'[^\w]', '_', col.lower()) for col in real_headers]
             for index, col in enumerate(headers):

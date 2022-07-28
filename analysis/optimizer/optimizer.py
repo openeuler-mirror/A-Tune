@@ -78,14 +78,14 @@ class Optimizer(multiprocessing.Process):
                     try:
                         r_range[0] = int(r_range[0])
                         r_range[1] = int(r_range[1])
-                    except ValueError:
-                        raise ValueError(f"the range value of {p_nob['name']} is not an integer value")
+                    except ValueError as e:
+                        raise ValueError(f"the range value of {p_nob['name']} is not an integer value") from e
                 elif p_nob['dtype'] == 'float':
                     try:
                         r_range[0] = float(r_range[0])
                         r_range[1] = float(r_range[1])
-                    except ValueError:
-                        raise ValueError(f"the range value of {p_nob['name']} is not an float value")
+                    except ValueError as e:
+                        raise ValueError(f"the range value of {p_nob['name']} is not an float value") from e
 
                 if len(self.ref) > 0:
                     if self.ref[i] < r_range[0] or self.ref[i] > r_range[1]:
@@ -113,8 +113,8 @@ class Optimizer(multiprocessing.Process):
             if len(self.ref) > 0:
                 try:
                     ref_value = int(self.ref[index])
-                except ValueError:
-                    raise ValueError(f"the ref value of {p_nob['name']} is not an integer value")
+                except ValueError as e:
+                    raise ValueError(f"the ref value of {p_nob['name']} is not an integer value") from e
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -134,8 +134,8 @@ class Optimizer(multiprocessing.Process):
             if len(self.ref) > 0:
                 try:
                     ref_value = float(self.ref[index])
-                except ValueError:
-                    raise ValueError(f"the ref value of {p_nob['name']} is not a float value")
+                except ValueError as e:
+                    raise ValueError(f"the ref value of {p_nob['name']} is not a float value") from e
                 if ref_value not in items:
                     items.append(ref_value)
             return items
@@ -144,8 +144,8 @@ class Optimizer(multiprocessing.Process):
             if len(self.ref) > 0:
                 try:
                     ref_value = str(self.ref[index])
-                except ValueError:
-                    raise ValueError(f"the ref value of {p_nob['name']} is not a string value")
+                except ValueError as e:
+                    raise ValueError(f"the ref value of {p_nob['name']} is not a string value") from e
                 if ref_value not in items:
                     items.append(ref_value)
             return items

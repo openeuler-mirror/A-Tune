@@ -26,20 +26,20 @@ def main(tuning_yamls_path):
     generate the server yaml files for tuning
     """
     all_tuning_config_yaml = 'tuning_params_all.yaml'
-    with open(os.path.join(tuning_yamls_path, all_tuning_config_yaml), 'r') as file:
+    with open(os.path.join(tuning_yamls_path, all_tuning_config_yaml), 'r', encoding='utf-8') as file:
         all_config = yaml.safe_load(file)
     for path, _, yamls in os.walk(tuning_yamls_path):
         for yaml_file in yamls:
             if yaml_file == all_tuning_config_yaml:
                 continue
-            with open(os.path.join(path, yaml_file), 'r') as file:
+            with open(os.path.join(path, yaml_file), 'r', encoding='utf-8') as file:
                 yaml_config = yaml.safe_load(file)
             for index, value in enumerate(yaml_config['object']):
                 for _, val in enumerate(all_config['object']):
                     if val['name'] == value['name']:
                         yaml_config['object'][index] = val
                         break
-            with open(os.path.join(path, yaml_file), 'w') as file:
+            with open(os.path.join(path, yaml_file), 'w', encoding='utf-8') as file:
                 file.write(yaml.dump(yaml_config, sort_keys=False))
 
 

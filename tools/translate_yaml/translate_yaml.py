@@ -33,7 +33,7 @@ class TranslateYaml:
         :param network_dev: the name of network device.
         :param test: whether test the commands in file or not.
         """
-        self.out_file = open(out_file_name, 'w')
+        self.out_file = open(out_file_name, 'w', encoding='utf-8')
         self.project_name = project_name
         self.iterations = iterations
         self.block_dev = block_dev

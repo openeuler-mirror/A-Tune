@@ -106,7 +106,7 @@ class WorkloadCharacterization:
         lasso = Lasso(alpha=0.01).fit(x_axis, y_axis)
         importance = lasso.coef_.tolist()
         featureimportance = sorted(zip(self.data_features, importance), key=lambda x: -np.abs(x[1]))
-        result = ", ".join("%s: %s" % (label, round(coef, 3)) for label, coef in featureimportance)
+        result = ", ".join(f"{label}: {round(coef, 3)}" for label, coef in featureimportance)
         print("Feature selection result of current classifier:", result)
 
         feature_model = SelectFromModel(lasso, threshold=0.001)
@@ -135,9 +135,9 @@ class WorkloadCharacterization:
                                  cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
         model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
-        print("the accuracy of svc classifier is %f" % accuracy_score(y_test, y_pred))
+        print(f"the accuracy of svc classifier is {accuracy_score(y_test, y_pred)}")
         if hasattr(model, 'best_params_'):
-            print("the grid search best params is: %s" % model.best_params_)
+            print(f"the grid search best params is: {model.best_params_}")
         if clfpath is not None:
             joblib.dump(model, clfpath)
         return model
@@ -157,9 +157,9 @@ class WorkloadCharacterization:
                     cv=5, n_jobs=-1, pre_dispatch='0.5*n_jobs')
         model.fit(x_train, y_train)
         y_pred = model.predict(x_test)
-        print("the accuracy of random forest classifier is %f" % accuracy_score(y_test, y_pred))
+        print(f"the accuracy of random forest classifier is {accuracy_score(y_test, y_pred)}")
         if hasattr(model, 'best_params_'):
-            print("the grid search best params is: %s" % model.best_params_)
+            print(f"the grid search best params is: {model.best_params_}")
         if clfpath is not None:
             joblib.dump(model, clfpath)
         return model
