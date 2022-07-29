@@ -3,13 +3,13 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 1.0.0
+Version: 1.1.0
 Release: 1
 License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
 Source: https://gitee.com/openeuler/A-Tune/repository/archive/v%{version}.tar.gz
 
-BuildRequires: rpm-build golang-bin procps-ng
+BuildRequires: rpm-build golang-bin procps-ng lshw
 BuildRequires: sqlite >= 3.24.0 openssl
 BuildRequires: python3-scikit-optimize python3-pandas python3-xgboost
 BuildRequires: python3-pyyaml
@@ -56,22 +56,15 @@ Requires: python3-xgboost
 Requires: python3-flask-restful
 Requires: python3-pandas
 Requires: python3-lhsmdu
-Conflicts: atune < 0.3-0.3
+Conflicts: atune < 0.3-0.9
 
 %description engine
 atune engine tool for manage atuned AI tuning system.
 
 %prep
-%autosetup -n A-Tune -p1
+%autosetup -n A-Tune-v%{version} -p1
 
 %build
-%if %{with_strip}
-export GOLDFLAGS="-s"
-%endif
-sed -i "s/^rest_tls.*/rest_tls = false/" misc/atuned.cnf
-sed -i "s/^engine_tls.*/engine_tls = false/" misc/atuned.cnf
-sed -i "s/^engine_tls.*/engine_tls = false/" misc/engine.cnf
-make models
 %make_build
 
 %install
@@ -81,55 +74,64 @@ make models
 
 %files
 %license License/LICENSE
-%defattr(0640,root,root,-)
-%attr(0640,root,root) /usr/lib/atuned/modules/daemon_profile_server.so
+%defattr(0640,root,root,0750)
+%attr(0550,root,root) /usr/lib/atuned/modules/daemon_profile_server.so
 %attr(0640,root,root) %{_unitdir}/atuned.service
-%attr(0750,root,root) %{_bindir}/atuned
-%attr(0750,root,root) /usr/libexec/atuned/analysis/*
-%attr(0640,root,root) /usr/lib/atuned/profiles/*
+%attr(0550,root,root) %{_bindir}/atuned
+%attr(0550,root,root) /usr/libexec/atuned/analysis/*
+/usr/lib/atuned/profiles/*
 %exclude /usr/libexec/atuned/analysis/app_engine.py
 %exclude /usr/libexec/atuned/analysis/models/
 %exclude /usr/libexec/atuned/analysis/optimizer/
 %exclude /usr/libexec/atuned/analysis/engine/
 %exclude /usr/libexec/atuned/analysis/dataset/
 %attr(0750,root,root) %dir /usr/lib/atuned
-%attr(0750,root,root) %dir /usr/lib/atuned/modules
+%attr(0550,root,root) %dir /usr/lib/atuned/modules
 %attr(0750,root,root) %dir /usr/lib/atuned/profiles
 %attr(0750,root,root) %dir /usr/libexec/atuned
-%attr(0750,root,root) %dir /usr/libexec/atuned/analysis
+%attr(0550,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /usr/share/atuned
 %attr(0750,root,root) %dir /etc/atuned
 %attr(0750,root,root) %dir /etc/atuned/rules
+%attr(0750,root,root) %dir /etc/atuned/tuning
 %attr(0750,root,root) %dir /var/atuned
 %attr(0640,root,root) /etc/atuned/atuned.cnf
+%attr(0700,root,root) %dir /etc/atuned/engine_certs
+%attr(0700,root,root) %dir /etc/atuned/rest_certs
 %exclude /etc/atuned/engine_certs/*
 %exclude /etc/atuned/rest_certs/*
 
+
 %files client
-%attr(0750,root,root) %{_bindir}/atune-adm
-%attr(0640,root,root) /usr/share/bash-completion/completions/atune-adm
+%attr(0550,root,root) %{_bindir}/atune-adm
+%attr(0550,root,root) /usr/share/bash-completion/completions/atune-adm
 
 %files db
 %attr(0750,root,root) %dir /var/lib/atuned
 %attr(0750,root,root) %dir /var/run/atuned
-%attr(0750,root,root) /var/lib/atuned/atuned.db
+%attr(0640,root,root) /var/lib/atuned/atuned.db
 %attr(0750,root,root) %dir /usr/libexec/atuned
+%attr(0550,root,root) %dir /usr/libexec/atuned/analysis
+%attr(0550,root,root) %dir /usr/libexec/atuned/analysis/models
+%attr(0550,root,root) /usr/libexec/atuned/analysis/models/*
 
 %files engine
 %license License/LICENSE
-%defattr(0640,root,root,-)
+%defattr(0640,root,root,0750)
 %attr(0640,root,root) %{_unitdir}/atune-engine.service
-%attr(0750,root,root) /usr/libexec/atuned/analysis/*
-%attr(0750,root,root) /etc/atuned/*
+%attr(0550,root,root) /usr/libexec/atuned/analysis/*
+/etc/atuned/*
 %exclude /usr/libexec/atuned/analysis/app_rest.py
+%exclude /usr/libexec/atuned/analysis/plugin/
 %exclude /usr/libexec/atuned/analysis/atuned/
-%exclude /usr/libexec/atuned/analysis/dataset/
-%attr(0750,root,root) %dir /usr/libexec/atuned/analysis
+%attr(0550,root,root) %dir /usr/libexec/atuned/analysis
 %attr(0750,root,root) %dir /etc/atuned
 %exclude /etc/atuned/atuned.cnf
 %exclude /etc/atuned/rules
+%exclude /etc/atuned/tuning
+%attr(0700,root,root) %dir /etc/atuned/engine_certs
 %exclude /etc/atuned/engine_certs/*
-%exclude /etc/atuned/rest_certs/*
+%exclude /etc/atuned/rest_certs
 
 %post
 %systemd_post atuned.service
@@ -141,6 +143,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Fri Jul 29 2022 gaoruoshu<gaoruoshu@huawei.com> - 1.1.0-1
+- upgrade to v1.1.0
+
 * Mon Nov 15 2021 hanxinke<hanxinke@huawei.com> - 1.0.0-1
 - upgrade to v1.0.0
 
