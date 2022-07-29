@@ -629,11 +629,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 
 		log.Infof("find Project:%s from %s", prj.Project, yamlPaths[idx])
 
-		objectSet := new(ObjectSet)
-		objectSet.Objects = append(objectSet.Objects, prj.Object...)
 		prj.Object = CheckObjectReplace(prj.Object)
-		objectSet.CheckObjectDuplicate()
-		prj.Object = objectSet.Objects
 
 		if optimizer.Prj == nil {
 			optimizer.Prj = prj
