@@ -1,4 +1,4 @@
-VERSION = 1.0.0
+VERSION = 1.1.0
 .PHONY: all clean modules
 
 PKGPATH=pkg
@@ -51,6 +51,11 @@ cleanall: clean
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
 	rm -rf $(DESTDIR)/var/atuned/
+	rm -rf $(BINDIR)/atune-adm
+	rm -rf $(BINDIR)/atuned
+	rm -rf $(SYSTEMDDIR)/atuned.service
+	rm -rf $(SYSTEMDDIR)/atune-engine.service
+	rm -rf $(DESTDIR)$(PREFIX)/share//bash-completion/completions/atune-adm
 
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
