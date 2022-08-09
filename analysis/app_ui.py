@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.app import App
 from analysis.ui.config import UiConfig
 from analysis.ui.database import ui_tuning, ui_analysis, ui_user
+from analysis.ui import offline
 
 
 class AppUI(App):
@@ -32,6 +33,7 @@ class AppUI(App):
         self.api.add_resource(ui_tuning.UiTuning, '/v1/UI/tuning/<string:cmd>')
         self.api.add_resource(ui_analysis.UiAnalysis, '/v1/UI/analysis/<string:cmd>')
         self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
+        self.api.add_resource(offline.OfflineTunning, '/v2/UI/offline/<string:cmd>')
 
 
 def main(filename):
