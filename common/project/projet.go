@@ -357,12 +357,17 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 		}
 
 		newScript = strings.Replace(newScript, "$name", objName, -1)
-		log.Infof("set script for %s: %s", obj.Name, newScript)
-		_, err = ExecCommand(newScript)
-		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", newScript, err), ""
+
+		obj_len := len(obj.Name)
+		if obj.Name[obj_len-1:obj_len] == "0" {
+			log.Infof("set script for %s: %s", obj.Name, newScript)
+			_, err = ExecCommand(newScript)
+			if err != nil {
+				return fmt.Errorf("failed to exec %s, err: %v", newScript, err), ""
+			}
+		} else {
+			scripts = append(scripts, newScript)
 		}
-		scripts = append(scripts, newScript)
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)
 	scriptsJson, _ := json.Marshal(scripts)
@@ -464,7 +469,7 @@ func ExecCommand(script string) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-//exec command and get complete output including subprocess 
+//exec command and get complete output including subprocess
 func ExecGetOutput(script string) ([]byte, error) {
 	cmd := exec.Command("sh", "-c", script)
 	return cmd.CombinedOutput()
