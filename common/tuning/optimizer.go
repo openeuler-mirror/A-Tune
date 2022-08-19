@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -76,7 +76,7 @@ type Optimizer struct {
 
 // object set type
 type ObjectSet struct {
-	Objects             []*project.YamlPrjObj
+	Objects []*project.YamlPrjObj
 }
 
 // InitTuned method for iniit tuning
@@ -653,39 +653,39 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 
 // Check if object contains {disk} or {network}
 func CheckObjectReplace(objects []*project.YamlPrjObj) []*project.YamlPrjObj {
-    for ind := 0; ind < len(objects); ind++ {
-        if strings.Contains(objects[ind].Info.GetScript, "{disk}") {
-            param := config.Disk
-            objects = ReplaceObject("{disk}", param, objects, ind)
-        }
-        if strings.Contains(objects[ind].Info.GetScript, "{network}") {
-            param := config.Network
-            objects = ReplaceObject("{network}", param, objects, ind)
-        }
-    }
-    return objects
+	for ind := 0; ind < len(objects); ind++ {
+		if strings.Contains(objects[ind].Info.GetScript, "{disk}") {
+			param := config.Disk
+			objects = ReplaceObject("{disk}", param, objects, ind)
+		}
+		if strings.Contains(objects[ind].Info.GetScript, "{network}") {
+			param := config.Network
+			objects = ReplaceObject("{network}", param, objects, ind)
+		}
+	}
+	return objects
 }
 
 // replace {disk} {network} string in object
 func ReplaceObject(replace string, param string, objects []*project.YamlPrjObj, ind int) []*project.YamlPrjObj {
-    params := strings.Split(param, ",")
-    if len(params) > 1 {
-        for i := 1; i < len(params); i++ {
-            newObj := &project.YamlPrjObj {
-                Name: objects[ind].Name,
-                Info: objects[ind].Info,
-                Relations: objects[ind].Relations,
-            }
-            newObj.Name = newObj.Name + "-" + params[i]
-            newObj.Info.GetScript = strings.Replace(newObj.Info.GetScript, replace, params[i], -1)
-            newObj.Info.SetScript = strings.Replace(newObj.Info.SetScript, replace, params[i], -1)
-            objects = append(objects, newObj)
-        }
-        objects[ind].Name = objects[ind].Name + "-" + params[0]
-    }
-    objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
-    objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
-    return objects
+	params := strings.Split(param, ",")
+	if len(params) > 1 {
+		for i := 1; i < len(params); i++ {
+			newObj := &project.YamlPrjObj{
+				Name:      objects[ind].Name,
+				Info:      objects[ind].Info,
+				Relations: objects[ind].Relations,
+			}
+			newObj.Name = newObj.Name + "-" + params[i]
+			newObj.Info.GetScript = strings.Replace(newObj.Info.GetScript, replace, params[i], -1)
+			newObj.Info.SetScript = strings.Replace(newObj.Info.SetScript, replace, params[i], -1)
+			objects = append(objects, newObj)
+		}
+		objects[ind].Name = objects[ind].Name + "-" + params[0]
+	}
+	objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
+	objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
+	return objects
 }
 
 // Check the address value in atuned.cnf
@@ -759,19 +759,31 @@ func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 }
 
 //sync config to other nodes in cluster mode
-func syncConfigToOthers(scripts string) error {
-	if config.TransProtocol != "tcp" || scripts == "" {
+func syncConfigToOthers(scripts []string) error {
+	if config.TransProtocol != "tcp" || scripts == nil {
 		return nil
 	}
 
 	otherServers := strings.Split(strings.TrimSpace(config.Connect), ",")
 	log.Infof("sync other nodes: %s", otherServers)
 
+	if len(scripts) == 0 {
+		log.Infof("no scripts")
+		return nil
+	}
+
+	serverIndex := 0
 	for _, server := range otherServers {
 		if server == config.Address || server == "" {
 			continue
 		}
-		if err := syncConfigToNode(server, scripts); err != nil {
+
+		scriptNum := len(scripts)
+		var newScripts []string
+		newScripts = append(newScripts, scripts[serverIndex])
+		newScripts = append(newScripts, scripts[serverIndex+scriptNum/2])
+		serverIndex += 1
+		if err := syncConfigToNode(server, newScripts); err != nil {
 			log.Errorf("server %s failed to sync config, err: %v", server, err)
 			return err
 		}
@@ -780,7 +792,7 @@ func syncConfigToOthers(scripts string) error {
 }
 
 //sync config to server node
-func syncConfigToNode(server string, scripts string) error {
+func syncConfigToNode(server string, scripts []string) error {
 	c, err := client.NewClient(server, config.Port)
 	if err != nil {
 		return err
@@ -798,7 +810,9 @@ func syncConfigToNode(server string, scripts string) error {
 			log.Errorf("close stream failed, error: %v", err)
 		}
 	}()
-	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scripts)}
+
+	scriptsJson, _ := json.Marshal(scripts)
+	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scriptsJson)}
 	if err := stream.Send(content); err != nil {
 		return fmt.Errorf("sends failure, error: %v", err)
 	}

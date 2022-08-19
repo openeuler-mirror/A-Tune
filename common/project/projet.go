@@ -15,7 +15,6 @@ package project
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"math"
 	"os/exec"
@@ -292,7 +291,7 @@ func (y *YamlPrjCli) ImproveRateString(current float64) string {
 }
 
 // RunSet method call the set script to set the value
-func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
+func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 	paraMap := make(map[string]string)
 	paraSlice := strings.Split(optStr, ",")
 	for _, para := range paraSlice {
@@ -338,18 +337,9 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 			continue
 		}
 
-		out, err := ExecGetOutput(obj.Info.GetScript)
-		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", obj.Info.GetScript, err), ""
-		}
-
-		if strings.TrimSpace(string(out)) == paraMap[obj.Name] {
-			log.Infof("%s need not be set, value is %s", obj.Name, paraMap[obj.Name])
-			continue
-		}
-
 		script := obj.Info.SetScript
 		var newScript string
+
 		if len(strings.Fields(paraMap[obj.Name])) > 1 {
 			newScript = strings.Replace(script, "$value", "\""+paraMap[obj.Name]+"\"", -1)
 		} else {
@@ -358,24 +348,23 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, string) {
 
 		newScript = strings.Replace(newScript, "$name", objName, -1)
 
-		obj_len := len(obj.Name)
-		if obj.Name[obj_len-1:obj_len] == "0" {
+		objLen := len(obj.Name)
+		if obj.Name[objLen-1:objLen] == "0" {
 			log.Infof("set script for %s: %s", obj.Name, newScript)
-			_, err = ExecCommand(newScript)
+			_, err := ExecCommand(newScript)
 			if err != nil {
-				return fmt.Errorf("failed to exec %s, err: %v", newScript, err), ""
+				return fmt.Errorf("failed to exec %s, err: %v", newScript, err), nil
 			}
 		} else {
 			scripts = append(scripts, newScript)
 		}
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)
-	scriptsJson, _ := json.Marshal(scripts)
-	return nil, string(scriptsJson)
+	return nil, scripts
 }
 
 // RestartProject method call the StartWorkload and StopWorkload script to restart the service
-func (y *YamlPrjSvr) RestartProject() (error, string) {
+func (y *YamlPrjSvr) RestartProject() (error, []string) {
 	startWorkload := y.Startworkload
 	stopWorkload := y.Stopworkload
 
@@ -393,7 +382,7 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 		log.Debugf("stop workload script is: %s", stopWorkload)
 		out, err := ExecCommand(stopWorkload)
 		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", stopWorkload, err), ""
+			return fmt.Errorf("failed to exec %s, err: %v", stopWorkload, err), nil
 		}
 		log.Debug(string(out))
 		scripts = append(scripts, stopWorkload)
@@ -401,15 +390,14 @@ func (y *YamlPrjSvr) RestartProject() (error, string) {
 		log.Debugf("start workload script is: %s", startWorkload)
 		out, err = ExecCommand(startWorkload)
 		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", startWorkload, err), ""
+			return fmt.Errorf("failed to exec %s, err: %v", startWorkload, err), nil
 		}
 		log.Debug(string(out))
 
 		scripts = append(scripts, startWorkload)
 	}
 
-	scriptsJson, _ := json.Marshal(scripts)
-	return nil, string(scriptsJson)
+	return nil, scripts
 }
 
 // MergeProject two yaml project to one object
