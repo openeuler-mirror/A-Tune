@@ -347,6 +347,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 		}
 
 		newScript = strings.Replace(newScript, "$name", objName, -1)
+		scripts = append(scripts, newScript)
 
 		objLen := len(obj.Name)
 		if obj.Name[objLen-1:objLen] == "0" {
@@ -355,8 +356,6 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 			if err != nil {
 				return fmt.Errorf("failed to exec %s, err: %v", newScript, err), nil
 			}
-		} else {
-			scripts = append(scripts, newScript)
 		}
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)

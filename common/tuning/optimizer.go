@@ -693,34 +693,52 @@ func (obj *ObjectSet) CheckObjectDuplicate() {
 	if strings.TrimSpace(config.Connect) == "" {
 		return
 	}
-	ipGroups := strings.Split(strings.TrimSpace(config.Connect), ",")
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
 	for ind := 0; ind < len(obj.Objects); ind++ {
 		if obj.Objects[ind].Clusters != "" {
 			continue
 		}
 		if obj.Objects[ind].Info.Requires == "" {
 			obj.WriteObject(ind, ipGroups)
-		} else if obj.Objects[ind].Info.Requires != "" {
-			reqGroups := utils.DivideToGroups(obj.Objects[ind].Info.Requires, ipGroups)
-			obj.WriteObject(ind, reqGroups)
+		} else {
+			continue
 		}
+		//else if obj.Objects[ind].Info.Requires != "" {
+		//reqGroups := utils.DivideToGroups(obj.Objects[ind].Info.Requires, ipGroups)
+		//obj.WriteObject(ind, reqGroups)
+		//}
 	}
 }
 
-func (obj *ObjectSet) WriteObject(ind int, groups []string) {
+func (obj *ObjectSet) WriteObject(ind int, groups [][]string) {
 	if len(groups) == 1 {
-		obj.Objects[ind].Clusters = groups[0]
+		obj.Objects[ind].Name = obj.Objects[ind].Name + "-0"
+		ipGroupString := ""
+		for i := 0; i < len(groups[0]); i++ {
+			ipGroupString = ipGroupString + "," + groups[0][i]
+		}
+		obj.Objects[ind].Clusters = ipGroupString
 		return
 	}
 	obj.AppendObject(ind, groups)
 	obj.Objects[ind].Name = obj.Objects[ind].Name + "-0"
-	obj.Objects[ind].Clusters = groups[0]
+	ipGroupString := ""
+	for i := 0; i < len(groups[0]); i++ {
+		ipGroupString = ipGroupString + "," + groups[0][i]
+	}
+	obj.Objects[ind].Clusters = ipGroupString
 }
 
 // append new params in object
-func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
+func (obj *ObjectSet) AppendObject(ind int, ipGroups [][]string) {
 	for i := 1; i < len(ipGroups); i++ {
-		if ipGroups[i] == "" {
+		if len(ipGroups[i]) == 0 {
 			continue
 		}
 		newObj := &project.YamlPrjObj{
@@ -728,8 +746,12 @@ func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
 			Info:      obj.Objects[ind].Info,
 			Relations: obj.Objects[ind].Relations,
 		}
+		ipGroupString := ""
+		for j := 0; j < len(ipGroups[i]); j++ {
+			ipGroupString = ipGroupString + "," + ipGroups[i][j]
+		}
 		newObj.Name = newObj.Name + "-" + strconv.Itoa(i)
-		newObj.Clusters = ipGroups[i]
+		newObj.Clusters = ipGroupString
 		obj.Objects = append(obj.Objects, newObj)
 	}
 }
@@ -764,28 +786,42 @@ func syncConfigToOthers(scripts []string) error {
 		return nil
 	}
 
-	otherServers := strings.Split(strings.TrimSpace(config.Connect), ",")
-	log.Infof("sync other nodes: %s", otherServers)
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
+	log.Infof("sync other nodes: %v", ipGroups)
 
 	if len(scripts) == 0 {
 		log.Infof("no scripts")
 		return nil
 	}
 
-	serverIndex := 0
-	for _, server := range otherServers {
-		if server == config.Address || server == "" {
-			continue
-		}
+	paramNum := len(scripts) / len(ipGroups)
 
-		scriptNum := len(scripts)
-		var newScripts []string
-		newScripts = append(newScripts, scripts[serverIndex])
-		newScripts = append(newScripts, scripts[serverIndex+scriptNum/2])
-		serverIndex += 1
-		if err := syncConfigToNode(server, newScripts); err != nil {
-			log.Errorf("server %s failed to sync config, err: %v", server, err)
-			return err
+	for i := 0; i < len(ipGroups); i++ {
+		for j := 0; j < len(ipGroups[i]); j++ {
+			if ipGroups[i][j] == config.Address || ipGroups[i][j] == "" {
+				continue
+			}
+			var newScripts []string
+			if i == 0 {
+				for k := 0; k < paramNum; k++ {
+					newScripts = append(newScripts, scripts[k])
+				}
+			} else {
+				for k := 0; k < paramNum; k++ {
+					scriptIndex := paramNum + k*(len(ipGroups)-1) + i - 1
+					newScripts = append(newScripts, scripts[scriptIndex])
+				}
+			}
+			if err := syncConfigToNode(ipGroups[i][j], newScripts); err != nil {
+				log.Errorf("server %s failed to sync config, err: %v", ipGroups[i][j], err)
+				return err
+			}
 		}
 	}
 	return nil
