@@ -23,6 +23,7 @@ import (
 	"time"
 
 	PB "gitee.com/openeuler/A-Tune/api/profile"
+	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
 )
@@ -98,11 +99,11 @@ type YamlObj struct {
 	Type        string    `yaml:"type"`
 	Step        float32   `yaml:"step,omitempty"`
 	Items       []float32 `yaml:"items"`
-	Requires    string    `yaml:"requires"`
 	Options     []string  `yaml:"options"`
 	Scope       []float32 `yaml:"scope,flow"`
 	Dtype       string    `yaml:"dtype"`
 	Ref         string    `yaml:"ref"`
+	Except      string    `yaml:"except"`
 }
 
 // YamlPrjObj :store the yaml object
@@ -110,7 +111,7 @@ type YamlPrjObj struct {
 	Name      string          `yaml:"name"`
 	Info      YamlObj         `yaml:"info"`
 	Relations []*RelationShip `yaml:"relationships"`
-	Clusters  string
+	Clusters  []interface{}
 }
 
 type RelationShip struct {
@@ -351,11 +352,16 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 
 		objLen := len(obj.Name)
 		if obj.Name[objLen-1:objLen] == "0" {
-			log.Infof("set script for %s: %s", obj.Name, newScript)
-			_, err := ExecCommand(newScript)
-			if err != nil {
-				return fmt.Errorf("failed to exec %s, err: %v", newScript, err), nil
+			if utils.InArray(obj.Clusters, config.Address) {
+				log.Infof("set script for %s: %s", obj.Name, newScript)
+				_, err := ExecCommand(newScript)
+				if err != nil {
+					return fmt.Errorf("failed to exec %s, err: %v", newScript, err), nil
+				}
+			} else {
+				log.Infof("no operation")
 			}
+
 		}
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)
