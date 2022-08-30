@@ -1,6 +1,6 @@
 [Unit]
 Description=A-Tune Daemon
-After=systemd-sysctl.service network.target
+After=systemd-sysctl.service network.target atune-rest.service
 Requires=polkit.service
 
 [Service]
