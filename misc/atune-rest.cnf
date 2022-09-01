@@ -1,0 +1,30 @@
+# Copyright (c) 2022 Huawei Technologies Co., Ltd.
+# A-Tune is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+# Create: 2022-9-1
+
+#################################### server ###############################
+# atune-rest config
+[server]
+# the rest service listening port, default is 8383
+# the port can be set between 0 to 65535 which not be used
+rest_host = localhost
+rest_port = 8383
+
+# enable rest server authentication SSL/TLS
+# default is true
+rest_tls = true
+tlsrestcacertfile = /etc/atuned/rest_certs/ca.crt
+tlsrestservercertfile = /etc/atuned/rest_certs/server.crt
+tlsrestserverkeyfile = /etc/atuned/rest_certs/server.key
+
+#################################### log ###############################
+[log]
+# either "debug", "info", "warn", "error", "critical", default is "info"
+level = info
