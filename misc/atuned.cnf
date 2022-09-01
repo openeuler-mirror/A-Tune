@@ -29,6 +29,11 @@ address = /var/run/atuned/atuned.sock
 # the port can be set between 0 to 65535 which not be used
 # port = 60001
 
+# the rest service listening port, default is 8383
+# the port can be set between 0 to 65535 which not be used
+rest_host = localhost
+rest_port = 8383
+
 # the tuning optimizer host and port, start by engine.service
 # if engine_host is same as rest_host, two ports cannot be same
 # the port can be set between 0 to 65535 which not be used
@@ -48,6 +53,13 @@ interval = 5
 # tlsservercafile = /etc/atuned/grpc_certs/ca.crt
 # tlsservercertfile = /etc/atuned/grpc_certs/server.crt
 # tlsserverkeyfile = /etc/atuned/grpc_certs/server.key
+
+# enable rest server authentication SSL/TLS
+# default is true
+rest_tls = true
+tlsrestcacertfile = /etc/atuned/rest_certs/ca.crt
+tlsrestservercertfile = /etc/atuned/rest_certs/server.crt
+tlsrestserverkeyfile = /etc/atuned/rest_certs/server.key
 
 # enable engine server authentication SSL/TLS
 # default is true
