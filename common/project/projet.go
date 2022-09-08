@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"math"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -300,7 +301,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 		if len(kvs) < 2 {
 			continue
 		}
-		paraMap[kvs[0]] = kvs[1]
+		paraMap[kvs[0]] = strings.TrimSpace(kvs[1])
 	}
 	log.Infof("before change paraMap: %+v\n", paraMap)
 	scripts := make([]string, 0)
@@ -350,8 +351,29 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 		newScript = strings.Replace(newScript, "$name", objName, -1)
 		scripts = append(scripts, newScript)
 
-		objLen := len(obj.Name)
-		if obj.Name[objLen-1:objLen] == "0" {
+		objGroupStr := ""
+		reg := regexp.MustCompile(`-[0-9]+$`)
+		res := reg.FindAllString(obj.Name, -1)
+		if len(res) != 0 {
+			for wordPos := 1; wordPos < len(res[0]); wordPos++ {
+				objGroupStr += string(res[0][wordPos])
+			}
+			objGroup, err := strconv.Atoi(string(objGroupStr))
+			if err != nil {
+				return err, nil
+			}
+			if objGroup == 0 {
+				if utils.InArray(obj.Clusters, config.Address) {
+					log.Infof("set script for %s: %s", obj.Name, newScript)
+					_, err := ExecCommand(newScript)
+					if err != nil {
+						return fmt.Errorf("failed to exec %s, err: %v", newScript, err), nil
+					}
+				} else {
+					log.Infof("no operation")
+				}
+			}
+		} else {
 			if utils.InArray(obj.Clusters, config.Address) {
 				log.Infof("set script for %s: %s", obj.Name, newScript)
 				_, err := ExecCommand(newScript)
@@ -361,7 +383,6 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 			} else {
 				log.Infof("no operation")
 			}
-
 		}
 	}
 	log.Infof("after change paraMap: %+v\n", paraMap)

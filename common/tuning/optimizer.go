@@ -24,6 +24,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -244,7 +245,6 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 		if len(items) != 6 {
 			continue
 		}
-
 		if o.Iter, err = strconv.Atoi(items[0]); err != nil {
 			return err
 		}
@@ -784,6 +784,24 @@ func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 	return nil
 }
 
+func (o *Optimizer) GetNodeInitialConfig(ch chan *PB.TuningMessage) error {
+
+	log.Infof("start to get the initial config: %s", string(o.Content))
+	command := string(o.Content)
+
+	log.Infof("execute getting command: %s", command)
+	out, err := project.ExecGetOutput(command)
+	if err != nil {
+		return fmt.Errorf("failed to exec %s, err: %v", command, err)
+	}
+	output := string(out)
+
+	log.Info("get the initial config success")
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_Ending, InitialConfig: output}
+
+	return nil
+}
+
 //sync config to other nodes in cluster mode
 func (o *Optimizer) syncConfigToOthers(scripts []string) error {
 	if config.TransProtocol != "tcp" || scripts == nil {
@@ -906,12 +924,47 @@ func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) e
 func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	o.BackupFlag = true
 	initConfigure := make([]string, 0)
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
+	var objGroupStr string
 	for _, item := range o.Prj.Object {
-		out, err := project.ExecGetOutput(item.Info.GetScript)
-		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+		objGroupStr = ""
+		reg := regexp.MustCompile(`-[0-9]+$`)
+		res := reg.FindAllString(item.Name, -1)
+		resLen := len(res)
+		if resLen == 0 {
+			out, err := project.ExecGetOutput(item.Info.GetScript)
+			if err != nil {
+				return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+			}
+			initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(out))))
+		} else {
+			for wordPos := 1; wordPos < len(res[0]); wordPos++ {
+				objGroupStr += string(res[0][wordPos])
+			}
+			objGroup, err := strconv.Atoi(string(objGroupStr))
+			if err != nil {
+				return err
+			}
+			if objGroup == 0 {
+				out, err := project.ExecGetOutput(item.Info.GetScript)
+				if err != nil {
+					return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+				}
+				initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(out))))
+			} else {
+				result, err := o.ExecGetCommand(ch, ipGroups[objGroup][0], config.Port, item.Info.GetScript)
+				if err != nil {
+					return err
+				}
+				initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(result))))
+			}
 		}
-		initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+string(out)))
 	}
 
 	err := utils.WriteFile(path.Join(config.DefaultTuningLogPath,
@@ -923,6 +976,50 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	}
 	o.InitConfig = strings.Join(initConfigure, ",")
 	return nil
+}
+
+func (o *Optimizer) ExecGetCommand(ch chan *PB.TuningMessage, ip string, port string, script string) (string, error) {
+	c, err := client.NewClient(ip, port)
+	if err != nil {
+		return "", err
+	}
+
+	defer c.Close()
+	svc := PB.NewProfileMgrClient(c.Connection())
+	stream, err := svc.Tuning(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if err := stream.CloseSend(); err != nil {
+			log.Errorf("close stream failed, error: %v", err)
+		}
+	}()
+
+	content := &PB.TuningMessage{State: PB.TuningMessage_GetInitialConfig, Content: []byte(script)}
+	if err := stream.Send(content); err != nil {
+		return "", fmt.Errorf("sends failure, error: %v", err)
+	}
+
+	for {
+		reply, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return "", err
+		}
+
+		state := reply.GetState()
+		result := reply.GetInitialConfig()
+		if state == PB.TuningMessage_Ending {
+			log.Infof("server %s get initial config success", ip)
+			return string(result), nil
+		}
+	}
+	return "", nil
 }
 
 // DeleteTask method delete the optimizer task in runing
