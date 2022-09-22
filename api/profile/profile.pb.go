@@ -25,42 +25,45 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 type TuningMessageStatus int32
 
 const (
-	TuningMessage_JobInit    TuningMessageStatus = 0
-	TuningMessage_JobRestart TuningMessageStatus = 1
-	TuningMessage_BenchMark  TuningMessageStatus = 2
-	TuningMessage_Restore    TuningMessageStatus = 3
-	TuningMessage_Ending     TuningMessageStatus = 4
-	TuningMessage_Display    TuningMessageStatus = 5
-	TuningMessage_SyncConfig TuningMessageStatus = 6
-	TuningMessage_Detail     TuningMessageStatus = 7
-	TuningMessage_Threshold  TuningMessageStatus = 8
-	TuningMessage_JobCreate  TuningMessageStatus = 9
+	TuningMessage_JobInit          TuningMessageStatus = 0
+	TuningMessage_JobRestart       TuningMessageStatus = 1
+	TuningMessage_BenchMark        TuningMessageStatus = 2
+	TuningMessage_Restore          TuningMessageStatus = 3
+	TuningMessage_Ending           TuningMessageStatus = 4
+	TuningMessage_Display          TuningMessageStatus = 5
+	TuningMessage_SyncConfig       TuningMessageStatus = 6
+	TuningMessage_Detail           TuningMessageStatus = 7
+	TuningMessage_Threshold        TuningMessageStatus = 8
+	TuningMessage_JobCreate        TuningMessageStatus = 9
+	TuningMessage_GetInitialConfig TuningMessageStatus = 10
 )
 
 var TuningMessageStatus_name = map[int32]string{
-	0: "JobInit",
-	1: "JobRestart",
-	2: "BenchMark",
-	3: "Restore",
-	4: "Ending",
-	5: "Display",
-	6: "SyncConfig",
-	7: "Detail",
-	8: "Threshold",
-	9: "JobCreate",
+	0:  "JobInit",
+	1:  "JobRestart",
+	2:  "BenchMark",
+	3:  "Restore",
+	4:  "Ending",
+	5:  "Display",
+	6:  "SyncConfig",
+	7:  "Detail",
+	8:  "Threshold",
+	9:  "JobCreate",
+	10: "GetInitialConfig",
 }
 
 var TuningMessageStatus_value = map[string]int32{
-	"JobInit":    0,
-	"JobRestart": 1,
-	"BenchMark":  2,
-	"Restore":    3,
-	"Ending":     4,
-	"Display":    5,
-	"SyncConfig": 6,
-	"Detail":     7,
-	"Threshold":  8,
-	"JobCreate":  9,
+	"JobInit":          0,
+	"JobRestart":       1,
+	"BenchMark":        2,
+	"Restore":          3,
+	"Ending":           4,
+	"Display":          5,
+	"SyncConfig":       6,
+	"Detail":           7,
+	"Threshold":        8,
+	"JobCreate":        9,
+	"GetInitialConfig": 10,
 }
 
 func (x TuningMessageStatus) String() string {
@@ -669,6 +672,7 @@ type TuningMessage struct {
 	FeatureFilterCount   int32               `protobuf:"varint,13,opt,name=FeatureFilterCount,proto3" json:"FeatureFilterCount,omitempty"`
 	EvalFluctuation      float64             `protobuf:"fixed64,14,opt,name=EvalFluctuation,proto3" json:"EvalFluctuation,omitempty"`
 	FeatureSelector      string              `protobuf:"bytes,15,opt,name=FeatureSelector,proto3" json:"FeatureSelector,omitempty"`
+	InitialConfig        string              `protobuf:"bytes,16,opt,name=InitialConfig,proto3" json:"InitialConfig,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -801,6 +805,13 @@ func (m *TuningMessage) GetEvalFluctuation() float64 {
 func (m *TuningMessage) GetFeatureSelector() string {
 	if m != nil {
 		return m.FeatureSelector
+	}
+	return ""
+}
+
+func (m *TuningMessage) GetInitialConfig() string {
+	if m != nil {
+		return m.InitialConfig
 	}
 	return ""
 }
