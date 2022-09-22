@@ -1,0 +1,19 @@
+project: "compress_Except_example"
+engine : "gbrt"
+iterations : 20
+random_starts : 10
+
+benchmark : "python3 compress_Except_example/compress_Except_example.py"
+evaluations :
+  -
+    name: "time"
+    info:
+        get: "echo '$out' | grep 'time' | awk '{print $3}'"
+        type: "positive"
+        weight: 20
+  -
+    name: "compress_ratio"
+    info:
+        get: "echo '$out' | grep 'compress_ratio' | awk '{print $3}'"
+        type: "negative"
+        weight: 80

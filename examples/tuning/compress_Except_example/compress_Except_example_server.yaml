@@ -1,0 +1,34 @@
+project: "compress_Except_example"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object : 
+  -
+    name : "compressLevel"
+    info :
+        desc : "The compresslevel parameter is an integer from 1 to 9 controlling the level of compression"
+        get : "cat compress_Except_example/compress_Except_example.py | grep 'COMPRESS_LEVEL =' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^COMPRESS_LEVEL =\\s*[0-9]*/COMPRESS_LEVEL = $value/g' compress_Except_example/compress_Except_example.py"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 1
+          - 9
+        dtype : "int"
+        Except : "ip1"
+        # ip1 不能调节 compressLevel
+  -
+    name : "compressMethod"
+    info :
+        desc : "The compressMethod parameter is a string controlling the compression method"
+        get : "cat compress_Except_example/compress_Except_example.py | grep 'COMPRESS_METHOD =' | awk -F '=' '{print $2}' | sed 's/\"//g'"
+        set : "sed -i 's/^COMPRESS_METHOD =\\s*[0-9,a-z,\"]*/COMPRESS_METHOD = \"$value\"/g' compress_Except_example/compress_Except_example.py"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "bz2"
+          - "zlib"
+          - "gzip"
+        dtype : "string"
+        Except : "ip2"
+        # ip2 不能调节compressMethod
