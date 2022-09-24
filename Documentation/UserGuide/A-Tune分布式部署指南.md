@@ -23,7 +23,7 @@
 4.	（可选步骤）在`A-Tune/examples/tuning/compress`文件夹下运行tuning命令：<br/>
 请先参考`A-Tune/examples/tuning/compress/README`的指导进行预处理<br/>
 执行`atune-adm tuning --project compress --detail compress_client.yaml`<br/>
-本步骤的目的是检验分节点部署是否成功。<br/>
+本步骤的目的是检验分节点部署是否成功。
 
 ### 注意事项
 1.	本文档不对认证证书配置方法作详细说明，如有需要也可以将atuned.cnf和engine.cnf中的rest_tls/engine_tls设成false
