@@ -93,7 +93,9 @@ libinstall:
 	install -m 750 pkg/atune-adm $(BINDIR)
 	install -m 750 pkg/atuned $(BINDIR)
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
+	install -m 640 misc/atune-rest.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
+	install -m 640 misc/atune-rest.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 misc/engine.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 misc/ui.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 rules/tuning/tuning_rules.grl $(DESTDIR)/etc/atuned/rules
@@ -195,6 +197,7 @@ env:
 
 startup:
 	systemctl daemon-reload
+	systemctl restart atune-rest
 	systemctl restart atuned
 	systemctl restart atune-engine
 	systemctl restart atune-ui

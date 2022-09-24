@@ -1,0 +1,10 @@
+[Unit]
+Description=A-Tune REST Service
+After=systemd-sysctl.service network.target
+Requires=polkit.service
+
+[Service]
+ExecStart=python3 /usr/libexec/atuned/analysis/app_rest.py /etc/atuned/atune-rest.cnf
+
+[Install]
+WantedBy=multi-user.target
