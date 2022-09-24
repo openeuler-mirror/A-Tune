@@ -1,0 +1,13 @@
+project: "tomcat"
+engine : "gbrt"
+iterations : 30
+random_starts : 10
+
+benchmark : "sh tomcat_benchmark.sh"
+evaluations :
+  -
+    name: "rps"
+    info:
+        get: "echo '$out' | grep 'taken' | awk '{print $5}'"
+        type: "negative"
+        weight: 100
