@@ -466,7 +466,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 				pairs := strings.Split(line, " ")
 				screen := ""
 				for _, ele := range pairs {
-					if (len(strings.Split(ele, ":")) == 2) {
+					if len(strings.Split(ele, ":")) == 2 {
 						screen += strings.Split(ele, ":")[1] + " "
 					}
 				}
@@ -477,7 +477,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 					log.Errorf("collect system data error: transfer data %v", err)
 					return
 				}
-                collectionId = retId
+				collectionId = retId
 			}
 
 			if !subProcess {
@@ -700,6 +700,12 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 		case PB.TuningMessage_SyncConfig:
 			optimizer.Content = reply.GetContent()
 			err = optimizer.SyncTunedNode(ch)
+			if err != nil {
+				return err
+			}
+		case PB.TuningMessage_GetInitialConfig:
+			optimizer.Content = reply.GetContent()
+			err = optimizer.GetNodeInitialConfig(ch)
 			if err != nil {
 				return err
 			}

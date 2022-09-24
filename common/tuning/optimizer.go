@@ -15,6 +15,7 @@ package tuning
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -23,13 +24,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
-	
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	"gitee.com/openeuler/A-Tune/common/config"
@@ -76,7 +76,7 @@ type Optimizer struct {
 
 // object set type
 type ObjectSet struct {
-	Objects             []*project.YamlPrjObj
+	Objects []*project.YamlPrjObj
 }
 
 // InitTuned method for iniit tuning
@@ -245,7 +245,6 @@ func (o *Optimizer) readTuningLog(body *models.OptimizerPostBody) error {
 		if len(items) != 6 {
 			continue
 		}
-
 		if o.Iter, err = strconv.Atoi(items[0]); err != nil {
 			return err
 		}
@@ -360,7 +359,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 	}
 	log.Info("set the parameter success")
 
-	err = syncConfigToOthers(scripts)
+	err = o.syncConfigToOthers(scripts)
 	if err != nil {
 		return err
 	}
@@ -371,8 +370,7 @@ func (o *Optimizer) DynamicTuned(ch chan *PB.TuningMessage, stopCh chan int) err
 		return err
 	}
 	log.Info("restart project success")
-
-	err = syncConfigToOthers(scripts)
+	err = o.syncConfigToOthers(scripts)
 	if err != nil {
 		return err
 	}
@@ -525,7 +523,7 @@ func (o *Optimizer) RestoreConfigTuned(ch chan *PB.TuningMessage) error {
 		return err
 	}
 
-	if err := syncConfigToOthers(scripts); err != nil {
+	if err := o.syncConfigToOthers(scripts); err != nil {
 		return err
 	}
 
@@ -598,9 +596,9 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	projects := strings.Split(data, ",")
 
 	log.Infof("client ask project: %s", data)
-	requireProject := make(map[string]struct{})
+	exceptProject := make(map[string]struct{})
 	for _, projectStr := range projects {
-		requireProject[strings.TrimSpace(projectStr)] = struct{}{}
+		exceptProject[strings.TrimSpace(projectStr)] = struct{}{}
 	}
 
 	var prjs []*project.YamlPrjSvr
@@ -623,7 +621,7 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 	}
 
 	for idx, prj := range prjs {
-		if _, ok := requireProject[prj.Project]; !ok {
+		if _, ok := exceptProject[prj.Project]; !ok {
 			continue
 		}
 
@@ -653,39 +651,39 @@ func CheckServerPrj(data string, optimizer *Optimizer) error {
 
 // Check if object contains {disk} or {network}
 func CheckObjectReplace(objects []*project.YamlPrjObj) []*project.YamlPrjObj {
-    for ind := 0; ind < len(objects); ind++ {
-        if strings.Contains(objects[ind].Info.GetScript, "{disk}") {
-            param := config.Disk
-            objects = ReplaceObject("{disk}", param, objects, ind)
-        }
-        if strings.Contains(objects[ind].Info.GetScript, "{network}") {
-            param := config.Network
-            objects = ReplaceObject("{network}", param, objects, ind)
-        }
-    }
-    return objects
+	for ind := 0; ind < len(objects); ind++ {
+		if strings.Contains(objects[ind].Info.GetScript, "{disk}") {
+			param := config.Disk
+			objects = ReplaceObject("{disk}", param, objects, ind)
+		}
+		if strings.Contains(objects[ind].Info.GetScript, "{network}") {
+			param := config.Network
+			objects = ReplaceObject("{network}", param, objects, ind)
+		}
+	}
+	return objects
 }
 
 // replace {disk} {network} string in object
 func ReplaceObject(replace string, param string, objects []*project.YamlPrjObj, ind int) []*project.YamlPrjObj {
-    params := strings.Split(param, ",")
-    if len(params) > 1 {
-        for i := 1; i < len(params); i++ {
-            newObj := &project.YamlPrjObj {
-                Name: objects[ind].Name,
-                Info: objects[ind].Info,
-                Relations: objects[ind].Relations,
-            }
-            newObj.Name = newObj.Name + "-" + params[i]
-            newObj.Info.GetScript = strings.Replace(newObj.Info.GetScript, replace, params[i], -1)
-            newObj.Info.SetScript = strings.Replace(newObj.Info.SetScript, replace, params[i], -1)
-            objects = append(objects, newObj)
-        }
-        objects[ind].Name = objects[ind].Name + "-" + params[0]
-    }
-    objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
-    objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
-    return objects
+	params := strings.Split(param, ",")
+	if len(params) > 1 {
+		for i := 1; i < len(params); i++ {
+			newObj := &project.YamlPrjObj{
+				Name:      objects[ind].Name,
+				Info:      objects[ind].Info,
+				Relations: objects[ind].Relations,
+			}
+			newObj.Name = newObj.Name + "-" + params[i]
+			newObj.Info.GetScript = strings.Replace(newObj.Info.GetScript, replace, params[i], -1)
+			newObj.Info.SetScript = strings.Replace(newObj.Info.SetScript, replace, params[i], -1)
+			objects = append(objects, newObj)
+		}
+		objects[ind].Name = objects[ind].Name + "-" + params[0]
+	}
+	objects[ind].Info.GetScript = strings.Replace(objects[ind].Info.GetScript, replace, params[0], -1)
+	objects[ind].Info.SetScript = strings.Replace(objects[ind].Info.SetScript, replace, params[0], -1)
+	return objects
 }
 
 // Check the address value in atuned.cnf
@@ -693,34 +691,55 @@ func (obj *ObjectSet) CheckObjectDuplicate() {
 	if strings.TrimSpace(config.Connect) == "" {
 		return
 	}
-	ipGroups := strings.Split(strings.TrimSpace(config.Connect), ",")
-	for ind := 0; ind < len(obj.Objects); ind++ {
-		if obj.Objects[ind].Clusters != "" {
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
+	objLen := len(obj.Objects)
+	for ind := 0; ind < objLen; ind++ {
+		if obj.Objects[ind].Clusters != nil {
 			continue
 		}
-		if obj.Objects[ind].Info.Requires == "" {
-			obj.WriteObject(ind, ipGroups)
-		} else if obj.Objects[ind].Info.Requires != "" {
-			reqGroups := utils.DivideToGroups(obj.Objects[ind].Info.Requires, ipGroups)
-			obj.WriteObject(ind, reqGroups)
-		}
+		obj.WriteObject(ind, ipGroups)
 	}
 }
 
-func (obj *ObjectSet) WriteObject(ind int, groups []string) {
+func (obj *ObjectSet) WriteObject(ind int, groups [][]string) {
+	var exceptsIps []interface{}
+	exceptsIp := strings.Split(strings.TrimSpace(obj.Objects[ind].Info.Except), ",")
+	for _, exceptIp := range exceptsIp {
+		exceptsIps = append(exceptsIps, exceptIp)
+	}
 	if len(groups) == 1 {
-		obj.Objects[ind].Clusters = groups[0]
+		obj.Objects[ind].Name = obj.Objects[ind].Name + "-0"
+		for i := 0; i < len(groups[0]); i++ {
+			if !utils.InArray(exceptsIps, groups[0][i]) {
+				obj.Objects[ind].Clusters = append(obj.Objects[ind].Clusters, groups[0][i])
+			}
+		}
 		return
 	}
 	obj.AppendObject(ind, groups)
 	obj.Objects[ind].Name = obj.Objects[ind].Name + "-0"
-	obj.Objects[ind].Clusters = groups[0]
+	for i := 0; i < len(groups[0]); i++ {
+		if !utils.InArray(exceptsIps, groups[0][i]) {
+			obj.Objects[ind].Clusters = append(obj.Objects[ind].Clusters, groups[0][i])
+		}
+	}
 }
 
 // append new params in object
-func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
+func (obj *ObjectSet) AppendObject(ind int, ipGroups [][]string) {
+	var exceptsIps []interface{}
+	exceptsIp := strings.Split(strings.TrimSpace(obj.Objects[ind].Info.Except), ",")
+	for _, exceptIp := range exceptsIp {
+		exceptsIps = append(exceptsIps, exceptIp)
+	}
 	for i := 1; i < len(ipGroups); i++ {
-		if ipGroups[i] == "" {
+		if len(ipGroups[i]) == 0 {
 			continue
 		}
 		newObj := &project.YamlPrjObj{
@@ -728,8 +747,12 @@ func (obj *ObjectSet) AppendObject(ind int, ipGroups []string) {
 			Info:      obj.Objects[ind].Info,
 			Relations: obj.Objects[ind].Relations,
 		}
+		for j := 0; j < len(ipGroups[i]); j++ {
+			if !utils.InArray(exceptsIps, ipGroups[i][j]) {
+				newObj.Clusters = append(newObj.Clusters, ipGroups[i][j])
+			}
+		}
 		newObj.Name = newObj.Name + "-" + strconv.Itoa(i)
-		newObj.Clusters = ipGroups[i]
 		obj.Objects = append(obj.Objects, newObj)
 	}
 }
@@ -746,6 +769,9 @@ func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 
 	for _, command := range commands {
 		log.Infof("execute setting command: %s", string(command))
+		if command == "no operation" {
+			continue
+		}
 		_, err := project.ExecCommand(command)
 		if err != nil {
 			return fmt.Errorf("failed to exec %s, err: %v", command, err)
@@ -758,29 +784,80 @@ func (o *Optimizer) SyncTunedNode(ch chan *PB.TuningMessage) error {
 	return nil
 }
 
+func (o *Optimizer) GetNodeInitialConfig(ch chan *PB.TuningMessage) error {
+
+	log.Infof("start to get the initial config: %s", string(o.Content))
+	command := string(o.Content)
+
+	log.Infof("execute getting command: %s", command)
+	out, err := project.ExecGetOutput(command)
+	if err != nil {
+		return fmt.Errorf("failed to exec %s, err: %v", command, err)
+	}
+	output := string(out)
+
+	log.Info("get the initial config success")
+	ch <- &PB.TuningMessage{State: PB.TuningMessage_Ending, InitialConfig: output}
+
+	return nil
+}
+
 //sync config to other nodes in cluster mode
-func syncConfigToOthers(scripts string) error {
-	if config.TransProtocol != "tcp" || scripts == "" {
+func (o *Optimizer) syncConfigToOthers(scripts []string) error {
+	if config.TransProtocol != "tcp" || scripts == nil {
 		return nil
 	}
 
-	otherServers := strings.Split(strings.TrimSpace(config.Connect), ",")
-	log.Infof("sync other nodes: %s", otherServers)
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
+	log.Infof("sync other nodes: %v", ipGroups)
 
-	for _, server := range otherServers {
-		if server == config.Address || server == "" {
-			continue
-		}
-		if err := syncConfigToNode(server, scripts); err != nil {
-			log.Errorf("server %s failed to sync config, err: %v", server, err)
-			return err
+	if len(scripts) == 0 {
+		log.Infof("no scripts")
+		return nil
+	}
+
+	objNum := len(scripts) / len(ipGroups)
+	for i := 0; i < len(ipGroups); i++ {
+		for j := 0; j < len(ipGroups[i]); j++ {
+			if ipGroups[i][j] == config.Address || ipGroups[i][j] == "" {
+				continue
+			}
+			var newScripts []string
+			if i == 0 {
+				for objIndex := 0; objIndex < objNum; objIndex++ {
+					if utils.InArray(o.Prj.Object[objIndex].Clusters, ipGroups[i][j]) {
+						newScripts = append(newScripts, scripts[objIndex])
+					} else {
+						newScripts = append(newScripts, "no operation")
+					}
+				}
+			} else {
+				for objIndex := 0; objIndex < objNum; objIndex++ {
+					scriptIndex := objNum + objIndex*(len(ipGroups)-1) + i - 1
+					if utils.InArray(o.Prj.Object[scriptIndex].Clusters, ipGroups[i][j]) {
+						newScripts = append(newScripts, scripts[scriptIndex])
+					} else {
+						newScripts = append(newScripts, "no operation")
+					}
+				}
+			}
+			if err := o.syncConfigToNode(ipGroups[i][j], newScripts); err != nil {
+				log.Errorf("server %s failed to sync config, err: %v", ipGroups[i][j], err)
+				return err
+			}
 		}
 	}
 	return nil
 }
 
 //sync config to server node
-func syncConfigToNode(server string, scripts string) error {
+func (o *Optimizer) syncConfigToNode(server string, scripts []string) error {
 	c, err := client.NewClient(server, config.Port)
 	if err != nil {
 		return err
@@ -798,7 +875,9 @@ func syncConfigToNode(server string, scripts string) error {
 			log.Errorf("close stream failed, error: %v", err)
 		}
 	}()
-	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scripts)}
+
+	scriptsJson, _ := json.Marshal(scripts)
+	content := &PB.TuningMessage{State: PB.TuningMessage_SyncConfig, Content: []byte(scriptsJson)}
 	if err := stream.Send(content); err != nil {
 		return fmt.Errorf("sends failure, error: %v", err)
 	}
@@ -845,12 +924,47 @@ func (o *Optimizer) InitFeatureSel(ch chan *PB.TuningMessage, stopCh chan int) e
 func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	o.BackupFlag = true
 	initConfigure := make([]string, 0)
+	var ips []string
+	var ipGroups [][]string
+	ips = strings.Split(strings.TrimSpace(config.Connect), "-")
+	for i := 0; i < len(ips); i++ {
+		ipSameGroup := strings.Split(strings.TrimSpace(ips[i]), ",")
+		ipGroups = append(ipGroups, ipSameGroup)
+	}
+	var objGroupStr string
 	for _, item := range o.Prj.Object {
-		out, err := project.ExecGetOutput(item.Info.GetScript)
-		if err != nil {
-			return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+		objGroupStr = ""
+		reg := regexp.MustCompile(`-[0-9]+$`)
+		res := reg.FindAllString(item.Name, -1)
+		resLen := len(res)
+		if resLen == 0 {
+			out, err := project.ExecGetOutput(item.Info.GetScript)
+			if err != nil {
+				return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+			}
+			initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(out))))
+		} else {
+			for wordPos := 1; wordPos < len(res[0]); wordPos++ {
+				objGroupStr += string(res[0][wordPos])
+			}
+			objGroup, err := strconv.Atoi(string(objGroupStr))
+			if err != nil {
+				return err
+			}
+			if objGroup == 0 {
+				out, err := project.ExecGetOutput(item.Info.GetScript)
+				if err != nil {
+					return fmt.Errorf("failed to exec %s, err: %v", item.Info.GetScript, err)
+				}
+				initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(out))))
+			} else {
+				result, err := o.ExecGetCommand(ch, ipGroups[objGroup][0], config.Port, item.Info.GetScript)
+				if err != nil {
+					return err
+				}
+				initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+strings.TrimSpace(string(result))))
+			}
 		}
-		initConfigure = append(initConfigure, strings.TrimSpace(item.Name+"="+string(out)))
 	}
 
 	err := utils.WriteFile(path.Join(config.DefaultTuningLogPath,
@@ -862,6 +976,50 @@ func (o *Optimizer) Backup(ch chan *PB.TuningMessage) error {
 	}
 	o.InitConfig = strings.Join(initConfigure, ",")
 	return nil
+}
+
+func (o *Optimizer) ExecGetCommand(ch chan *PB.TuningMessage, ip string, port string, script string) (string, error) {
+	c, err := client.NewClient(ip, port)
+	if err != nil {
+		return "", err
+	}
+
+	defer c.Close()
+	svc := PB.NewProfileMgrClient(c.Connection())
+	stream, err := svc.Tuning(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if err := stream.CloseSend(); err != nil {
+			log.Errorf("close stream failed, error: %v", err)
+		}
+	}()
+
+	content := &PB.TuningMessage{State: PB.TuningMessage_GetInitialConfig, Content: []byte(script)}
+	if err := stream.Send(content); err != nil {
+		return "", fmt.Errorf("sends failure, error: %v", err)
+	}
+
+	for {
+		reply, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return "", err
+		}
+
+		state := reply.GetState()
+		result := reply.GetInitialConfig()
+		if state == PB.TuningMessage_Ending {
+			log.Infof("server %s get initial config success", ip)
+			return string(result), nil
+		}
+	}
+	return "", nil
 }
 
 // DeleteTask method delete the optimizer task in runing

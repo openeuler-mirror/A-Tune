@@ -110,16 +110,17 @@ message TuningMessage {
     string engine = 2;
     bytes content = 3;
     enum status {
-		JobInit = 0;
-		JobRestart = 1;
-		BenchMark= 2;
-		Restore = 3;
-		Ending = 4;
-		Display = 5;
-		SyncConfig = 6;
-		Detail = 7;
-		Threshold = 8;
-		JobCreate = 9;
+        JobInit = 0;
+        JobRestart = 1;
+        BenchMark= 2;
+        Restore = 3;
+        Ending = 4;
+        Display = 5;
+        SyncConfig = 6;
+        Detail = 7;
+        Threshold = 8;
+        JobCreate = 9;
+        GetInitialConfig = 10;
     }
     status state = 4;
     int32 RandomStarts = 5;
@@ -133,6 +134,7 @@ message TuningMessage {
     int32 FeatureFilterCount = 13;
     double EvalFluctuation = 14;
     string FeatureSelector = 15;
+    string InitialConfig = 16;
 }
 
 message TuningHistory {

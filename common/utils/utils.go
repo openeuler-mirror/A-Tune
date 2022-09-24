@@ -20,7 +20,6 @@ import (
 	"encoding/csv"
 	"encoding/xml"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"math"
@@ -30,14 +29,17 @@ import (
 	"path"
 	"path/filepath"
 	"plugin"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/urfave/cli"
-	
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/log"
 )
@@ -578,7 +580,7 @@ func ChangeFileName(dataPath string) (string, string, error) {
 	dir, fileName := filepath.Split(dataPath)
 	extension := filepath.Ext(dataPath)
 	name := strings.TrimSuffix(fileName, extension)
-	timestamp := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
+	timestamp := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
 	newFilePath := dir + name + "-" + timestamp + extension
 	log.Infof("new file path: %s", newFilePath)
 	err := os.Rename(dataPath, newFilePath)
@@ -637,4 +639,26 @@ func DivideToGroups(strs string, groups []string) []string {
 		}
 	}
 	return divRes
+}
+
+func StringArrayToInterface(array []string) []interface{} {
+	var goalArray []interface{}
+	for _, value := range array {
+		goalArray = append(goalArray, value)
+	}
+	return goalArray
+}
+
+func InArray(array []interface{}, element interface{}) bool {
+	if element == nil || array == nil {
+		return false
+	}
+	for _, value := range array {
+		if reflect.TypeOf(value).Kind() == reflect.TypeOf(element).Kind() {
+			if value == element {
+				return true
+			}
+		}
+	}
+	return false
 }
