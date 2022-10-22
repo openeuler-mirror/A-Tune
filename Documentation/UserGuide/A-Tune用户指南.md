@@ -936,7 +936,7 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **命令格式**
 
-**atune-adm collection** <OPTINOS*>*
+**atune-adm collection** <OPTIONS*>*
 
 **参数说明**
 
@@ -966,7 +966,7 @@ example.conf 可以参考如下方式书写（以下各优化项非必填，仅�
 
 **命令格式**
 
-**atune-adm train** <OPTINOS*>*
+**atune-adm train** <OPTIONS*>*
 
 **参数说明**
 

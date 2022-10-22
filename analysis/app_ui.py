@@ -23,7 +23,7 @@ from analysis.app import App
 from analysis.ui.config import UiConfig
 from analysis.ui.database import ui_tuning, ui_analysis, ui_user
 from analysis.ui import offline
-
+from analysis.ui import echo
 
 class AppUI(App):
     """app ui"""
@@ -34,6 +34,7 @@ class AppUI(App):
         self.api.add_resource(ui_analysis.UiAnalysis, '/v1/UI/analysis/<string:cmd>')
         self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
         self.api.add_resource(offline.OfflineTunning, '/v2/UI/offline/<string:cmd>')
+        self.api.add_resource(echo.EchoTunning, '/v2/UI/echo')
 
 
 def main(filename):

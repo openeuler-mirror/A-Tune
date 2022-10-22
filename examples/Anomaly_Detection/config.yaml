@@ -1,0 +1,38 @@
+data_process:  
+    col_timestamp: timestamp
+    col_value: value
+    col_service: cmdb_id
+    col_label: label
+    col_level: level   
+    col_node: node
+    
+    raw_train_path: ./data/raw_train
+    raw_test_path: ./data/raw_test
+    raw_label_path: ./data/raw_label
+    
+    train_path: ./data/train
+    test_path: ./data/test
+    label_path: ./data/label
+    
+    label_start_time: 1651334400
+    save_type: .csv    
+
+detection: 
+    lr: 0.0001
+    num_epochs: 10
+    k: 3
+    win_size: 20
+    input_c: 56
+    output_c: 56
+    batch_size: 64
+    pretrained_model: 20
+    dataset: multi_datasets
+    mode: train
+    train_path: ./data/train/
+    test_path: ./data/test/
+    label_path: ./data/label/
+    model_save_path: ./checkpoints
+    model_save_file: _checkpoint.pth
+    anormly_ratio: 0.7
+    loss_bias: 0.0001
+    patience: 3
