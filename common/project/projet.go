@@ -374,7 +374,7 @@ func (y *YamlPrjSvr) RunSet(optStr string) (error, []string) {
 				}
 			}
 		} else {
-			if utils.InArray(obj.Clusters, config.Address) {
+			if utils.InArray(obj.Clusters, config.Address) || config.TransProtocol == "unix" {
 				log.Infof("set script for %s: %s", obj.Name, newScript)
 				_, err := ExecCommand(newScript)
 				if err != nil {
