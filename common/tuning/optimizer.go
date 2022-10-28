@@ -90,13 +90,19 @@ func (o *Optimizer) InitTuned(ch chan *PB.TuningMessage, stopCh chan int) error 
 	log.Infof("begin to dynamic optimizer search, client ask iterations:%d", clientIter)
 
 	//dynamic profle setting
+	if o.Prj.Maxiterations == 0 {
+		log.Error("project:%s max iterations is 0", o.Prj.Project)
+		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(fmt.Sprintf("project:%s max iterations is 0\n",
+			o.Prj.Project))}
+		return fmt.Errorf("max iterations cannot be 0")
+	}
+
 	o.MaxIter = int32(clientIter)
 	if o.MaxIter > o.Prj.Maxiterations {
 		o.MaxIter = o.Prj.Maxiterations
 		log.Infof("project:%s max iterations:%d", o.Prj.Project, o.Prj.Maxiterations)
 		ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(fmt.Sprintf("server project %s max iterations %d\n",
 			o.Prj.Project, o.Prj.Maxiterations))}
-
 	}
 
 	if len(o.TuningParams) > 0 {
