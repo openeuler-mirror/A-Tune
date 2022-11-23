@@ -1,0 +1,19 @@
+project: "spark_hibench_{program}"
+engine : "bayes"
+iterations : 20
+random_starts : 10
+
+benchmark : sh spark/spark_hibench_{program}/spark_hibench_{program}.sh
+evaluations :
+  -
+    name: "duration"
+    info:
+        get: "awk '{print $5}' /apps/HiBench/report/hibench.report | tail -n 1"
+        type: "positive"
+        weight: 80
+  -
+    name: "throughput"
+    info:
+        get: "awk '{print $6}' /apps/HiBench/report/hibench.report | tail -n 1"
+        type: "negative"
+        weight: 20
