@@ -1,0 +1,89 @@
+project: "spark_hibench_{program}"
+maxiterations: 100
+startworkload: ""
+stopworkload: ""
+object :
+  -
+    name : "num_executors"
+    info :
+        desc : "Executor number"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^num_executors=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^num_executors=.*/num_executors=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 2
+          - 4
+        dtype : "int"
+  -
+    name : "executor_core"
+    info :
+        desc : "Executor number"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^executor_core=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^executor_core=.*/executor_core=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 2
+          - 4
+        dtype : "int"
+  -
+    name : "executor_memory"
+    info :
+        desc : "Executor memory"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^executor_memory=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^executor_memory=.*/executor_memory=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "continuous"
+        type : "discrete"
+        options :
+          - "2g"
+          - "3g"
+          - "4g"
+        dtype : "string"
+  -
+    name : "driver_memory"
+    info :
+        desc : "Driver memory"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^driver_memory=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^driver_memory=.*/driver_memory=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "1g"
+          - "2g"
+          - "3g"
+          - "4g"
+        dtype : "string"
+  
+  -
+    name : "default_parallelism"
+    info :
+        desc : "Default parallelism"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^default_parallelism=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^default_parallelism=.*/default_parallelism=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "10"
+          - "20"
+          - "30"
+          - "40"
+          - "50"
+        dtype : "string"
+  
+  -
+    name : "sql_shuffle_partitions"
+    info :
+        desc : "Sql shuffle partitions"
+        get : "cat spark/spark_hibench_{program}/spark_hibench_{program}.sh | grep -i '^sql_shuffle_partitions=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^sql_shuffle_partitions=.*/sql_shuffle_partitions=$value/g' spark/spark_hibench_{program}/spark_hibench_{program}.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "10"
+          - "20"
+          - "30"
+          - "40"
+          - "50"
+        dtype : "string"

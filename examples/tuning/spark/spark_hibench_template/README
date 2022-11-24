@@ -1,0 +1,6 @@
+1. Prepare the environment
+sh prepare.sh
+2. Start to tuning
+atune-adm -a [ip] -p [port] tuning --project spark_hibench_{program} --detail spark_hibench_{program}_client.yaml
+3. Restore the environment
+atune-adm -a [ip] -p [port] tuning --restore --project spark_hibench_{program}
