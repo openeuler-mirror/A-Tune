@@ -741,7 +741,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 				if err != nil {
 					return err
 				}
-				message = fmt.Sprintf("%d.Current runing application is: %s", step, project)
+				message = fmt.Sprintf("%d.Current running application is: %s", step, project)
 				step += 1
 				ch <- &PB.TuningMessage{State: PB.TuningMessage_Display, Content: []byte(message)}
 			}
