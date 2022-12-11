@@ -354,6 +354,15 @@ class Optimizer(multiprocessing.Process):
                 self.child_conn.send(final_param)
                 return final_param["param"]
 
+            elif self.engine == 'ppo':
+                from analysis.optimizer.ppotuning_manager import PPOOptimizer
+                ppo_opt = PPOOptimizer(
+                        self.knobs, self.child_conn, self.max_eval)
+                best_params = ppo_opt.run()
+                final_param = dict(finished=True, param=best_params)
+                self.child_conn.send(final_param)
+                return best_params
+
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:
             LOGGER.error('Value Error: %s', repr(value_error))
