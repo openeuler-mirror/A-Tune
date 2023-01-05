@@ -77,7 +77,7 @@ def get_db_url():
         url += 'mysql+pymysql://'
     else:
         return None
-    pwd = decrypted_code(UiConfig.user_passwd, UiConfig.passwd_key, UiConfig.passwd_iv)
-    url += UiConfig.user_name + ':' + pwd + '@' + UiConfig.db_host + ':' \
+    pwd = decrypted_code(UiConfig.db_user_passwd, UiConfig.db_passwd_key, UiConfig.db_passwd_iv)
+    url += UiConfig.db_user_name + ':' + pwd + '@' + UiConfig.db_host + ':' \
            + UiConfig.db_port + '/' + UiConfig.db_name
     return url
