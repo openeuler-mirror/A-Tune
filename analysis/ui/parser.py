@@ -33,9 +33,12 @@ UI_ANALYSIS_GET_PARSER.add_argument('csvLine', type=str, help="analysis round", 
 UI_ANALYSIS_GET_PARSER.add_argument('logLine', type=str, help="analysis round", location='args')
 
 UI_USER_GET_PARSER = reqparse.RequestParser()
-UI_USER_GET_PARSER.add_argument('email', type=str, help="user email", location='args')
-UI_USER_GET_PARSER.add_argument('name', type=str, help="user name", location='args')
-UI_USER_GET_PARSER.add_argument('password', type=str, help="user password", location='args')
 UI_USER_GET_PARSER.add_argument('userId', type=int, help="user id", location='args')
 UI_USER_GET_PARSER.add_argument('ipAddrs', type=str, help="ip address", location='args')
-UI_USER_GET_PARSER.add_argument('newPasswd', type=str, help="new password for changing", location='args')
+
+UI_USER_POST_PARSER = reqparse.RequestParser()
+UI_USER_POST_PARSER.add_argument('email', type=str, help="user email", location='json')
+UI_USER_POST_PARSER.add_argument('name', type=str, help="user name", location='json')
+UI_USER_POST_PARSER.add_argument('password', type=str, help="user password", location='json')
+UI_USER_POST_PARSER.add_argument('userId', type=int, help="user id", location='json')
+UI_USER_POST_PARSER.add_argument('newPasswd', type=str, help="new password for changing", location='json')

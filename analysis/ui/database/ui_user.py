@@ -20,7 +20,7 @@ import json
 from flask import abort
 from flask_restful import Resource
 
-from analysis.ui.parser import UI_USER_GET_PARSER
+from analysis.ui.parser import UI_USER_GET_PARSER, UI_USER_POST_PARSER
 from analysis.ui.config import UiConfig
 
 LOGGER = logging.getLogger(__name__)
@@ -35,15 +35,36 @@ class UiUser(Resource):
         if not cmd:
             abort(404, 'does not get command')
 
-        args = UI_USER_GET_PARSER.parse_args()
+        from analysis.ui.database import trigger_user
         if cmd == 'initialPage':
             if not UiConfig.db_enable:
                 return json.dumps({'connectDB': False}), 200, CORS
 
-            from analysis.ui.database import trigger_user
             has_user = True if trigger_user.count_user() > 0 else False
             return json.dumps({'connectDB': True, 'hasUser': has_user}), 200, CORS
+        
+        args = UI_USER_GET_PARSER.parse_args()
+        if cmd == 'ipList':
+            uid = args.get('userId')
+            return json.dumps({'ipList': trigger_user.user_ip_list(uid)}), 200, CORS
 
+        if cmd == 'getIpData':
+            ip_addrs = args.get('ipAddrs')
+            response_obj = trigger_user.ip_info_list(ip_addrs)
+            return json.dumps(response_obj), 200, CORS
+
+        if cmd == 'addNewIp':
+            ip_addrs = args.get('ipAddrs')
+            uid = args.get('userId')
+            return json.dumps({'success': trigger_user.add_ip(uid, ip_addrs)}), 200, CORS
+
+
+    def post(self, cmd):
+        """restful api post"""
+        if not cmd:
+            abort(404, 'does not post command')
+        
+        args = UI_USER_POST_PARSER.parse_args()
         from analysis.ui.database import trigger_user
         if cmd == 'login':
             email = args.get('email')
@@ -61,21 +82,7 @@ class UiUser(Resource):
             if res:
                 return json.dumps({'signup': res}), 200, CORS
             return json.dumps({'signup': res, 'duplicate': dup}), 200, CORS
-
-        if cmd == 'ipList':
-            uid = args.get('userId')
-            return json.dumps({'ipList': trigger_user.user_ip_list(uid)}), 200, CORS
-
-        if cmd == 'getIpData':
-            ip_addrs = args.get('ipAddrs')
-            response_obj = trigger_user.ip_info_list(ip_addrs)
-            return json.dumps(response_obj), 200, CORS
-
-        if cmd == 'addNewIp':
-            ip_addrs = args.get('ipAddrs')
-            uid = args.get('userId')
-            return json.dumps({'success': trigger_user.add_ip(uid, ip_addrs)}), 200, CORS
-
+        
         if cmd == 'changePasswd':
             uid = args.get('userId')
             pwd = args.get('password')
@@ -88,5 +95,5 @@ class UiUser(Resource):
                 return json.dumps({'success': False, 'reason': 'duplicate'}), 200, CORS
             pwd = args.get('password')
             return json.dumps(trigger_user.create_admin(pwd)), 200, CORS
-
+        
         return '', 200, CORS
