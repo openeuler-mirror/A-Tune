@@ -83,11 +83,22 @@ class UiUser(Resource):
                 return json.dumps({'signup': res}), 200, CORS
             return json.dumps({'signup': res, 'duplicate': dup}), 200, CORS
         
+        if cmd == 'getBasicInfo':
+            uid = args.get('userId')
+            name, description = trigger_user.get_user_info(uid)
+            return json.dumps({'name': name, 'description': description}), 200, CORS
+        
         if cmd == 'changePasswd':
             uid = args.get('userId')
             pwd = args.get('password')
             new_pwd = args.get('newPasswd')
             return json.dumps(trigger_user.change_user_pwd(uid, pwd, new_pwd)), 200, CORS
+
+        if cmd == 'changeBasicInfo':
+            uid = args.get('userId')
+            name = args.get('name')
+            description = args.get('description')
+            return json.dumps(trigger_user.change_user_info(uid, name, description)), 200, CORS
 
         if cmd == 'createAdmin':
             has_user = True if trigger_user.count_user() > 0 else False

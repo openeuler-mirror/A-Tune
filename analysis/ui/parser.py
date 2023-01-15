@@ -41,4 +41,5 @@ UI_USER_POST_PARSER.add_argument('email', type=str, help="user email", location=
 UI_USER_POST_PARSER.add_argument('name', type=str, help="user name", location='json')
 UI_USER_POST_PARSER.add_argument('password', type=str, help="user password", location='json')
 UI_USER_POST_PARSER.add_argument('userId', type=int, help="user id", location='json')
+UI_USER_POST_PARSER.add_argument('description', type=str, help="user description", location='json')
 UI_USER_POST_PARSER.add_argument('newPasswd', type=str, help="new password for changing", location='json')

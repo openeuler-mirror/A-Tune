@@ -62,7 +62,11 @@ def create_user(email, pwd, name):
                                                  session)
         if password is not None:
             return False, True
-        uid = user_account.get_max_uid(session) + 1
+        uid = user_account.get_max_uid(session)
+        if uid is None:
+            uid = 1
+        else:
+            uid += 1
         user_account.insert_new_user(uid, email, name, pwd, session)
         session.commit()
     except SQLAlchemyError as err:
@@ -129,6 +133,27 @@ def add_ip(uid, ip_addrs):
     return res
 
 
+def get_user_info(uid):
+    """get user info for given user"""
+    session = tables.get_session()
+    account_name = ''
+    description = ''
+    if session is None:
+        return account_name, description
+    try:
+        user_account = UserAccount()
+        account_name = user_account.get_field_by_key(UserAccount.account_name, UserAccount.user_id, uid,
+                                                 session)
+        description = user_account.get_field_by_key(UserAccount.description, UserAccount.user_id, uid,
+                                                 session)
+    except SQLAlchemyError as err:
+        LOGGER.error('User login failed: %s', err)
+        return account_name, description
+    finally:
+        session.close()
+    return account_name, description
+
+
 def change_user_pwd(uid, pwd, new_pwd):
     """check if user password match pwd"""
     session = tables.get_session()
@@ -143,6 +168,24 @@ def change_user_pwd(uid, pwd, new_pwd):
             return {'oldMatch': False}
         response['oldMatch'] = True
         response['newMatch'] = user_account.update_password(uid, new_pwd, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Check user password failed: %s', err)
+        return response
+    finally:
+        session.close()
+    return response
+
+
+def change_user_info(uid, name, description):
+    """change basic info of user"""
+    session = tables.get_session()
+    if session is None:
+        return {'success': False}
+    response = {}
+    try:
+        user_account = UserAccount()
+        response['success'] = user_account.update_user_basic_info(uid, name, description, session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Check user password failed: %s', err)

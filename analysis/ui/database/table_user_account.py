@@ -15,7 +15,7 @@
 Mapping for user_account table.
 """
 
-from sqlalchemy import Column, VARCHAR, Integer, UniqueConstraint, PrimaryKeyConstraint
+from sqlalchemy import Column, VARCHAR, Integer, Text, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy import func, select, insert, update, delete
 
 from analysis.ui.database.tables import BASE
@@ -30,6 +30,7 @@ class UserAccount(BASE):
     account_name = Column(VARCHAR(255), nullable=False)
     email = Column(VARCHAR(255), nullable=False, unique=True)
     password = Column(VARCHAR(255), nullable=False)
+    description = Column(Text, nullable=True)
     role = Column(VARCHAR(255), nullable=False, default='user')
 
     __table_args__ = (
@@ -74,6 +75,14 @@ class UserAccount(BASE):
     def update_password(uid, pwd, session):
         """update password"""
         sql = update(UserAccount).where(UserAccount.user_id == uid).values(password=pwd)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_user_basic_info(uid, name, description, session):
+        """update basic info"""
+        sql = update(UserAccount).where(UserAccount.user_id == uid).values(account_name=name,
+                     description=description)
         res = session.execute(sql)
         return res is not None
 
