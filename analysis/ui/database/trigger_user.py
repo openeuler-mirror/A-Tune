@@ -114,7 +114,7 @@ def ip_info_list(ip_addr):
     return response
 
 
-def add_ip(uid, ip_addrs):
+def add_ip(uid, ip_addrs, ip_port, server_user, server_password, description):
     """add ip to table"""
     session = tables.get_session()
     if session is None:
@@ -123,10 +123,29 @@ def add_ip(uid, ip_addrs):
     try:
         ip_table = IpAddrs()
         if not ip_table.check_exist_by_ip(ip_addrs, uid, session):
-            res = ip_table.insert_ip_by_user(ip_addrs, uid, session)
+            res = ip_table.insert_ip_by_user(ip_addrs, ip_port, server_user, server_password, description, uid, session)
             session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Insert new ip failed: %s', err)
+        return res
+    finally:
+        session.close()
+    return res
+
+
+def delete_ip(uid, ip_addrs):
+    """delete ip from table"""
+    session = tables.get_session()
+    if session is None:
+        return False
+    res = False
+    try:
+        ip_table = IpAddrs()
+        if ip_table.check_exist_by_ip(ip_addrs, uid, session):
+            res = ip_table.delete_ip_by_user(ip_addrs, uid, session)
+            session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Delete ip failed: %s', err)
         return res
     finally:
         session.close()

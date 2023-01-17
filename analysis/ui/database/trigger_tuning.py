@@ -34,7 +34,7 @@ def add_new_tuning(name, engine, rounds, tip):
     try:
         ip_table = IpAddrs()
         if not ip_table.find_ip(tip, session):
-            ip_table.insert_ip_by_user(tip, 0, session)
+            ip_table.insert_ip_by_user(ip=tip, uid=0, session=session)
         tuning_table = TuningTable()
         tid = tuning_table.get_max_tid(session) + 1
         tuning_table.insert_new_tuning(tid, name, engine, rounds, tip, session)
@@ -138,9 +138,9 @@ def get_tuning_list(uid, status):
         res = []
         for tip in ips:
             if status == 'all':
-                res.extend(tuning_table.get_all_tunings_by_ip(tip, session))
+                res.extend(tuning_table.get_all_tunings_by_ip(tip['ipAddrs'], session))
             else:
-                res.extend(tuning_table.get_status_tuning_by_ip(status, tip, session))
+                res.extend(tuning_table.get_status_tuning_by_ip(status['ipAddrs'], tip, session))
         if len(res) > 0:
             res = sorted(res, key=(lambda x:x['date']), reverse=True)
     except SQLAlchemyError as err:

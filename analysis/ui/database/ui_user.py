@@ -22,6 +22,7 @@ from flask_restful import Resource
 
 from analysis.ui.parser import UI_USER_GET_PARSER, UI_USER_POST_PARSER
 from analysis.ui.config import UiConfig
+from analysis.ui.util import verify_server_connectivity, decode_server_password
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -53,10 +54,10 @@ class UiUser(Resource):
             response_obj = trigger_user.ip_info_list(ip_addrs)
             return json.dumps(response_obj), 200, CORS
 
-        if cmd == 'addNewIp':
-            ip_addrs = args.get('ipAddrs')
+        if cmd == 'deleteIp':
             uid = args.get('userId')
-            return json.dumps({'success': trigger_user.add_ip(uid, ip_addrs)}), 200, CORS
+            ip_addrs = args.get('ipAddrs')
+            return json.dumps({'success': trigger_user.delete_ip(uid, ip_addrs)}), 200, CORS
 
 
     def post(self, cmd):
@@ -106,5 +107,22 @@ class UiUser(Resource):
                 return json.dumps({'success': False, 'reason': 'duplicate'}), 200, CORS
             pwd = args.get('password')
             return json.dumps(trigger_user.create_admin(pwd)), 200, CORS
+        
+        if cmd == 'addNewIp':
+            uid = args.get('userId')
+            ip_addrs = args.get('ipAddrs')
+            ip_port = args.get('ipPort')
+            server_user = args.get('serverUser')
+            server_password = decode_server_password(args.get('serverPassword'))
+            description = args.get("description")
+            return json.dumps({'success': trigger_user.add_ip(uid, ip_addrs, ip_port, 
+                                server_user, server_password, description)}), 200, CORS
+
+        if cmd == 'testConnect':
+            ip_addrs = args.get('ipAddrs')
+            ip_port = args.get('ipPort')
+            server_user = args.get('serverUser')
+            server_password = decode_server_password(args.get('serverPassword'))
+            return json.dumps(verify_server_connectivity(ip_addrs, ip_port, server_user, server_password)), 200, CORS
         
         return '', 200, CORS

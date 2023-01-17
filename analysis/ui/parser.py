@@ -43,3 +43,7 @@ UI_USER_POST_PARSER.add_argument('password', type=str, help="user password", loc
 UI_USER_POST_PARSER.add_argument('userId', type=int, help="user id", location='json')
 UI_USER_POST_PARSER.add_argument('description', type=str, help="user description", location='json')
 UI_USER_POST_PARSER.add_argument('newPasswd', type=str, help="new password for changing", location='json')
+UI_USER_POST_PARSER.add_argument('ipAddrs', type=str, help="ip address", location='json')
+UI_USER_POST_PARSER.add_argument('ipPort', type=str, help="ip port", location='json')
+UI_USER_POST_PARSER.add_argument('serverUser', type=str, help="server user", location='json')
+UI_USER_POST_PARSER.add_argument('serverPassword', type=str, help="server password", location='json')
