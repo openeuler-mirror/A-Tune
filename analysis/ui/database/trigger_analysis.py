@@ -35,7 +35,7 @@ def add_new_collection(cip):
     try:
         ip_table = IpAddrs()
         if not ip_table.find_ip(cip, session):
-            ip_table.insert_ip_by_user(cip, 0, session)
+            ip_table.insert_ip_by_user(ip=cip, uid=0, session=session)
             table_name = table_collection_data.get_table_name(cip)
             table_collection_data.initial_table(table_name, session)
         collection_table = CollectionTable()
@@ -142,7 +142,7 @@ def get_analysis_list(uid):
         ips = ip_table.get_ips_by_uid(uid, session)
         res = []
         for cip in ips:
-            res.extend(collection_table.get_all_collection_by_ip(cip, session))
+            res.extend(collection_table.get_all_collection_by_ip(cip['ipAddrs'], session))
         if len(res) > 0:
             res = sorted(res, key=(lambda x:x['date']), reverse=True)
     except SQLAlchemyError as err:

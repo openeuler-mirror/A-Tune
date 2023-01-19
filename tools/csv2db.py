@@ -74,7 +74,7 @@ def find_or_initial_ip(uid, ip, session):
     ip_table = IpAddrs()
     user_list = ip_table.get_ips_by_uid(uid, session)
     if not ip in user_list:
-        ip_table.insert_ip_by_user(ip, uid, session)
+        ip_table.insert_ip_by_user(ip=ip, uid=uid, session=session)
 
 
 if __name__ == '__main__':

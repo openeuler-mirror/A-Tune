@@ -15,8 +15,8 @@
 Mapping for ip_addrs table.
 """
 
-from sqlalchemy import Column, VARCHAR, Integer, PrimaryKeyConstraint
-from sqlalchemy import insert, select
+from sqlalchemy import Column, VARCHAR, Integer, Text, PrimaryKeyConstraint
+from sqlalchemy import insert, select, delete
 
 from analysis.ui.database.tables import BASE
 
@@ -28,6 +28,10 @@ class IpAddrs(BASE):
 
     user_id = Column(Integer, nullable=False)
     ip = Column(VARCHAR(255), nullable=False)
+    port = Column(VARCHAR(255), nullable=True)
+    server_user = Column(VARCHAR(255), nullable=True)
+    server_password = Column(Text, nullable=True)
+    description = Column(Text, nullable=True)
     ip_status = Column(VARCHAR(255), nullable=False, default='rest')
 
     __table_args__ = (
@@ -45,20 +49,28 @@ class IpAddrs(BASE):
         return res is not None
 
     @staticmethod
-    def insert_ip_by_user(iip, uid, session):
+    def insert_ip_by_user(ip, port, user, password, description, uid, session):
         """insert iip and uid into ip_addrs table"""
-        sql = insert(IpAddrs).values(user_id=uid, ip=iip)
+        sql = insert(IpAddrs).values(user_id=uid, ip=ip, port=port, server_user=user, 
+                                        description=description, server_password=password)
         inserts = session.execute(sql)
         return inserts is not None
+    
+    @staticmethod
+    def delete_ip_by_user(ip, uid, session):
+        """delete ip from ip_addrs table"""
+        sql = delete(IpAddrs).where(IpAddrs.user_id == uid).where(IpAddrs.ip == ip)
+        res = session.execute(sql)
+        return res is not None
 
     @staticmethod
     def get_ips_by_uid(uid, session):
         """get all ips by user_id"""
-        sql = select([IpAddrs.ip]).where(IpAddrs.user_id == uid)
+        sql = select([IpAddrs.ip, IpAddrs.description]).where(IpAddrs.user_id == uid)
         tuples = session.execute(sql).fetchall()
         res = []
         for each_line in tuples:
-            res.append(each_line[0])
+            res.append({'ipAddrs': each_line[0], 'description':  each_line[1]})
         return res
 
     @staticmethod
