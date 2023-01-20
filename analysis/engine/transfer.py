@@ -21,7 +21,7 @@ from flask import current_app
 from flask_restful import Resource
 from flask_restful import request
 
-from analysis.engine.utils import utils
+from analysis.engine.utils import utils, save_collection
 from analysis.engine.parser import TRANSFER_PUT_PARSER
 from analysis.engine.config import EngineConfig
 from analysis.default_config import ANALYSIS_DATA_PATH
@@ -59,27 +59,10 @@ class Transfer(Resource):
         if not EngineConfig.db_enable:
             return -1, 200
 
-        from analysis.ui.database import trigger_analysis
         args = TRANSFER_PUT_PARSER.parse_args()
         LOGGER.info(args)
 
         curr_id = args['collect_id']
         client_ip = request.remote_addr
-        if curr_id == -1:
-            curr_id = trigger_analysis.add_new_collection(client_ip)
-        if curr_id != -1:
-            types = args['type']
-            status = args['status']
-            workload = args['workload_type']
-
-            if types == 'csv' and status == 'running':
-                trigger_analysis.add_collection_data(curr_id, client_ip, args['collect_data'])
-            elif types == 'csv' and status == 'finished':
-                trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
-                trigger_analysis.change_collection_info(curr_id, workload)
-            elif types == 'log' and status == 'running':
-                trigger_analysis.add_analysis_log(curr_id, args['collect_data'])
-            else:
-                trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
-                trigger_analysis.change_collection_info(curr_id, workload)
+        save_collection.save_analysis_data(args, client_ip)
         return curr_id, 200

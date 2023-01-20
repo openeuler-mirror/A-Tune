@@ -21,9 +21,8 @@ from flask import abort, request
 from flask_restful import reqparse, Resource
 
 from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
-from analysis.engine.utils import task_cache, utils
+from analysis.engine.utils import task_cache, save_collection
 from analysis.optimizer import optimizer
-from analysis.engine.config import EngineConfig
 
 LOGGER = logging.getLogger(__name__)
 
@@ -96,53 +95,12 @@ class Optimizer(Resource):
             abort(404, f"taskid {task_id} not found")
         args = OPTIMIZER_PUT_PARSER.parse_args()
         LOGGER.info(args)
-        if args["iterations"] == -1:
-            value = args["line"][:-1].split(" ")
-            utils.add_data_to_file(value[2] + "," + value[3], "w", args["prj_name"])
-            if EngineConfig.db_enable:
-                from analysis.ui.database import trigger_tuning
-                client_ip = request.remote_addr
-                trigger_tuning.add_new_tuning(args['prj_name'], value[2], args['max_iter'],
-                                              client_ip)
-            return {}, 200
-        if args["iterations"] == 0:
-            total_eval = args["line"].split("|")[3].split("=")[1]
-            utils.add_data_to_file(utils.get_opposite_num(total_eval, True), "a", args["prj_name"])
-            params = utils.get_string_split(args["line"], 5, 0, "")
-            params += utils.get_string_split(args["line"], 4, 0, "evaluation-")
-            if len(args["line"].split("|")[4].split(",")) > 1:
-                params += "evaluation-TOTAL" + ","
-            params = params[:-1]
-            utils.add_data_to_file(params, "a", args["prj_name"])
-            if EngineConfig.db_enable:
-                from analysis.ui.database import trigger_tuning
-                trigger_tuning.change_tuning_baseline(args['prj_name'],
-                                                      utils.get_opposite_num(total_eval, True))
-                trigger_tuning.create_tuning_data_table(args['line'])
-
         out_queue = task[self.pipe]
-        if args["iterations"] != 0 and len(args["value"]) != 0:
-            params = utils.get_time_difference(args["line"].split("|")[2],
-                                               args["line"].split("|")[1])
-            params += "," + utils.get_string_split(args["line"], 5, 1, "")
-            if len(args["line"].split("|")[4].split(",")) > 1:
-                for each_eval in args["line"].split("|")[4].split(","):
-                    params += utils.get_opposite_num(each_eval.split("=")[1], False) + ","
-            total_eval = args["line"].split("|")[3].split("=")[1]
-            params += utils.get_opposite_num(total_eval, True)
-            utils.add_data_to_file(params, "a", args["prj_name"])
-            out_queue.send(args.get("value"))
-            if EngineConfig.db_enable:
-                from analysis.ui.database import trigger_tuning
-                table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'],
-                                                            args['line'])
-                if table_name is not None:
-                    trigger_tuning.change_tuning_status(table_name, args['prj_name'])
-
-        if args["iterations"] == args["max_iter"]:
-            utils.add_data_to_file("END", "a", args["prj_name"])
-            utils.change_file_name(args["prj_name"], "finished")
-
+        save_collection.save_tuning_data(args, out_queue)
+        
+        if args["iterations"] == -1:
+            return {}, 200
+        
         result = {}
         opt_params = out_queue.recv()
         if isinstance(opt_params, Exception):
