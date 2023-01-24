@@ -113,9 +113,19 @@ class UiUser(Resource):
             ip_addrs = args.get('ipAddrs')
             ip_port = args.get('ipPort')
             server_user = args.get('serverUser')
-            server_password = decode_server_password(args.get('serverPassword'))
+            server_password = args.get('serverPassword')
             description = args.get("description")
             return json.dumps({'success': trigger_user.add_ip(uid, ip_addrs, ip_port, 
+                                server_user, server_password, description)}), 200, CORS
+
+        if cmd == 'updateIp':
+            uid = args.get('userId')
+            ip_addrs = args.get('ipAddrs')
+            ip_port = args.get('ipPort')
+            server_user = args.get('serverUser')
+            server_password = decode_server_password(args.get('serverPassword'))
+            description = args.get("description")
+            return json.dumps({'success': trigger_user.update_ip(uid, ip_addrs, ip_port, 
                                 server_user, server_password, description)}), 200, CORS
 
         if cmd == 'testConnect':
