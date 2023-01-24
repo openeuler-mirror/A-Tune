@@ -132,6 +132,22 @@ def add_ip(uid, ip_addrs, ip_port, server_user, server_password, description):
         session.close()
     return res
 
+def update_ip(uid, ip_addrs, ip_port, server_user, server_password, description):
+    """update ip from table"""
+    session = tables.get_session()
+    if session is None:
+        return False
+    res = False
+    try:
+        ip_table = IpAddrs()
+        res = ip_table.update_ip_by_user(ip_addrs, ip_port, server_user, server_password, description, uid, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Insert new ip failed: %s', err)
+        return res
+    finally:
+        session.close()
+    return res
 
 def delete_ip(uid, ip_addrs):
     """delete ip from table"""

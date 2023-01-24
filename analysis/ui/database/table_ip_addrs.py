@@ -16,7 +16,7 @@ Mapping for ip_addrs table.
 """
 
 from sqlalchemy import Column, VARCHAR, Integer, Text, PrimaryKeyConstraint
-from sqlalchemy import insert, select, delete
+from sqlalchemy import insert, select, delete, update
 
 from analysis.ui.database.tables import BASE
 
@@ -50,11 +50,20 @@ class IpAddrs(BASE):
 
     @staticmethod
     def insert_ip_by_user(ip, port, user, password, description, uid, session):
-        """insert iip and uid into ip_addrs table"""
+        """insert ip info into ip_addrs table"""
         sql = insert(IpAddrs).values(user_id=uid, ip=ip, port=port, server_user=user, 
                                         description=description, server_password=password)
         inserts = session.execute(sql)
         return inserts is not None
+
+    @staticmethod
+    def update_ip_by_user(ip, port, user, password, description, uid, session):
+        """update ip info from ip_addrs table"""
+        sql = update(IpAddrs).where(IpAddrs.user_id == uid, IpAddrs.ip == ip) \
+                .values(port = port, server_user=user, description=description, 
+                        server_password=password)
+        res = session.execute(sql)
+        return res is not None
     
     @staticmethod
     def delete_ip_by_user(ip, uid, session):
