@@ -24,6 +24,10 @@ tlsuicacertfile = /etc/atuned/ui_certs/ca.crt
 tlsuiservercertfile = /etc/atuned/ui_certs/server.crt
 tlsuiserverkeyfile = /etc/atuned/ui_certs/server.key
 
+# the secret of jwt
+# default is atune_ui
+jwt_secret = "atune_ui"
+
 #################################### log ###############################
 [log]
 # either "debug", "info", "warn", "error", "critical", default is "info"

@@ -17,12 +17,12 @@ Routers for /v1/UI/user url.
 
 import logging
 import json
-from flask import abort
+from flask import abort, request
 from flask_restful import Resource
 
 from analysis.ui.parser import UI_USER_GET_PARSER, UI_USER_POST_PARSER
 from analysis.ui.config import UiConfig
-from analysis.ui.util import verify_server_connectivity, decode_server_password
+from analysis.ui.util import JwtUtil, verify_server_connectivity, decode_server_password
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -45,8 +45,15 @@ class UiUser(Resource):
             return json.dumps({'connectDB': True, 'hasUser': has_user}), 200, CORS
         
         args = UI_USER_GET_PARSER.parse_args()
-        if cmd == 'ipList':
+        if cmd == 'userVerify':
             uid = args.get('userId')
+            jwt = JwtUtil(UiConfig.jwt_secret)
+            token = request.headers.get("Authorization")
+            token_vaild, msg = jwt.is_token_vaild(token, uid)
+            return json.dumps({'vaild': token_vaild, 'msg': msg}), 200, CORS
+
+        if cmd == 'ipList':
+            uid = args.get('userId')       
             return json.dumps({'ipList': trigger_user.user_ip_list(uid)}), 200, CORS
 
         if cmd == 'getIpData':
@@ -66,6 +73,7 @@ class UiUser(Resource):
             abort(404, 'does not post command')
         
         args = UI_USER_POST_PARSER.parse_args()
+        jwt = JwtUtil(UiConfig.jwt_secret)
         from analysis.ui.database import trigger_user
         if cmd == 'login':
             email = args.get('email')
@@ -73,7 +81,9 @@ class UiUser(Resource):
             res, name = trigger_user.user_exist(email, pwd)
             if res == -1:
                 return json.dumps({'login': False}), 200, CORS
-            return json.dumps({'login': True, 'user_id': res, 'user_name': name}), 200, CORS
+            token = jwt.encode({'user_id': res})
+            return json.dumps({'login': True, 'user_id': res, 'user_name': name, 
+                                'token': token}), 200, CORS
 
         if cmd == 'signup':
             email = args.get('email')

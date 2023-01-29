@@ -51,6 +51,7 @@ class UiConfig:
         UiConfig.ui_host = get_or_default(config, 'server', 'ui_host', 'localhost')
         UiConfig.ui_port = get_or_default(config, 'server', 'ui_port', '3839')
         UiConfig.ui_tls = get_or_default_bool(config, 'server', 'ui_tls', False)
+        UiConfig.jwt_secret = get_or_default(config, 'server', 'jwt_secret', 'atune_ui')
         if UiConfig.ui_tls:
             UiConfig.ui_ca_file = get_or_default(config, 'server',
                     'tlsuicacertfile', UI_CERT_PATH + 'ca.crt')

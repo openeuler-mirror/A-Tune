@@ -17,11 +17,41 @@ Provide utility functions for ui
 """
 import socket
 import base64
-import paramiko
+from datetime import datetime, timedelta
 
+import jwt
+import paramiko
 from paramiko import ssh_exception
 from paramiko.ssh_exception import AuthenticationException
 
+
+class JwtUtil:
+    """jwt util class"""
+
+
+    def __init__(self, secret):
+        self.secret = secret
+
+    def encode(self, payload, expires=1):
+        """encode payload and set expires time"""
+        payload['exp'] = datetime.utcnow().timestamp() + timedelta(days=expires).total_seconds()
+
+        return jwt.encode(payload=payload, key=self.secret, algorithm='HS256')
+
+    def is_token_vaild(self, token, uid):
+        """Judge whether the token is valid"""
+        try:
+            payload = jwt.decode(jwt=token, key=self.secret, algorithms=['HS256'])
+            if payload['user_id'] != uid:
+                return False, "Invalid user"
+            return True, ""
+        except jwt.exceptions.InvalidSignatureError:
+            return False, "Invalid token"
+        except jwt.exceptions.ExpiredSignatureError:
+            return False, "Token expired"
+        except Exception:
+            return False, "Verification failed"
+        
 
 def verify_server_connectivity(ip_addrs, ip_port, server_user, server_password):
     """Verify server connectivity"""
