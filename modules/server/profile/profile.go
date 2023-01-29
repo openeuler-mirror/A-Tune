@@ -598,8 +598,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	pro.SetWorkloadType(workloadType)
 	pro.SetCollectionId(collectionId)
 
-	_ = stream.Send(&PB.AckCheck{Name: "\n 5. bengin to set static profile"})
-	log.Infof("bengin to set static profile")
+	_ = stream.Send(&PB.AckCheck{Name: "\n 5. begin to set static profile"})
+	log.Infof("begin to set static profile")
 
 	//static profile setting
 	ch := make(chan *PB.AckCheck)
@@ -633,7 +633,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 
 	log.Info("begin to dynamic tuning depending on rules")
-	_ = stream.Send(&PB.AckCheck{Name: "\n 6. bengin to set dynamic profile"})
+	_ = stream.Send(&PB.AckCheck{Name: "\n 6. begin to set dynamic profile"})
 	if err := tuning.RuleTuned(workloadType); err != nil {
 		return err
 	}
