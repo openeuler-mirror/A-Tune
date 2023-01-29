@@ -102,3 +102,4 @@ def save_analysis_data(args, client_ip):
         else:
             trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
             trigger_analysis.change_collection_info(curr_id, workload)
+    return curr_id

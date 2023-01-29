@@ -64,5 +64,5 @@ class Transfer(Resource):
 
         curr_id = args['collect_id']
         client_ip = request.remote_addr
-        save_collection.save_analysis_data(args, client_ip)
+        curr_id = save_collection.save_analysis_data(args, client_ip)
         return curr_id, 200
