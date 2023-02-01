@@ -49,7 +49,7 @@ db_name = atune_db
 # database user info
 # user_passwd should be encrypted according to Advanced Encryption Standard (AES)
 # you can use ./tools/encrypt.py to encrypt your password
-# user_name = admin
-# passwd_key = 
-# passwd_iv = 
-# user_passwd = 
+# db_user_name = admin
+# db_passwd_key = 
+# db_passwd_iv = 
+# db_user_passwd = 

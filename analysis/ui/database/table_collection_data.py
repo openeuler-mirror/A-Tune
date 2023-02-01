@@ -22,12 +22,12 @@ from sqlalchemy import Table, Column, VARCHAR, Integer
 from sqlalchemy import text
 from sqlalchemy.engine.reflection import Inspector
 
-from analysis.ui.database.tables import get_db_url
+from analysis.ui.database.tables import get_engine_db_url
 
 
 def exists_table(table_name):
     """check if table exists"""
-    engine = create_engine(get_db_url())
+    engine = create_engine(get_engine_db_url())
     inspector = Inspector.from_engine(engine)
     table = inspector.get_table_names()
     return table_name in table
@@ -41,7 +41,7 @@ def initial_table(table_name, session):
                   Column('round', Integer, primary_key=True, nullable=False),
                   Column('timestamp', VARCHAR(255), nullable=True)
                  )
-    engine = create_engine(get_db_url())
+    engine = create_engine(get_engine_db_url())
     metadata.create_all(engine)
     sql = 'insert into ' + table_name + ' values (-1, -1, \'timeStamp\')'
     session.execute(sql)
@@ -83,7 +83,7 @@ def execute_collection_data(cid, rounds, data, table_name, session):
         col_name = re.sub(r'[^\w]', '_', param[0].lower())
         if len(param) != 2:
             continue
-        if not exist_column(table_name, col_name, session):
+        if not exist_column(table_name, param[0], session):
             insert_new_column(table_name, col_name, param[0], session)
         keys += ', ' + col_name
         vals += ', :' + col_name
@@ -102,7 +102,7 @@ def exist_column(table_name, col_name, session):
 
 def insert_new_column(table_name, col_name, param, session):
     """insert new column to collection_data table"""
-    sql = 'alter table ' + table_name + ' add column if not exists ' + col_name + \
+    sql = 'alter table ' + table_name + ' add column ' + col_name + \
         ' varchar(255) default null'
     session.execute(sql)
     update_sql = 'update ' + table_name + ' set ' + col_name + ' = :param where collection_id = -1'

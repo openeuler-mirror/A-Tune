@@ -28,7 +28,7 @@ LOGGER = logging.getLogger(__name__)
 
 def add_new_tuning(name, engine, rounds, tip):
     """add new tuning to tuning_table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -46,7 +46,7 @@ def add_new_tuning(name, engine, rounds, tip):
 
 def change_tuning_baseline(name, val):
     """change baseline info"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -60,7 +60,7 @@ def change_tuning_baseline(name, val):
 
 def create_tuning_data_table(line):
     """create new tuning_data table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -73,7 +73,7 @@ def create_tuning_data_table(line):
         if table is None:
             LOGGER.info('Data in tuning_data does not match what desired')
             return
-        engine = create_engine(tables.get_db_url())
+        engine = create_engine(tables.get_engine_db_url())
         metadata.create_all(engine)
         sql = 'insert into ' + table_name + ' ' + init_key + ' values ' + init_val
         session.execute(text(sql), pairs)
@@ -86,7 +86,7 @@ def create_tuning_data_table(line):
 
 def add_tuning_data(name, iters, line):
     """add new round to tuning_data table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return None
     try:
@@ -110,7 +110,7 @@ def add_tuning_data(name, iters, line):
 
 def change_tuning_status(table_name, name):
     """change tuning_table status"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return None
     try:
@@ -128,7 +128,7 @@ def change_tuning_status(table_name, name):
 
 def get_tuning_list(uid, status):
     """get all tuning with status 'status' as a list"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return None
     try:
@@ -153,7 +153,7 @@ def get_tuning_list(uid, status):
 
 def rename_tuning(name, new_name):
     """rename tuning"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return False, 'connect'
     try:
@@ -175,7 +175,7 @@ def rename_tuning(name, new_name):
 def tuning_exist(name):
     """check if tuning exist"""
     exist = False
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return exist
     try:
@@ -189,7 +189,7 @@ def tuning_exist(name):
 
 def get_tuning_info(status, name):
     """get info about tuning"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -216,7 +216,7 @@ def get_tuning_info(status, name):
 
 def get_tuning_data(status, name, line):
     """get each round data"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -242,7 +242,7 @@ def get_tuning_data(status, name, line):
 
 def get_tuning_status(name):
     """get tuning status"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return 'break'
     status = 'break'
