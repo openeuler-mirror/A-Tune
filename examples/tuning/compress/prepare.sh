@@ -13,7 +13,7 @@ echo "unzip enwik8.zip"
 unzip "$path"/enwik8.zip
 
 echo "set FILE_PATH to the path of enwik8 in compress.py"
-sed -i "s#compress/enwik8#$path/enwik8#g" "$path"/compress.py
+sed -i 's#".*compress/enwik8"#"'$path'/enwik8"#g' $path/compress.py
 
 echo "update the client and server yaml files"
 sed -i "s#python3 .*compress.py#python3 $path/compress.py#g" "$path"/compress_client.yaml
