@@ -36,10 +36,10 @@ class EngineConfig:
     db_host = ''
     db_port = ''
     db_name = ''
-    user_name = ''
-    user_passwd = ''
-    passwd_key = ''
-    passwd_iv = ''
+    db_user_name = ''
+    db_user_passwd = ''
+    db_passwd_key = ''
+    db_passwd_iv = ''
 
     @staticmethod
     def initial_params(filename):

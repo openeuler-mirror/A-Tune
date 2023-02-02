@@ -27,6 +27,7 @@ class UiConfig:
     ui_host = ''
     ui_port = ''
     ui_tls = False
+    jwt_secret = ''
     ui_ca_file = ''
     ui_server_cert = ''
     ui_server_key = ''
