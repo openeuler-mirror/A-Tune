@@ -28,7 +28,7 @@ LOGGER = logging.getLogger(__name__)
 
 def add_new_collection(cip):
     """add new collection to collection_table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     cid = -1
     if session is None:
         return cid
@@ -52,7 +52,7 @@ def add_new_collection(cip):
 
 def add_collection_data(cid, cip, data):
     """add collection data to collection_ip table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -69,7 +69,7 @@ def add_collection_data(cid, cip, data):
 
 def add_analysis_log(cid, data):
     """add log to analysis_log table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -84,7 +84,7 @@ def add_analysis_log(cid, data):
 
 def change_collection_status(cid, cip, status, types):
     """change status of collection_table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -110,7 +110,7 @@ def change_collection_status(cid, cip, status, types):
 
 def change_collection_info(cid, workload):
     """change name & workload of collection_table"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return
     try:
@@ -133,7 +133,7 @@ def change_collection_info(cid, workload):
 
 def get_analysis_list(uid):
     """get all analysis with user_id 'uid' as a list"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return None
     try:
@@ -155,7 +155,7 @@ def get_analysis_list(uid):
 
 def rename_collection(name, new_name):
     """rename collecton from 'name' to 'new_name' """
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return False, 'connect'
     try:
@@ -177,7 +177,7 @@ def rename_collection(name, new_name):
 def collection_exist(name):
     """check if collection exist"""
     exist = False
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return exist
     try:
@@ -215,7 +215,7 @@ def get_analysis_log_dirs(cid, log_line, response, session):
 
 def get_analysis_data(name, csv_line, log_line):
     """get each round data"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -252,7 +252,7 @@ def get_analysis_data(name, csv_line, log_line):
 
 def get_compare_collection(name, csv_line):
     """get compare collection data"""
-    session = tables.get_session()
+    session = tables.get_engine_session()
     if session is None:
         return {'isExist': False}
     response = {}

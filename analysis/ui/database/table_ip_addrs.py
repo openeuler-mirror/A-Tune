@@ -49,7 +49,7 @@ class IpAddrs(BASE):
         return res is not None
 
     @staticmethod
-    def insert_ip_by_user(ip, port, user, password, description, uid, session):
+    def insert_ip_by_user(ip="", port="", user="", password="", description="", uid=0, session=None):
         """insert ip info into ip_addrs table"""
         sql = insert(IpAddrs).values(user_id=uid, ip=ip, port=port, server_user=user, 
                                         description=description, server_password=password)

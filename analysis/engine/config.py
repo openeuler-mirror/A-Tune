@@ -65,8 +65,8 @@ class EngineConfig:
             EngineConfig.db_host = get_or_default(config, 'database', 'db_host', 'localhost')
             EngineConfig.db_port = get_or_default(config, 'database', 'db_port', '5432')
             EngineConfig.db_name = get_or_default(config, 'database', 'db_name', 'atune_db')
-            EngineConfig.user_name = get_or_default(config, 'database', 'user_name', 'admin')
-            EngineConfig.user_passwd = get_or_default(config, 'database', 'user_passwd', '')
-            EngineConfig.passwd_key = get_or_default(config, 'database', 'passwd_key', '')
-            EngineConfig.passwd_iv = get_or_default(config, 'database', 'passwd_iv', '')
+            EngineConfig.db_user_name = get_or_default(config, 'database', 'db_user_name', 'admin')
+            EngineConfig.db_user_passwd = get_or_default(config, 'database', 'db_user_passwd', '')
+            EngineConfig.db_passwd_key = get_or_default(config, 'database', 'db_passwd_key', '')
+            EngineConfig.db_passwd_iv = get_or_default(config, 'database', 'db_passwd_iv', '')
         return True
