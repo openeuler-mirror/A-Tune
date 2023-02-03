@@ -17,7 +17,6 @@ path=$(
 
 echo "update the client and server yaml files"
 sed -i "s#sh .*/gcc_compile.sh#sh $path/gcc_compile.sh#g" $path/gcc_compile_client.yaml
-sed -i "s#-c .*/stream.o#-c $path/stream.o#g" $path/gcc_compile_client.yaml
 sed -i "s#cat .*/gcc_compile.sh#cat $path/gcc_compile.sh#g" $path/gcc_compile_server.yaml
 sed -i "s#' .*/gcc_compile.sh#' $path/gcc_compile.sh#g" $path/gcc_compile_server.yaml
 
