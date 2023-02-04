@@ -25,6 +25,7 @@ import numpy as np
 from pathlib import Path
 
 from analysis.default_config import TUNING_DATA_PATH, TUNING_DATA_DIRS
+from analysis.engine.config import EngineConfig
 
 
 def read_from_csv(path):
@@ -168,3 +169,11 @@ def get_multiple_res(values, mul):
             res += "".join(str(x) for x in res_arr[index:]).lstrip('0') + " "
     logging.info("The options would be: %s", res[:-1])
     return res[:-1]
+
+
+def is_analysis_data(data):
+    """Determine whether the data is a fixed type of analysis"""
+    data_types = []
+    for key in data:
+        data_types.append(key)
+    return data_types.sort() == EngineConfig.db_analysis_type.sort()

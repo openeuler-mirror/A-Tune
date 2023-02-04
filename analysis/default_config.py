@@ -37,3 +37,11 @@ def get_or_default_bool(config, section, key, value):
     if config.has_option(section, key):
         return config.get(section, key).lower() == 'true'
     return value
+
+
+def get_or_default_list(config, section, key, value):
+    """get or default list param"""
+    import ast
+    if config.has_option(section, key):
+        return ast.literal_eval(config.get(section, key))
+    return []

@@ -16,7 +16,7 @@ Mapping for collection_table table.
 """
 
 import time
-from sqlalchemy import Column, VARCHAR, Integer
+from sqlalchemy import Column, VARCHAR, Integer, Text
 from sqlalchemy import func, select, insert, update
 
 from analysis.ui.database.tables import BASE
@@ -35,7 +35,7 @@ class CollectionTable(BASE):
     collection_date = Column(VARCHAR(255), nullable=False)
     workload_type = Column(VARCHAR(255), nullable=True)
     total_round = Column(Integer)
-    total_log = Column(Integer)
+    description = Column(Text)
 
     def __repr__(self):
         return "<collection_table(collection='%s %s %s %s %s', round='%s %s')>" \

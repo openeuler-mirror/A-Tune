@@ -36,7 +36,7 @@ def add_new_collection(cip):
         ip_table = IpAddrs()
         if not ip_table.find_ip(cip, session):
             ip_table.insert_ip_by_user(ip=cip, uid=0, session=session)
-            table_name = table_collection_data.get_table_name(cip)
+            table_name = table_collection_data.get_table_name()
             table_collection_data.initial_table(table_name, session)
         collection_table = CollectionTable()
         cid = collection_table.get_max_cid(session) + 1
@@ -56,8 +56,8 @@ def add_collection_data(cid, cip, data):
     if session is None:
         return
     try:
-        rounds = table_collection_data.get_max_round(cid, cip, session) + 1
-        res = table_collection_data.insert_table(cid, rounds, cip, data, session)
+        rounds = table_collection_data.get_max_round(cid, session) + 1
+        res = table_collection_data.insert_table(cid, rounds, data, session)
         if not res:
             LOGGER.error('Failed to insert data to collection_table')
         session.commit()
@@ -96,7 +96,7 @@ def change_collection_status(cid, cip, status, types):
             collection_table.update_status(cid, status, session)
 
         if types == 'csv':
-            rounds = table_collection_data.get_max_round(cid, cip, session)
+            rounds = table_collection_data.get_max_round(cid, session)
             collection_table.update_total_round(cid, rounds, session)
         else:
             analysis_log = AnalysisLog()
@@ -191,8 +191,8 @@ def collection_exist(name):
 
 def get_collection_data_dirs(cip, cid, csv_line, response, session):
     """get collection data"""
-    header, _ = table_collection_data.get_line(cip, -1, -2, -1, session)
-    data, response['round'] = table_collection_data.get_line(cip, cid, csv_line, csv_line + 10,
+    header, _ = table_collection_data.get_line(-1, -2, -1, session)
+    data, response['round'] = table_collection_data.get_line(cid, csv_line, csv_line + 10,
                                                              session)
     for i, val in enumerate(data):
         if val[0] is None:

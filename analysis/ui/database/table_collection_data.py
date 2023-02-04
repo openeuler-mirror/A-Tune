@@ -39,18 +39,18 @@ def initial_table(table_name, session):
     table = Table(table_name, metadata,
                   Column('collection_id', Integer, primary_key=True, nullable=False),
                   Column('round', Integer, primary_key=True, nullable=False),
-                  Column('timestamp', VARCHAR(255), nullable=True)
+                  Column('time', VARCHAR(255), nullable=True)
                  )
     engine = create_engine(get_engine_db_url())
     metadata.create_all(engine)
-    sql = 'insert into ' + table_name + ' values (-1, -1, \'timeStamp\')'
+    sql = 'insert into ' + table_name + ' values (-1, -1, \'time\')'
     session.execute(sql)
     return table
 
 
-def get_max_round(cid, cip, session):
+def get_max_round(cid, session):
     """get max round num in collection_table"""
-    table_name = get_table_name(cip)
+    table_name = get_table_name()
     if table_name is None:
         return False
     if not exists_table(table_name):
@@ -62,9 +62,9 @@ def get_max_round(cid, cip, session):
     return cid
 
 
-def insert_table(cid, rounds, cip, data, session):
+def insert_table(cid, rounds, data, session):
     """insert data into collection_ip table"""
-    table_name = get_table_name(cip)
+    table_name = get_table_name()
     if table_name is None:
         return False
     keys, vals, pairs = execute_collection_data(cid, rounds, data, table_name, session)
@@ -75,9 +75,10 @@ def insert_table(cid, rounds, cip, data, session):
 
 def execute_collection_data(cid, rounds, data, table_name, session):
     """execute data of new round"""
-    keys = '(collection_id, round'
-    vals = '(:collection_id, :round'
-    pairs = {'collection_id': cid, 'round': rounds}
+    import time
+    keys = '(collection_id, round, time'
+    vals = '(:collection_id, :round, :time'
+    pairs = {'collection_id': cid, 'round': rounds, 'time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}
     for element in data.split(' '):
         param = element.split(':')
         col_name = re.sub(r'[^\w]', '_', param[0].lower())
@@ -109,16 +110,14 @@ def insert_new_column(table_name, col_name, param, session):
     session.execute(text(update_sql), {'param': param})
 
 
-def get_table_name(ip):
+def get_table_name():
     """get collection data table name by ip"""
-    if ip is None or ip == '':
-        return ip
-    return 'collection_' + re.sub(r'[^\w]', '_', ip.lower())
+    return 'analysis_data' 
 
 
-def get_line(cip, cid, start, end, session):
+def get_line(cid, start, end, session):
     """get selected line by cid and line range, return data & round"""
-    table_name = get_table_name(cip)
+    table_name = get_table_name()
     sql = 'select * from ' + table_name + \
         ' where collection_id = :id and round > :round1 and round <= :round2'
     res = session.execute(text(sql), {'id': cid, 'round1': start, 'round2': end}).fetchall()
