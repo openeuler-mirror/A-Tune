@@ -81,7 +81,14 @@ def save_tuning_data_database(args):
         if table_name is not None:
             trigger_tuning.change_tuning_status(table_name, args['prj_name'])
 
-    
+
+def save_analysis_or_collection_data(args, client_ip):
+    if utils.is_analysis_data(args['collect_data']):
+        return save_analysis_data(args, client_ip)
+    else:
+        return -1
+
+
 def save_analysis_data(args, client_ip):
     from analysis.ui.database import trigger_analysis
     curr_id = args['collect_id']

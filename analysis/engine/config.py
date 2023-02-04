@@ -18,7 +18,7 @@ Initial engine config parameters.
 import os
 from configparser import ConfigParser
 from analysis.default_config import ENGINE_CERT_PATH
-from analysis.default_config import get_or_default, get_or_default_bool
+from analysis.default_config import get_or_default, get_or_default_bool, get_or_default_list
 
 
 class EngineConfig:
@@ -40,6 +40,7 @@ class EngineConfig:
     db_user_passwd = ''
     db_passwd_key = ''
     db_passwd_iv = ''
+    db_analysis_type = []
 
     @staticmethod
     def initial_params(filename):
@@ -69,4 +70,5 @@ class EngineConfig:
             EngineConfig.db_user_passwd = get_or_default(config, 'database', 'db_user_passwd', '')
             EngineConfig.db_passwd_key = get_or_default(config, 'database', 'db_passwd_key', '')
             EngineConfig.db_passwd_iv = get_or_default(config, 'database', 'db_passwd_iv', '')
+            EngineConfig.db_analysis_type = get_or_default_list(config, 'database', 'db_analysis_type', [])
         return True
