@@ -15,7 +15,7 @@ yum -y install httpd-tools
 
 echo "set your tomcat folder"
 root_tomcat=$1
-sed -i 's/'root_tomcat'/'$root_tomcat'/' tuning_params_tomcat.yaml
+sed -i 's#'root_tomcat'#'$root_tomcat'#' tuning_params_tomcat.yaml
 
 echo "copy the tuning file to atune"
 cp tuning_params_tomcat.yaml /etc/atuned/tuning/tomcat/
