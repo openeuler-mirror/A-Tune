@@ -18,23 +18,35 @@ Func for initial and use tuning_data table.
 import re
 import logging
 import numpy
+from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Integer, VARCHAR
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.engine.reflection import Inspector
 
 from analysis.engine.utils import utils
+from analysis.ui.database.tables import get_engine_db_url
 
 LOGGER = logging.getLogger(__name__)
+
+
+def exists_table(table_name):
+    """check if table exists"""
+    engine = create_engine(get_engine_db_url())
+    inspector = Inspector.from_engine(engine)
+    table = inspector.get_table_names()
+    return table_name in table
 
 
 def initial_table(table_name, metadata, line):
     """initial columns in tuning table"""
     table = Table(table_name, metadata,
+                  Column('tuning_id', Integer, primary_key=True),
                   Column('_round', Integer, primary_key=True),
                   Column('_cost', VARCHAR(255), nullable=False)
                  )
-    init_key = '(_round, _cost'
-    init_val = '(:_round, :_cost'
-    pairs = {'_round': 0, '_cost': 'cost'}
+    init_key = '(tuning_id, _round, _cost'
+    init_val = '(:tuning_id, :_round, :_cost'
+    pairs = {'tuning_id': -1, '_round': -1, '_cost': 'cost'}
     params = line.split('|')[-2:]
     if len(params) != 2:
         return None, '', '', ''
@@ -74,11 +86,11 @@ def exist_tuning_column(table, param, session):
     return key, True
 
 
-def execute_tuning_data(table, iteration, line, session):
+def execute_tuning_data(table, tid, iteration, line, session):
     """execute data of new round"""
-    keys = '(_round, _cost'
-    vals = '(:_round, :_cost'
-    pairs = {'_round': iteration,
+    keys = '(tuning_id, _round, _cost'
+    vals = '(:tuning_id, :_round, :_cost'
+    pairs = {'tuning_id': tid, '_round': iteration,
              '_cost': utils.get_time_difference(line.split('|')[2], line.split('|')[1])}
     params = line.split('|')[-2:]
     if len(params) != 2:
