@@ -16,6 +16,7 @@ Triggers to action tuning database.
 """
 
 import logging
+import string
 from sqlalchemy import text, MetaData, create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -58,26 +59,25 @@ def change_tuning_baseline(name, val):
     session.close()
 
 
-def create_tuning_data_table(line):
+def create_tuning_data_table(name, line):
     """create new tuning_data table"""
     session = tables.get_engine_session()
     if session is None:
         return
     try:
-        tuning_table = TuningTable()
-        tid = tuning_table.get_max_tid(session)
-        table_name = 'tuning_' + str(tid)
-        metadata = MetaData()
-        table, init_key, init_val, pairs = table_tuning_data.initial_table(table_name, metadata,
-                                                                           line)
-        if table is None:
-            LOGGER.info('Data in tuning_data does not match what desired')
-            return
-        engine = create_engine(tables.get_engine_db_url())
-        metadata.create_all(engine)
-        sql = 'insert into ' + table_name + ' ' + init_key + ' values ' + init_val
-        session.execute(text(sql), pairs)
-        session.commit()
+        table_name = 'tuning_' + name
+        if not table_tuning_data.exists_table(table_name):
+            metadata = MetaData()
+            table, init_key, init_val, pairs = table_tuning_data.initial_table(table_name, metadata,
+                                                                            line)
+            if table is None:
+                LOGGER.info('Data in tuning_data does not match what desired')
+                return
+            engine = create_engine(tables.get_engine_db_url())
+            metadata.create_all(engine)
+            sql = 'insert into ' + table_name + ' ' + init_key + ' values ' + init_val
+            session.execute(text(sql), pairs)
+            session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Create new tuning data table failed: %s', err)
     finally:
@@ -91,9 +91,11 @@ def add_tuning_data(name, iters, line):
         return None
     try:
         tuning_table = TuningTable()
-        table_name = str(tuning_table.get_field_by_name(TuningTable.tuning_id, name, session))
-        table_name = 'tuning_' + table_name
-        keys, vals, pairs = table_tuning_data.execute_tuning_data(table_name, iters, line, session)
+        tid = str(tuning_table.get_field_by_name(TuningTable.tuning_id, name, session))
+        table_name = 'tuning_' + name.rstrip(string.digits)[:-1]
+        if not table_tuning_data.exists_table(table_name):
+            create_tuning_data_table(table_name, line)
+        keys, vals, pairs = table_tuning_data.execute_tuning_data(table_name, tid, iters, line, session)
         if keys is None:
             LOGGER.info('Data in tuning_data does not match what desired')
             return None

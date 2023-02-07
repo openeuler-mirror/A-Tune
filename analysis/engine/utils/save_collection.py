@@ -15,6 +15,7 @@
 Save tuning or analysis data to file and database
 """
 
+import string
 from flask import request
 
 from analysis.engine.utils import utils
@@ -73,7 +74,7 @@ def save_tuning_data_database(args):
         total_eval = args["line"].split("|")[3].split("=")[1]
         trigger_tuning.change_tuning_baseline(args['prj_name'],
                                                     utils.get_opposite_num(total_eval, True))
-        trigger_tuning.create_tuning_data_table(args['line'])
+        trigger_tuning.create_tuning_data_table(args['prj_name'].rstrip(string.digits)[:-1], args['line'])
 
     if args["iterations"] != 0 and len(args["value"]) != 0:
         table_name = trigger_tuning.add_tuning_data(args['prj_name'], args['iterations'],
