@@ -130,7 +130,7 @@ def change_tuning_status(table_name, name):
 
 def get_tuning_list(uid, status):
     """get all tuning with status 'status' as a list"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return None
     try:
@@ -155,7 +155,7 @@ def get_tuning_list(uid, status):
 
 def rename_tuning(name, new_name):
     """rename tuning"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return False, 'connect'
     try:
@@ -177,7 +177,7 @@ def rename_tuning(name, new_name):
 def tuning_exist(name):
     """check if tuning exist"""
     exist = False
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return exist
     try:
@@ -191,7 +191,7 @@ def tuning_exist(name):
 
 def get_tuning_info(status, name):
     """get info about tuning"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -218,7 +218,7 @@ def get_tuning_info(status, name):
 
 def get_tuning_data(status, name, line):
     """get each round data"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -244,7 +244,7 @@ def get_tuning_data(status, name, line):
 
 def get_tuning_status(name):
     """get tuning status"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return 'break'
     status = 'break'
