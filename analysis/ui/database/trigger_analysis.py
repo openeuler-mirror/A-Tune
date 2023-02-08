@@ -133,7 +133,7 @@ def change_collection_info(cid, workload):
 
 def get_analysis_list(uid):
     """get all analysis with user_id 'uid' as a list"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return None
     try:
@@ -155,7 +155,7 @@ def get_analysis_list(uid):
 
 def rename_collection(name, new_name):
     """rename collecton from 'name' to 'new_name' """
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return False, 'connect'
     try:
@@ -177,7 +177,7 @@ def rename_collection(name, new_name):
 def collection_exist(name):
     """check if collection exist"""
     exist = False
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return exist
     try:
@@ -215,7 +215,7 @@ def get_analysis_log_dirs(cid, log_line, response, session):
 
 def get_analysis_data(name, csv_line, log_line):
     """get each round data"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return {'isExist': False}
     response = {}
@@ -252,7 +252,7 @@ def get_analysis_data(name, csv_line, log_line):
 
 def get_compare_collection(name, csv_line):
     """get compare collection data"""
-    session = tables.get_engine_session()
+    session = tables.get_session()
     if session is None:
         return {'isExist': False}
     response = {}
