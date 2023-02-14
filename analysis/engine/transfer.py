@@ -21,7 +21,7 @@ from flask import current_app
 from flask_restful import Resource
 from flask_restful import request
 
-from analysis.engine.utils import utils, save_collection
+from analysis.engine.utils import utils, save_data
 from analysis.engine.parser import TRANSFER_PUT_PARSER
 from analysis.engine.config import EngineConfig
 from analysis.default_config import ANALYSIS_DATA_PATH
@@ -64,5 +64,5 @@ class Transfer(Resource):
 
         curr_id = args['collect_id']
         client_ip = request.remote_addr
-        curr_id = save_collection.save_analysis_or_collection_data(args, client_ip)
+        curr_id = save_data.save_analysis_or_collection_data(args, client_ip)
         return curr_id, 200

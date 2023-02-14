@@ -70,7 +70,7 @@ class UiAnalysis(Resource):
         from analysis.ui.database import trigger_analysis
         if cmd == 'initialPage':
             uid = args.get('uid')
-            res = trigger_analysis.get_analysis_list(int(uid))
+            res = trigger_analysis.count_analysis_list(int(uid))
             return json.dumps({'analysis': res}), 200, CORS
 
         if cmd == 'rename':

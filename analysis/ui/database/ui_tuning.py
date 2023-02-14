@@ -90,8 +90,7 @@ class UiTuning(Resource):
         from analysis.ui.database import trigger_tuning
         if cmd == 'initialPage':
             uid = args.get('uid')
-            status = args.get('status')
-            res = trigger_tuning.get_tuning_list(int(uid), status)
+            res = trigger_tuning.count_tuning_list(int(uid))
             return json.dumps({'message': res}), 200, CORS
 
         if cmd == 'rename':

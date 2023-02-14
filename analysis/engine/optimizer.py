@@ -21,7 +21,7 @@ from flask import abort, request
 from flask_restful import reqparse, Resource
 
 from analysis.engine.parser import OPTIMIZER_POST_PARSER, OPTIMIZER_PUT_PARSER
-from analysis.engine.utils import task_cache, save_collection
+from analysis.engine.utils import task_cache, save_data
 from analysis.optimizer import optimizer
 
 LOGGER = logging.getLogger(__name__)
@@ -96,7 +96,7 @@ class Optimizer(Resource):
         args = OPTIMIZER_PUT_PARSER.parse_args()
         LOGGER.info(args)
         out_queue = task[self.pipe]
-        save_collection.save_tuning_data(args, out_queue)
+        save_data.save_tuning_data(args, out_queue)
         
         if args["iterations"] == -1:
             return {}, 200
