@@ -16,6 +16,7 @@ Triggers to action tuning database.
 """
 
 import logging
+import time
 import string
 from sqlalchemy import text, MetaData, create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -23,6 +24,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from analysis.ui.database import tables, table_tuning_data
 from analysis.ui.database.table_ip_addrs import IpAddrs
 from analysis.ui.database.table_tuning import TuningTable
+from analysis.ui.database.table_command import CommandTable
 
 LOGGER = logging.getLogger(__name__)
 
@@ -36,9 +38,13 @@ def add_new_tuning(name, engine, rounds, tip):
         ip_table = IpAddrs()
         if not ip_table.find_ip(tip, session):
             ip_table.insert_ip_by_user(ip=tip, uid=0, session=session)
+        localtime = time.localtime()
         tuning_table = TuningTable()
         tid = tuning_table.get_max_tid(session) + 1
-        tuning_table.insert_new_tuning(tid, name, engine, rounds, tip, session)
+        tuning_table.insert_new_tuning(tid, name, engine, rounds, tip, localtime, session)
+        command_table = CommandTable()
+        cid = command_table.get_max_cid(session) + 1
+        command_table.insert_new_command(cid, name, tid, 'tuning', tip, localtime, session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Add new tuning to tuning_table failed: %s', err)
@@ -122,10 +128,32 @@ def change_tuning_status(table_name, name):
                 table_name).scalar()
         if total_round is not None and total_round == data_round:
             tuning_table.update_status(name, 'finished', session)
+            command_table = CommandTable()
+            command_table.update_status_by_name(name, 'finished', session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Change tuning_table status failed: %s', err)
     session.close()
+
+
+def count_tuning_list(uid):
+    """count the number of tuning list in tuning_table table"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    try:
+        ip_table = IpAddrs()
+        tuning_table = TuningTable()
+        ips = ip_table.get_ips_by_uid(uid, session)
+        count = 0
+        for tip in ips:
+            count += tuning_table.count_all_collection_by_ip(tip['ipAddrs'], session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Count tuning list failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return count
 
 
 def get_tuning_list(uid, status):

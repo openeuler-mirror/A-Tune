@@ -103,11 +103,11 @@ def save_analysis_data(args, client_ip):
         if types == 'csv' and status == 'running':
             trigger_analysis.add_collection_data(curr_id, client_ip, args['collect_data'])
         elif types == 'csv' and status == 'finished':
-            trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
+            trigger_analysis.change_collection_status(curr_id, status, types)
             trigger_analysis.change_collection_info(curr_id, workload)
         elif types == 'log' and status == 'running':
             trigger_analysis.add_analysis_log(curr_id, args['collect_data'])
         else:
-            trigger_analysis.change_collection_status(curr_id, client_ip, status, types)
+            trigger_analysis.change_collection_status(curr_id, status, types)
             trigger_analysis.change_collection_info(curr_id, workload)
     return curr_id

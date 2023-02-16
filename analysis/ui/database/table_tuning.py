@@ -16,7 +16,7 @@ Mapping for tuning_table table.
 """
 
 import time
-from sqlalchemy import Column, VARCHAR, Integer
+from sqlalchemy import Column, VARCHAR, Integer, Text
 from sqlalchemy import func, select, insert, update
 
 from analysis.ui.database.tables import BASE
@@ -36,19 +36,22 @@ class TuningTable(BASE):
     tuning_date = Column(VARCHAR(255), nullable=False)
     total_round = Column(Integer, nullable=True)
     baseline = Column(VARCHAR(255))
+    description = Column(Text, default='')
+
 
     def __repr__(self):
-        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s')>" \
+        return "<tuning_table(tuning='%s %s %s %s %s %s', round='%s', baseline='%s', description='%s')>" \
                 % (self.tuning_id, self.tuning_name, self.tuning_engine,
                    self.tuning_status, self.tuning_date, self.tuning_ip,
                    0 if self.total_round is None else self.total_round,
-                   0 if self.baseline is None else self.baseline)
+                   0 if self.baseline is None else self.baseline,
+                   "" if self.description is None else self.description)
 
 
     @staticmethod
-    def insert_new_tuning(tid, name, engine, rounds, tip, session):
+    def insert_new_tuning(tid, name, engine, rounds, tip, localtime, session):
         """insert new tuning into tuning_table"""
-        curr_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        curr_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
         sql = ''
         if rounds != '0':
             sql = insert(TuningTable).values(tuning_id=tid, tuning_name=name,
@@ -93,14 +96,23 @@ class TuningTable(BASE):
         return utils.zip_key_value(dicts, res)
 
     @staticmethod
+    def count_all_collection_by_ip(tip, session):
+        """count the num of tunings by cip"""
+        sql = func.count(TuningTable.tuning_id)
+        res = session.query(sql).filter(TuningTable.tuning_ip==tip).scalar()
+        return res
+
+    @staticmethod
     def get_status_tuning_by_ip(status, tip, session):
         """get tunings in given status by tip as a list"""
-        sql = select([TuningTable.tuning_name, TuningTable.tuning_status, TuningTable.tuning_date,
-                     TuningTable.tuning_ip]).where(TuningTable.tuning_ip == tip) \
+        sql = select([TuningTable.tuning_name, TuningTable.tuning_status, 
+                     TuningTable.tuning_date, TuningTable.tuning_ip, 
+                     TuningTable.description]) \
+                     .where(TuningTable.tuning_ip == tip) \
                      .where(TuningTable.tuning_status == status) \
                      .order_by(TuningTable.tuning_id.desc())
         res = session.execute(sql).fetchall()
-        dicts=['name', 'status', 'date', 'info']
+        dicts = ['name', 'status', 'date', 'ip', 'description']
         return utils.zip_key_value(dicts, res)
 
     @staticmethod

@@ -15,12 +15,14 @@
 Triggers to action analysis database.
 """
 
+import time
 import logging
 from sqlalchemy.exc import SQLAlchemyError
 
 from analysis.ui.database import tables, table_collection_data
 from analysis.ui.database.table_ip_addrs import IpAddrs
 from analysis.ui.database.table_collection import CollectionTable
+from analysis.ui.database.table_command import CommandTable
 from analysis.ui.database.table_analysis_log import AnalysisLog
 
 LOGGER = logging.getLogger(__name__)
@@ -38,9 +40,15 @@ def add_new_collection(cip):
             ip_table.insert_ip_by_user(ip=cip, uid=0, session=session)
             table_name = table_collection_data.get_table_name()
             table_collection_data.initial_table(table_name, session)
+        localtime = time.localtime()
         collection_table = CollectionTable()
-        cid = collection_table.get_max_cid(session) + 1
-        collection_table.insert_new_collection(cid, cip, session)
+        collection_id = collection_table.get_max_cid(session) + 1
+        collection_table.insert_new_collection(collection_id, cip, localtime, session)
+        command_table = CommandTable()
+        command_id = command_table.get_max_cid(session) + 1
+        name = int(time.mktime(localtime))
+        command_table.insert_new_command(command_id, collection_id, 'analysis', 
+                                        str(name), cip, localtime, session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Add new collection to collection_table failed: %s', err)
@@ -82,7 +90,7 @@ def add_analysis_log(cid, data):
     session.close()
 
 
-def change_collection_status(cid, cip, status, types):
+def change_collection_status(cid, status, types):
     """change status of collection_table"""
     session = tables.get_engine_session()
     if session is None:
@@ -94,6 +102,12 @@ def change_collection_status(cid, cip, status, types):
                                                         cid, session)
         if curr_status != status:
             collection_table.update_status(cid, status, session)
+
+        command_table = CommandTable()
+        curr_status = command_table.get_field_by_key(CommandTable.command_status, 
+                                            CommandTable.command_map_id, cid, session)
+        if curr_status != status:
+            command_table.update_status(cid, status, session)                                            
 
         if types == 'csv':
             rounds = table_collection_data.get_max_round(cid, session)
@@ -122,6 +136,8 @@ def change_collection_info(cid, workload):
             names = collection_table.get_field_by_key(CollectionTable.collection_name,
                     CollectionTable.collection_id, cid, session)
             names = workload + '-' + names
+            command_table = CommandTable()
+            command_table.update_name_by_id(cid, names, session)
             collection_table.update_name(cid, names, session)
             if workload != 'csv_convert':
                 collection_table.update_workload(cid, workload, session)
@@ -129,6 +145,26 @@ def change_collection_info(cid, workload):
     except SQLAlchemyError as err:
         LOGGER.error('Change name and workload of collection_table failed: %s', err)
     session.close()
+
+
+def count_analysis_list(uid):
+    """count the number of analysis list in collection_table table"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    try:
+        ip_table = IpAddrs()
+        collection_table = CollectionTable()
+        ips = ip_table.get_ips_by_uid(uid, session)
+        count = 0
+        for cip in ips:
+            count += collection_table.count_all_collection_by_ip(cip['ipAddrs'], session)
+    except SQLAlchemyError as err:
+        LOGGER.error('Count analysis list failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return count
 
 
 def get_analysis_list(uid):

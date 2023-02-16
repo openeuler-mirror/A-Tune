@@ -35,19 +35,18 @@ class CollectionTable(BASE):
     collection_date = Column(VARCHAR(255), nullable=False)
     workload_type = Column(VARCHAR(255), nullable=True)
     total_round = Column(Integer)
-    description = Column(Text)
+    description = Column(Text, default='')
 
     def __repr__(self):
-        return "<collection_table(collection='%s %s %s %s %s', round='%s %s')>" \
+        return "<collection_table(collection='%s %s %s %s %s', round='%s' description='%s')>" \
                 % (self.collection_id, self.collection_name, self.collection_status,
                    self.collection_date, self.collection_ip,
                    0 if self.total_round is None else self.total_round,
-                   0 if self.total_log is None else self.total_log)
+                   "" if self.description is None else self.description)
 
     @staticmethod
-    def insert_new_collection(cid, cip, session):
+    def insert_new_collection(cid, cip, localtime, session):
         """insert new collection to collection_table"""
-        localtime = time.localtime()
         times = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
         name = int(time.mktime(localtime))
         sql = insert(CollectionTable).values(collection_id=cid, collection_status='running',
@@ -82,12 +81,20 @@ class CollectionTable(BASE):
     def get_all_collection_by_ip(cip, session):
         """get all collections by cip as a list"""
         sql = select([CollectionTable.collection_name, CollectionTable.collection_status,
-                     CollectionTable.collection_date, CollectionTable.collection_ip]) \
+                     CollectionTable.collection_date, CollectionTable.collection_ip, 
+                     CollectionTable.description]) \
                      .where(CollectionTable.collection_ip == cip) \
                      .order_by(CollectionTable.collection_id.desc())
         res = session.execute(sql).fetchall()
-        dicts = ['name', 'status', 'date', 'info']
+        dicts = ['name', 'status', 'date', 'ip', 'description']
         return utils.zip_key_value(dicts, res)
+
+    @staticmethod
+    def count_all_collection_by_ip(cip, session):
+        """count the num of collections by cip"""
+        sql = func.count(CollectionTable.collection_id)
+        res = session.query(sql).filter(CollectionTable.collection_ip==cip).scalar()
+        return res
 
     @staticmethod
     def update_status(cid, status, session):
