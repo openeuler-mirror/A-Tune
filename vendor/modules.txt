@@ -28,10 +28,15 @@ github.com/golang/protobuf/ptypes
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
 github.com/golang/protobuf/ptypes/timestamp
-# github.com/juju/errors v0.0.0-20190806202954-0232dcc7464d
+# github.com/google/go-cmp v0.5.6
+## explicit
+# github.com/juju/errors v1.0.0
+## explicit
 github.com/juju/errors
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
+# github.com/kr/pretty v0.3.1
+## explicit
 # github.com/mattn/go-sqlite3 v1.11.0
 ## explicit
 github.com/mattn/go-sqlite3
@@ -53,10 +58,14 @@ github.com/sirupsen/logrus
 github.com/sirupsen/logrus/hooks/syslog
 # github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337
 ## explicit
+# github.com/stretchr/testify v1.6.1
+## explicit
 # github.com/urfave/cli v1.20.0
 ## explicit
 github.com/urfave/cli
-# golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
+# golang.org/x/crypto v0.3.0
+## explicit
+# golang.org/x/net v0.7.0
 ## explicit
 golang.org/x/net/context
 golang.org/x/net/http/httpguts
@@ -65,9 +74,9 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
 golang.org/x/net/trace
-# golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a
+# golang.org/x/sys v0.5.0
 golang.org/x/sys/unix
-# golang.org/x/text v0.3.2
+# golang.org/x/text v0.7.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
@@ -113,7 +122,7 @@ google.golang.org/grpc/status
 google.golang.org/grpc/tap
 # gopkg.in/ini.v1 v1.48.0
 ## explicit
-# gopkg.in/yaml.v2 v2.2.2
+# gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
 # xorm.io/builder v0.3.5
