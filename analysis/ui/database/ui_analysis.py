@@ -71,7 +71,14 @@ class UiAnalysis(Resource):
         if cmd == 'initialPage':
             uid = args.get('uid')
             res = trigger_analysis.count_analysis_list(int(uid))
-            return json.dumps({'analysis': res}), 200, CORS
+            return json.dumps({'count': res}), 200, CORS
+
+        if cmd == 'getList':
+            uid = int(args.get('uid'))
+            page_num = int(args.get('pageNum'))
+            page_size = int(args.get('pageSize'))
+            list = trigger_analysis.get_analysis_list(uid, page_num, page_size)
+            return json.dumps({'data': list}), 200, CORS
 
         if cmd == 'rename':
             name = args.get('name')
@@ -96,4 +103,10 @@ class UiAnalysis(Resource):
             log_line = args.get('logLine')
             response_obj = trigger_analysis.get_analysis_data(name, int(csv_line), int(log_line))
             return json.dumps(response_obj), 200, CORS
+
+        if cmd == 'updateDescription':
+            cid = args.get('cid')
+            description = args.get('description')
+            res = trigger_analysis.update_analysis_description(cid, description)
+            return json.dumps({'status': res}), 200, CORS
         return '', 200, CORS

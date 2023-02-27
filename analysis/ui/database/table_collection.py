@@ -90,6 +90,19 @@ class CollectionTable(BASE):
         return utils.zip_key_value(dicts, res)
 
     @staticmethod
+    def get_collection_by_ip(ips, page_num, page_size, session):
+        """get the page_size data in page_num page with by ips as a list"""
+        sql = select([CollectionTable.collection_id, CollectionTable.collection_name, 
+                     CollectionTable.collection_status,CollectionTable.collection_date, 
+                     CollectionTable.collection_ip, CollectionTable.description]) \
+                     .where(CollectionTable.collection_ip.in_(ips)) \
+                     .order_by(CollectionTable.collection_id.desc()) \
+                     .limit(page_size).offset((page_num-1)*page_size)
+        res = session.execute(sql).fetchall()
+        dicts = ['id', 'name', 'status', 'date', 'ip', 'description']
+        return utils.zip_key_value(dicts, res)
+
+    @staticmethod
     def count_all_collection_by_ip(cip, session):
         """count the num of collections by cip"""
         sql = func.count(CollectionTable.collection_id)
@@ -143,5 +156,13 @@ class CollectionTable(BASE):
         """update workload"""
         sql = update(CollectionTable).where(CollectionTable.collection_id == cid) \
                 .values(workload_type=workload)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_description(cid, description, session):
+        """update description"""
+        sql = update(CollectionTable).where(CollectionTable.collection_id == cid) \
+                .values(description=description)
         res = session.execute(sql)
         return res is not None

@@ -21,7 +21,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__) + "/../")
 from analysis.app import App
 from analysis.ui.config import UiConfig
-from analysis.ui.database import ui_tuning, ui_analysis, ui_user
+from analysis.ui.database import ui_tuning, ui_analysis, ui_user, ui_command
 from analysis.ui import offline
 from analysis.ui import echo
 
@@ -32,6 +32,7 @@ class AppUI(App):
         """flask app add resource"""
         self.api.add_resource(ui_tuning.UiTuning, '/v1/UI/tuning/<string:cmd>')
         self.api.add_resource(ui_analysis.UiAnalysis, '/v1/UI/analysis/<string:cmd>')
+        self.api.add_resource(ui_command.UiCommand, '/v1/UI/command/<string:cmd>')
         self.api.add_resource(ui_user.UiUser, '/v1/UI/user/<string:cmd>')
         self.api.add_resource(offline.OfflineTunning, '/v2/UI/offline/<string:cmd>')
         self.api.add_resource(echo.EchoTunning, '/v2/UI/echo')

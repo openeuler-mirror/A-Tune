@@ -42,12 +42,12 @@ def add_new_collection(cip):
             table_collection_data.initial_table(table_name, session)
         localtime = time.localtime()
         collection_table = CollectionTable()
-        collection_id = collection_table.get_max_cid(session) + 1
-        collection_table.insert_new_collection(collection_id, cip, localtime, session)
+        cid = collection_table.get_max_cid(session) + 1
+        collection_table.insert_new_collection(cid, cip, localtime, session)
         command_table = CommandTable()
         command_id = command_table.get_max_cid(session) + 1
         name = int(time.mktime(localtime))
-        command_table.insert_new_command(command_id, collection_id, 'analysis', 
+        command_table.insert_new_command(command_id, cid, 'analysis', 
                                         str(name), cip, localtime, session)
         session.commit()
     except SQLAlchemyError as err:
@@ -167,7 +167,29 @@ def count_analysis_list(uid):
     return count
 
 
-def get_analysis_list(uid):
+def get_analysis_list(uid, page_num, page_size):
+    """get the page_size data in page_num page with user_id 'uid' as a list"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    try:
+        ip_table = IpAddrs()
+        collection_table = CollectionTable()
+        ips = ip_table.get_ips_by_uid(uid, session)
+        res = []
+        ips = [ip['ipAddrs'] for ip in ips]
+        res.extend(collection_table.get_collection_by_ip(ips, page_num, page_size, session))
+        if len(res) > 0:
+            res = sorted(res, key=(lambda x:x['date']), reverse=True)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get analysis list failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return res
+
+
+def get_all_analysis_list(uid):
     """get all analysis with user_id 'uid' as a list"""
     session = tables.get_session()
     if session is None:
@@ -310,3 +332,24 @@ def get_compare_collection(name, csv_line):
         session.close()
         response['isExist'] = True
     return response
+
+
+def update_analysis_description(cid, description):
+    """update one command record description by cid"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    res = False
+    try:
+        collection_table = CollectionTable()
+        res = collection_table.update_description(cid, description, session)
+        command_table = CommandTable()
+        command_id = command_table.get_cid_by_mid_and_type(cid, 'analysis', session)
+        res = command_table.update_description(command_id, description, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Update analysis description failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return res

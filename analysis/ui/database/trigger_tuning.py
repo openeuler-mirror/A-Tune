@@ -44,7 +44,7 @@ def add_new_tuning(name, engine, rounds, tip):
         tuning_table.insert_new_tuning(tid, name, engine, rounds, tip, localtime, session)
         command_table = CommandTable()
         cid = command_table.get_max_cid(session) + 1
-        command_table.insert_new_command(cid, name, tid, 'tuning', tip, localtime, session)
+        command_table.insert_new_command(cid, tid, 'tuning', name, tip, localtime, session)
         session.commit()
     except SQLAlchemyError as err:
         LOGGER.error('Add new tuning to tuning_table failed: %s', err)
@@ -156,7 +156,29 @@ def count_tuning_list(uid):
     return count
 
 
-def get_tuning_list(uid, status):
+def get_tuning_list(uid, page_num, page_size):
+    """get the page_size data in page_num page with user_id 'uid' as a list"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    try:
+        ip_table = IpAddrs()
+        tuning_table = TuningTable()
+        ips = ip_table.get_ips_by_uid(uid, session)
+        res = []
+        ips = [ip['ipAddrs'] for ip in ips]
+        res.extend(tuning_table.get_command_by_ip(ips, page_num, page_size, session))
+        if len(res) > 0:
+            res = sorted(res, key=(lambda x:x['date']), reverse=True)
+    except SQLAlchemyError as err:
+        LOGGER.error('Get analysis list failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return res
+
+
+def get_all_tuning_list(uid, status):
     """get all tuning with status 'status' as a list"""
     session = tables.get_session()
     if session is None:
@@ -283,3 +305,24 @@ def get_tuning_status(name):
         LOGGER.error('Get tuning status failed: %s', err)
     session.close()
     return status
+
+
+def update_tuning_description(tid, description):
+    """update one tuning record description by cid"""
+    session = tables.get_session()
+    if session is None:
+        return None
+    res = False
+    try:
+        tuning_table = TuningTable()
+        res = tuning_table.update_description(tid, description, session)
+        command_table = CommandTable()
+        command_id = command_table.get_cid_by_mid_and_type(tid, 'tuning', session)
+        res = command_table.update_description(command_id, description, session)
+        session.commit()
+    except SQLAlchemyError as err:
+        LOGGER.error('Update analysis description failed: %s', err)
+        return None
+    finally:
+        session.close()
+    return res
