@@ -103,6 +103,19 @@ class TuningTable(BASE):
         return res
 
     @staticmethod
+    def get_command_by_ip(ips, page_num, page_size, session):
+        """get the page_size data in page_num page with by ips as a list"""
+        sql = select([TuningTable.tuning_id, TuningTable.tuning_name, 
+                     TuningTable.tuning_status, TuningTable.tuning_date, 
+                     TuningTable.tuning_ip, TuningTable.description]) \
+                     .where(TuningTable.tuning_ip.in_(ips)) \
+                     .order_by(TuningTable.tuning_id.desc()) \
+                     .limit(page_size).offset((page_num-1)*page_size)
+        res = session.execute(sql).fetchall()
+        dicts = ['id', 'name', 'status', 'date', 'ip', 'description']
+        return utils.zip_key_value(dicts, res)
+
+    @staticmethod
     def get_status_tuning_by_ip(status, tip, session):
         """get tunings in given status by tip as a list"""
         sql = select([TuningTable.tuning_name, TuningTable.tuning_status, 
@@ -135,5 +148,13 @@ class TuningTable(BASE):
         """update tuning name"""
         sql = update(TuningTable).where(TuningTable.tuning_name == name) \
                 .values(tuning_name=new_name)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_description(tid, description, session):
+        """update description"""
+        sql = update(TuningTable).where(TuningTable.tuning_id == tid) \
+                .values(description=description)
         res = session.execute(sql)
         return res is not None

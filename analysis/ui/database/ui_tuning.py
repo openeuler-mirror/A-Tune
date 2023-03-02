@@ -91,7 +91,14 @@ class UiTuning(Resource):
         if cmd == 'initialPage':
             uid = args.get('uid')
             res = trigger_tuning.count_tuning_list(int(uid))
-            return json.dumps({'message': res}), 200, CORS
+            return json.dumps({'count': res}), 200, CORS
+
+        if cmd == 'getList':
+            uid = int(args.get('uid'))
+            page_num = int(args.get('pageNum'))
+            page_size = int(args.get('pageSize'))
+            list = trigger_tuning.get_tuning_list(uid, page_num, page_size)
+            return json.dumps({'data': list}), 200, CORS
 
         if cmd == 'rename':
             name = args.get('name')
@@ -128,5 +135,11 @@ class UiTuning(Resource):
         if cmd == 'getTuningStatus':
             name = args.get('name')
             res = trigger_tuning.get_tuning_status(name)
+            return json.dumps({'status': res}), 200, CORS
+        
+        if cmd == 'updateDescription':
+            tid = args.get('tid')
+            description = args.get('description')
+            res = trigger_tuning.update_tuning_description(tid, description)
             return json.dumps({'status': res}), 200, CORS
         return '', 200, CORS

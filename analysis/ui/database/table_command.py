@@ -44,9 +44,9 @@ class CommandTable(BASE):
                    "" if self.description is None else self.description)
 
     @staticmethod
-    def insert_new_command(cid, name, mid, type, ip, localtime, session):
+    def insert_new_command(cid, mid, mtype, name, ip, localtime, session):
         curr_time = time.strftime("%Y-%m-%d %H:%M:%S", localtime)
-        sql = insert(CommandTable).values(command_id=cid, command_map_id=mid, command_type=type, command_name=name,
+        sql = insert(CommandTable).values(command_id=cid, command_map_id=mid, command_type=mtype, command_name=name,
                                  command_status='running', command_ip=ip, command_date=curr_time)
         res = session.execute(sql)
         return res is not None
@@ -66,7 +66,16 @@ class CommandTable(BASE):
         return value
 
     @staticmethod
-    def get_all_collection_by_ip(cip, session):
+    def get_cid_by_mid_and_type(mid, mtype, session):
+        """get command_id by command_map_id and command_type"""
+        sql = select([CommandTable.command_id])
+                     .where(CommandTable.command_map_id == mid)
+                     .where(CommandTable.command_type == mtype)
+        value = session.execute(sql).scalar()
+        return value
+
+    @staticmethod
+    def get_all_command_by_ip(cip, session):
         """get all collections by cip as a list"""
         sql = select([CommandTable.command_name, CommandTable.command_status,
                      CommandTable.command_date, CommandTable.command_ip,
@@ -78,7 +87,21 @@ class CommandTable(BASE):
         return utils.zip_key_value(dicts, res)
 
     @staticmethod
-    def count_all_collection_by_ip(cip, session):
+    def get_command_by_ip(ips, page_num, page_size, session):
+        """get the page_size data in page_num page with by ips as a list"""
+        sql = select([CommandTable.command_id, CommandTable.command_map_id,
+                     CommandTable.command_name, CommandTable.command_status, 
+                     CommandTable.command_date, CommandTable.command_ip, 
+                     CommandTable.command_type, CommandTable.description]) \
+                     .where(CommandTable.command_ip.in_(ips)) \
+                     .order_by(CommandTable.command_id.desc()) \
+                     .limit(page_size).offset((page_num-1)*page_size)
+        res = session.execute(sql).fetchall()
+        dicts = ['id', 'mid', 'name', 'status', 'date', 'ip', 'type', 'description']
+        return utils.zip_key_value(dicts, res)
+        
+    @staticmethod
+    def count_all_command_by_ip(cip, session):
         """count the num of collections by cip"""
         sql = func.count(CommandTable.command_id)
         res = session.query(sql).filter(CommandTable.command_ip==cip).scalar()
@@ -105,5 +128,13 @@ class CommandTable(BASE):
         """update name"""
         sql = update(CommandTable).where(CommandTable.command_map_id == cid) \
                 .values(command_name=name)
+        res = session.execute(sql)
+        return res is not None
+
+    @staticmethod
+    def update_description(cid, description, session):
+        """update description"""
+        sql = update(CommandTable).where(CommandTable.command_id == cid) \
+                .values(description=description)
         res = session.execute(sql)
         return res is not None
