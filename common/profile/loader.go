@@ -193,7 +193,7 @@ func LoadFromProfile(profiles string) (Profile, bool) {
 func Load(profileNames []string) (Profile, string) {
 	profileNames = filter(profileNames)
 	if len(profileNames) == 0 {
-		fmt.Println("No profile or invaild profiles were specified.")
+		fmt.Println("No profile or invalid profiles were specified.")
 		return Profile{}, "no valid profile specified"
 	}
 
