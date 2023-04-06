@@ -587,8 +587,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	profileType := classProfile.Result[0].ProfileType
 	profileNames := strings.Split(profileType, ",")
 	if len(profileNames) == 0 {
-		log.Errorf("No profile or invaild profiles were specified.")
-		return fmt.Errorf("no profile or invaild profiles were specified")
+		log.Errorf("No profile or invalid profiles were specified.")
+		return fmt.Errorf("no profile or invalid profiles were specified")
 	}
 
 	//6. get the profile info depend on the profile type
