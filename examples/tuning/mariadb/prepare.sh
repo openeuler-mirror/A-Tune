@@ -35,7 +35,9 @@ sed -i "s#warehouses#$warehouses#g" "$path"/mariadb_benchmark.sh
 echo "install mariadb benchmark"
 rm -rf tpcc-mysql
 git clone https://github.com/Percona-Lab/tpcc-mysql.git
-cd tpcc-mysql/src && make
+cd tpcc-mysql/src 
+sed -i 's#$(CC) $(OBJS) $(LIBS) -o ../tpcc_start#$(CC) $(OBJS) $(LIBS) -o ../tpcc_start -lm#' Makefile
+make
 cd ..
 cp tpcc_start /usr/bin
 
