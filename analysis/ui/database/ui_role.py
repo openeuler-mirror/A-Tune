@@ -25,7 +25,7 @@ from analysis.ui.config import UiConfig
 from analysis.ui.database import trigger_user
 
 LOGGER = logging.getLogger(__name__)
-CORS = [('Access-Control-Allow-Origin', '*')]
+CORS = [('Access-Control-Allow-Origin', 'http://localhost:3000')]
 
 
 class UiRole(Resource):
