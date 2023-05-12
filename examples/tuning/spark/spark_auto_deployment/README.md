@@ -38,8 +38,8 @@
 
 ```bash
 # 为git配置代理执行：
-git config –global http.proxy http://ip:port
-git config –global https.proxy http://ip:port
+git config --global http.proxy http://ip:port
+git config --global https.proxy http://ip:port
 
 # 为系统设置代理，可以在~/.bashrc中添加如下：
 export http_proxy=http://ip:port
