@@ -23,6 +23,7 @@ import hashlib
 import base64
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.utils import secure_filename
 
 sys.path.insert(0, "./../")
 from analysis.engine.database import tables, table_collection_data
@@ -100,6 +101,7 @@ if __name__ == '__main__':
     SESSION = tables.get_session()
     if SESSION is None:
         raise SystemExit('Failed to connect to database')
+    ARGS.path=secure_filename(ARGS.path)
     res, err, CID = add_data(ARGS.path, ARGS.host, UID, SESSION)
     if CID == -1:
         raise SystemExit(err)
