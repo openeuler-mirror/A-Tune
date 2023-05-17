@@ -1,29 +1,9 @@
 #!/bin/bash
 
-# install dependencies
-echo "install dependencies..."
-sudo dnf install gcc make curl wget samba git -y
-if [ $? -eq 0 ]; then
-    echo "------------ dependencies install success ------------" >>./install_spark.log
-else
-    echo "------------ dependencies install failed  ------------" >>./install_spark.log
-    exit
-fi
-
-# stop firewalld
-sudo systemctl disable --now firewalld
-
-# start samba
-sudo systemctl enable --now nmbd
-
-### ssh password-free login
-ssh-keygen -t rsa
-cat ~/.ssh/id_rsa.pub >>~/.ssh/authorized_keys
-
 # download and install software
 # JDK 1.8
 echo "downloading jdk..."
-wget https://mirrors.tuna.tsinghua.edu.cn/Adoptium/8/jdk/x64/linux/OpenJDK8U-jdk_x64_linux_hotspot_8u372b07.tar.gz
+wget https://mirrors.ustc.edu.cn/adoptium/releases/temurin8-binaries/jdk8u372-b07/OpenJDK8U-jdk_x64_linux_hotspot_8u372b07.tar.gz
 if [ $? -eq 0 ]; then
     echo "------------ jdk-1.8 download success ------------" >>./install_spark.log
 else
@@ -32,6 +12,7 @@ else
 fi
 # install jdk
 tar -xf ./OpenJDK8U-jdk_x64_linux_hotspot_8u372b07.tar.gz
+rm -f ./OpenJDK8U-jdk_x64_linux_hotspot_8u372b07.tar.gz
 export JAVA_HOME=$(pwd)/jdk8u372-b07
 if ! grep -q "export JAVA_HOME=$(pwd)/jdk8u372-b07" ~/.bashrc; then
     echo "export JAVA_HOME=$(pwd)/jdk8u372-b07" >>~/.bashrc
@@ -41,7 +22,7 @@ source ~/.bashrc
 
 ## Hadoop
 echo "downloading hadoop..."
-wget https://mirrors.tuna.tsinghua.edu.cn/apache/hadoop/core/hadoop-3.2.4/hadoop-3.2.4.tar.gz
+wget https://mirrors.ustc.edu.cn/apache/hadoop/core/hadoop-3.2.4/hadoop-3.2.4.tar.gz
 if [ $? -eq 0 ]; then
     echo "------------ hadoop-3.2 download success ------------" >>./install_spark.log
 else
@@ -50,12 +31,102 @@ else
 fi
 # install hadoop
 tar -xf ./hadoop-3.2.4.tar.gz
+rm -f ./hadoop-3.2.4.tar.gz
 export HADOOP_HOME=$(pwd)/hadoop-3.2.4
 if ! grep -q "export HADOOP_HOME=$(pwd)/hadoop-3.2.4" ~/.bashrc; then
     echo "export HADOOP_HOME=$(pwd)/hadoop-3.2.4" >>~/.bashrc
     echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin" >>~/.bashrc
 fi
-cp ./conf/core-site.xml ./conf/hdfs-site.xml ./conf/mapred-site.xml ./conf/yarn-site.xml hadoop-3.2.4/etc/hadoop/
+cat >hadoop-3.2.4/etc/hadoop/core-site.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>$(pwd)/tmp</value>
+    </property>
+</configuration>
+EOF
+
+cat >hadoop-3.2.4/etc/hadoop/hdfs-site.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.safemode.threshold.pct</name>
+        <value>0</value>
+        <description>
+            Specifies the percentage of blocks that should satisfy
+            the minimal replication requirement defined by dfs.replication.min.
+            Values less than or equal to 0 mean not to wait for any particular
+            percentage of blocks before exiting safemode.
+            Values greater than 1 will make safe mode permanent.
+        </description>
+    </property>
+</configuration>
+EOF
+
+cat >hadoop-3.2.4/etc/hadoop/mapred-site.xml <<EOF
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>\$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:\$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+    </property>
+</configuration>
+EOF
+
+cat >hadoop-3.2.4/etc/hadoop/yarn-site.xml <<EOF
+<?xml version="1.0"?>
+<configuration>
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+  <property>
+    <name>yarn.nodemanager.env-whitelist</name>
+    <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME,PATH,LANG,TZ,HADOOP_MAPRED_HOME</value>
+  </property>
+    <property>
+        <name>yarn.nodemanager.pmem-check-enabled</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.vmem-check-enabled</name>
+        <value>false</value>
+    </property>
+</configuration>
+
+EOF
+
+cat >>hadoop-3.2.4/etc/hadoop/hadoop-env.sh <<EOF
+export JAVA_HOME=$JAVA_HOME
+export HDFS_NAMENODE_USER=root
+export HDFS_DATANODE_USER=root
+export HDFS_SECONDARYNAMENODE_USER=root
+export YARN_RESOURCEMANAGER_USER=root
+export YARN_NODEMANAGER_USER=root
+EOF
+
+cat >>hadoop-3.2.4/etc/hadoop/yarn-env.sh <<EOF
+export JAVA_HOME=$JAVA_HOME
+EOF
+cat >>hadoop-3.2.4/etc/hadoop/mapred-env.sh <<EOF
+export JAVA_HOME=$JAVA_HOME
+EOF
 source ~/.bashrc
 
 # start hadoop
@@ -92,10 +163,11 @@ else
 fi
 # install spark
 tar -xf ./spark-3.1.3-bin-hadoop3.2.tgz
+rm -f ./spark-3.1.3-bin-hadoop3.2.tgz
 export SPARK_HOME=$(pwd)/spark-3.1.3-bin-hadoop3.2
 if ! grep -q "export SPARK_HOME=$(pwd)/spark-3.1.3-bin-hadoop3.2" ~/.bashrc; then
     echo "export SPARK_HOME=$(pwd)/spark-3.1.3-bin-hadoop3.2" >>~/.bashrc
-    echo "export PATH=\$PATH:$\SPARK_HOME/bin:$\SPARK_HOME/sbin" >>~/.bashrc
+    echo "export PATH=\$PATH:\$SPARK_HOME/bin:\$SPARK_HOME/sbin" >>~/.bashrc
 fi
 
 cp spark-3.1.3-bin-hadoop3.2/conf/spark-env.sh.template spark-3.1.3-bin-hadoop3.2/conf/spark-env.sh

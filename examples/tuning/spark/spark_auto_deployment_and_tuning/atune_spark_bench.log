@@ -1,0 +1,211 @@
+[root@spark sparkbench]# atune-adm tuning --project spark_hibench --detail ./spark_hibench_client.yaml
+ Start to benchmark baseline...
+ 1.Loading its corresponding tuning project: spark_hibench
+ 2.Start to tuning the system......
+ Current Tuning Progress......(1/50)
+ Used time: 1m38s, Total Time: 1m38s, Best Performance: (duration=48.58,throughput=39149753.00), Performance Improvement Rate: 0.06%
+ The 1th recommand parameters is: num_executors=3,executor_core=3,executor_memory=1,driver_memory=1,default_parallelism=13,storageLevel=0,shuffle_partition=2
+ The 1th evaluation value: (duration=48.58,throughput=39149753.00)(0.06%)
+ Current Tuning Progress......(2/50)
+ Used time: 2m23s, Total Time: 2m23s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 2th recommand parameters is: num_executors=3,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=33,storageLevel=0,shuffle_partition=4
+ The 2th evaluation value: (duration=44.55,throughput=42695879.00)(9.11%)
+ Current Tuning Progress......(3/50)
+ Used time: 3m10s, Total Time: 3m10s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 3th recommand parameters is: num_executors=2,executor_core=3,executor_memory=2,driver_memory=2,default_parallelism=13,storageLevel=0,shuffle_partition=3
+ The 3th evaluation value: (duration=47.06,throughput=40417640.00)(3.29%)
+ Current Tuning Progress......(4/50)
+ Used time: 3m56s, Total Time: 3m56s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 4th recommand parameters is: num_executors=4,executor_core=3,executor_memory=3,driver_memory=2,default_parallelism=38,storageLevel=0,shuffle_partition=1
+ The 4th evaluation value: (duration=45.69,throughput=41629603.00)(6.39%)
+ Current Tuning Progress......(5/50)
+ Used time: 4m50s, Total Time: 4m50s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 5th recommand parameters is: num_executors=2,executor_core=4,executor_memory=1,driver_memory=1,default_parallelism=39,storageLevel=1,shuffle_partition=3
+ The 5th evaluation value: (duration=53.73,throughput=35400039.00)(-10.53%)
+ Current Tuning Progress......(6/50)
+ Used time: 5m40s, Total Time: 5m40s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 6th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=35,storageLevel=1,shuffle_partition=3
+ The 6th evaluation value: (duration=49.34,throughput=38548304.00)(-1.50%)
+ Current Tuning Progress......(7/50)
+ Used time: 6m27s, Total Time: 6m27s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 7th recommand parameters is: num_executors=3,executor_core=4,executor_memory=1,driver_memory=1,default_parallelism=38,storageLevel=0,shuffle_partition=2
+ The 7th evaluation value: (duration=47.10,throughput=40383314.00)(3.21%)
+ Current Tuning Progress......(8/50)
+ Used time: 7m12s, Total Time: 7m12s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 8th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 8th evaluation value: (duration=45.06,throughput=42213541.00)(7.88%)
+ Current Tuning Progress......(9/50)
+ Used time: 8m0s, Total Time: 8m0s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 9th recommand parameters is: num_executors=3,executor_core=2,executor_memory=3,driver_memory=2,default_parallelism=12,storageLevel=0,shuffle_partition=3
+ The 9th evaluation value: (duration=46.89,throughput=40560721.00)(3.67%)
+ Current Tuning Progress......(10/50)
+ Used time: 8m50s, Total Time: 8m50s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 10th recommand parameters is: num_executors=3,executor_core=2,executor_memory=3,driver_memory=2,default_parallelism=30,storageLevel=1,shuffle_partition=3
+ The 10th evaluation value: (duration=50.58,throughput=37604012.00)(-4.05%)
+ Current Tuning Progress......(11/50)
+ Used time: 9m41s, Total Time: 9m41s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 11th recommand parameters is: num_executors=2,executor_core=4,executor_memory=4,driver_memory=1,default_parallelism=40,storageLevel=0,shuffle_partition=1
+ The 11th evaluation value: (duration=49.54,throughput=38390354.00)(-1.92%)
+ Current Tuning Progress......(12/50)
+ Used time: 10m32s, Total Time: 10m32s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 12th recommand parameters is: num_executors=3,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=33,storageLevel=0,shuffle_partition=4
+ The 12th evaluation value: (duration=49.37,throughput=38528782.00)(-1.56%)
+ Current Tuning Progress......(13/50)
+ Used time: 11m23s, Total Time: 11m23s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 13th recommand parameters is: num_executors=3,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=33,storageLevel=0,shuffle_partition=4
+ The 13th evaluation value: (duration=50.74,throughput=37484693.00)(-4.38%)
+ Current Tuning Progress......(14/50)
+ Used time: 12m13s, Total Time: 12m13s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 14th recommand parameters is: num_executors=2,executor_core=2,executor_memory=4,driver_memory=1,default_parallelism=14,storageLevel=0,shuffle_partition=1
+ The 14th evaluation value: (duration=48.31,throughput=39370993.00)(0.62%)
+ Current Tuning Progress......(15/50)
+ Used time: 13m5s, Total Time: 13m5s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 15th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=2,default_parallelism=37,storageLevel=0,shuffle_partition=1
+ The 15th evaluation value: (duration=51.56,throughput=36887828.00)(-6.07%)
+ Current Tuning Progress......(16/50)
+ Used time: 13m54s, Total Time: 13m54s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 16th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=2,default_parallelism=17,storageLevel=1,shuffle_partition=2
+ The 16th evaluation value: (duration=48.44,throughput=39264519.00)(0.35%)
+ Current Tuning Progress......(17/50)
+ Used time: 14m44s, Total Time: 14m44s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 17th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=3
+ The 17th evaluation value: (duration=47.74,throughput=39836907.00)(1.82%)
+ Current Tuning Progress......(18/50)
+ Used time: 15m32s, Total Time: 15m32s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 18th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=2,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 18th evaluation value: (duration=47.72,throughput=39861119.00)(1.87%)
+ Current Tuning Progress......(19/50)
+ Used time: 16m22s, Total Time: 16m22s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 19th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=1,default_parallelism=17,storageLevel=0,shuffle_partition=1
+ The 19th evaluation value: (duration=48.78,throughput=38990843.00)(-0.35%)
+ Current Tuning Progress......(20/50)
+ Used time: 17m11s, Total Time: 17m11s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 20th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=4
+ The 20th evaluation value: (duration=48.30,throughput=39382406.00)(0.64%)
+ Current Tuning Progress......(21/50)
+ Used time: 17m58s, Total Time: 17m58s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 21th recommand parameters is: num_executors=2,executor_core=2,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 21th evaluation value: (duration=46.49,throughput=40913210.00)(4.56%)
+ Current Tuning Progress......(22/50)
+ Used time: 18m49s, Total Time: 18m49s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 22th recommand parameters is: num_executors=4,executor_core=3,executor_memory=3,driver_memory=2,default_parallelism=38,storageLevel=0,shuffle_partition=1
+ The 22th evaluation value: (duration=49.63,throughput=38324601.00)(-2.10%)
+ Current Tuning Progress......(23/50)
+ Used time: 19m34s, Total Time: 19m34s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 23th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 23th evaluation value: (duration=44.78,throughput=42473723.00)(8.55%)
+ Current Tuning Progress......(24/50)
+ Used time: 20m21s, Total Time: 20m21s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 24th recommand parameters is: num_executors=2,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 24th evaluation value: (duration=45.56,throughput=41747477.00)(6.69%)
+ Current Tuning Progress......(25/50)
+ Used time: 21m8s, Total Time: 21m8s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 25th recommand parameters is: num_executors=4,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 25th evaluation value: (duration=46.73,throughput=40697850.00)(4.02%)
+ Current Tuning Progress......(26/50)
+ Used time: 21m54s, Total Time: 21m54s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 26th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 26th evaluation value: (duration=44.84,throughput=42415943.00)(8.41%)
+ Current Tuning Progress......(27/50)
+ Used time: 22m40s, Total Time: 22m40s, Best Performance: (duration=44.55,throughput=42695879.00), Performance Improvement Rate: 9.11%
+ The 27th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 27th evaluation value: (duration=44.76,throughput=42496499.00)(8.60%)
+ Current Tuning Progress......(28/50)
+ Used time: 23m25s, Total Time: 23m25s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 28th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=3
+ The 28th evaluation value: (duration=44.38,throughput=42861370.00)(9.53%)
+ Current Tuning Progress......(29/50)
+ Used time: 24m11s, Total Time: 24m11s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 29th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=3
+ The 29th evaluation value: (duration=45.40,throughput=41891840.00)(7.07%)
+ Current Tuning Progress......(30/50)
+ Used time: 25m8s, Total Time: 25m8s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 30th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 30th evaluation value: (duration=56.03,throughput=33942595.00)(-15.27%)
+ Current Tuning Progress......(31/50)
+ Used time: 26m2s, Total Time: 26m2s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 31th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=13,storageLevel=0,shuffle_partition=1
+ The 31th evaluation value: (duration=53.17,throughput=35774241.00)(-9.38%)
+ Current Tuning Progress......(32/50)
+ Used time: 26m56s, Total Time: 26m56s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 32th recommand parameters is: num_executors=2,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=2
+ The 32th evaluation value: (duration=52.67,throughput=36111132.00)(-8.35%)
+ Current Tuning Progress......(33/50)
+ Used time: 27m49s, Total Time: 27m49s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 33th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=3
+ The 33th evaluation value: (duration=50.66,throughput=37540182.00)(-4.22%)
+ Current Tuning Progress......(34/50)
+ Used time: 28m39s, Total Time: 28m39s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 34th recommand parameters is: num_executors=3,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=3
+ The 34th evaluation value: (duration=49.44,throughput=38474225.00)(-1.71%)
+ Current Tuning Progress......(35/50)
+ Used time: 29m26s, Total Time: 29m26s, Best Performance: (duration=44.38,throughput=42861370.00), Performance Improvement Rate: 9.53%
+ The 35th recommand parameters is: num_executors=3,executor_core=2,executor_memory=3,driver_memory=1,default_parallelism=12,storageLevel=1,shuffle_partition=3
+ The 35th evaluation value: (duration=45.28,throughput=42003783.00)(7.35%)
+ Current Tuning Progress......(36/50)
+ Used time: 30m8s, Total Time: 30m8s, Best Performance: (duration=41.91,throughput=45385575.00), Performance Improvement Rate: 15.99%
+ The 36th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 36th evaluation value: (duration=41.91,throughput=45385575.00)(15.99%)
+ Current Tuning Progress......(37/50)
+ Used time: 30m51s, Total Time: 30m51s, Best Performance: (duration=41.81,throughput=45494135.00), Performance Improvement Rate: 16.26%
+ The 37th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 37th evaluation value: (duration=41.81,throughput=45494135.00)(16.26%)
+ Current Tuning Progress......(38/50)
+ Used time: 31m33s, Total Time: 31m33s, Best Performance: (duration=41.35,throughput=45999161.00), Performance Improvement Rate: 17.56%
+ The 38th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=1
+ The 38th evaluation value: (duration=41.35,throughput=45999161.00)(17.56%)
+ Current Tuning Progress......(39/50)
+ Used time: 32m15s, Total Time: 32m15s, Best Performance: (duration=41.35,throughput=45999161.00), Performance Improvement Rate: 17.56%
+ The 39th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=19,storageLevel=0,shuffle_partition=1
+ The 39th evaluation value: (duration=41.48,throughput=45858308.00)(17.19%)
+ Current Tuning Progress......(40/50)
+ Used time: 32m58s, Total Time: 32m58s, Best Performance: (duration=41.35,throughput=45999161.00), Performance Improvement Rate: 17.56%
+ The 40th recommand parameters is: num_executors=2,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=40,storageLevel=0,shuffle_partition=1
+ The 40th evaluation value: (duration=41.81,throughput=45486519.00)(16.26%)
+ Current Tuning Progress......(41/50)
+ Used time: 33m41s, Total Time: 33m41s, Best Performance: (duration=41.35,throughput=45999161.00), Performance Improvement Rate: 17.56%
+ The 41th recommand parameters is: num_executors=4,executor_core=4,executor_memory=4,driver_memory=2,default_parallelism=13,storageLevel=1,shuffle_partition=4
+ The 41th evaluation value: (duration=41.36,throughput=45983592.00)(17.53%)
+ Current Tuning Progress......(42/50)
+ Used time: 34m23s, Total Time: 34m23s, Best Performance: (duration=41.35,throughput=45999161.00), Performance Improvement Rate: 17.56%
+ The 42th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=18,storageLevel=0,shuffle_partition=3
+ The 42th evaluation value: (duration=41.52,throughput=45808606.00)(17.08%)
+ Current Tuning Progress......(43/50)
+ Used time: 35m5s, Total Time: 35m5s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 43th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=20,storageLevel=0,shuffle_partition=2
+ The 43th evaluation value: (duration=41.33,throughput=46014741.00)(17.61%)
+ Current Tuning Progress......(44/50)
+ Used time: 35m48s, Total Time: 35m48s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 44th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=30,storageLevel=0,shuffle_partition=2
+ The 44th evaluation value: (duration=41.53,throughput=45800884.00)(17.05%)
+ Current Tuning Progress......(45/50)
+ Used time: 36m30s, Total Time: 36m30s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 45th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=2,default_parallelism=14,storageLevel=1,shuffle_partition=4
+ The 45th evaluation value: (duration=41.44,throughput=45902578.00)(17.30%)
+ Current Tuning Progress......(46/50)
+ Used time: 37m13s, Total Time: 37m13s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 46th recommand parameters is: num_executors=3,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=20,storageLevel=1,shuffle_partition=2
+ The 46th evaluation value: (duration=41.77,throughput=45533344.00)(16.37%)
+ Current Tuning Progress......(47/50)
+ Used time: 37m57s, Total Time: 37m57s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 47th recommand parameters is: num_executors=4,executor_core=3,executor_memory=1,driver_memory=2,default_parallelism=39,storageLevel=1,shuffle_partition=2
+ The 47th evaluation value: (duration=43.16,throughput=44067964.00)(12.63%)
+ Current Tuning Progress......(48/50)
+ Used time: 38m42s, Total Time: 38m42s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 48th recommand parameters is: num_executors=3,executor_core=3,executor_memory=3,driver_memory=1,default_parallelism=16,storageLevel=0,shuffle_partition=3
+ The 48th evaluation value: (duration=43.91,throughput=43312306.00)(10.70%)
+ Current Tuning Progress......(49/50)
+ Used time: 39m31s, Total Time: 39m31s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 49th recommand parameters is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=19,storageLevel=1,shuffle_partition=2
+ The 49th evaluation value: (duration=47.78,throughput=39807725.00)(1.74%)
+ Current Tuning Progress......(50/50)
+ Used time: 40m16s, Total Time: 40m16s, Best Performance: (duration=41.33,throughput=46014741.00), Performance Improvement Rate: 17.61%
+ The 50th recommand parameters is: num_executors=4,executor_core=4,executor_memory=2,driver_memory=1,default_parallelism=17,storageLevel=1,shuffle_partition=1
+ The 50th evaluation value: (duration=43.84,throughput=43388387.00)(10.88%)
+
+ The final optimization result is: num_executors=3,executor_core=3,executor_memory=4,driver_memory=1,default_parallelism=20,storageLevel=0,shuffle_partition=2
+ The final evaluation value is: duration=41.33,throughput=46014741.00
+
+ Baseline Performance is: (duration=48.61,throughput=39128812.00)
+
+ Tuning Finished

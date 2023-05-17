@@ -1,0 +1,96 @@
+project: "spark_hibench"
+maxiterations: 50
+startworkload: ""
+stopworkload: ""
+object:
+  - name: "num_executors"
+    info:
+      desc: "num_executors"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^num_executors=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^num_executors=.*/num_executors=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 2
+        - 4
+      dtype: "int"
+
+  - name: "executor_core"
+    info:
+      desc: "executor_core"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^executor_core=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^executor_core=.*/executor_core=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 2
+        - 4
+      dtype: "int"
+
+  - name: "executor_memory"
+    info:
+      desc: "executor_memory"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^executor_memory=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^executor_memory=[0-9]/executor_memory=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 1
+        - 2
+        - 3
+        - 4
+      dtype: "int"
+
+  - name: "driver_memory"
+    info:
+      desc: "driver_memory"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^driver_memory=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^driver_memory=[0-9]/driver_memory=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "continuous"
+      scope:
+        - 1
+        - 2
+      dtype: "int"
+
+  - name: "default_parallelism"
+    info:
+      desc: "default_parallelism"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^default_parallelism=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^default_parallelism=.*/default_parallelism=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 10
+        - 20
+        - 30
+        - 40
+        - 50
+      dtype: "int"
+
+  - name: "storageLevel"
+    info:
+      desc: "storageLevel"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^storageLevel=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^storageLevel=.*/storageLevel=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 0
+        - 1
+        - 2
+      dtype: "int"
+
+  - name: "shuffle_partition"
+    info:
+      desc: "shuffle_partition"
+      get: "cat /root/sparkbench/spark_hibench.sh | grep -i '^shuffle_partitions=' | awk -F '=' '{print $2}'"
+      set: 'sed -i "s/^shuffle_partitions=.*/shuffle_partitions=$value/g" /root/sparkbench/spark_hibench.sh'
+      needrestart: "false"
+      type: "discrete"
+      scope:
+        - 1
+        - 2
+        - 3
+        - 4
+      dtype: "int" 
