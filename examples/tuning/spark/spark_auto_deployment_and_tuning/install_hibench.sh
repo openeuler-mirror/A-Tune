@@ -12,6 +12,7 @@ if ! command -v python2 &>/dev/null; then
         exit
     fi
     tar -xf ./Python-2.7.18.tgz
+    rm -f ./Python-2.7.18.tgz
     # install python-2.7
     echo "installing python-2.7..."
     td=$(pwd)
@@ -19,7 +20,7 @@ if ! command -v python2 &>/dev/null; then
     ./configure --prefix=$td/python-2.7
     make
     make install
-    sudo ln -s $td/python-2.7/bin/python2.7 /usr/bin/python2
+    ln -s $td/python-2.7/bin/python2.7 /usr/bin/python2
     cd ..
 fi
 
@@ -33,6 +34,7 @@ else
     exit
 fi
 tar -xf ./apache-maven-3.8.8-bin.tar.gz
+rm -f ./apache-maven-3.8.8-bin.tar.gz
 export MAVEN_HOME=$(pwd)/apache-maven-3.8.8
 if ! grep -q "export MAVEN_HOME=$(pwd)/apache-maven-3.8.8" ~/.bashrc; then
     echo "export MAVEN_HOME=$(pwd)/apache-maven-3.8.8" >>~/.bashrc
@@ -42,7 +44,20 @@ source ~/.bashrc
 
 # maven aliyun mirror
 mkdir ~/.m2
-cp ./conf/settings.xml ~/.m2
+cat >~/.m2/settings.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+    <mirrors>
+        <mirror>
+            <id>aliyunmaven</id>
+            <mirrorOf>*</mirrorOf>
+            <name>阿里云公共仓库</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </mirror>
+    </mirrors>
+</settings>
+EOF
 
 # install HiBench
 echo "installing HiBench..."
@@ -71,6 +86,8 @@ fi
 cp conf/hadoop.conf.template conf/hadoop.conf
 sed -i "2c hibench.hadoop.home      $HADOOP_HOME" conf/hadoop.conf
 sed -i "11c hibench.hdfs.master       hdfs://localhost:9000" conf/hadoop.conf
+
+sed -i "s|hibench.scale.profile.*|hibench.scale.profile\thuge|g" conf/hibench.conf
 
 cp conf/spark.conf.template conf/spark.conf
 sed -i "2c hibench.spark.home      $SPARK_HOME" conf/spark.conf
