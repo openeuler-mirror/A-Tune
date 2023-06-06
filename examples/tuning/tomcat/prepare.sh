@@ -4,11 +4,15 @@
 systemctl stop firewalld
 
 echo "download tomcat"
-wget https://dlcdn.apache.org/tomcat/tomcat-10/v10.0.27/bin/apache-tomcat-10.0.27.tar.gz
+rm -rf index.html
+wget https://dlcdn.apache.org/tomcat/tomcat-10/
+version=$(cat index.html | grep -oP '\d+\.\d+\.\d+' | tail -1)
+wget https://dlcdn.apache.org/tomcat/tomcat-10/v$version/bin/apache-tomcat-$version.tar.gz
+rm -rf index.html
 echo "install tomcat"
-tar -zxvf apache-tomcat-10.0.27.tar.gz
+tar -zxvf apache-tomcat-$version.tar.gz
 echo "start tomcat"
-./apache-tomcat-10.0.27/bin/startup.sh
+./apache-tomcat-$version/bin/startup.sh
 
 echo "install tomcat benchmark"
 yum -y install httpd-tools
