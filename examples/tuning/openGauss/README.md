@@ -30,7 +30,7 @@ sh install.sh -w "password@123"
 source ~/.bashrc
 
 # verify install result, opengauss has started
-gs_ctl quary -D /opt/software/openGauss/data/single_node
+gs_ctl query -D /opt/software/openGauss/data/single_node
 
 # create benchmark database as tpcc
 gsql -d postgres -r -c 'create database tpcc; create user tpcc with password "password@123"; grant all privileges to tpcc;'
