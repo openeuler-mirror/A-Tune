@@ -98,10 +98,10 @@ class UiAnalysis(Resource):
             return json.dumps(response_obj), 200, CORS
 
         if cmd == 'getAnalysisData':
-            name = args.get('name')
+            cid = args.get('cid')
             csv_line = args.get('csvLine')
             log_line = args.get('logLine')
-            response_obj = trigger_analysis.get_analysis_data(name, int(csv_line), int(log_line))
+            response_obj = trigger_analysis.get_analysis_data(int(cid), int(csv_line), int(log_line))
             return json.dumps(response_obj), 200, CORS
 
         if cmd == 'updateDescription':

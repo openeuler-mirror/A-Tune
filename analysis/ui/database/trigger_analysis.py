@@ -247,7 +247,7 @@ def collection_exist(name):
     return exist
 
 
-def get_collection_data_dirs(cip, cid, csv_line, response, session):
+def get_collection_data_dirs(cid, csv_line, response, session):
     """get collection data"""
     header, _ = table_collection_data.get_line(-1, -2, -1, session)
     data, response['round'] = table_collection_data.get_line(cid, csv_line, csv_line + 10,
@@ -271,7 +271,7 @@ def get_analysis_log_dirs(cid, log_line, response, session):
     response['nextLog'] = log_line + len(response['log_data'])
 
 
-def get_analysis_data(name, csv_line, log_line):
+def get_analysis_data(cid, csv_line, log_line):
     """get each round data"""
     session = tables.get_session()
     if session is None:
@@ -279,11 +279,7 @@ def get_analysis_data(name, csv_line, log_line):
     response = {}
     try:
         collection_table = CollectionTable()
-        cid = collection_table.get_field_by_key(CollectionTable.collection_id,
-                                                CollectionTable.collection_name, name, session)
-        cip = collection_table.get_field_by_key(CollectionTable.collection_ip,
-                                                CollectionTable.collection_name, name, session)
-        get_collection_data_dirs(cip, cid, csv_line, response, session)
+        get_collection_data_dirs(cid, csv_line, response, session)
         get_analysis_log_dirs(cid, log_line, response, session)
         workload = collection_table.get_field_by_key(CollectionTable.workload_type,
                 CollectionTable.collection_id, cid, session)

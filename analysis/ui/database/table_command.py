@@ -68,8 +68,8 @@ class CommandTable(BASE):
     @staticmethod
     def get_cid_by_mid_and_type(mid, mtype, session):
         """get command_id by command_map_id and command_type"""
-        sql = select([CommandTable.command_id])
-                     .where(CommandTable.command_map_id == mid)
+        sql = select([CommandTable.command_id]) \
+                     .where(CommandTable.command_map_id == mid) \
                      .where(CommandTable.command_type == mtype)
         value = session.execute(sql).scalar()
         return value

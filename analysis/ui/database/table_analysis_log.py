@@ -19,6 +19,7 @@ from sqlalchemy import Column, VARCHAR, Integer, PrimaryKeyConstraint
 from sqlalchemy import func, insert, select
 
 from analysis.ui.database.tables import BASE
+from analysis.engine.utils import utils
 
 
 class AnalysisLog(BASE):
@@ -64,11 +65,12 @@ class AnalysisLog(BASE):
     @staticmethod
     def get_line(aid, line_start, line_end, session):
         """get selected line by cid and line range"""
-        sql = select([AnalysisLog]).where(AnalysisLog.analysis_id == aid) \
-                .where(AnalysisLog.round_num > line_start) \
-                .where(AnalysisLog.round_num <= line_end)
+        sql = select([AnalysisLog.round_num, AnalysisLog.section, 
+                      AnalysisLog.status, AnalysisLog.analysis_key,
+                      AnalysisLog.analysis_value, AnalysisLog.notes]) \
+                      .where(AnalysisLog.analysis_id == aid) \
+                      .where(AnalysisLog.round_num > line_start) \
+                      .where(AnalysisLog.round_num <= line_end)
         res = session.execute(sql).fetchall()
-        if len(res) == 0:
-            return []
-        res = [list(row)[2:] for row in res]
-        return res
+        dicts = ['round_num', 'section', 'status', 'akey', 'avlue', 'notes']
+        return utils.zip_key_value(dicts, res)
