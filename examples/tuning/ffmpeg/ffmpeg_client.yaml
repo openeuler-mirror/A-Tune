@@ -1,0 +1,25 @@
+project: "ffmpeg"
+engine : "bayes"
+iterations : 30
+random_starts : 10
+
+benchmark : "sh ffmpeg/ffmpeg_benchmark.sh"
+evaluations :
+  -
+    name: "real"
+    info:
+      get: "cat tran.txt | grep 'real' | awk -F ":" '{print $2}'"
+      type: "string"
+      weight: 50
+  -
+    name: "SSIM"
+    info: 
+      get:  "cat tran.txt | grep 'SSIM Y:' | awk -F ":" '{print $2}'"
+      type: "float"
+      weight: 25   
+  -
+    name: "PSNR"
+    info: 
+      get:  "cat tran.txt | grep 'PSNR y:' | awk -F ":" '{print $2}'"
+      type: "float"
+      weight: 25       

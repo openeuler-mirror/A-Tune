@@ -1,0 +1,85 @@
+project: "ffmpeg"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object:
+ -
+    name: "threads"
+    info:
+        desc : "The threads ffmpeg used"
+        get : "cat ffmpeg/ffmpeg_benchmark.sh | grep -i '^threads=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^threads=.*/threads=$value/g' ffmpeg/ffmpeg.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+        dtype : "int"
+ -
+    name: "b:v"
+    info:
+        desc : "The b:v ffmpeg transfer video to"
+        get : "cat ffmpeg/ffmpeg_benchmark.sh | grep -i '^b:v=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^b:v=.*/b:v=$value/g' ffmpeg/ffmpeg.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "200k"
+          - "400k"
+          - "600k"
+          - "800k"
+          - "1000k"
+          - "1200k"
+        dtype : "string"
+ -
+    name: "bufsize"
+    info:
+        desc : "The bufsize ffmpeg used"
+        get : "cat ffmpeg/ffmpeg_benchmark.sh | grep -i '^bufsize=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^bufsize=.*/bufsize=$value/g' ffmpeg/ffmpeg.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "2000K"
+          - "4000K"
+          - "6000K"
+          - "8000K"
+          - "10000K"
+          - "12000K"
+        dtype : "string"        
+ -
+    name: "c:v"
+    info:
+        desc : "The encoder ffmpeg used"
+        get : "cat ffmpeg/ffmpeg_benchmark.sh | grep -i '^c:v=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^c:v=.*/c:v=$value/g' ffmpeg/ffmpeg.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "libx264"
+          - "libx265"
+        dtype : "string"            
+  -
+    name: "preset"
+    info:
+        desc : "The encoder ffmpeg used"
+        get : "cat ffmpeg/ffmpeg_benchmark.sh | grep -i '^preset=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^preset=.*/c:v=$value/g' ffmpeg/ffmpeg.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "ultrafast"
+          - "superfast"
+          - "veryfast"
+          - "faster"
+          - "fast"
+          - "medium"
+          - "slow"
+          - "slower"
+        dtype : "string"    
