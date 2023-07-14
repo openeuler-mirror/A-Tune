@@ -285,6 +285,10 @@ def get_analysis_data(cid, csv_line, log_line):
                 CollectionTable.collection_id, cid, session)
         if workload is not None:
             response['workload'] = workload
+        name = collection_table.get_field_by_key(CollectionTable.collection_name,
+                CollectionTable.collection_id, cid, session)
+        if name is not None:
+            response['name'] = name
         status = collection_table.get_field_by_key(CollectionTable.collection_status,
                                                    CollectionTable.collection_id, cid, session)
         if csv_line < response['nextCsv'] or log_line < response['nextLog']:
