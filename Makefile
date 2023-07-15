@@ -27,8 +27,8 @@ all: abs-python modules atune-adm atuned db
 abs-python:
 	@if [ $(PYDIR) ] ; then \
 		sed -i "s?ExecStart=.*python3?ExecStart=$(PYDIR)?g" $(CURDIR)/misc/atune-engine.service; \
+		sed -i "s?ExecStart=.*python3?ExecStart=$(PYDIR)?g" $(CURDIR)/misc/atune-rest.service; \
 		sed -i "s?ExecStart=.*python3?ExecStart=$(PYDIR)?g" $(CURDIR)/misc/atune-ui.service; \
-		sed -i 's?".*python3"?"$(PYDIR)"?g' $(CURDIR)/common/service/pyservice/pyservice.go; \
 	else \
 		echo "no python3 exists."; \
 	fi
@@ -94,6 +94,7 @@ libinstall:
 	install -m 640 pkg/daemon_profile_server.so $(DESTDIR)$(PREFIX)/lib/atuned/modules
 	install -m 750 pkg/atune-adm $(BINDIR)
 	install -m 750 pkg/atuned $(BINDIR)
+	install -m 640 misc/atune-rest.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.service $(SYSTEMDDIR)
 	install -m 640 misc/atuned.cnf $(DESTDIR)/etc/atuned/
 	install -m 640 misc/engine.cnf $(DESTDIR)/etc/atuned/
@@ -197,6 +198,7 @@ env:
 
 startup:
 	systemctl daemon-reload
+	systemctl restart atune-rest
 	systemctl restart atuned
 	systemctl restart atune-engine
 	systemctl restart atune-ui

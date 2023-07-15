@@ -211,12 +211,6 @@ func runatuned(ctx *cli.Context) error {
 		return err
 	}
 
-	if err := utils.WaitForPyservice(); err != nil {
-		log.Errorf("waiting for pyservice failed: %v", err)
-		return err
-	}
-
-	log.Info("pyservice has been started")
 	_, _ = daemon.SdNotify(false, "READY=1")
 
 	reflection.Register(s)

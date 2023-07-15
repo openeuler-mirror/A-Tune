@@ -1,0 +1,10 @@
+[Unit]
+Description=A-Tune AI service
+After=network.target
+Requires=polkit.service
+
+[Service]
+ExecStart=python3 /usr/libexec/atuned/analysis/app_rest.py /etc/atuned/atuned.cnf
+
+[Install]
+WantedBy=multi-user.target
