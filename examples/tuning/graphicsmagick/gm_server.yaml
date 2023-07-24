@@ -1,0 +1,57 @@
+project: "graphicsmagick"
+maxiterations: 500
+startworkload: ""
+stopworkload: ""
+object:
+ -
+    name: "filter"
+    info:
+        desc : "The filter graphicsmagick used"
+        get : "cat graphicsmagick/gm_benchmark.sh | grep -i '^filter=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^filter=.*/filter=$value/g' graphicsmagick/gm_benchmark.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "Point"
+          - "Box"
+          - "Triangle"
+          - "Hermite"
+          - "Hanning"
+          - "Hamming"
+          - "Blackman"
+          - "Gaussian"
+          - "Quadratic"
+          - "Cubic"
+          - "Catrom"
+          - "Mitchell"
+          - "Lanczos"
+        dtype : "string"
+ -
+    name: "OMP_NUM_THREADS"
+    info:
+        desc : "The OMP_NUM_THREADS graphicsmagick used"
+        get : "cat graphicsmagick/gm_benchmark.sh | grep -i '^OMP_NUM_THREADS=' | awk -F '=' '{print $2}'"
+        set : "sed -i 's/^OMP_NUM_THREADS=.*/OMP_NUM_THREADS=$value/g' graphicsmagick/gm_benchmark.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - 1
+          - 2
+          - 3
+          - 4
+        dtype : "int"
+ -
+    name: "taskset"
+    info:
+        desc : "The taskset graphicsmagick used"
+        get : "cat graphicsmagick/gm_benchmark.sh | grep -i '^taskset -c' | awk -F ' ' '{print $3}'"
+        set : "sed -i 's/^taskset -c.*/taskset -c $value/g' graphicsmagick/gm_benchmark.sh"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "0,1"
+          - "0,1,2"
+          - "0,1,2,3"
+        dtype : "string"        
+  

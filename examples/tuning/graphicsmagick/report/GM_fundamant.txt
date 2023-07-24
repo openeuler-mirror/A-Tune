@@ -1,0 +1,163 @@
+graphicsmagick性能基线报告
+测试目的
+本次测试的目的是评估graphicsmagick在进行视频转码时的基本性能表现，包括图像处理速度、图像处理质量、资源消耗等指标。
+测试环境
+•	测试软件：graphicsmagick1.3.40
+•	测试图片：test00.jpg(pixel:1160x806,type:JPEG,size:101.7KB) test01.jpg(pixel:4000x2500,type:JPEG,size:5.0M) 
+•	测试工具：gm benchmark,Phoronix Test Suite(PTS)
+•	硬件参数：Processor: Intel Core i5-10200H (4 Cores), Motherboard: Oracle VirtualBox v1.2, Chipset: Intel 440FX 82441FX PMC, Memory: 8GB, Disk: 32GB VBOX HDD, Graphics: VMware SVGA II, Audio: Intel 82801AA AC 97 Audio, Network: 2 x Intel 82540EM
+•	软件参数：OS: openEuler22.03-LTS-SP1, Kernel: 5.10.0-136.12.0.86.oe2203sp1.x86_64 (x86_64), Compiler: GCC 10.3.1, File-System: ext4, Screen Resolution: 2048x2048, System Layer: Oracle VMware
+本次测试中取test00.jpg为小图样本,即xxxKB(超过1KB);取test01.jpg为大图样本,即xxxMB(超过1MB)
+另外,考虑到gm默认安装为开启OpenMP,而OpenMP对gm性能有巨大影响,故安装gm时已预先设置OMP_NUM_THREADS=4,将会在调优过程中对1,2,3,4线程下gm性能进行测试并确定OMP_NUM_THREADS的最优值
+1.基准测试(PTS):
+PTS进行gm性能测试所使用的图片(自带,不必下载或做其他处理):a sample 6000x4000 pixel JPEG image
+gm参数说明:
+-swirl 90：将图像旋转 90 度
+-rotate 90：将图像旋转 90 度，不改变图像的大小。
+-sharpen 0x2.0：锐化图像，增强图像的边缘和细节。它接受两个数字作为参数，第一个数字表示锐化的半径，第二个数字表示锐化的标准差。如果第一个数字为 0，gm 会自动计算合适的半径。
+-enhance：这个参数可以增强图像的质量，减少图像的噪声和失真。它不接受任何参数。
+-resize 50%：这个参数可以缩放图像的大小，按照给定的百分比或者绝对值。你可以指定一个百分比或者一个宽度和高度来缩放图像。
+-operator all Noise-Gaussian 30%：这个参数可以对图像的所有通道（红、绿、蓝、透明等）进行操作。它接受三个参数，第一个参数表示要操作的通道，第二个参数表示要执行的操作，第三个参数表示操作的强度或值。例如，你可以使用以下命令对一张图片的所有通道添加高斯噪声
+gm convert -operator all Noise-Gaussian 30% input.jpg output.jpg
+-colorspace HWB：这个参数可以改变图像的色彩空间。它接受一个参数，表示要转换成的色彩空间。gm 支持多种色彩空间，比如 RGB, CMYK, Gray, HSL, HWB 等。
+PTS测试表格参数说明:
+Arguments：这一列表示测试的操作的参数。这里表示 gm 的 -swirl 90, -rotate 90, -sharpen 0x2.0, -enhance, -resize 50%, -operator all Noise-Gaussian 30%, -colorspace HWB 这些操作。
+Description：这一列表示测试的操作的名称。这里表示 gm 的 Swirl, Rotate, Sharpen, Enhanced, Resizing, Noise-Gaussian, HWB Color Space 这些操作。
+Scale：这一列表示测试的结果的单位。这里表示 Iterations Per Minute，即每分钟的迭代次数。
+Proportion：这一列表示测试的结果的比例。这里表示 HIB，即 Higher Is Better，即结果越高越好。
+DisplayFormat：这一列表示测试的结果的显示格式。这里表示 BAR_GRAPH，即柱状图。
+Identifier：这一列表示测试的软件的名称和版本。这里表示 gm 1.3.40，即 graphics-magick 1.3.40。
+Value：这一列表示测试的结果的平均值。这里表示 gm 的不同操作的平均每分钟迭代次数。
+RawString：这一列表示测试的结果的原始值。这里表示 gm 的不同操作的每次运行的迭代次数(每分钟)。
+基准测试数据表1:
+Arguments	Description	Scale	Proportion	DisplayFormat	Identifier	Value	RawString
+-swirl 90	Operation: Swirl	Iterations Per Minute	HIB	BAR_GRAPH	basic	105	107:106:102
+-rotate 90	Operation: Rotate	Iterations Per Minute	HIB	BAR_GRAPH	basic	965	961:951:982
+-sharpen 0x2.0	Operation: Sharpen	Iterations Per Minute	HIB	BAR_GRAPH	basic	47	47:47:47
+-enhance	Operation: Enhanced	Iterations Per Minute	HIB	BAR_GRAPH	basic	70	70:71:68
+-resize 50%	Operation: Resizing	Iterations Per Minute	HIB	BAR_GRAPH	basic	346	353:348:337
+-operator all Noise-Gaussian 30%	Operation: Noise-Gaussian	Iterations Per Minute	HIB	BAR_GRAPH	basic	81	82:82:80
+-colorspace HWB	Operation: HWB Color Space	Iterations Per Minute	HIB	BAR_GRAPH	basic	730	732:731:727
+较粗糙地呈现了gm1.3.40在openEuler22.03-LTS-SP1系统下的基准性能
+2.gm benchmark进一步测试:
+test00.jpg(pixel:1160x806,type:JPEG,size:101.7KB) 
+使用gm在60s内重复执行将test00.jpg图片转换成png图片命令,不加参数
+Results: 4 threads 164 iter 59.58s user 60.028503s total 2.732 iter/s 2.753 iter/cpu
+4 threads 表示使用了4个线程来执行命令。
+164 iter 表示执行了164次迭代。
+59.58s user 表示用户态CPU时间是59.58秒。
+60.028503s total 表示总共花费了60.028503秒。
+2.732 iter/s 表示每秒执行了2.732次迭代。
+2.753 iter/cpu 表示每个CPU执行了2.753次迭代。
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0000000000        0.0
+   Green: 0.0000000000        0.0
+    Blue: 0.0000000000        0.0
+   Total: 0.0000000000        0.0
+Red: 0.0000000000        0.0 表示红色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Green: 0.0000000000        0.0 表示绿色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Blue: 0.0000000000        0.0 表示蓝色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Total: 0.0000000000        0.0 表示总体的归一化MSE和绝对MSE都是0，即没有差异。
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: inf   
+   Green: inf   
+    Blue: inf   
+   Total: inf   
+Red: inf 表示红色通道的PSNR是无穷大，即没有差异。
+Green: inf 表示绿色通道的PSNR是无穷大，即没有差异。
+Blue: inf 表示蓝色通道的PSNR是无穷大，即没有差异。
+Total: inf 表示总体的PSNR是无穷大，即没有差异。
+
+使用gm生成一个100x100的缩略图
+Results: 4 threads 31796 iter 229.43s user 60.000813s total 529.926 iter/s 138.587 iter/cpu
+4 threads 表示使用了4个线程来执行命令。
+31796 iter 表示执行了31796次迭代。
+229.43s user 表示用户态CPU时间是229.43秒。
+60.000813s total 表示总共花费了60.000813秒。
+529.926 iter/s 表示每秒执行了529.926次迭代。
+138.587 iter/cpu 表示每个CPU执行了138.587次迭代。
+
+test01.jpg(pixel:4000x2500,type:JPEG,size:5.0M)
+
+使用gm在60s内重复执行将test01.jpg图片转换成png图片命令,不加参数
+Results: 4 threads 22 iter 58.00s user 60.225046s total 0.365 iter/s 0.379 iter/cpu
+4 threads 表示使用了4个线程来执行命令。
+22 iter 表示执行了22次迭代。
+58.00s user 表示用户态CPU时间是58.00秒。
+60.225046s total 表示总共花费了60.225046秒。
+0.365 iter/s 表示每秒执行了0.365次迭代。
+ 0.379  iter/cpu 表示每个CPU执行了 0.379 次迭代。
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0000000000        0.0
+   Green: 0.0000000000        0.0
+    Blue: 0.0000000000        0.0
+   Total: 0.0000000000        0.0
+Red: 0.0000000000        0.0 表示红色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Green: 0.0000000000        0.0 表示绿色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Blue: 0.0000000000        0.0 表示蓝色通道的归一化MSE和绝对MSE都是0，即没有差异。
+Total: 0.0000000000        0.0 表示总体的归一化MSE和绝对MSE都是0，即没有差异。
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: inf   
+   Green: inf   
+    Blue: inf   
+   Total: inf   
+Red: inf 表示红色通道的PSNR是无穷大，即没有差异。
+Green: inf 表示绿色通道的PSNR是无穷大，即没有差异。
+Blue: inf 表示蓝色通道的PSNR是无穷大，即没有差异。
+Total: inf 表示总体的PSNR是无穷大，即没有差异。
+
+对这张稍大些的图片使用gm生成一个100x100的缩略图
+Results: 4 threads 1195 iter 106.24s user 60.032057s total 19.906 iter/s 11.248 iter/cpu
+4 threads 表示使用了4个线程来执行命令。
+1195 iter 表示执行了1195次迭代。
+106.24s user 表示用户态CPU时间是106.24秒。
+60.032057s total 表示总共花费了60.032057秒。
+19.906 iter/s 表示每秒执行了19.906次迭代。
+11.248 iter/cpu 表示每个CPU执行了 11.248 次迭代。
+
+小图:转换:a 缩放:b
+大图:转换:c 缩放:d
+图像处理速度 图像处理速度通过gm的操作每分钟迭代次数来判断，反映了gm的图像处理能力。
+图像处理质量 图像处理质量是指gm在进行图像处理时对图像的保真度，反映了gm的压缩效率。本次测试中，gm在不指定参数进行图像处理时，可以保持较高的图像质量。根据MSE（均方误差,反映两张图片像素值之间的平均差异,越小越相似）指标，输出图像与输入图像之间的图像差异为0，越接近于0，表示越没有可见的图像损失。根据PSNR（峰值信噪比,越大越相似）指标，输出图像与输入图像之间的多个通道的图像差异为inf(无穷大)dB,即没有差异,可见gm在进行图像转换时的处理质量极高。
+资源消耗 资源消耗是指gm在进行图像处理时所占用的系统资源，如CPU利用率，反映了gm的资源利用率。本次测试中，使用gm benchmark命令监控gm的资源消耗，通过公式 总体CPU利用率 = 总共时间 / (迭代次数 * 线程数) * 100% 计算CPU利用率。
+a:
+用户态CPU利用率 = 59.58 / 60.028503 * 100% = 99.25%
+总体CPU利用率 = 60.028503 / (164 * 4) * 100% = 91.38%
+图像处理速度 = 2.732 iter/s
+b:
+用户态CPU利用率 = 229.43 / 60.000813 * 100% = 382.37%
+总体CPU利用率 = 60.000813 / (31796 * 4) * 100% = 0.05%
+图像处理速度 = 529.926 iter/s
+c:
+用户态CPU利用率 = 58 / 60.225046 * 100% = 96.31%
+总体CPU利用率 = 60.225046 / (22 * 4) * 100% = 68.44%
+图像处理速度 = 0.365 iter/s
+d:
+用户态CPU利用率 = 106.24 / 60.032057 * 100% = 176.98%
+总体CPU利用率 = 60.032057 / (1195 * 4) * 100% = 1.25%
+图像处理速度 = 19.906 iter/s
+
+gm benchmark convert test00.jpg -size 100x100 -resize 50% output00.jpg
+Results: 4 threads 1 iter 0.04s user 0.018389s total 54.379 iter/s 25.000 iter/cpu
+用户态CPU利用率 = 0.04 / 0.018389 * 100% = 217.52%
+总体CPU利用率 = 0.018389 / (1 * 4) * 100% = 4.5%
+图像处理速度:54.379 iter/s
+图像处理质量: MSE为0,PSNR无穷大,视作缩放后图像无损耗
+得到测试数据表:
+图像处理速度	MSE	PSNR	CPU利用率        用户态CPU利用率
+54.379 iter/s	0	inf	4.5%	217.52%
+测试结论
+根据本次测试的结果，可以得出以下结论：
+•	graphicsmagick在未设置参数时处理速度较快,但还有提升空间。
+•	graphicsmagick在进行图片处理方面具有极高的处理质量，几与原图无异。
+•	graphicsmagick在进行图片转换时能充分调用资源,在缩放图片时需要根据实际情况进行优化。
+

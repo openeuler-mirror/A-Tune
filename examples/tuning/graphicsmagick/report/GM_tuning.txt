@@ -1,0 +1,392 @@
+graphicsmagick性能调优报告
+任务目的
+对graphicsmagick进行性能调优。
+测试环境
+•	软件：graphicsmagick1.3.40
+•	参数：gm:OMP_NUM_THREADS ;filter;enhance; OS:nice;taskset
+•	测试工具：gm benchmark,Phoronix Test Suite(PTS)
+•	硬件参数：Processor: Intel Core i5-10200H (4 Cores), Motherboard: Oracle VirtualBox v1.2, Chipset: Intel 440FX 82441FX PMC, Memory: 8GB, Disk: 32GB VBOX HDD, Graphics: VMware SVGA II, Audio: Intel 82801AA AC 97 Audio, Network: 2 x Intel 82540EM
+•	软件参数：OS: openEuler22.03-LTS-SP1, Kernel: 5.10.0-136.12.0.86.oe2203sp1.x86_64 (x86_64), Compiler: GCC 10.3.1, File-System: ext4, Screen Resolution: 2048x2048, System Layer: Oracle VMware
+原数据:
+gm benchmark convert test00.jpg -size 100x100 -resize 50% output00.jpg
+Results: 4 threads 1 iter 0.04s user 0.018389s total 54.379 iter/s 25.000 iter/cpu
+用户态CPU利用率 = 0.04 / 0.018389 * 100% = 217,52%
+总体CPU利用率 = 0.018389 / (1 * 4) * 100% = 4.5%
+图像处理速度:54.379 iter/s
+图像处理质量: MSE为0,PSNR无穷大,视作缩放后图像无损耗
+参数表:
+OMP_NUM_THREADS	filter	enhance	      nice	           taskset
+1	Point		              -20
+2	Box				       
+3	Triangle
+4	Hermite
+	Hanning
+	Hamming
+	Blackman
+	Gaussian
+	Quadratic
+	Cubic
+	Catrom
+	Mitchell
+	Lanczos
+		
+本调优报告中测量值如未标明则为多次测量的均值(至少3次)	
+1.OMP_NUM_THREADS:
+OMP_NUM_THREADS ：这个环境变量可以设置 graphics-magick 可以使用的线程数。通过使用 OpenMP 可以利用多线程进行图片处理，增强了通过扩展 CPU 提高处理能力。必须设置 OMP_NUM_THREADS 环境变量才可以真正使用起多线程 (openmp)。
+确定gm适合使用的线程数,临时调整环境变量:OMP_NUM_THREADS=6
+测试命令:
+gm benchmark -iterations 100 -stepthreads 1 convert -resize 100x100 -quality 90 +profile "*" test00.jpg output00.jpg
+测试结果(3次):
+Results: 1 threads 100 iter 1.85s user 1.873258s total 53.383 iter/s 54.054 iter/cpu 1.00 speedup 1.000 karp-flatt
+Results: 2 threads 100 iter 2.28s user 1.156086s total 86.499 iter/s 43.860 iter/cpu 1.62 speedup 0.234 karp-flatt
+Results: 3 threads 100 iter 2.86s user 0.965052s total 103.621 iter/s 34.965 iter/cpu 1.94 speedup 0.273 karp-flatt
+Results: 4 threads 100 iter 3.46s user 0.876051s total 114.149 iter/s 28.902 iter/cpu 2.14 speedup 0.290 karp-flatt
+Results: 5 threads 100 iter 2.04s user 0.987205s total 101.296 iter/s 49.020 iter/cpu 1.90 speedup 0.409 karp-flatt
+Results: 6 threads 100 iter 2.03s user 0.871952s total 114.685 iter/s 49.261 iter/cpu 2.15 speedup 0.359 karp-flatt
+
+Results: 1 threads 100 iter 1.80s user 1.820440s total 54.932 iter/s 55.556 iter/cpu 1.00 speedup 1.000 karp-flatt
+Results: 2 threads 100 iter 2.37s user 1.194422s total 83.722 iter/s 42.194 iter/cpu 1.52 speedup 0.312 karp-flatt
+Results: 3 threads 100 iter 2.95s user 0.996992s total 100.302 iter/s 33.898 iter/cpu 1.83 speedup 0.321 karp-flatt
+Results: 4 threads 100 iter 3.52s user 0.895535s total 111.665 iter/s 28.409 iter/cpu 2.03 speedup 0.323 karp-flatt
+Results: 5 threads 100 iter 2.02s user 0.868910s total 115.087 iter/s 49.505 iter/cpu 2.10 speedup 0.347 karp-flatt
+Results: 6 threads 100 iter 2.06s user 0.872700s total 114.587 iter/s 48.544 iter/cpu 2.09 speedup 0.375 karp-flatt
+
+Results: 1 threads 100 iter 1.88s user 1.901946s total 52.578 iter/s 53.191 iter/cpu 1.00 speedup 1.000 karp-flatt
+Results: 2 threads 100 iter 2.30s user 1.165618s total 85.791 iter/s 43.478 iter/cpu 1.63 speedup 0.226 karp-flatt
+Results: 3 threads 100 iter 2.80s user 0.943829s total 105.951 iter/s 35.714 iter/cpu 2.02 speedup 0.244 karp-flatt
+Results: 4 threads 100 iter 3.51s user 0.891888s total 112.122 iter/s 28.490 iter/cpu 2.13 speedup 0.292 karp-flatt
+Results: 5 threads 100 iter 2.03s user 0.882009s total 113.378 iter/s 49.261 iter/cpu 2.16 speedup 0.330 karp-flatt
+Results: 6 threads 100 iter 2.04s user 0.873701s total 114.456 iter/s 49.020 iter/cpu 2.18 speedup 0.351 karp-flatt
+threads - 使用的线程数。
+iter - 运行的次数。
+user - 用户时间，即CPU花在执行程序上的时间。
+total - 总时间，即程序从开始到结束的时间。
+iter/s - 每秒运行的次数，反映了程序的速度。
+iter/cpu - 每次运行消耗的CPU时间，反映了程序的效率。
+speedup - 相对于单线程的加速比，反映了多线程的优势。
+karp-flatt - Karp-Flatt指标，反映了多线程的效率，越接近1越好
+可以观测到OMP_NUM_THREADS=4时,iter/s相对较低,程序速度较快;iter/cpu在以上结果中最低,程序效率最高
+结论:在本测试的软硬件环境下,可以确认gm在执行多线程并行区域时使用的线程数的最优值为4,即OMP_NUM_THREADS=4,程序速度是单线程的113%,每次运行消耗的CPU时间减少了46.44%即程序效率提高了46.44% 综合来看可以提升113%*50%+46.44%*50%=79.72%
+2.使用PTS对filter进行调优:
+filter参数来指定缩放图片时使用的算法，这可以提高缩放速度。
+Arguments	Description	Scale	Proportion	DisplayFormat	Identifier   	Value	RawString
+-filter Box -resize 100x100	Operation: Box	Iterations Per Minute	HIB	BAR_GRAPH	filter	2844	2858:2861:2814
+-filter Cubic -resize 100x100	Operation: Cubic	Iterations Per Minute	HIB	BAR_GRAPH	filter	721	715:724:724
+-filter Point -resize 100x100	Operation: Point	Iterations Per Minute	HIB	BAR_GRAPH	filter	55540	53341:55871:56693:56254
+-filter Catrom -resize 100x100	Operation: Catrom	Iterations Per Minute	HIB	BAR_GRAPH	filter	721	722:715:726
+-resize 100x100	Operation: normal	Iterations Per Minute	HIB	BAR_GRAPH	filter	490	491:502:478
+-filter Hamming -resize 100x100	Operation: Hamming	Iterations Per Minute	HIB	BAR_GRAPH	filter	1371	1366:1368:1379
+-filter Hanning -resize 100x100	Operation: Hanning	Iterations Per Minute	HIB	BAR_GRAPH	filter	1381	1388:1379:1377
+-filter Hermite -resize 100x100	Operation: Hermite	Iterations Per Minute	HIB	BAR_GRAPH	filter	1371	1377:1376:1360
+-filter Lanczos -resize 100x100	Operation: Lanczos	Iterations Per Minute	HIB	BAR_GRAPH	filter	486	486:485:488
+-filter Blackman -resize 100x100	Operation: Blackman	Iterations Per Minute	HIB	BAR_GRAPH	filter	1370	1365:1380:1364
+-filter Gaussian -resize 100x100	Operation: Gaussian	Iterations Per Minute	HIB	BAR_GRAPH	filter	1123	1128:1131:1110
+-filter Mitchell -resize 100x100	Operation: Mitchell	Iterations Per Minute	HIB	BAR_GRAPH	filter	720	716:717:727
+-filter Triangle -resize 100x100	Operation: Triangle	Iterations Per Minute	HIB	BAR_GRAPH	filter	1373	1363:1381:1375
+-filter Quadratic -resize 100x100	Operation: Quadratic	Iterations Per Minute	HIB	BAR_GRAPH	filter	939	957:880:947:945:945:952:947
+将缩放图片算法按照速度排序:(从上到下递增,常态下迭代次数为Operation: normal:490)
+Operation: Lanczos	486
+Operation: Mitchell	720
+Operation: Cubic	721
+Operation: Catrom	721
+Operation: Quadratic	939
+Operation: Gaussian	1123
+Operation: Blackman	1370
+Operation: Hermite	1371
+Operation: Hamming	1371
+Operation: Triangle	1373
+Operation: Hanning	1381
+Operation: Box	2844
+Operation: Point	55540
+进一步测试以观察缩放质量,和基准测试得到的图片做对比,
+发现除了Lanczos算法外,其余算法的MSE和PSNR值都相差不大,而Lanczos算法又对速度几乎没有提升,所以取图像处理最快的算法Point算法
+对比结果如下:
+将Lanczos和基准图片对比,质量没有下降,但速度也变化不大,只提升了0.8%
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0000000000        0.0
+   Green: 0.0000000000        0.0
+    Blue: 0.0000000000        0.0
+   Total: 0.0000000000        0.0
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: inf   
+   Green: inf   
+    Blue: inf   
+   Total: inf 
+Point算法转换图片和基准图片对比,图像处理速度扩大到原来的112倍,即11200%,图像的质量下降23.47%(图像质量评估方法请参考文末注1)
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0007231913        0.2
+   Green: 0.0006930453        0.2
+    Blue: 0.0008398307        0.2
+   Total: 0.0007520224        0.2
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 31.41 
+   Green: 31.59 
+    Blue: 30.76 
+   Total: 31.24 
+其余对比(按顺序自上而下,共11个):
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0003232914        0.1
+   Green: 0.0003016919        0.1
+    Blue: 0.0003909982        0.1
+   Total: 0.0003386605        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 34.90 
+   Green: 35.20 
+    Blue: 34.08 
+   Total: 34.70 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0005748899        0.1
+   Green: 0.0005464416        0.1
+    Blue: 0.0006887659        0.2
+   Total: 0.0006033658        0.2
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 32.40 
+   Green: 32.62 
+    Blue: 31.62 
+   Total: 32.19 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0001693970        0.0
+   Green: 0.0001395566        0.0
+    Blue: 0.0001535516        0.0
+   Total: 0.0001541684        0.0
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 37.71 
+   Green: 38.55 
+    Blue: 38.14 
+   Total: 38.12 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0004886156        0.1
+   Green: 0.0004644260        0.1
+    Blue: 0.0006094600        0.2
+   Total: 0.0005208339        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 33.11 
+   Green: 33.33 
+    Blue: 32.15 
+   Total: 32.83
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0004402365        0.1
+   Green: 0.0004090123        0.1
+    Blue: 0.0005293074        0.1
+   Total: 0.0004595187        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 33.56 
+   Green: 33.88 
+    Blue: 32.76 
+   Total: 33.38 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0002208907        0.1
+   Green: 0.0001992168        0.1
+    Blue: 0.0002574518        0.1
+   Total: 0.0002258531        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 36.56 
+   Green: 37.01 
+    Blue: 35.89 
+   Total: 36.46 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0002680429        0.1
+   Green: 0.0002512515        0.1
+    Blue: 0.0003540117        0.1
+   Total: 0.0002911020        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 35.72 
+   Green: 36.00 
+    Blue: 34.51 
+   Total: 35.36 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0003528261        0.1
+   Green: 0.0003324740        0.1
+    Blue: 0.0004351061        0.1
+   Total: 0.0003734688        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 34.52 
+   Green: 34.78 
+    Blue: 33.61 
+   Total: 34.28 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0003524420        0.1
+   Green: 0.0003259681        0.1
+    Blue: 0.0004219043        0.1
+   Total: 0.0003667715        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 34.53 
+   Green: 34.87 
+    Blue: 33.75 
+   Total: 34.36 
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0002588066        0.1
+   Green: 0.0002477280        0.1
+    Blue: 0.0003447423        0.1
+   Total: 0.0002837590        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 35.87 
+   Green: 36.06 
+    Blue: 34.63 
+   Total: 35.47 
+
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0004392988        0.1
+   Green: 0.0004091114        0.1
+    Blue: 0.0004326855        0.1
+   Total: 0.0004270319        0.1
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 33.57 
+   Green: 33.88 
+    Blue: 33.64 
+   Total: 33.70 
+确定filter参数为Point,图像处理速度扩大到原来的112倍,即11200%,图像的质量下降了23.47%
+使用gm benchmark具体测试:
+gm benchmark convert  -filter Point test00.jpg -size 100x100 -resize 50% output29P.jpg
+Results: 4 threads 1 iter 0.02s user 0.010287s total 97.212 iter/s 50.000 iter/cpu
+图像处理速度97.212 iter/s,提升78.76%,
+CPU利用率0.010287/(1*4)*100%=0.25%
+用户态CPU利用率0.02/0.010287*100%=194.42%
+综合性能变化为78.76%*40%+(94%*10%+10.61%*10%)-23.47%*40%=32.577%,提升了32.577%
+3.enhance:
+采用该参数增强图像的质量，减少图像的噪声和失真
+gm benchmark convert  -enhance -filter Point test00.jpg -size 100x100 -resize 50% output30.jpg
+Results: 4 threads 1 iter 0.16s user 0.045876s total 21.798 iter/s 6.250 iter/cpu
+速度降低了59%,CPU利用率为0.045876/(1*4)*100%=1.146%
+查看图像质量 gm compare -metric MSE output00.jpg output30.jpg
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0006167546        0.2
+   Green: 0.0005916102        0.2
+    Blue: 0.0006158656        0.2
+   Total: 0.0006080768        0.2
+ gm compare -metric PSNR output00.jpg output30.jpg
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 32.10 
+   Green: 32.28 
+    Blue: 32.11 
+   Total: 32.16 
+图像质量相比基准图像质量下降了22.32%,稍缓解了因使用Point算法而降低的图像质量,但效果不大,且filter=Point的情况下速度降低过多,故不选用该参数
+4.nice:
+nice命令来调整进程的优先级，让graphicsmagick获得更多的CPU时间
+优先级调整值的范围是-20到19，数字越小，优先级越高，数字越大，优先级越低,这里采用-20
+nice -n -20 gm benchmark convert  -filter Point test00.jpg -size 100x100 -resize 50% output40.jpg
+Results: 4 threads 1 iter 0.02s user 0.010959s total 91.246 iter/s 50.000 iter/cpu
+图像处理速度91.246 iter/s,提升67.79%,
+CPU利用率0.010959/(1*4)*100%=0.27%
+用户态CPU利用率0.02/0.010959*100%=182.49%
+与不使用nice参数区别不大,故不选用该参数
+5.taskset:
+taskset命令来绑定进程到特定的CPU核心或节点，减少上下文切换和内存访问延迟。
+taskset -c 0,1,2,3把四个CPU分配给gm进程,最大化提升效率。
+taskset -c 0,1,2,3 gm benchmark convert  -filter Point test00.jpg -size 100x100 -resize 50% output50.jpg
+Results: 4 threads 1 iter 0.02s user 0.010s total 100.124 iter/s 50.000 iter/cpu
+用户态CPU利用率 = 0.02 / 0.010 * 100% = 200%
+总体CPU利用率 = 0.010 / (1 * 4) * 100% = 0.25%
+图像处理速度:100.124 iter/s
+图像处理质量:
+gm compare -metric MSE output00.jpg output50.jpg
+Image Difference (MeanSquaredError):
+           Normalized    Absolute
+          ============  ==========
+     Red: 0.0007236096        0.2
+   Green: 0.0007010602        0.2
+    Blue: 0.0007228090        0.2
+   Total: 0.0007158263        0.2
+gm compare -metric PSNR output00.jpg output50.jpg
+Image Difference (PeakSignalToNoiseRatio):
+           PSNR
+          ======
+     Red: 31.40 
+   Green: 31.54 
+    Blue: 31.41 
+   Total: 31.45 
+Q = 1 - MSE / 255^2 = 1 - 0.2 / 255^2 = 0.9996
+PSNR = 20 * log10(255 / sqrt(MSE)) = 31.45
+Q = (PSNR - 10) / 40 = (31.45 - 10) / 40 = 0.536
+Q的平均值为 (0.9996 + 0.536) / 2 = 0.7678
+图片质量下降的百分比为 (1 - Q) * 100% = (1 - 0.7678) * 100% = 23.22%
+故经一系列测试后,最终取参数为OMP_NUM_THREADS=4 filter=Point taskset: -c 0,1,2,3
+用户态CPU利用率 = 0.02 / 0.010 * 100% = 200%,降低了8.05%
+总体CPU利用率 = 0.010 / (1 * 4) * 100% = 0.25%,降低了94%
+图像处理速度:100.124 iter/s,提升了84.12%
+图片质量下降的百分比为 (1 - Q) * 100% = (1 - 0.7678) * 100% = 23.22%
+得到调优数据表:
+图像处理速度	MSE	PSNR	CPU利用率        用户态CPU利用率
+100.124 iter/s	0.2	31.45	0.25%	200%
+图像处理速度和质量是最重要的目标，因为它们直接影响程序的运行结果。CPU利用率则是一个次要的目标，因为它只影响到系统的性能和稳定性。以图像处理速度：40%,图像处理质量：40%,CPU利用率：20%的比例进行性能计算
+综合以上调优可得,性能提升为84.12%*0.4+(-23.22%)*0.4+(-94%)*0.1+(-8.05%)*0.1=14.155%
+注1:
+关于如何使用MSE和PSNR来评估图像质量,可以根据以下网站提供的资料进行粗略计算:
+https://www.mathworks.com/help/images/ref/psnr.html
+https://www.researchgate.net/publication/224164062_A_new_quality_metric_for_image_compression_based_on_MSE_and_HVS
+使用以下两个公式来计算图片质量的变换程度
+MSE = (1 - Q) * 255^2
+PSNR=10*log(peakval^2/MSE)=20 * log(255 / sqrt(MSE))(底数为10)
+Q = (PSNR - 10) / 40
+其中，Q是图片质量的相对值，介于0到1之间，越接近1表示越高的质量。MSE是均方误差，PSNR是峰值信噪比。
+根据这些公式，我们可以反推出Q的值，然后用百分比表示。例如本次调优中Point算法和基准图片的图片质量对比：
+Normalized 0.0007520224 Absolute 0.2 PSNR 31.24
+Q = 1 - MSE / 255^2 = 1 - 0.2 / 255^2 = 0.9996
+PSNR = 20 * log10(255 / sqrt(MSE)) = 31.24
+Q = (PSNR - 10) / 40 = (31.24 - 10) / 40 = 0.531
+Q的平均值为 (0.9996 + 0.531) / 2 = 0.7653
+图片质量下降的百分比为 (1 - Q) * 100% = (1 - 0.7653) * 100% = 23.47%

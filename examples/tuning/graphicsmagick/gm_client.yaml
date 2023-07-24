@@ -1,0 +1,26 @@
+project: "graphicsmagick"
+engine : "bayes"
+iterations : 30
+random_starts : 10
+
+benchmark : "sh graphicsmagick/gm_benchmark.sh"
+evaluations :
+  -
+    name: "iter/s"
+    info:
+      get: "cat final.txt | grep 'Results:' | awk -F " " '{print $(NF-1)}'"
+      type: "positive"
+      weight: 50
+  -
+    name: "MSE"
+    info: 
+      get:  "cat mse.txt | grep 'Total' | awk -F " " '{print $3}'"
+      type: "negative"
+      weight: 25   
+  -
+    name: "PSNR"
+    info: 
+      get:  "cat psnr.txt | grep 'Total' | awk -F " " '{print $3}'"
+      type: "positive"
+      weight: 25       
+   
