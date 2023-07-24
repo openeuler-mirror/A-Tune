@@ -34,7 +34,7 @@ cd
 wget https://github.com/phoronix-test-suite/phoronix-test-suite/archive/v9.8.0.tar.gz -O phoronix-test-suite-9.8.0.tar.gz
 tar -zxvf phoronix-test-suite-9.8.0.tar.gz
 cd phoronix-test-suite-9.8.0
-./install.sh
+./install-sh
 phoronix-test-suite list-available-tests
 
 echo "download ffmpeg 6.0 source code"
