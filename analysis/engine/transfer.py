@@ -31,7 +31,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Transfer(Resource):
     """restful api for transfer"""
-    file_path = "/etc/atuned/"
+    file_path = "/etc/atuned/{service}"
 
     def post(self):
         """provide the method of post"""
@@ -40,15 +40,19 @@ class Transfer(Resource):
         file_obj = request.files.get("file")
         service = request.form.get("service")
 
+        target_path = self.file_path.format(service=service)
+        dir_name, _ = os.path.split(os.path.abspath(save_path))
+        if not dir_name == target_path:
+            return "illegal path to save file", 400
+
         if service == "classification":
             os.makedirs(ANALYSIS_DATA_PATH, exist_ok=True)
-            file_name = ANALYSIS_DATA_PATH + save_path.split(self.file_path + service)[1][1:]
+            file_name = ANALYSIS_DATA_PATH + save_path.split(target_path)[1][1:]
             current_app.logger.info(file_name)
             file_obj.save(file_name)
             return file_name, 200
 
         file_obj.save(save_path)
-        target_path = self.file_path + service
         res = utils.extract_file(save_path, target_path)
         os.remove(save_path)
         return res, 200
