@@ -23,6 +23,7 @@ GRPC_CERT_PATH = '/etc/atuned/grpc_certs'
 ANALYSIS_DATA_PATH = '/var/atune_data/analysis/'
 TUNING_DATA_PATH = '/var/atune_data/tuning/'
 TUNING_DATA_DIRS = ['running', 'finished', 'error']
+TRAINING_MODEL_PATH = '/usr/libexec/atuned/analysis/models/'
 
 
 def get_or_default(config, section, key, value):

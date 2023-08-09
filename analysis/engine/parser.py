@@ -69,8 +69,8 @@ CLASSIFICATION_POST_PARSER.add_argument('model',
 TRAIN_POST_PARSER = reqparse.RequestParser()
 TRAIN_POST_PARSER.add_argument('datapath', required=True,
                                help="The datapath can not be null")
-TRAIN_POST_PARSER.add_argument('outputpath', required=True,
-                               help="The output path can not be null")
+TRAIN_POST_PARSER.add_argument('modelname', required=True,
+                               help="The model name can not be null")
 TRAIN_POST_PARSER.add_argument('modelpath', required=True,
                                help="The model path can not be null")
 

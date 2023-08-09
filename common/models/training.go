@@ -15,7 +15,7 @@ package models
 
 import (
 	"fmt"
-	
+
 	"gitee.com/openeuler/A-Tune/common/config"
 	"gitee.com/openeuler/A-Tune/common/http"
 )
@@ -24,7 +24,7 @@ import (
 type Training struct {
 	DataPath   string `json:"datapath"`
 	ModelPath  string `json:"modelpath"`
-	OutputPath string `json:"outputpath"`
+	ModelName  string `json:"modelname"`
 }
 
 // Post method call training service
