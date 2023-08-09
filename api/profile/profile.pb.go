@@ -408,7 +408,7 @@ type CollectFlag struct {
 	Interval             int64    `protobuf:"varint,1,opt,name=Interval,proto3" json:"Interval,omitempty"`
 	Duration             int64    `protobuf:"varint,2,opt,name=Duration,proto3" json:"Duration,omitempty"`
 	Workload             string   `protobuf:"bytes,3,opt,name=Workload,proto3" json:"Workload,omitempty"`
-	OutputPath           string   `protobuf:"bytes,4,opt,name=OutputPath,proto3" json:"OutputPath,omitempty"`
+	OutputDir            string   `protobuf:"bytes,4,opt,name=OutputDir,proto3" json:"OutputDir,omitempty"`
 	Block                string   `protobuf:"bytes,5,opt,name=Block,proto3" json:"Block,omitempty"`
 	Network              string   `protobuf:"bytes,6,opt,name=Network,proto3" json:"Network,omitempty"`
 	Type                 string   `protobuf:"bytes,7,opt,name=Type,proto3" json:"Type,omitempty"`
@@ -463,9 +463,9 @@ func (m *CollectFlag) GetWorkload() string {
 	return ""
 }
 
-func (m *CollectFlag) GetOutputPath() string {
+func (m *CollectFlag) GetOutputDir() string {
 	if m != nil {
-		return m.OutputPath
+		return m.OutputDir
 	}
 	return ""
 }

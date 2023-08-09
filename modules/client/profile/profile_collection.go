@@ -16,11 +16,10 @@ package profile
 import (
 	"fmt"
 	"io"
-	"path/filepath"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
-	
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
@@ -48,8 +47,8 @@ var collectionCommand = cli.Command{
 			Value: 1200,
 		},
 		cli.StringFlag{
-			Name:  "output_path,o",
-			Usage: "the output path of the collecting data",
+			Name:  "output_dir,o",
+			Usage: "the output dir name of the collecting data, full dir path would be /var/atune_data/collection/{output_dir}",
 			Value: "",
 		},
 		cli.StringFlag{
@@ -71,8 +70,8 @@ var collectionCommand = cli.Command{
 	Description: func() string {
 		desc := `
 	 collect data for train machine learning model, you must set the command options
-	 which has no default value, the output_path must be a absolute path.
-	     example: atune-adm collection -f mysql -i 5 -d 1200 -o /home -b sda -n eth0 -t mysql`
+	 which has no default value.
+	     example: atune-adm collection -f mysql -i 5 -d 1200 -o tmp -b sda -n eth0 -t mysql`
 		return desc
 	}(),
 	Action: collection,
@@ -118,9 +117,9 @@ func checkCollectionCtx(ctx *cli.Context) error {
 		return fmt.Errorf("error: app type must be specified")
 	}
 
-	if ctx.String("output_path") == "" {
+	if ctx.String("output_dir") == "" {
 		_ = cli.ShowCommandHelp(ctx, "collection")
-		return fmt.Errorf("error: output_path must be specified")
+		return fmt.Errorf("error: output_dir must be specified")
 	}
 
 	if ctx.Int64("interval") < 1 || ctx.Int64("interval") > 60 {
@@ -129,10 +128,6 @@ func checkCollectionCtx(ctx *cli.Context) error {
 
 	if ctx.Int64("duration") < ctx.Int64("interval")*10 {
 		return fmt.Errorf("error: collection duration value must be bigger than interval*10")
-	}
-
-	if !filepath.IsAbs(ctx.String("output_path")) {
-		return fmt.Errorf("error: output path must be absolute path")
 	}
 
 	return nil
@@ -149,16 +144,11 @@ func collection(ctx *cli.Context) error {
 	}
 	defer c.Close()
 
-	outputPath := ctx.String("output_path")
-	outputPath, err = filepath.Abs(outputPath)
-	if err != nil {
-		return err
-	}
 	message := PB.CollectFlag{
 		Interval:   ctx.Int64("interval"),
 		Duration:   ctx.Int64("duration"),
 		Workload:   ctx.String("filename"),
-		OutputPath: outputPath,
+		OutputDir:  ctx.String("output_dir"),
 		Block:      ctx.String("disk"),
 		Network:    ctx.String("network"),
 		Type:       ctx.String("app_type"),
