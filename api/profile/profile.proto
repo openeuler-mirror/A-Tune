@@ -76,7 +76,7 @@ message CollectFlag {
     int64 Interval = 1;
     int64 Duration = 2;
     string Workload = 3;
-    string OutputPath = 4;
+    string OutputDir = 4;
     string Block = 5;
     string Network = 6;
     string Type = 7;

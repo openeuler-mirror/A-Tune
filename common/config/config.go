@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/go-ini/ini"
-	
+
 	"gitee.com/openeuler/A-Tune/common/log"
 	"gitee.com/openeuler/A-Tune/common/utils"
 )
@@ -55,6 +55,7 @@ const (
 	DefaultCheckerPath      = "/usr/share/atuned/checker/"
 	DefaultBackupPath       = "/usr/share/atuned/backup/"
 	DefaultTuningLogPath    = "/var/atuned"
+	DefaultCollectionPath	= "/var/atune_data/collection/"
 )
 
 // log config

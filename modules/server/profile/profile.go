@@ -1019,8 +1019,8 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return fmt.Errorf("input:%s is invalid", message.GetWorkload())
 	}
 
-	if valid := utils.IsInputStringValid(message.GetOutputPath()); !valid {
-		return fmt.Errorf("input:%s is invalid", message.GetOutputPath())
+	if valid, _ := regexp.MatchString("^[a-zA-Z]+(_[a-zA-Z0-9]+)*$", message.GetOutputDir()); !valid {
+		return fmt.Errorf("output dir:%s is invalid", message.GetOutputDir())
 	}
 
 	if valid := utils.IsInputStringValid(message.GetType()); !valid {
@@ -1049,12 +1049,13 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 		return err
 	}
 
-	exist, err := utils.PathExist(message.GetOutputPath())
+	outputDir := path.Join(config.DefaultCollectionPath, message.GetOutputDir())
+	exist, err := utils.PathExist(message.GetOutputDir())
 	if err != nil {
 		return err
 	}
 	if !exist {
-		return fmt.Errorf("output_path %s is not exist", message.GetOutputPath())
+		_ = os.MkdirAll(outputDir, 0755)
 	}
 
 	if err = utils.InterfaceByName(message.GetNetwork()); err != nil {
@@ -1106,7 +1107,7 @@ func (s *ProfileServer) Collection(message *PB.CollectFlag, stream PB.ProfileMgr
 	collectorBody.Monitors = monitors
 	nowTime := time.Now().Format("20060702-150405")
 	fileName := fmt.Sprintf("%s-%s.csv", message.GetWorkload(), nowTime)
-	collectorBody.File = path.Join(message.GetOutputPath(), fileName)
+	collectorBody.File = path.Join(outputDir, fileName)
 	if include == "" {
 		include = "default"
 	}
