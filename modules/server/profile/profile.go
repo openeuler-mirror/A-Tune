@@ -1137,7 +1137,7 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 	}
 
 	DataPath := message.GetDataPath()
-	OutputPath := message.GetOutputPath()
+	ModelName := message.GetModelName()
 
 	compressPath, err := utils.CreateCompressFile(DataPath)
 	if err != nil {
@@ -1156,7 +1156,7 @@ func (s *ProfileServer) Training(message *PB.TrainMessage, stream PB.ProfileMgr_
 
 	trainBody := new(models.Training)
 	trainBody.DataPath = trainPath
-	trainBody.OutputPath = OutputPath
+	trainBody.ModelName = ModelName
 	trainBody.ModelPath = path.Join(config.DefaultAnalysisPath, "models")
 
 	success, err := trainBody.Post()

@@ -84,7 +84,7 @@ message CollectFlag {
 
 message TrainMessage {
     string DataPath = 1;
-    string OutputPath = 2;
+    string ModelName = 2;
 }
 
 message DetectMessage {

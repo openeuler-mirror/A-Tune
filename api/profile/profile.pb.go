@@ -493,7 +493,7 @@ func (m *CollectFlag) GetType() string {
 
 type TrainMessage struct {
 	DataPath             string   `protobuf:"bytes,1,opt,name=DataPath,proto3" json:"DataPath,omitempty"`
-	OutputPath           string   `protobuf:"bytes,2,opt,name=OutputPath,proto3" json:"OutputPath,omitempty"`
+	ModelName            string   `protobuf:"bytes,2,opt,name=ModelName,proto3" json:"ModelName,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -531,9 +531,9 @@ func (m *TrainMessage) GetDataPath() string {
 	return ""
 }
 
-func (m *TrainMessage) GetOutputPath() string {
+func (m *TrainMessage) GetModelName() string {
 	if m != nil {
-		return m.OutputPath
+		return m.ModelName
 	}
 	return ""
 }

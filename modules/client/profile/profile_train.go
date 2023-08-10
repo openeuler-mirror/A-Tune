@@ -16,16 +16,16 @@ package profile
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 
 	"github.com/urfave/cli"
 	CTX "golang.org/x/net/context"
-	
+
 	PB "gitee.com/openeuler/A-Tune/api/profile"
 	"gitee.com/openeuler/A-Tune/common/client"
 	SVC "gitee.com/openeuler/A-Tune/common/service"
 	"gitee.com/openeuler/A-Tune/common/utils"
+	"gitee.com/openeuler/A-Tune/common/config"
 )
 
 var trainCommand = cli.Command{
@@ -39,8 +39,8 @@ var trainCommand = cli.Command{
 			Value: "",
 		},
 		cli.StringFlag{
-			Name:  "output_file,o",
-			Usage: "the model to be generated",
+			Name:  "model_name,m",
+			Usage: "the model name of generate model",
 			Value: "",
 		},
 	},
@@ -48,9 +48,9 @@ var trainCommand = cli.Command{
 		desc := `
 	 training a new model with the self collected data, data_path option specified
 	 the path that storage the collected data, the collected data must have more 
-	 than two workload type. output_file specified the file path where to store
+	 than two workload type. model_name specified the name of model to be generated
 	 the trained model, which must be end with .m.
-	     example: atune-adm train --data_path=./data --output_file=./model/trained.m`
+	     example: atune-adm train --data_path=/home/data --model_name=trained.m`
 		return desc
 	}(),
 	Action: train,
@@ -82,13 +82,13 @@ func checkTrainCtx(ctx *cli.Context) error {
 		return fmt.Errorf("input:%s is invalid", dataPath)
 	}
 
-	outputPath := ctx.String("output_file")
-	if outputPath == "" {
+	modelName := ctx.String("model_name")
+	if modelName == "" {
 		_ = cli.ShowCommandHelp(ctx, "train")
-		return fmt.Errorf("error: output_file must be specified")
+		return fmt.Errorf("error: model_name must be specified")
 	}
-	if !utils.IsInputStringValid(outputPath) {
-		return fmt.Errorf("input:%s is invalid", outputPath)
+	if !utils.IsInputStringValid(modelName) {
+		return fmt.Errorf("input:%s is invalid", modelName)
 	}
 
 	return nil
@@ -103,23 +103,8 @@ func train(ctx *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	outputPath, err := filepath.Abs(ctx.String("output_file"))
-	if err != nil {
-		return err
-	}
 
-	dir := filepath.Dir(outputPath)
-
-	exist, err := utils.PathExist(dir)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		err = os.MkdirAll(dir, utils.FilePerm)
-		if err != nil {
-			return err
-		}
-	}
+	modelName := ctx.String("model_name")
 
 	c, err := client.NewClientFromContext(ctx)
 	if err != nil {
@@ -128,7 +113,7 @@ func train(ctx *cli.Context) error {
 	defer c.Close()
 
 	svc := PB.NewProfileMgrClient(c.Connection())
-	stream, err := svc.Training(CTX.Background(), &PB.TrainMessage{DataPath: dataPath, OutputPath: outputPath})
+	stream, err := svc.Training(CTX.Background(), &PB.TrainMessage{DataPath: dataPath, ModelName: modelName})
 	if err != nil {
 		return err
 	}
@@ -145,6 +130,7 @@ func train(ctx *cli.Context) error {
 		}
 		utils.Print(reply)
 	}
-	fmt.Println("the model generate path:", outputPath)
+	modelPath := fmt.Sprintf("%s/models/%s", config.DefaultAnalysisPath, modelName)
+	fmt.Println("the model generate path:", modelPath)
 	return nil
 }
