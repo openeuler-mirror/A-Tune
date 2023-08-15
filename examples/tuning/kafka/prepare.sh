@@ -44,12 +44,36 @@ if [ "$setup_new_ssh_key" = "y" ]; then
     ssh-copy-id -i $working_directory/client_ssh_key root@"$kafka_client_ip"
 fi
 
+read -p "enter version of kafka to download in https://dlcdn.apache.org/kafka/ or skip if using latest version:" version
+
+wget https://dlcdn.apache.org/kafka --no-check-certificate
+if [ -z "$version" ]; then
+    version=$(cat kafka | grep -oP '\d+\.\d+\.\d+' | tail -1)
+    echo "using version $version"
+else
+    if grep -q $version kafka; then
+        echo "found version $version"
+    else
+        echo "no version $version in https://dlcdn.apache.org/kafka/"
+        version=$(cat kafka | grep -oP '\d+\.\d+\.\d+' | tail -1)
+        echo "using $version instead"
+    fi
+fi
+rm -rf kafka
+
+wget https://dlcdn.apache.org/kafka/$version/ --no-check-certificate
+zip_name=$(grep "$version.tgz\"" index.html | awk -F "a href=" '{print $2}' | awk -F '"' '{print $2}' | tail -1 | awk -F | awk -F '.tgz' '{print $1}')
+rm -rf index.html
+
+
 echo "update manager.sh, launcher_on_server.sh and benchmark_on_client.sh with value just entered..."
 sed -i "s#KAFKA_DIR=.*#KAFKA_DIR=$kafka_dir#g" $working_directory/manager.sh
-sed -i "s#working_dir=.*.#working_dir=$working_directory#g" $atune_directory/kafka_client.yaml
-sed -i "s#working_dir=.*.#working_dir=$working_directory#g" $atune_directory/kafka_server.yaml
+sed -i "s#working_dir#$working_directory#g" $atune_directory/kafka_client.yaml
+sed -i "s#working_dir#$working_directory#g" $atune_directory/kafka_server.yaml
 sed -i "s#KAFKA_SERVER_IP=.*#KAFKA_SERVER_IP=$kafka_server_ip#g" $working_directory/benchmark_on_client.sh
+sed -i "s#KAFKA_DIR=.*#KAFKA_DIR=$kafka_dir#g" $working_directory/benchmark_on_client.sh
 sed -i "s#KAFKA_CLIENT_IP=.*#KAFKA_CLIENT_IP=$kafka_client_ip#g" $working_directory/launcher_on_server.sh
+sed -i "s#WORKING_DIR=.*#WORKING_DIR=$working_directory#g" $working_directory/launcher_on_server.sh
 
 echo "copy benchmark script to kafka-client" "$kafka_client_ip"
 if [ "$setup_new_ssh_key" = "y" ]; then
@@ -58,15 +82,15 @@ else
     scp $working_directory/benchmark_on_client.sh root@"$kafka_client_ip":/root/
 fi
 
-if [ -f "$working_directory/kafka_2.13-3.2.0.tgz" ]; then
+if [ -f "$working_directory/$zip_name.tgz" ]; then
     echo "Kafka release exist on local."
 else
     echo "download Kafka release on kafka-server."
-    wget https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.2.0.tgz
+    wget https://dlcdn.apache.org/kafka/$version/$zip_name.tgz --no-check-certificate
 fi
 
 echo "copy Kafka release to kafka-client."
-scp -i $working_directory/client_ssh_key $working_directory/kafka_2.13-3.2.0.tgz root@"$kafka_client_ip":/root/
+scp -i $working_directory/client_ssh_key $working_directory/$zip_name.tgz root@"$kafka_client_ip":/root/
 
 echo "install tar and jdk runtime on kafka-server"
 yum install -y tar java
@@ -74,11 +98,11 @@ echo "install tar and jdk runtime on kafka-client"
 ssh -i $working_directory/client_ssh_key -t root@"$kafka_client_ip" "yum install -y tar java;"
 
 echo "extract Kafka release tarball on kafka-server."
-tar -xzf $working_directory/kafka_2.13-3.2.0.tgz
-mv $working_directory/kafka_2.13-3.2.0/ $working_directory/kafka
+tar -xzf $working_directory/$zip_name.tgz
+mv $working_directory/$zip_name/ $working_directory/kafka
 
 echo "extract Kafka release tarball on kafka-client."
-ssh -i $working_directory/client_ssh_key -t root@"$kafka_client_ip" "tar -xzf /root/kafka_2.13-3.2.0.tgz"
+ssh -i $working_directory/client_ssh_key -t root@"$kafka_client_ip" "tar -xzf /root/$zip_name.tgz"
 
 echo "modify kafka server configuration"
 echo "listeners=PLAINTEXT://0.0.0.0:9092

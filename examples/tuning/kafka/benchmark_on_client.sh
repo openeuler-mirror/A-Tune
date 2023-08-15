@@ -18,7 +18,7 @@
 # @Desc      :   kafka benchmark script
 # #############################################
 
-KAFKA_DIR=/root/kafka_2.13-3.2.0
+KAFKA_DIR=$KAFKA_DIR
 KAFKA_PRODUCER_TEST=$KAFKA_DIR/bin/kafka-producer-perf-test.sh
 KAFKA_CONSUMER_TEST=$KAFKA_DIR/bin/kafka-consumer-perf-test.sh
 KAFKA_SERVER_IP='will be replaced after running prepare.sh'

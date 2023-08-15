@@ -14,7 +14,7 @@
 
 Before tuning, we need to deploy Kafka first.
 
-You can download the Kafka release tarball(<https://dlcdn.apache.org/kafka/3.2.0/kafka_2.13-3.2.0.tgz>) and put it under this directory so that the deployment script will skip the download. This tarball will be sent to the client by scp cause we will use the benchmark tool included in it.
+You can download the Kafka release tarball(<https://dlcdn.apache.org/kafka/>) and put it under this directory so that the deployment script will skip the download. This tarball will be sent to the client by scp cause we will use the benchmark tool included in it.
 
 Running `prepare.sh` to deploy, follow the hint. The script will create a new ssh-key from server to client if not set up yet.
 
