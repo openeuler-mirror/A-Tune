@@ -46,14 +46,13 @@ clean:
 	rm -rf $(PKGPATH)/*
 
 cleanall: clean
-	rm -rf $(DESTDIR)/etc/atuned/
+	rm -rf $(DESTDIR)/etc/atune*
 	rm -rf $(DESTDIR)$(PREFIX)/lib/atuned/
 	rm -rf $(DESTDIR)$(PREFIX)/share/atuned/
 	rm -rf $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
-	rm -rf $(DESTDIR)/var/atuned/
-	rm -rf $(DESTDIR)/var/atune_data/
+	rm -rf $(DESTDIR)/var/atune*
 
 db:
 	sqlite3 database/atuned.db ".read database/init.sql"
@@ -72,14 +71,13 @@ libinstall:
 	@echo "BEGIN INSTALL A-Tune..."
 	mkdir -p $(BINDIR)
 	mkdir -p $(SYSTEMDDIR)
-	rm -rf $(DESTDIR)/etc/atuned/
+	rm -rf $(DESTDIR)/etc/atune*
 	rm -rf $(DESTDIR)$(PREFIX)/lib/atuned/
 	rm -rf $(DESTDIR)$(PREFIX)/share/atuned/
 	rm -rf $(DESTDIR)$(PREFIX)/$(LIBEXEC)/atuned/
 	rm -rf $(DESTDIR)/var/lib/atuned/
 	rm -rf $(DESTDIR)/var/run/atuned/
-	rm -rf $(DESTDIR)/var/atuned/
-	rm -rf $(DESTDIR)/var/atune_data/
+	rm -rf $(DESTDIR)/var/atune*
 	mkdir -p $(DESTDIR)/etc/atuned/tuning
 	mkdir -p $(DESTDIR)/etc/atuned/rules
 	mkdir -p $(DESTDIR)/etc/atuned/training
