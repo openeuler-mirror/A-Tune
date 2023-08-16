@@ -7,6 +7,9 @@ Requires=polkit.service
 Type=notify
 ExecStart=/usr/bin/atuned
 SuccessExitStatus=100
+Restart=on-failure
+RestartSec=3s
+TimeoutSec=1m
 
 [Install]
 WantedBy=multi-user.target
