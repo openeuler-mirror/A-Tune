@@ -294,7 +294,7 @@ func (p *Profile) ItemSort() error {
 			} else {
 				itemQuery, err := sqlstore.GetPropertyItem(key.Name())
 				if err != nil {
-					log.Errorf("key %s is not exist in tuned_item", key.Name())
+					log.Infof("key %s is not exist in tuned_item", key.Name())
 					itemName = "OTHERS"
 				} else {
 					itemName = itemQuery
