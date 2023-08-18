@@ -1,7 +1,7 @@
 project: "mysql_sysbench"
 maxiterations: 2048
 startworkload: "taskset -c 0,1 systemctl start mysql"
-stopworkload: "systemctl stop mysql"
+stopworkload: "systemctl stop mysql && sleep 5"
 object : 
   -
     name : "kernel.numa_balancing"

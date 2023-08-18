@@ -45,7 +45,7 @@ rm -rf /etc/my.cnf
 cp my.cnf /etc
 kill -9 `pidof mysqld`
 rm -rf /usr/local/mysql/data/*
-eval $add_path
+eval $cmd_add_path
 mysqld --user=root --initialize-insecure
 
 
@@ -71,6 +71,11 @@ flush privileges;
 create database sbtest;
 quit
 EOF
+
+if [ ! -f /usr/lib64/libmysqlclient.so.* ]; then
+    echo "ln libmysqlclient.so.21 to /usr/lib64"
+    ln -s /usr/local/mysql/lib/libmysqlclient.so.21 /usr/lib64
+fi
 
 
 echo "install sysbench..."
@@ -103,6 +108,10 @@ else
     sed -i "s#stopworkload:.*#stopworkload: \"systemctl stop mysql\" #g" $path/mysql_sysbench_server.yaml
 fi
 
+read -p "enter tables of sysbench to used:" tables
+read -p "enter table_size of sysbench to used:" table_size
+sed -i "s#TABLES=.*#TABLES=$tables#g" $path/mysql_sysbench_benchmark.sh
+sed -i "s#TABLE_SIZE=.*#TABLE_SIZE=$table_size#g" $path/mysql_sysbench_benchmark.sh
 
 echo "copy the server yaml file to /etc/atuned/tuning/"
 cp $path/mysql_sysbench_server.yaml /etc/atuned/tuning/
