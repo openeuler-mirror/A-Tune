@@ -1,0 +1,195 @@
+project: "mariadb"
+maxiterations: 100
+startworkload: "systemctl start mariadb"
+stopworkload: "systemctl stop mariadb"
+object : 
+  -
+    name : "mariadb.key_buffer_size"
+    info :
+        desc : "Index parameters of the myisam storage engine"
+        get : "cat /etc/my.cnf | grep key_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/key_buffer_size.*/key_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 536870912
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.max_allowed_packet"
+    info :
+        desc : "Maximum number of received packets"
+        get : "cat /etc/my.cnf | grep max_allowed_packet | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/max_allowed_packet.*/max_allowed_packet = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 104857600
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.table_open_cache"
+    info :
+        desc : "Table cache for storing data"
+        get : "cat /etc/my.cnf | grep table_open_cache | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/table_open_cache.*/table_open_cache = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 16
+          - 1000000
+        step : 2
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.back_log"
+    info :
+        desc : "The number of new requests stored in the stack"
+        get : "cat /etc/my.cnf | grep back_log | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/back_log.*/back_log = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 16
+          - 65536
+        dtype : "int"
+  -
+    name : "mariadb.sort_buffer_size"
+    info :
+        desc : "Cache used for sorting"
+        get : "cat /etc/my.cnf | grep sort_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/sort_buffer_size.*/sort_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 256
+          - 104857600
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.read_buffer_size"
+    info :
+        desc : "the buffer allocated to each thread during sequential table scanning."
+        get : "cat /etc/my.cnf | grep read_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/read_buffer_size.*/read_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 104857600
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.read_rnd_buffer_size"
+    info :
+        desc : "the buffer allocated to each thread when the table is read randomly"
+        get : "cat /etc/my.cnf | grep read_rnd_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/read_rnd_buffer_size.*/read_rnd_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 104857600
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.myisam_sort_buffer_size"
+    info :
+        desc : "the buffer required for reordering when the MyISAM table changes"
+        get : "cat /etc/my.cnf | grep myisam_sort_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/myisam_sort_buffer_size.*/myisam_sort_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 104857600
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.thread_cache_size"
+    info :
+        desc : "Number of threads saved in the cache that are reused"
+        get : "cat /etc/my.cnf | grep thread_cache_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/thread_cache_size.*/thread_cache_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 8
+          - 1000
+        dtype : "int"
+  -
+    name : "mariadb.max_connections"
+    info :
+        desc : "the max number of connections"
+        get : "cat /etc/my.cnf | grep max_connections | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/max_connections.*/max_connections = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 10
+          - 65536
+        dtype : "int"
+  -
+    name : "mariadb.max_heap_table_size"
+    info :
+        desc : "size of a memory table that can be created"
+        get : "cat /etc/my.cnf | grep max_heap_table_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/max_heap_table_size.*/max_heap_table_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 104857600
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.innodb_buffer_pool_size"
+    info :
+        desc : "size of innodb buffer pool"
+        get : "cat /etc/my.cnf | grep innodb_buffer_pool_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/innodb_buffer_pool_size.*/innodb_buffer_pool_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1024
+          - 1.37E+11
+        step : 1024
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.innodb_log_buffer_size"
+    info :
+        desc : "size of innodb log buffer"
+        get : "cat /etc/my.cnf | grep innodb_log_buffer_size | awk -F '=' '{print $2}' | awk '$1=$1'"
+        set : "sed -i 's/innodb_log_buffer_size.*/innodb_log_buffer_size = $value/g' /etc/my.cnf"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 104857600
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "vm.swappiness"
+    info :
+        desc : "A larger value indicates that the swap partition is used more actively. A smaller value indicates that the memory is used more actively."
+        get : "sysctl -n vm.swappiness"
+        set : "sysctl -w vm.swappiness=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 0
+          - 100
+        step : 1
+        items : 
+        dtype : "int"
