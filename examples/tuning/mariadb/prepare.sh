@@ -24,7 +24,7 @@ path=$(
 
 echo "install mariadb"
 yum install mariadb mariadb-server mariadb-devel -y
-cp /etc/my.cnf /etc/my-tmp.cnf
+mv /etc/my.cnf /etc/my-tmp.cnf
 cp my.cnf /etc/
 systemctl restart mariadb
 
@@ -56,3 +56,9 @@ while (($ret == 0)); do
   ret=$?
 done
 echo "loading data end"
+
+echo "cp mariadb_server.yaml to /etc/atuned/tuning"
+mkdir -p /etc/atuned/tuning
+cp $path/mariadb_server.yaml /etc/atuned/tuning
+
+echo "finish prepare"
