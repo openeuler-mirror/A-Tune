@@ -171,7 +171,7 @@ class WorkloadCharacterization:
         """
         from xgboost import XGBClassifier
         x_train, x_test, y_train, y_test = tts(x_axis, y_axis, test_size=0.3)
-        weights = list(class_weight.compute_class_weight('balanced', np.unique(y_train), y_train))
+        weights = list(class_weight.compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train))
         class_weights = dict(zip(np.unique(y_train), weights))
         w_array = np.ones(y_train.shape[0], dtype='float')
         for i, val in enumerate(y_train):
