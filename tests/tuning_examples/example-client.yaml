@@ -1,5 +1,5 @@
 project: "example"
-engine: "bayes"
+engine: "gbrt"
 random_starts: 5
 iterations : 11
 benchmark : "sh `pwd`/tuning_examples/benchmarks.sh"
