@@ -96,22 +96,32 @@ if [ $? -ne 0 ]; then
     exit 1;   
 fi
 
-
-echo "update the client and server yaml files"
-sed -i "s#sh .*/mysql_sysbench_benchmark.sh#sh $path/mysql_sysbench_benchmark.sh#g" $path/mysql_sysbench_client.yaml
-sed -i "s#cat .*/sysbench_oltp_read_write.log#cat $path/sysbench_oltp_read_write.log#g" $path/mysql_sysbench_client.yaml
-if [[ "$version" != *"20.03"* ]]; then
-    sed -i "s#startworkload:.*#startworkload: \"\`mysqld \& \` \& sleep 10\" #g" $path/mysql_sysbench_server.yaml
-    sed -i "s#stopworkload:.*#stopworkload: \"mysqladmin -S/var/lib/mysql/mysql.sock shutdown -uroot -p123456\" #g" $path/mysql_sysbench_server.yaml
-else
-    sed -i "s#startworkload:.*#startworkload: \"taskset -c 0,1 systemctl start mysql\" #g" $path/mysql_sysbench_server.yaml
-    sed -i "s#stopworkload:.*#stopworkload: \"systemctl stop mysql\" #g" $path/mysql_sysbench_server.yaml
-fi
-
 read -p "enter tables of sysbench to used:" tables
 read -p "enter table_size of sysbench to used:" table_size
-sed -i "s#TABLES=.*#TABLES=$tables#g" $path/mysql_sysbench_benchmark.sh
-sed -i "s#TABLE_SIZE=.*#TABLE_SIZE=$table_size#g" $path/mysql_sysbench_benchmark.sh
+echo "update the client and server yaml files"
+sed -i "s#PATH#$path#g" $path/mysql_sysbench_client.yaml
+if [ "$is_restart" = "restart" ];then
+    sed -i "s#TABLES=.*#TABLES=$tables#g" $path/mysql_sysbench_benchmark.sh
+    sed -i "s#TABLE_SIZE=.*#TABLE_SIZE=$table_size#g" $path/mysql_sysbench_benchmark.sh
+
+    if [[ "$version" != *"20.03"* ]]; then
+        sed -i "s#startworkload:.*#startworkload: \"\`mysqld \& \` \& sleep 10\" #g" $path/mysql_sysbench_server.yaml
+        sed -i "s#stopworkload:.*#stopworkload: \"mysqladmin -S/var/lib/mysql/mysql.sock shutdown -uroot -p123456\" #g" $path/mysql_sysbench_server.yaml
+    else
+        sed -i "s#startworkload:.*#startworkload: \"taskset -c 0,1 systemctl start mysql\" #g" $path/mysql_sysbench_server.yaml
+        sed -i "s#stopworkload:.*#stopworkload: \"systemctl stop mysql\" #g" $path/mysql_sysbench_server.yaml
+    fi
+else
+    sed -i "s#mysql_sysbench_benchmark.sh#benchmark.sh#g" $path/mysql_sysbench_client.yaml
+    sed -i "s#PATH#$path#g" $path/server.yaml
+    sed -i "s#TABLES=.*#TABLES=$tables#g" $path/benchmark.sh
+    sed -i "s#TABLE_SIZE=.*#TABLE_SIZE=$table_size#g" $path/benchmark.sh
+fi
 
 echo "copy the server yaml file to /etc/atuned/tuning/"
-cp $path/mysql_sysbench_server.yaml /etc/atuned/tuning/
+rm -rf /etc/atuned/tuning/mysql_sysbench_server.yaml
+if [ "$is_restart" = "restart" ];then
+    cp $path/mysql_sysbench_server.yaml /etc/atuned/tuning/
+else
+    cp $path/server.yaml /etc/atuned/tuning/mysql_sysbench_server.yaml
+fi

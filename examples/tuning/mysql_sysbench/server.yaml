@@ -1,0 +1,156 @@
+project: "mysql_sysbench"
+maxiterations: 2048
+startworkload:
+stopworkload:
+object :
+  -
+    name : "kernel.numa_balancing"
+    info :
+        desc : "Specifies whether to enable NUMA automatic balancing."
+        get : "sysctl -n kernel.numa_balancing"
+        set : "sysctl -w kernel.numa_balancing=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "kernel.sched_autogroup_enabled"
+    info :
+        desc : "When enabled, the kernel creates task groups to optimize desktop program scheduling.
+0: disabled
+1: enabled"
+        get : "sysctl -n kernel.sched_autogroup_enabled"
+        set : "sysctl -w kernel.sched_autogroup_enabled=$value"
+        needrestart : "false"
+        type : "discrete"
+        options :
+          - "0"
+          - "1"
+        dtype : "string"
+  -
+    name : "kernel.sched_wakeup_granularity_ns"
+    info :
+        desc : "This variable indicates the base of the minimum time that a process should run after it is woken up. The smaller the base, the higher the probability of preemption."
+        get : "sysctl -n kernel.sched_wakeup_granularity_ns"
+        set : "sysctl -w kernel.sched_wakeup_granularity_ns=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1000000
+          - 100000000
+        step : 1000000
+        items :
+        dtype : "int"
+  -
+    name : "kernel.sched_min_granularity_ns"
+    info :
+        desc : "Minimum running time of a process on the CPU. During this time, the kernel does not proactively select other processes for scheduling (in nanoseconds)."
+        get : "sysctl -n kernel.sched_min_granularity_ns"
+        set : "sysctl -w kernel.sched_min_granularity_ns=$value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 1000000
+          - 100000000
+        step : 1000000
+        items :
+        dtype : "int"
+  -
+    name : "innodb_io_capacity"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_io_capacity'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_io_capacity'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_io_capacity $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 100
+          - 2000
+        dtype : "int"
+  -
+    name : "innodb_spin_wait_delay"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_spin_wait_delay'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_spin_wait_delay'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_io_capacity $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 2
+          - 30
+        dtype : "int"
+  -
+    name : "innodb_sync_spin_loops"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_sync_spin_loops'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_sync_spin_loops'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_sync_spin_loops $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 10
+          - 500
+        dtype : "int"
+  -
+    name : "innodb_log_buffer_size"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_log_buffer_size'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_log_buffer_size'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_log_buffer_size $value"
+        needrestart : "false"
+        type : "discrete"
+        scope :
+          - 8192
+          - 1048576
+        step : 1024
+        dtype : "int"
+  -
+    name : "innodb_lru_scan_depth"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_lru_scan_depth'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_lru_scan_depth'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_lru_scan_depth $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 100
+          - 2000
+        dtype : "int"
+  -
+    name : "innodb_thread_concurrency"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_thread_concurrency'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_thread_concurrency'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_thread_concurrency $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 300
+        dtype : "int"
+  -
+    name : "innodb_flush_log_at_trx_commit"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_flush_log_at_trx_commit'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_flush_log_at_trx_commit'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh innodb_flush_log_at_trx_commit $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 2
+        dtype : "int"
+  -
+    name : "sync_binlog"
+    info :
+        desc : "MySQL [mysqld] parameters 'sync_binlog'."
+        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'sync_binlog'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        set : "sh PATH/set_params.sh sync_binlog $value"
+        needrestart : "false"
+        type : "continuous"
+        scope :
+          - 0
+          - 2
+        dtype : "int"
