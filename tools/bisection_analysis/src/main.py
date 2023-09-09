@@ -1,6 +1,7 @@
 import subprocess
 import os
 import re
+import sys
 
 
 def extract_execution_time(text):
@@ -38,8 +39,9 @@ def get_commits(start_commit, stop_commit):
     return commits
 
 
-def compile_ffmpeg(commit):
+def compile_project(commit):
     print(f"Compiling FFmpeg at commit {commit}...")
+    # 重新编译项目
     subprocess.run(["../scripts/compile-ffmpeg.sh", commit])
 
 
@@ -61,18 +63,18 @@ def main(start_commit, stop_commit):
     best_improvement = -1
 
     # 计算 start 和 end 的运行时间
-    compile_ffmpeg(commits[left])
+    compile_project(commits[left])
     start_benchmark = benchmark()
     print(f"Start commit {commits[left]} executed in {start_benchmark} milliseconds.")
 
-    compile_ffmpeg(commits[right])
+    compile_project(commits[right])
     end_benchmark = benchmark()
     print(f"End commit {commits[right]} executed in {end_benchmark} milliseconds.")
 
     while left < right:
         mid = (left + right) // 2
 
-        compile_ffmpeg(commits[mid])
+        compile_project(commits[mid])
         mid_benchmark = benchmark()
         print(f"Mid commit {commits[mid]} executed in {mid_benchmark} milliseconds.")
 
@@ -93,16 +95,8 @@ def main(start_commit, stop_commit):
 
     print(f"The commit with the highest benchmark improvement is {best_commit}")
 
-if __name__ == "__main__":
-    main("start_commit_hash", "stop_commit_hash")
-
-
 
 if __name__ == "__main__":
-    # start_hash = "99da411322e1e8603149033138d6e87b58fe41a3"
-    start_hash = "c7049013247ac6c4851cf1b4ad6e22f0461a775a"
-    end_hash = "a3b434e1515ecb0de0c4b92c6b7659e510b980c2"
+    start_hash = sys.argv[1]
+    end_hash = sys.argv[2]
     main(start_hash, end_hash)
-
-# git rev-list --count 99da411322e1e8603149033138d6e87b58fe41a3..a3b434e1515ecb0de0c4b92c6b7659e510b980c2
-# 中间一共有 753 个 commit
