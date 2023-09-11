@@ -100,6 +100,7 @@ read -p "enter tables of sysbench to used:" tables
 read -p "enter table_size of sysbench to used:" table_size
 echo "update the client and server yaml files"
 sed -i "s#PATH#$path#g" $path/mysql_sysbench_client.yaml
+sed -i "s#PATH#$path#g" $path/get_eval.sh
 if [ "$is_restart" = "restart" ];then
     sed -i "s#TABLES=.*#TABLES=$tables#g" $path/mysql_sysbench_benchmark.sh
     sed -i "s#TABLE_SIZE=.*#TABLE_SIZE=$table_size#g" $path/mysql_sysbench_benchmark.sh
