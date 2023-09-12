@@ -71,4 +71,23 @@ class EngineConfig:
             EngineConfig.db_passwd_key = get_or_default(config, 'database', 'db_passwd_key', '')
             EngineConfig.db_passwd_iv = get_or_default(config, 'database', 'db_passwd_iv', '')
             EngineConfig.db_analysis_type = get_or_default_list(config, 'database', 'db_analysis_type', [])
+        
+        # bottleneck
+        # computing
+        EngineConfig.cpu_stat_util = get_or_default(config, 'bottleneck', 'cpu_stat_util', '80')
+        EngineConfig.cpu_stat_cutil = get_or_default(config, 'bottleneck', 'cpu_stat_cutil', '80')
+        EngineConfig.perf_stat_ipc = get_or_default(config, 'bottleneck', 'perf_stat_ipc', '1')
+        # memory
+        EngineConfig.mem_bandwidth_total_util = get_or_default(config, 'bottleneck', 'mem_bandwidth_total_util', '70')
+        EngineConfig.mem_vmstat_util_swap = get_or_default(config, 'bottleneck', 'mem_vmstat_util_swap', '70')
+        EngineConfig.mem_vmstat_util_cpu = get_or_default(config, 'bottleneck', 'mem_vmstat_util_cpu', '70')
+        # network
+        EngineConfig.net_stat_ifutil = get_or_default(config, 'bottleneck', 'net_stat_ifutil', '70')
+        EngineConfig.net_estat_errs = get_or_default(config, 'bottleneck', 'net_estat_errs', '1')
+        # network I/O
+        EngineConfig.net_stat_rxkbs = get_or_default(config, 'bottleneck', 'net_stat_rxkbs', '70')
+        EngineConfig.net_stat_txkbs = get_or_default(config, 'bottleneck', 'net_stat_txkbs', '70')
+        #disk I/OF
+        EngineConfig.storage_stat_util = get_or_default(config, 'bottleneck', 'storage_stat_util', '70')
+            
         return True
