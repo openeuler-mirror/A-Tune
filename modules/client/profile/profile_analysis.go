@@ -44,6 +44,10 @@ var profileAnalysisCommand = cli.Command{
 			Name:  "characterization, c",
 			Usage: "only analysis the workload type",
 		},
+		cli.BoolFlag{
+			Name:  "bottleneck, b",
+			Usage: "identify and tune system bottlenecks",
+		},
 		cli.StringFlag{
 			Name:  "times, t",
 			Usage: "specify the collection times",
@@ -65,7 +69,9 @@ var profileAnalysisCommand = cli.Command{
 	     example: atune-adm analysis --model ./self_trained.m
 	 you can only analysis the workload type.
 	     example: atune-adm analysis --characterization
-	you can specify the collecting times.
+	 you can identify and tune system bottlenecks.
+		 example: atune-adm analysis --bottleneck
+	 you can specify the collecting times.
 	     example: atune-adm analysis -t 5
 	 you can specify the script to be executed.
 	     example: atune-adm analysis -s script.sh`
@@ -132,7 +138,7 @@ func profileAnalysis(ctx *cli.Context) error {
 		flag = "start"
 	}
 	stream, _ := svc.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile, 
-		Characterization: ctx.Bool("characterization"), Times: times, Flag: flag, Id:id})
+		Characterization: ctx.Bool("characterization"), Bottleneck: ctx.Bool("bottleneck"), Times: times, Flag: flag, Id:id})
 
 	endCollect := false
 	for {
@@ -150,7 +156,7 @@ func profileAnalysis(ctx *cli.Context) error {
 			svcend := PB.NewProfileMgrClient(c.Connection())
 			endCollect = true
 			_, _ = svcend.Analysis(CTX.Background(), &PB.AnalysisMessage{Name: appname, Model: modelFile,
-				Characterization: ctx.Bool("characterization"), Times: times, Flag: "end", Id:id})
+				Characterization: ctx.Bool("characterization"), Bottleneck: ctx.Bool("bottleneck"), Times: times, Flag: "end", Id:id})
 		}
 	}
 
