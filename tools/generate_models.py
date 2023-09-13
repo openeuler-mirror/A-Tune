@@ -22,7 +22,8 @@ import sys
 
 FILE_PATH = os.path.realpath(os.path.dirname(__file__))
 sys.path.insert(0, FILE_PATH + "/../")
-from analysis.optimizer.workload_characterization import WorkloadCharacterization
+# from analysis.optimizer.workload_characterization import WorkloadCharacterization
+from analysis.optimizer.app_characterization import AppCharacterization
 
 
 def main(csv_path, model_path, feature_selection, search):
@@ -34,7 +35,7 @@ def main(csv_path, model_path, feature_selection, search):
     :param search: enable the grid search for model train, default value is False
     :return: None
     """
-    processor = WorkloadCharacterization(model_path)
+    processor = AppCharacterization(model_path, mode="train")
     processor.train(csv_path, feature_selection, search)
 
 
