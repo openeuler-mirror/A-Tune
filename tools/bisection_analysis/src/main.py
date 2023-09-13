@@ -8,8 +8,6 @@ The tool is used for bisection analysising the commits.
 """
 
 # Function to extract execution time from a text
-
-
 def extract_execution_time(text):
     match = re.search(r"Compile script executed in (\d+) milliseconds\.", text)
     if match:
@@ -68,7 +66,7 @@ def benchmark(benchmark_script_path):
         print(f"Benchmark script executed in {result} milliseconds.")
     except Exception as e:
         print(f"Error while running benchmark script: {e}")
-    return float(result)  # 假设基准测试脚本返回浮点数
+    return float(result)
 
 
 # Main function
@@ -138,7 +136,7 @@ if __name__ == "__main__":
     compile_script_path = sys.argv[3]
     project_path = sys.argv[4]
     benchmark_script_path = sys.argv[5]
-    log_path = sys.argv[6] if len(sys.argv) > 6 else "../logs/ffmpeg.log"
+    log_path = sys.argv[6] if len(sys.argv) > 6 else "../logs/compile.log"
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
     main(start_hash, end_hash, compile_script_path,
          project_path, benchmark_script_path, log_path)
