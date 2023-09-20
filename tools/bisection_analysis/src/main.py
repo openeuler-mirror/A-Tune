@@ -8,16 +8,15 @@ The tool is used for bisection analysising the commits.
 """
 
 # Function to extract execution time from a text
+
+
 def extract_execution_time(text):
     match = re.search(r"Compile script executed in (\d+) milliseconds\.", text)
-    if match:
-        execution_time = float(match.group(1))
-        return execution_time
-    else:
-        return -1
-
+    return float(match.group(1)) if match else -1
 
 # Function to fetch commits within a range
+
+
 def get_commits(start_commit, stop_commit, project_path):
     print("Fetching commits...")
     commits_file_name = "commits.txt"
@@ -29,22 +28,28 @@ def get_commits(start_commit, stop_commit, project_path):
             all_commits = file.read().split('\n')
         print("Commits loaded from file.")
     else:
-        # If commits file doesn't exist, fetch commits from the repository
-        os.chdir("{project_path}")
-        all_commits = subprocess.getoutput("git rev-list --reverse HEAD")
-        all_commits = all_commits.split('\n')
-        with open(commits_file_name, 'w') as file:
-            file.write('\n'.join(all_commits))
-        os.chdir("../../src")
-        print("Commits fetched from repository and saved to file.")
+        try:
+            os.chdir(project_path)
+            all_commits = subprocess.getoutput(
+                "git rev-list --reverse HEAD").split('\n')
+            with open(commits_file_path, 'w') as file:
+                file.write('\n'.join(all_commits))
+            os.chdir("../../src")
+            print("Commits fetched from the repository and saved to file.")
+        except Exception as e:
+            print(f"Error fetching commits: {e}")
+            return []
 
     # Find the indices of start_commit and stop_commit to get the commits within the range
-    start_index = all_commits.index(start_commit)
-    stop_index = all_commits.index(stop_commit)
-    commits = all_commits[start_index:stop_index+1]
-    print(f"Filtered commits from {start_commit} to {stop_commit}.")
-
-    return commits
+    try:
+        start_index = all_commits.index(start_commit)
+        stop_index = all_commits.index(stop_commit)
+        commits = all_commits[start_index:stop_index+1]
+        print(f"Filtered commits from {start_commit} to {stop_commit}.")
+        return commits
+    except ValueError:
+        print("Start commit or stop commit not found in the list of commits.")
+        return []
 
 
 # Function to compile the project at a specific commit
@@ -58,33 +63,35 @@ def compile_project(commit, compile_script_path, log_path):
 # Function to run a benchmark script and extract execution time
 def benchmark(benchmark_script_path):
     print("Running benchmark...")
-
-    result = -1
     try:
         result = subprocess.getoutput("bash " + benchmark_script_path)
         result = extract_execution_time(result)
         print(f"Benchmark script executed in {result} milliseconds.")
+        return float(result)  # Assuming the benchmark script returns a float
     except Exception as e:
         print(f"Error while running benchmark script: {e}")
-    return float(result)
+        return -1
 
 
 # Main function
 def main(start_commit, stop_commit, compile_script_path, project_path, benchmark_script_path, log_path):
     print("Starting search for commit with highest benchmark improvement...")
 
+    # Get the list of commits within the specified range
     commits = get_commits(start_commit, stop_commit, project_path)
+
     left = 0
     right = len(commits) - 1
     best_commit = None
     best_improvement = -1
 
-    # Calculate the execution time at the start and end commits
+    # Calculate the execution time at the start commit
     compile_project(commits[left], compile_script_path, log_path)
     start_benchmark = benchmark(benchmark_script_path)
     print(
         f"Start commit {commits[left]} executed in {start_benchmark} milliseconds.")
 
+    # Calculate the execution time at the end commit
     compile_project(commits[right], compile_script_path, log_path)
     end_benchmark = benchmark(benchmark_script_path)
     print(
@@ -95,7 +102,7 @@ def main(start_commit, stop_commit, compile_script_path, project_path, benchmark
     while left < right:
         mid = (left + right) // 2
 
-        # Handle corner cases where the commit is not suitable for benchmarking
+        # Handle cases where the commit may not be suitable for benchmarking
         mid_benchmark = -1
         while mid < right and mid_benchmark == -1:
             compile_project(commits[mid], compile_script_path, log_path)
@@ -124,6 +131,7 @@ def main(start_commit, stop_commit, compile_script_path, project_path, benchmark
 
         best_benchmark = min(best_benchmark, mid_benchmark)
 
+    # Print the results
     print(
         f"The commit with the highest benchmark improvement is {best_commit}")
     print(f"The benchmark of the best commit is {best_benchmark}")
@@ -131,12 +139,23 @@ def main(start_commit, stop_commit, compile_script_path, project_path, benchmark
 
 # Entry point of the script
 if __name__ == "__main__":
-    start_hash = sys.argv[1]
-    end_hash = sys.argv[2]
-    compile_script_path = sys.argv[3]
-    project_path = sys.argv[4]
-    benchmark_script_path = sys.argv[5]
+    # Check if the correct number of command-line arguments is provided
+    if len(sys.argv) < 6:
+        print(
+            "Usage: python script.py <start_commit> <stop_commit> <compile_script_path> <project_path> <benchmark_script_path> [log_path]")
+        sys.exit(1)
+
+    # Parse command-line arguments
+    start_commit = sys.argv[1]
+    stop_commit = sys.argv[2]
+    compile_script_path = sys.argv[3]  # Path to the compilation script
+    project_path = sys.argv[4]  # Path to the project directory
+    benchmark_script_path = sys.argv[5]  # Path to the benchmarking script
     log_path = sys.argv[6] if len(sys.argv) > 6 else "../logs/compile.log"
+
+    # Create the directory for the log file if it doesn't exist
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    main(start_hash, end_hash, compile_script_path,
+
+    # Call the main function with the parsed arguments
+    main(start_commit, stop_commit, compile_script_path,
          project_path, benchmark_script_path, log_path)

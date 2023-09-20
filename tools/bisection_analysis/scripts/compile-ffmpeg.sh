@@ -1,17 +1,28 @@
 #!/bin/bash
 
-# 跳转到 FFmpeg 源码目录
+# Change directory to the FFmpeg source code directory.
 cd ../projects/FFmpeg
 
-# 检出特定提交
+# Remove any existing build directory and clean up previous builds.
 rm -rf build
 make clean
+
+# Check out a specific commit or branch from the FFmpeg repository.
+# The desired commit or branch name is provided as an argument ($1).
 git checkout $1
 
-# 运行编译命令
+# Configure FFmpeg build settings:
+#   --prefix=./build   : Set the installation prefix to the 'build' directory.
+#   --enable-gpl       : Enable GPL (GNU General Public License) components.
+#   --enable-libx264   : Enable the libx264 codec library.
+# This prepares FFmpeg for compilation with the specified options.
 ./configure  --prefix=./build --enable-gpl --enable-libx264
+
+# Compile FFmpeg using multiple CPU cores to speed up the process.
 make -j
+
+# Install the compiled FFmpeg binaries and libraries into the 'build' directory.
 make install
 
-# 返回到原始目录
+# Return to the original working directory.
 cd -
