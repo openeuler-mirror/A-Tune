@@ -1,0 +1,4 @@
+# Install dependencies
+UnixBench: https://github.com/kdlucas/byte-unixbench
+Stream: https://github.com/jeffhammond/STREAM?tab=readme-ov-file
+pktgen: 

@@ -1,0 +1,17 @@
+2023-09-21 14:21:14,450 - root - INFO - This is a log message
+2023-09-21 14:21:14,488 - root - INFO - load_config.py start
+2023-09-21 14:21:20,764 - root - INFO - 请输入 {'172.22.60.188'} 的密码:
+2023-09-21 14:21:20,773 - paramiko.transport - INFO - Connected (version 2.0, client OpenSSH_8.0)
+2023-09-21 14:21:20,828 - paramiko.transport - INFO - Authentication (password) successful!
+2023-09-21 14:21:20,828 - root - INFO - {'172.22.70.189'} 与 {'172.22.60.188'} 连通性测试成功
+2023-09-21 14:21:20,829 - root - INFO - 本机与远程主机连通性测试成功
+2023-09-21 14:21:20,829 - root - INFO - 获取系统版本为 openEuler
+2023-09-21 14:21:20,829 - root - INFO - sysctl_res_file_name = 'sysctl@openEuler.txt',ulimit_res_file_name = 'ulimit@openEuler.txt',save_difflib_res = 'differ-2023-09-21-14-21-14.txt',save_statistical_res = 'statistical-2023-09-21-14-21-14.txt' 
+2023-09-21 14:21:20,839 - root - INFO - run command 'sysctl -a'
+2023-09-21 14:21:20,840 - root - INFO - run_sysctl_command_and_save_result successfully, save in './data/sysctl@openEuler.txt'
+2023-09-21 14:21:20,841 - root - INFO - run command 'ulimit -a'
+2023-09-21 14:21:20,841 - root - INFO - run_ulimit_command_and_save_result successfully, save in './data/ulimit@openEuler.txt'
+2023-09-21 14:21:25,377 - root - INFO - compare file1 = './data/sysctl@openEuler.txt', file2 = './data/sysctl@CentOSStream.txt'
+2023-09-21 14:21:25,377 - root - INFO - text1 in './data/sysctl@openEuler.txt', text2 in './data/sysctl@CentOSStream.txt'
+2023-09-21 14:21:25,377 - root - INFO - compare file1 and file2 by difflib successfully
+2023-09-21 14:21:25,388 - root - INFO - save diff_result to file './data/differ-2023-09-21-14-21-14.txt' successfully

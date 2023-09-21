@@ -1,0 +1,965 @@
+1类: ABI (Application Binary Interface) 相关设置
+    3类: abi.vsyscall32 1    启用32位系统调用接口，可能用于兼容旧的32位应用程序
+1类: 加密 (Crypto) 相关设置
+    3类: crypto.fips_enabled 0    FIPS (Federal Information Processing Standards) 加密标准未启用
+    3类: crypto.fips_name Red Hat Enterprise Linux 8 - Kernel Cryptographic API
+    3类: crypto.fips_version 4.18.0-499.el8.x86_64
+1类: 调试 (Debug) 相关设置
+    3类: debug.exception-trace 1    启用异常追踪
+    3类: debug.kprobes-optimization 1    启用kprobes优化
+1类: 设备 (Device) 相关设置
+    3类: dev.hpet.max-user-freq 64    HPET (High Precision Event Timer) 最大用户频率为64
+    3类: dev.i915.oa_max_sample_rate 100000    i915驱动OA (OpeAnaylstics)的最大采样率为100000
+    3类: dev.i915.perf_stream_paranoid 1    i915驱动性能流控制开启
+    3类: dev.mac_hid.mouse_button2_keycode 97    鼠标按钮2的键值设置为97
+    3类: dev.mac_hid.mouse_button3_keycode 100    鼠标按钮3的键值设置为100
+    3类: dev.mac_hid.mouse_button_emulation 0    禁用鼠标按钮仿真
+1类: RAID 相关设置
+    3类: dev.raid.speed_limit_max 200000    RAID速度上限为200000
+    3类: dev.raid.speed_limit_min 1000    RAID速度下限为1000
+1类: SCSI 相关设置
+    3类: dev.scsi.logging_level 0    禁用SCSI命令日志记录
+1类: 文件系统 (File System) 相关设置
+    3类: fs.aio-max-nr 1048576    AIO (Asynchronous I/O)最大请求数为1048576
+    3类: fs.aio-nr 0    当前进行中的AIO请求数为0
+    3类: fs.binfmt_misc.status enabled    binfmt_misc模块状态为enabled
+    3类: fs.dentry-state 109771    84353    45    0    17793    0    文件系统dentry状态
+    3类: fs.dir-notify-enable 1    启用目录通知功能
+    3类: fs.epoll.max_user_watches 3226624    单个用户可以设置的epoll观察者数目为3226624
+    3类: fs.file-max 1569928    系统同时打开的文件描述符上限为1569928
+    3类: fs.file-nr 5440    0    1569928    当前已分配的文件描述符数为5440
+1类: Inode与Dentry
+    3类: fs.inode-nr 84488    618    文件系统inode统计
+    3类: fs.inode-state 84488    618    0    0    0    0    0    文件系统inode状态
+  2类: 文件监控
+    3类: fs.inotify.max_queued_events 16384    inotify队列中最大事件数为16384
+    3类: fs.inotify.max_user_instances 128    单个用户可以设置的inotify实例数目为128
+    3类: fs.inotify.max_user_watches 117245    单个用户可以设置的inotify观察数目为117245
+    3类: fs.lease-break-time 45    租约终止时间为45秒
+    3类: fs.leases-enable 1    启用文件锁定
+    3类: fs.mount-max 100000    文件系统挂载点数上限为100000
+  2类: 管道与消息队列1
+    3类: fs.mqueue.msg_default 10    POSIX消息队列的默认消息数目为10
+    3类: fs.mqueue.msg_max 10    POSIX消息队列的最大消息数目为10
+    3类: fs.mqueue.msgsize_default 8192    POSIX消息队列的默认消息大小为8192字节
+    3类: fs.mqueue.msgsize_max 8192    POSIX消息队列的最大消息大小为8192字节
+    3类: fs.mqueue.queues_max 256    POSIX消息队列的最大队列数目为256
+    3类: fs.nr_open 1048576    单个进程可以打开的文件描述符数目上限为1048576
+    3类: fs.overflowgid 65534    指定文件系统的GID (group ID) 当文件系统出现错误时的溢出组ID
+    3类: fs.overflowuid 65534    指定文件系统的UID (user ID) 当文件系统出现错误时的溢出用户ID
+  2类: 管道与消息队列2
+    3类: fs.pipe-max-size 1048576    管道缓冲区最大大小为1048576字节
+    3类: fs.pipe-user-pages-hard 0    使用pipe缓冲区硬限制，限制为0
+    3类: fs.pipe-user-pages-soft 16384    使用pipe缓冲区软限制，限制为16384
+  2类: 文件访问控制
+    3类: fs.protected_fifos 0    不保护FIFO文件
+    3类: fs.protected_hardlinks 1    保护硬链接，阻止非特权用户创建硬链接
+    3类: fs.protected_regular 0    不保护常规文件
+    3类: fs.protected_symlinks 1    保护符号链接，阻止非特权用户创建符号链接
+  2类: 配额管理
+    3类: fs.quota.allocated_dquots 0    当前分配的磁盘配额数量为0
+    3类: fs.quota.cache_hits 0    磁盘配额缓存命中数为0
+    3类: fs.quota.drops 0    磁盘配额被删除数为0
+    3类: fs.quota.free_dquots 0    空闲磁盘配额数量为0
+    3类: fs.quota.lookups 0    磁盘配额查找数为0
+    3类: fs.quota.reads 0    磁盘配额读取数为0
+    3类: fs.quota.syncs 0    磁盘配额同步数为0
+    3类: fs.quota.warnings 1    磁盘配额警告数为1
+    3类: fs.quota.writes 0    磁盘配额写入数为0
+    3类: fs.suid_dumpable 0    设置suid程序在转储核心文件时不包含任何敏感信息
+  2类: XFS 文件系统相关设置
+    3类: fs.xfs.error_level 3    设置XFS文件系统错误等级为3
+    3类: fs.xfs.filestream_centisecs 3000    XFS文件系统流文件分配时间间隔为3000毫秒
+    3类: fs.xfs.inherit_noatime 1    继承noatime标志，保留不更新文件访问时间
+    3类: fs.xfs.inherit_nodefrag 1    继承nodefrag标志，保留不允许碎片化文件
+    3类: fs.xfs.inherit_nodump 1    继承nodump标志，保留不将文件包含在备份中
+    3类: fs.xfs.inherit_nosymlinks 0    继承nosymlinks标志，保留允许符号链接
+    3类: fs.xfs.inherit_sync 1    继承sync标志，保留同步写入
+    3类: fs.xfs.irix_sgid_inherit 0    IRIX sgid继承标志，保留不继承sgid位
+    3类: fs.xfs.irix_symlink_mode 0    IRIX符号链接模式标志，保留不允许以绝对路径打开符号链接
+    3类: fs.xfs.panic_mask 0    XFS内核恐慌掩码设置为0
+    3类: fs.xfs.rotorstep 1    XFS元数据加锁器的转子步长为1
+    3类: fs.xfs.speculative_cow_prealloc_lifetime 300    XFS文件预分配的写时复制寿命为300秒
+    3类: fs.xfs.speculative_prealloc_lifetime 300    XFS文件预分配寿命为300秒
+    3类: fs.xfs.stats_clear 0    清除XFS文件系统统计信息的标志为0
+    3类: fs.xfs.xfssyncd_centisecs 3000    XFS同步刷新时间为3000毫秒
+1类: 内核 (Kernel) 相关设置
+    3类: kernel.acct 4    2    30    启用进程账户和启动信息记录，缓冲区大小为4KB，每隔30秒记录到文件系统
+    3类: kernel.acpi_video_flags 0    禁用ACPI视频扩展
+    3类: kernel.auto_msgmni 0    自动计算消息队列的最大标识符数目为0
+    3类: kernel.bootloader_type 6    启动加载器类型为6
+    3类: kernel.bootloader_version 38    启动加载器版本为38
+    3类: kernel.bpf_stats_enabled 0    禁用BPF统计
+  2类: 内核进程及任务相关1
+    3类: kernel.cad_pid 1    CAD (Ctrl-Alt-Del)进程的PID为1
+    3类: kernel.cap_last_cap 40    系统中支持的最后一个能力为40
+    3类: kernel.core_pattern |/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h %e    设置核心转储模式，使用systemd-coredump处理
+    3类: kernel.core_pipe_limit 16    核心转储管道限制为16
+    3类: kernel.core_uses_pid 1    核心转储文件名中使用PID
+    3类: kernel.ctrl-alt-del 0    禁用Ctrl-Alt-Del组合键的处理
+    3类: kernel.dmesg_restrict 0    禁用非特权用户访问dmesg
+    3类: kernel.domainname (none)    系统域名设置为(none)
+    3类: kernel.firmware_config.force_sysfs_fallback 0    不强制使用sysfs回退来查找固件配置
+    3类: kernel.firmware_config.ignore_sysfs_fallback 0    不忽略sysfs回退来查找固件配置
+    3类: kernel.ftrace_dump_on_oops 0    不在oops发生时转储ftrace跟踪缓冲区
+    3类: kernel.ftrace_enabled 1    启用ftrace跟踪
+    3类: kernel.hardlockup_all_cpu_backtrace 0    不在所有CPU上的硬锁定发生时转储回溯
+    3类: kernel.hardlockup_panic 1    在硬锁定发生时触发内核恐慌
+    3类: kernel.hostname localhost.localdomain    主机名设置为localhost.localdomain
+  2类: 内核进程及任务相关2
+    3类: kernel.hung_task_check_count 4194304    检查挂起任务的次数为4194304
+    3类: kernel.hung_task_panic 0    在挂起任务发生时不触发内核恐慌
+    3类: kernel.hung_task_timeout_secs 120    挂起任务超时时间为120秒
+    3类: kernel.hung_task_warnings 10    挂起任务的警告次数为10
+    3类: kernel.io_delay_type 0    使用PIO作为io_delay的类型
+    3类: kernel.kexec_load_disabled 0    允许使用kexec来加载新内核
+  2类: Key 相关设置
+    3类: kernel.keys.gc_delay 300    Key处理延迟为300秒
+    3类: kernel.keys.maxbytes 20000    每个key的最大长度为20000字节
+    3类: kernel.keys.maxkeys 200    每个用户可以拥有的keys数目上限为200
+    3类: kernel.keys.persistent_keyring_expiry 259200    永久key的过期时间为259200秒
+    3类: kernel.keys.root_maxbytes 25000000    根用户每个key的最大长度为25000000字节
+    3类: kernel.keys.root_maxkeys 1000000    根用户可以拥有的keys数目上限为1000000
+    3类: kernel.kptr_restrict 1    限制KPTR访问，允许仅内核代码使用指针反解
+  2类: 内核锁相关
+    3类: kernel.max_lock_depth 1024    锁的最大嵌套深度为1024
+    3类: kernel.max_rcu_stall_to_panic 0    不在RCU stall发生时触发内核恐慌
+  2类: 内核模块相关
+    3类: kernel.modprobe /sbin/modprobe    指定modprobe命令路径为/sbin/modprobe
+    3类: kernel.modules_disabled 0    允许加载和卸载内核模块
+  2类: 内核内存相关
+    3类: kernel.msg_next_id -1    消息队列的下一个标识符为-1
+    3类: kernel.msgmax 8192    消息队列中单个消息的最大大小为8192字节
+    3类: kernel.msgmnb 16384    消息队列中单个队列的最大大小为16384字节
+    3类: kernel.msgmni 32000    系统范围内的消息队列最大标识符数目为32000
+    3类: kernel.ngroups_max 65536    用户所属的最大组数为65536
+    3类: kernel.nmi_watchdog 1    启用NMI watchdog
+    3类: kernel.ns_last_pid 131565    最后一个PID命名空间的PID为131565
+  2类: 内核NUMA相关
+    3类: kernel.numa_balancing 0    禁用NUMA均衡
+    3类: kernel.numa_balancing_scan_delay_ms 1000    NUMA均衡扫描延迟为1000毫秒
+    3类: kernel.numa_balancing_scan_period_max_ms 60000    NUMA均衡扫描周期最大值为60000毫秒
+    3类: kernel.numa_balancing_scan_period_min_ms 1000    NUMA均衡扫描周期最小值为1000毫秒
+    3类: kernel.numa_balancing_scan_size_mb 256    NUMA均衡扫描的大小为256MB
+    3类: kernel.osrelease 4.18.0-499.el8.x86_64    内核版本号为4.18.0-499.el8.x86_64
+    3类: kernel.ostype Linux    操作系统类型为Linux
+    3类: kernel.overflowgid 65534    指定在inode中使用的溢出GID为65534
+    3类: kernel.overflowuid 65534    指定在inode中使用的溢出UID为65534
+  2类: Panic 相关设置
+    3类: kernel.panic 0    内核恐慌设置为0，不在内核崩溃时触发重启
+    3类: kernel.panic_on_io_nmi 0    不在I/O错误NMI发生时触发内核恐慌
+    3类: kernel.panic_on_oops 1    在内核oops发生时触发内核恐慌
+    3类: kernel.panic_on_rcu_stall 0    不在RCU stall发生时触发内核恐慌
+    3类: kernel.panic_on_unrecovered_nmi 0    不在未恢复的NMI发生时触发内核恐慌
+    3类: kernel.panic_on_warn 0    不在警告级别的内核消息发生时触发内核恐慌
+    3类: kernel.panic_print 0    不在内核恐慌时打印内核栈
+  2类: 内核性能事件相关
+    3类: kernel.perf_cpu_time_max_percent 25    限制内核性能事件所占CPU时间的最大百分比为25
+    3类: kernel.perf_event_max_contexts_per_stack 8    允许的内核性能事件上下文数目为8
+    3类: kernel.perf_event_max_sample_rate 100000    允许的内核性能事件最大采样率为100000次/秒
+    3类: kernel.perf_event_max_stack 127    允许的内核性能事件最大栈深度为127
+    3类: kernel.perf_event_mlock_kb 516    锁定内核性能事件的内存为516KB
+    3类: kernel.perf_event_paranoid 2    设置内核性能事件的安全级别为2
+  2类: 内核进程及任务相关
+    3类: kernel.pid_max 4194304    单个PID命名空间中允许的最大PID数目为4194304
+  2类: 关机命令设置
+    3类: kernel.poweroff_cmd /sbin/poweroff    设置关机命令为/sbin/poweroff
+  2类: 内核打印相关
+    3类: kernel.print-fatal-signals 0    不在进程fatal信号时打印进程信息
+    3类: kernel.printk 4    4    1    7    设置内核打印级别，依次为console loglevel, default message loglevel, minimum console loglevel, default console loglevel
+    3类: kernel.printk_delay 0    内核打印延迟为0毫秒
+    3类: kernel.printk_devkmsg ratelimit    设置内核打印到/dev/kmsg的方式为ratelimit
+    3类: kernel.printk_ratelimit 5    内核打印速率限制为5次/秒
+    3类: kernel.printk_ratelimit_burst 10    内核打印速率限制突发次数为10次
+  2类: 伪终端相关**
+    3类: kernel.pty.max 4096    伪终端设备的最大数量为4096
+    3类: kernel.pty.nr 2    系统中伪终端的数量为2
+    3类: kernel.pty.reserve 1024    保留伪终端数量为1024
+  2类: 内核随机数相关
+    3类: kernel.random.boot_id 01f51ec3-c876-4067-ae67-f2dcc27375c8    启动时生成的随机引导ID为01f51ec3-c876-4067-ae67-f2dcc27375c8
+    3类: kernel.random.entropy_avail 1415    随机数池的熵可用值为1415
+    3类: kernel.random.poolsize 4096    随机数池大小为4096字节
+    3类: kernel.random.read_wakeup_threshold 64    随机数读唤醒阈值为64字节
+    3类: kernel.random.urandom_min_reseed_secs 60    重种子随机数池的最小时间间隔为60秒
+    3类: kernel.random.uuid 0cf92d90-e5f0-44f7-bb10-33c725158255    启动时生成的随机UUID为0cf92d90-e5f0-44f7-bb10-33c725158255
+    3类: kernel.random.write_wakeup_threshold 896    随机数写唤醒阈值为896字节
+    3类: kernel.randomize_va_space 2    随机化内核空间布局，使用Full ASLR模式
+  2类: 其他内核相关配置*
+    3类: kernel.real-root-dev 0    指定真实的根设备为/dev/sda
+  2类: 调度器相关设置**
+    3类: kernel.sched_autogroup_enabled 0    禁用自动创建调度组
+    3类: kernel.sched_cfs_bandwidth_slice_us 5000    CFS调度器的带宽切片时间为5000微秒
+    3类: kernel.sched_child_runs_first 0    子进程在父进程之前运行
+    3类: kernel.sched_deadline_period_max_us 4194304    Deadline调度器的最大周期为4194304微秒
+    3类: kernel.sched_deadline_period_min_us 100    Deadline调度器的最小周期为100微秒
+  2类: CPU0的SMT调度域
+    3类: kernel.sched_domain.cpu0.domain0.busy_factor 16    第一个CPU核的SMT调度域的忙因子为16
+    3类: kernel.sched_domain.cpu0.domain0.cache_nice_tries 0    第一个CPU核的SMT调度域的缓存Nice尝试数为0
+    3类: kernel.sched_domain.cpu0.domain0.flags 4783    第一个CPU核的SMT调度域的标志位为4783
+    3类: kernel.sched_domain.cpu0.domain0.imbalance_pct 110    第一个CPU核的SMT调度域的不平衡百分比为110%
+    3类: kernel.sched_domain.cpu0.domain0.max_interval 4    第一个CPU核的SMT调度域的最大间隔为4
+    3类: kernel.sched_domain.cpu0.domain0.max_newidle_lb_cost 2656    第一个CPU核的SMT调度域的最大Newidle负载均衡代价为2656
+    3类: kernel.sched_domain.cpu0.domain0.min_interval 2    第一个CPU核的SMT调度域的最小间隔为2
+    3类: kernel.sched_domain.cpu0.domain0.name SMT    第一个CPU核的SMT调度域的名称为SMT
+  2类: CPU0 MC调度域设置
+    3类: kernel.sched_domain.cpu0.domain1.busy_factor 16    第一个CPU核的MC调度域的忙因子为16
+    3类: kernel.sched_domain.cpu0.domain1.cache_nice_tries 1    第一个CPU核的MC调度域的缓存Nice尝试数为1
+    3类: kernel.sched_domain.cpu0.domain1.flags 4655    第一个CPU核的MC调度域的标志位为4655
+    3类: kernel.sched_domain.cpu0.domain1.imbalance_pct 117    第一个CPU核的MC调度域的不平衡百分比为117%
+    3类: kernel.sched_domain.cpu0.domain1.max_interval 24    第一个CPU核的MC调度域的最大间隔为24
+    3类: kernel.sched_domain.cpu0.domain1.max_newidle_lb_cost 5189    第一个CPU核的MC调度域的最大Newidle负载均衡代价为5189
+    3类: kernel.sched_domain.cpu0.domain1.min_interval 12    第一个CPU核的MC调度域的最小间隔为12
+    3类: kernel.sched_domain.cpu0.domain1.name MC    第一个CPU核的MC调度域的名称为MC
+  2类: CPU1的SMT调度域
+    3类: kernel.sched_domain.cpu1.domain0.busy_factor 16    第二个CPU核的SMT调度域的忙因子为16
+    3类: kernel.sched_domain.cpu1.domain0.cache_nice_tries 0    第二个CPU核的SMT调度域的缓存Nice尝试数为0
+    3类: kernel.sched_domain.cpu1.domain0.flags 4783    第二个CPU核的SMT调度域的标志位为4783
+    3类: kernel.sched_domain.cpu1.domain0.imbalance_pct 110    第二个CPU核的SMT调度域的不平衡百分比为110%
+    3类: kernel.sched_domain.cpu1.domain0.max_interval 4    第二个CPU核的SMT调度域的最大间隔为4
+    3类: kernel.sched_domain.cpu1.domain0.max_newidle_lb_cost 3202    第二个CPU核的SMT调度域的最大Newidle负载均衡代价为3202
+    3类: kernel.sched_domain.cpu1.domain0.min_interval 2    第二个CPU核的SMT调度域的最小间隔为2
+    3类: kernel.sched_domain.cpu1.domain0.name SMT    第二个CPU核的SMT调度域的名称为SMT
+  2类: CPU1的MC调度域
+    3类: kernel.sched_domain.cpu1.domain1.busy_factor 16    第二个CPU核的MC调度域的忙因子为16
+    3类: kernel.sched_domain.cpu1.domain1.cache_nice_tries 1    第二个CPU核的MC调度域的缓存Nice尝试数为1
+    3类: kernel.sched_domain.cpu1.domain1.flags 4655    第二个CPU核的MC调度域的标志位为4655
+    3类: kernel.sched_domain.cpu1.domain1.imbalance_pct 117    第二个CPU核的MC调度域的不平衡百分比为117%
+    3类: kernel.sched_domain.cpu1.domain1.max_interval 24    第二个CPU核的MC调度域的最大间隔为24
+    3类: kernel.sched_domain.cpu1.domain1.max_newidle_lb_cost 4296    第二个CPU核的MC调度域的最大Newidle负载均衡代价为4296
+    3类: kernel.sched_domain.cpu1.domain1.min_interval 12    第二个CPU核的MC调度域的最小间隔为12
+    3类: kernel.sched_domain.cpu1.domain1.name MC    第二个CPU核的MC调度域的名称为MC
+  2类: 调度器相关设置
+    3类: ... （以下是其他CPU核的调度域参数，类似上述内容）
+    3类: kernel.sched_energy_aware 1    启用调度能量感知功能
+    3类: kernel.sched_latency_ns 24000000    调度器的延迟为24000000纳秒
+    3类: kernel.sched_migration_cost_ns 500000    调度迁移的成本为500000纳秒
+    3类: kernel.sched_min_granularity_ns 10000000    最小调度粒度为10000000纳秒
+    3类: kernel.sched_nr_migrate 32    每次调度迁移允许的最大任务数为32
+    3类: kernel.sched_rr_timeslice_ms 100    Round Robin调度器的时间片为100毫秒
+    3类: kernel.sched_rt_period_us 1000000    实时调度器的周期为1000000微秒
+    3类: kernel.sched_rt_runtime_us 950000    实时调度器的运行时间为950000微秒
+    3类: kernel.sched_schedstats 0    禁用调度器统计信息
+    3类: kernel.sched_tunable_scaling 1    启用调度器可调整性
+    3类: kernel.sched_wakeup_granularity_ns 15000000    调度唤醒的粒度为15000000纳秒
+  2类: 系统调用过滤设置
+    3类: kernel.seccomp.actions_avail kill_process kill_thread trap errno trace log allow    支持的seccomp系统调用过滤动作包括：杀死进程、杀死线程、跟踪、记录错误号、记录调用、允许
+    3类: kernel.seccomp.actions_logged kill_process kill_thread trap errno trace log    记录的seccomp系统调用过滤动作包括：杀死进程、杀死线程、跟踪、记录错误号、记录调用
+  2类: 信号量相关设置
+    3类: kernel.sem 32000	1024000000	500	32000    信号量相关参数：信号量数组个数为32000，信号量值的最大值为1024000000，信号量操作的最大值为500，单个进程拥有的信号量最大数为32000
+    3类: kernel.sem_next_id -1    下一个信号量的ID为-1
+  2类: 共享内存相关设置
+    3类: kernel.shm_next_id -1    下一个共享内存的ID为-1
+    3类: kernel.shm_rmid_forced 0    禁止删除共享内存段
+    3类: kernel.shmall 18446744073692774399    共享内存段总大小为18446744073692774399页
+    3类: kernel.shmmax 18446744073692774399    单个共享内存段的最大大小为18446744073692774399字节
+    3类: kernel.shmmni 4096    最大共享内存段的数目为4096
+  2类: 软件看门狗定时器设置
+    3类: kernel.soft_watchdog 1    启用软件看门狗定时器
+    3类: kernel.softlockup_all_cpu_backtrace 0    软锁定检测发生时，不打印所有CPU的回溯信息
+    3类: kernel.softlockup_panic 0    软锁定检测发生时，不进行内核崩溃转储
+    3类: kernel.stack_tracer_enabled 0    禁用内核堆栈跟踪
+    3类: kernel.sysctl_writes_strict 1    严格执行sysctl值的写入权限
+    3类: kernel.sysrq 16    SysRq键的功能被限制为Magic SysRq键和控制台日志记录
+    3类: kernel.tainted 0    内核没有被污染，没有使用非开源模块或有问题的模块
+    3类: kernel.threads-max 123086    最大线程数为123086
+    3类: kernel.timer_migration 1    启用定时器的迁移
+    3类: kernel.traceoff_on_warning 0    不在内核警告时关闭跟踪功能
+    3类: kernel.tracepoint_printk 0    禁用tracepoint_printk
+    3类: kernel.unknown_nmi_panic 0    未知NMI发生时，不进行内核崩溃转储
+    3类: kernel.unprivileged_bpf_disabled 1    禁用非特权用户的BPF
+    3类: kernel.usermodehelper.bset 4294967295	511    usermodehelper组的权限掩码为4294967295，用户权限掩码为511
+    3类: kernel.usermodehelper.inheritable 4294967295	511    usermodehelper组的可继承权限掩码为4294967295，用户可继承权限掩码为511
+    3类: kernel.version #1 SMP Thu Jun 22 12:08:06 UTC 2023    内核版本信息：#1 SMP Thu Jun 22 12:08:06 UTC 2023
+  2类: 硬件看门狗定时器设置
+    3类: kernel.watchdog 1    启用硬件看门狗定时器
+    3类: kernel.watchdog_cpumask 0-11    硬件看门狗定时器适用于CPU 0到11
+    3类: kernel.watchdog_thresh 10    看门狗定时器阈值为10秒
+    3类: kernel.yama.ptrace_scope 0    Yama LSM允许任何进程使用ptrace系统调用跟踪其他进程的执行
+1类: 网络核心 (net.core) 相关设置
+  2类: BPF (Berkeley Packet Filter) JIT编译器设置
+    3类: net.core.bpf_jit_enable 1    启用BPF (Berkeley Packet Filter) JIT编译器
+    3类: net.core.bpf_jit_harden 1    提高BPF JIT编译器的安全性
+    3类: net.core.bpf_jit_kallsyms 1    在BPF JIT编译器中支持内核符号导出
+    3类: net.core.bpf_jit_limit 264241152    BPF JIT编译器的内存限制
+  2类: 忙时数据包轮询模式设置
+    3类: net.core.busy_poll 0    启用忙时数据包轮询模式
+    3类: net.core.busy_read 0    启用忙时读取模式
+  2类: 队列调度器设置
+    3类: net.core.default_qdisc fq_codel    默认队列调度器设置为fq_codel
+  2类: 网络接口权重设置
+    3类: net.core.dev_weight 64    接口权重设置为64
+    3类: net.core.dev_weight_rx_bias 1    接口接收方向权重偏置设置为1
+    3类: net.core.dev_weight_tx_bias 1    接口发送方向权重偏置设置为1
+    3类: net.core.fb_tunnels_only_for_init_net 0    允许其他网络命名空间使用转发隧道设备
+    3类: net.core.flow_limit_cpu_bitmap 000    CPU位图用于限制流量
+    3类: net.core.flow_limit_table_len 4096    用于流量限制的表长度
+    3类: net.core.max_skb_frags 17    数据包内允许的最大分片数
+    3类: net.core.message_burst 10    允许发送的最大突发消息数
+    3类: net.core.message_cost 5    消息成本设置为5
+    3类: net.core.netdev_budget 300    每个网络设备处理预算设置为300
+    3类: net.core.netdev_budget_usecs 2000    每个网络设备处理预算时间设置为2000微秒
+    3类: net.core.netdev_max_backlog 1000    网络设备接收队列的最大长度
+    3类: net.core.netdev_rss_key 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00    RSS (Receive Side Scaling) 密钥设置
+    3类: net.core.netdev_tstamp_prequeue 1    接收时间戳预队列设置为1
+    3类: net.core.optmem_max 81920    socket选项内存最大限制设置为81920
+    3类: net.core.rmem_default 212992    默认接收缓冲区大小设置为212992
+    3类: net.core.rmem_max 212992    最大接收缓冲区大小设置为212992
+    3类: net.core.rps_default_mask 000    默认的RPS掩码
+    3类: net.core.rps_sock_flow_entries 0    RPS (Receive Packet Steering) 分流表的大小
+    3类: net.core.somaxconn 2048    监听套接字最大连接数设置为2048
+    3类: net.core.tstamp_allow_data 1    允许数据包接收时间戳设置为1
+    3类: net.core.warnings 0    禁用网络核心警告
+1类: IPv4 配置项
+  2类: IPv4全局接口配置
+    3类: net.ipv4.cipso_cache_bucket_size 10    CIPSO (Common IP Security Option) 缓存桶大小设置为10
+    3类: net.ipv4.cipso_cache_enable 1    启用CIPSO缓存
+    3类: net.ipv4.cipso_rbm_optfmt 0    CIPSO可选项格式设置为0
+    3类: net.ipv4.cipso_rbm_strictvalid 1    严格验证CIPSO RBM (Remote-Label-Based Mandatory Access Control)
+    3类: net.ipv4.conf.all.accept_local 0    不接受来自本地主机的数据包
+    3类: net.ipv4.conf.all.accept_redirects 0    不接受重定向数据包
+    3类: net.ipv4.conf.all.accept_source_route 0    不接受源路由数据包
+    3类: net.ipv4.conf.all.arp_accept 0    不接受ARP (Address Resolution Protocol) 请求
+    3类: net.ipv4.conf.all.arp_announce 0    不修改发送的ARP请求的源IP地址
+    3类: net.ipv4.conf.all.arp_filter 0    禁用ARP过滤
+    3类: net.ipv4.conf.all.arp_ignore 0    不忽略ARP请求
+    3类: net.ipv4.conf.all.arp_notify 0    不通知ARP地址冲突
+    3类: net.ipv4.conf.all.bc_forwarding 0    不进行广播数据包转发
+    3类: net.ipv4.conf.all.bootp_relay 0    禁用BOOTP (Bootstrap Protocol) 中继代理
+    3类: net.ipv4.conf.all.disable_policy 0    不禁用源路由数据包处理
+    3类: net.ipv4.conf.all.disable_xfrm 0    不禁用IPsec (IP Security) XFRM(传输层安全扩展)
+    3类: net.ipv4.conf.all.drop_gratuitous_arp 0    不丢弃不必要的ARP响应
+    3类: net.ipv4.conf.all.drop_unicast_in_l2_multicast 0    不丢弃在二层多播组中的单播数据包
+    3类: net.ipv4.conf.all.force_igmp_version 0    不强制使用IGMP (Internet Group Management Protocol) 版本
+    3类: net.ipv4.conf.all.forwarding 1    开启IP转发功能
+    3类: net.ipv4.conf.all.igmpv2_unsolicited_report_interval 10000    IGMPv2 非请求报告的间隔时间
+    3类: net.ipv4.conf.all.igmpv3_unsolicited_report_interval 1000    IGMPv3 非请求报告的间隔时间
+    3类: net.ipv4.conf.all.ignore_routes_with_linkdown 0    不忽略与已关闭的接口相关的路由
+    3类: net.ipv4.conf.all.igmpv2_unsolicited_report_interval 10000    IGMPv2 非请求报告的间隔时间
+    3类: net.ipv4.conf.all.igmpv3_unsolicited_report_interval 1000    IGMPv3 非请求报告的间隔时间
+    3类: net.ipv4.conf.all.ignore_routes_with_linkdown 0    不忽略与已关闭的接口相关的路由
+    3类: net.ipv4.conf.all.log_martians 0    不记录欺骗攻击尝试的日志
+    3类: net.ipv4.conf.all.mc_forwarding 0    不进行多播数据包转发
+    3类: net.ipv4.conf.all.medium_id 0    网络介质类型标识设置为0
+    3类: net.ipv4.conf.all.promote_secondaries 0    不使IP别名地址成为主地址
+    3类: net.ipv4.conf.all.proxy_arp 0    不开启ARP代理
+    3类: net.ipv4.conf.all.proxy_arp_pvlan 0    不开启ARP代理专用虚拟局域网
+    3类: net.ipv4.conf.all.route_localnet 0    不接受来自本地主机的数据包作为路由
+    3类: net.ipv4.conf.all.rp_filter 1    开启反向路径过滤，用于防止IP欺骗攻击
+    3类: net.ipv4.conf.all.secure_redirects 0    不接受安全重定向
+    3类: net.ipv4.conf.all.send_redirects 0    不发送重定向数据包
+    3类: net.ipv4.conf.all.shared_media 1    支持共享介质类型
+    3类: net.ipv4.conf.all.src_valid_mark 0    不启用源地址合法标记
+    3类: net.ipv4.conf.all.tag 0    网络设备标记设置为0
+    3类: net.ipv4.conf.all.ugc_tstamp 0    不启用ugc时间戳
+    3类: net.ipv4.conf.all.disable_xfrm 0    不禁用IPsec (IP Security) XFRM(传输层安全扩展)
+    3类: net.ipv4.conf.all.pim_rp_warn 1    开启PIM (Protocol Independent Multicast) RP (Rendezvous Point)警告
+  2类: IPv4默认接口配置
+    3类: net.ipv4.conf.default.accept_local 0    不接受来自本地主机的数据包
+    3类: net.ipv4.conf.default.accept_redirects 0    不接受重定向数据包
+    3类: net.ipv4.conf.default.accept_source_route 0    不接受源路由数据包
+    3类: net.ipv4.conf.default.arp_accept 0    不接受ARP (Address Resolution Protocol) 请求
+    3类: net.ipv4.conf.default.arp_announce 0    不修改发送的ARP请求的源IP地址
+    3类: net.ipv4.conf.default.arp_filter 0    禁用ARP过滤
+    3类: net.ipv4.conf.default.arp_ignore 0    不忽略ARP请求
+    3类: net.ipv4.conf.default.arp_notify 0    不通知ARP地址冲突
+    3类: net.ipv4.conf.default.bc_forwarding 0    不进行广播数据包转发
+    3类: net.ipv4.conf.default.bootp_relay 0    禁用BOOTP (Bootstrap Protocol) 中继代理
+    3类: net.ipv4.conf.default.disable_policy 0    不禁用源路由数据包处理
+    3类: net.ipv4.conf.default.drop_gratuitous_arp 0    不丢弃不必要的ARP响应
+    3类: net.ipv4.conf.default.drop_unicast_in_l2_multicast 0    不丢弃在二层多播组中的单播数据包
+    3类: net.ipv4.conf.default.force_igmp_version 0    不强制使用IGMP (Internet Group Management Protocol) 版本
+    3类: net.ipv4.conf.default.forwarding 1    开启IP转发功能
+    3类: net.ipv4.conf.default.igmpv2_unsolicited_report_interval 10000    IGMPv2 非请求报告的间隔时间
+    3类: net.ipv4.conf.default.igmpv3_unsolicited_report_interval 1000    IGMPv3 非请求报告的间隔时间
+    3类: net.ipv4.conf.default.ignore_routes_with_linkdown 0    不忽略与已关闭的接口相关的路由
+    3类: net.ipv4.conf.default.log_martians 0    不记录欺骗攻击尝试的日志
+    3类: net.ipv4.conf.default.mc_forwarding 0    不进行多播数据包转发
+    3类: net.ipv4.conf.default.medium_id 0    网络介质类型标识设置为0
+    3类: net.ipv4.conf.default.promote_secondaries 0    不使IP别名地址成为主地址
+    3类: net.ipv4.conf.default.proxy_arp 0    不开启ARP代理
+    3类: net.ipv4.conf.default.proxy_arp_pvlan 0    不开启ARP代理专用虚拟局域网
+    3类: net.ipv4.conf.default.route_localnet 0    不接受来自本地主机的数据包作为路由
+    3类: net.ipv4.conf.default.rp_filter 1    开启反向路径过滤，用于防止IP欺骗攻击
+    3类: net.ipv4.conf.default.secure_redirects 0    不接受安全重定向
+    3类: net.ipv4.conf.default.send_redirects 0    不发送重定向数据包
+    3类: net.ipv4.conf.default.shared_media 1    支持共享介质类型
+    3类: net.ipv4.conf.default.src_valid_mark 0    不启用源地址合法标记
+    3类: net.ipv4.conf.default.tag 0    网络设备标记设置为0
+    3类: net.ipv4.conf.default.ugc_tstamp 0    不启用ugc时间戳
+    3类: net.ipv4.conf.default.disable_xfrm 0    不禁用IPsec (IP Security) XFRM(传输层安全扩展)
+    3类: net.ipv4.conf.default.pim_rp_warn 1    开启PIM (Protocol Independent Multicast) RP (Rendezvous Point)警告
+  2类: IPv4 eth0接口配置
+    3类: net.ipv4.conf.eth0.accept_local 0    不接受来自本地主机的数据包
+    3类: net.ipv4.conf.eth0.accept_redirects 0    不接受重定向数据包
+    3类: net.ipv4.conf.eth0.accept_source_route 0    不接受源路由数据包
+    3类: net.ipv4.conf.eth0.arp_accept 0    不接受ARP (Address Resolution Protocol) 请求
+    3类: net.ipv4.conf.eth0.arp_announce 0    不修改发送的ARP请求的源IP地址
+    3类: net.ipv4.conf.eth0.arp_filter 0    禁用ARP过滤
+    3类: net.ipv4.conf.eth0.arp_ignore 0    不忽略ARP请求
+    3类: net.ipv4.conf.eth0.arp_notify 0    不通知ARP地址冲突
+    3类: net.ipv4.conf.eth0.bc_forwarding 0    不进行广播数据包转发
+    3类: net.ipv4.conf.eth0.bootp_relay 0    禁用BOOTP (Bootstrap Protocol) 中继代理
+    3类: net.ipv4.conf.eth0.disable_policy 0    不禁用源路由数据包处理
+    3类: net.ipv4.conf.eth0.drop_gratuitous_arp 0    不丢弃不必要的ARP响应
+    3类: net.ipv4.conf.eth0.drop_unicast_in_l2_multicast 0    不丢弃在二层多播组中的单播数据包
+    3类: net.ipv4.conf.eth0.force_igmp_version 0    不强制使用IGMP (Internet Group Management Protocol) 版本
+    3类: net.ipv4.conf.eth0.forwarding 1    开启IP转发功能
+    3类: net.ipv4.conf.eth0.igmpv2_unsolicited_report_interval 10000    IGMPv2 非请求报告的间隔时间
+    3类: net.ipv4.conf.eth0.igmpv3_unsolicited_report_interval 1000    IGMPv3 非请求报告的间隔时间
+    3类: net.ipv4.conf.eth0.ignore_routes_with_linkdown 0    不忽略与已关闭的接口相关的路由
+    3类: net.ipv4.conf.eth0.log_martians 0    不记录欺骗攻击尝试的日志
+    3类: net.ipv4.conf.eth0.mc_forwarding 0    不进行多播数据包转发
+    3类: net.ipv4.conf.eth0.medium_id 0    网络介质类型标识设置为0
+    3类: net.ipv4.conf.eth0.promote_secondaries 0    不使IP别名地址成为主地址
+    3类: net.ipv4.conf.eth0.proxy_arp 0    不开启ARP代理
+    3类: net.ipv4.conf.eth0.proxy_arp_pvlan 0    不开启ARP代理专用虚拟局域网
+    3类: net.ipv4.conf.eth0.route_localnet 0    不接受来自本地主机的数据包作为路由
+    3类: net.ipv4.conf.eth0.rp_filter 1    开启反向路径过滤，用于防止IP欺骗攻击
+    3类: net.ipv4.conf.eth0.secure_redirects 0    不接受安全重定向
+    3类: net.ipv4.conf.eth0.send_redirects 0    不发送重定向数据包
+    3类: net.ipv4.conf.eth0.shared_media 1    支持共享介质类型
+    3类: net.ipv4.conf.eth0.src_valid_mark 0    不启用源地址合法标记
+    3类: net.ipv4.conf.eth0.tag 0    网络设备标记设置为0
+    3类: net.ipv4.conf.eth0.ugc_tstamp 0    不启用ugc时间戳
+    3类: net.ipv4.conf.eth0.disable_xfrm 0    不禁用IPsec (IP Security) XFRM(传输层安全扩展)
+    3类: net.ipv4.conf.eth0.pim_rp_warn 1    开启PIM (Protocol Independent Multicast) RP (Rendezvous Point)警告
+  2类: IPv4 lo接口配置
+    3类: net.ipv4.conf.lo.accept_local 0    不接受来自本地主机的数据包
+    3类: net.ipv4.conf.lo.accept_redirects 0    不接受重定向数据包
+    3类: net.ipv4.conf.lo.accept_source_route 0    不接受源路由数据包
+    3类: net.ipv4.conf.lo.arp_accept 0    不接受ARP (Address Resolution Protocol) 请求
+    3类: net.ipv4.conf.lo.arp_announce 0    不修改发送的ARP请求的源IP地址
+    3类: net.ipv4.conf.lo.arp_filter 0    禁用ARP过滤
+    3类: net.ipv4.conf.lo.arp_ignore 0    不忽略ARP请求
+    3类: net.ipv4.conf.lo.arp_notify 0    不通知ARP地址冲突
+    3类: net.ipv4.conf.lo.bc_forwarding 0    不进行广播数据包转发
+    3类: net.ipv4.conf.lo.bootp_relay 0    禁用BOOTP (Bootstrap Protocol) 中继代理
+    3类: net.ipv4.conf.lo.disable_policy 0    不禁用源路由数据包处理
+    3类: net.ipv4.conf.lo.drop_gratuitous_arp 0    不丢弃不必要的ARP响应
+    3类: net.ipv4.conf.lo.drop_unicast_in_l2_multicast 0    不丢弃在二层多播组中的单播数据包
+    3类: net.ipv4.conf.lo.force_igmp_version 0    不强制使用IGMP (Internet Group Management Protocol) 版本
+    3类: net.ipv4.conf.lo.forwarding 0    不开启IP转发功能
+    3类: net.ipv4.conf.lo.igmpv2_unsolicited_report_interval 10000    IGMPv2 非请求报告的间隔时间
+    3类: net.ipv4.conf.lo.igmpv3_unsolicited_report_interval 1000    IGMPv3 非请求报告的间隔时间
+    3类: net.ipv4.conf.lo.ignore_routes_with_linkdown 0    不忽略与已关闭的接口相关的路由
+    3类: net.ipv4.conf.lo.log_martians 0    不记录欺骗攻击尝试的日志
+    3类: net.ipv4.conf.lo.mc_forwarding 0    不进行多播数据包转发
+    3类: net.ipv4.conf.lo.medium_id 0    网络介质类型标识设置为0
+    3类: net.ipv4.conf.lo.promote_secondaries 0    不使IP别名地址成为主地址
+    3类: net.ipv4.conf.lo.proxy_arp 0   不开启ARP代理
+    3类: net.ipv4.conf.lo.proxy_arp_pvlan 0    不开启ARP代理专用虚拟局域网
+    3类: net.ipv4.conf.lo.route_localnet 0    不接受来自本地主机的数据包作为路由
+    3类: net.ipv4.conf.lo.rp_filter 0    关闭反向路径过滤，允许所有源地址的数据包进入接口
+    3类: net.ipv4.conf.lo.secure_redirects 0    不接受安全重定向
+    3类: net.ipv4.conf.lo.send_redirects 0    不发送重定向数据包
+    3类: net.ipv4.conf.lo.shared_media 1    支持共享介质类型
+    3类: net.ipv4.conf.lo.src_valid_mark 0    不启用源地址合法标记
+    3类: net.ipv4.conf.lo.tag 0    网络设备标记设置为0
+    3类: net.ipv4.conf.lo.ugc_tstamp 0    不启用ugc时间戳
+    3类: net.ipv4.conf.lo.disable_xfrm 0    不禁用IPsec (IP Security) XFRM(传输层安全扩展)
+    3类: net.ipv4.conf.lo.pim_rp_warn 1    开启PIM (Protocol Independent Multicast) RP (Rendezvous Point)警告
+1类: IPv6 相关设置
+  2类: IPv6全局设置
+    3类: net.ipv6.anycast_src_echo_reply 0    启用任播源地址回复功能
+    3类: net.ipv6.auto_flowlabels 1    自动分配IPv6流标签
+    3类: net.ipv6.bindv6only 0    允许IPv6套接字绑定到IPv4套接字
+    3类: net.ipv6.calipso_cache_bucket_size 10    设置Calipso缓存桶大小
+    3类: net.ipv6.calipso_cache_enable 1    启用Calipso缓存
+  2类: IPv6所有接口默认配置
+    3类: net.ipv6.conf.all.accept_dad 0    禁用IPv6冲突检测
+    3类: net.ipv6.conf.all.accept_ra 1    允许接收IPv6路由通告
+    3类: net.ipv6.conf.all.accept_ra_defrtr 1    允许接收默认路由信息
+    3类: net.ipv6.conf.all.accept_ra_from_local 0    禁止从本地接口接收路由通告
+    3类: net.ipv6.conf.all.accept_ra_min_hop_limit 1    设置接收路由通告的最小跳限
+    3类: net.ipv6.conf.all.accept_ra_mtu 1    设置接收路由通告的最大传输单元
+    3类: net.ipv6.conf.all.accept_ra_pinfo 1    允许接收IPv6路由信息选项
+    3类: net.ipv6.conf.all.accept_ra_rt_info_max_plen 0    设置接收路由通告的最大前缀长度
+    3类: net.ipv6.conf.all.accept_ra_rt_info_min_plen 0    设置接收路由通告的最小前缀长度
+    3类: net.ipv6.conf.all.accept_ra_rtr_pref 1    允许接收路由通告的路由器优先级信息
+    3类: net.ipv6.conf.all.accept_redirects 1    允许接收IPv6重定向
+    3类: net.ipv6.conf.all.accept_source_route 0    禁止接受IPv6源路由选项
+    3类: net.ipv6.conf.all.addr_gen_mode 0    禁止自动地址生成
+    3类: net.ipv6.conf.all.autoconf 1    允许IPv6自动配置
+    3类: net.ipv6.conf.all.dad_transmits 1    设置IPv6冲突检测重传次数
+    3类: net.ipv6.conf.all.disable_ipv6 0    启用IPv6功能
+    3类: net.ipv6.conf.all.disable_policy 0    启用IPv6流控策略
+    3类: net.ipv6.conf.all.drop_unicast_in_l2_multicast 0    允许接收L2组播报文的单播报文
+    3类: net.ipv6.conf.all.drop_unsolicited_na 0    允许发送不经过确认的NA报文
+    3类: net.ipv6.conf.all.enhanced_dad 1    启用增强的IPv6冲突检测
+    3类: net.ipv6.conf.all.force_mld_version 0    不强制使用指定版本的MLD协议
+    3类: net.ipv6.conf.all.force_tllao 0    不强制使用指定的链路层地址选项
+    3类: net.ipv6.conf.all.forwarding 0    禁止IPv6路由转发
+    3类: net.ipv6.conf.all.hop_limit 64    设置默认IPv6跳数限制
+    3类: net.ipv6.conf.all.ignore_routes_with_linkdown 0    允许使用离线路由表
+    3类: net.ipv6.conf.all.keep_addr_on_down 0    禁止保持下线的IPv6地址
+    3类: net.ipv6.conf.all.max_addresses 16    设置IPv6接口上的最大地址数
+    3类: net.ipv6.conf.all.max_desync_factor 600    设置IPv6地址重同步的最大因子
+    3类: net.ipv6.conf.all.mc_forwarding 0    禁止IPv6组播转发
+    3类: net.ipv6.conf.all.mldv1_unsolicited_report_interval 10000    设置MLDv1主动报告间隔时间
+    3类: net.ipv6.conf.all.mldv2_unsolicited_report_interval 1000    设置MLDv2主动报告间隔时间
+    3类: net.ipv6.conf.all.mtu 1280    设置IPv6默认MTU
+    3类: net.ipv6.conf.all.ndisc_notify 0    禁用IPv6邻居发现通知
+    3类: net.ipv6.conf.all.ndisc_tclass 0    设置IPv6邻居发现报文的通知类别
+    3类: net.ipv6.conf.all.optimistic_dad 0    禁用IPv6乐观的冲突检测
+    3类: net.ipv6.conf.all.proxy_ndp 0    禁用IPv6代理邻居发现协议
+    3类: net.ipv6.conf.all.regen_max_retry 3    设置IPv6地址重生成的最大尝试次数
+    3类: net.ipv6.conf.all.router_probe_interval 60    设置IPv6路由器探测间隔时间
+    3类: net.ipv6.conf.all.router_solicitation_delay 1    设置IPv6路由器请求延迟时间
+    3类: net.ipv6.conf.all.router_solicitation_interval 4    设置IPv6路由器请求间隔时间
+    3类: net.ipv6.conf.all.router_solicitation_max_interval 3600    设置IPv6路由器请求最大间隔时间
+    3类: net.ipv6.conf.all.router_solicitations -1    设置接收的IPv6路由器请求数
+    3类: net.ipv6.conf.all.seg6_enabled 0    禁用IPv6段路由（Segment Routing）
+    3类: net.ipv6.conf.all.suppress_frag_ndisc 1    禁止通过通告片段来防止IPv6碎片化
+    3类: net.ipv6.conf.all.temp_prefered_lft 86400    设置IPv6临时地址优先生存时间
+    3类: net.ipv6.conf.all.temp_valid_lft 604800    设置IPv6临时地址有效生存时间
+    3类: net.ipv6.conf.all.use_oif_addrs_only 0    允许使用IPv6输出接口地址
+    3类: net.ipv6.conf.all.use_optimistic 0    禁用IPv6乐观的地址生成
+    3类: net.ipv6.conf.all.use_tempaddr 0    禁用IPv6临时地址生成
+  2类: IPv6接口默认配置
+    3类: net.ipv6.conf.default.accept_dad 1    允许IPv6冲突检测
+    3类: net.ipv6.conf.default.accept_ra 1    允许接收IPv6路由通告
+    3类: net.ipv6.conf.default.accept_ra_defrtr 1    允许接收默认路由信息
+    3类: net.ipv6.conf.default.accept_ra_from_local 0    禁止从本地接口接收路由通告
+    3类: net.ipv6.conf.default.accept_ra_min_hop_limit 1    设置接收路由通告的最小跳限
+    3类: net.ipv6.conf.default.accept_ra_mtu 1    设置接收路由通告的最大传输单元
+    3类: net.ipv6.conf.default.accept_ra_pinfo 1    允许接收IPv6路由信息选项
+    3类: net.ipv6.conf.default.accept_ra_rt_info_max_plen 0    设置接收路由通告的最大前缀长度
+    3类: net.ipv6.conf.default.accept_ra_rt_info_min_plen 0    设置接收路由通告的最小前缀长度
+    3类: net.ipv6.conf.default.accept_ra_rtr_pref 1    允许接收路由通告的路由器优先级信息
+    3类: net.ipv6.conf.default.accept_redirects 1    允许接收IPv6重定向
+    3类: net.ipv6.conf.default.accept_source_route 0    禁止接受IPv6源路由选项
+    3类: net.ipv6.conf.default.addr_gen_mode 0    禁止自动地址生成
+    3类: net.ipv6.conf.default.autoconf 1    允许IPv6自动配置
+    3类: net.ipv6.conf.default.dad_transmits 1    设置IPv6冲突检测重传次数
+    3类: net.ipv6.conf.default.disable_ipv6 0    启用IPv6功能
+    3类: net.ipv6.conf.default.disable_policy 0    启用IPv6流控策略
+    3类: net.ipv6.conf.default.drop_unicast_in_l2_multicast 0    允许接收L2组播报文的单播报文
+    3类: net.ipv6.conf.default.drop_unsolicited_na 0    允许发送不经过确认的NA报文
+    3类: net.ipv6.conf.default.enhanced_dad 1    启用增强的IPv6冲突检测
+    3类: net.ipv6.conf.default.force_mld_version 0    不强制使用指定版本的MLD协议
+    3类: net.ipv6.conf.default.force_tllao 0    不强制使用指定的链路层地址选项
+    3类: net.ipv6.conf.default.forwarding 0    禁止IPv6路由转发
+    3类: net.ipv6.conf.default.hop_limit 64    设置默认IPv6跳数限制
+    3类: net.ipv6.conf.default.ignore_routes_with_linkdown 0    允许使用离线路由表
+    3类: net.ipv6.conf.default.keep_addr_on_down 0    禁止保持下线的IPv6地址
+    3类: net.ipv6.conf.default.max_addresses 16    设置IPv6接口上的最大地址数
+    3类: net.ipv6.conf.default.max_desync_factor 600    设置IPv6地址重同步的最大因子
+    3类: net.ipv6.conf.default.mc_forwarding 0    禁止IPv6组播转发
+    3类: net.ipv6.conf.default.mldv1_unsolicited_report_interval 10000    设置MLDv1主动报告间隔时间
+    3类: net.ipv6.conf.default.mldv2_unsolicited_report_interval 1000    设置MLDv2主动报告间隔时间
+    3类: net.ipv6.conf.default.mtu 1280    设置IPv6默认MTU
+    3类: net.ipv6.conf.default.ndisc_notify 0    禁用IPv6邻居发现通知
+    3类: net.ipv6.conf.default.ndisc_tclass 0    设置IPv6邻居发现报文的通知类别
+    3类: net.ipv6.conf.default.optimistic_dad 0    禁用IPv6乐观的冲突检测
+    3类: net.ipv6.conf.default.proxy_ndp 0    禁用IPv6代理邻居发现协议
+    3类: net.ipv6.conf.default.regen_max_retry 3    设置IPv6地址重生成的最大尝试次数
+    3类: net.ipv6.conf.default.router_probe_interval 60    设置IPv6路由器探测间隔时间
+    3类: net.ipv6.conf.default.router_solicitation_delay 1    设置IPv6路由器请求延迟时间
+    3类: net.ipv6.conf.default.router_solicitation_interval 4    设置IPv6路由器请求间隔时间
+    3类: net.ipv6.conf.default.router_solicitation_max_interval 3600    设置IPv6路由器请求最大间隔时间
+    3类: net.ipv6.conf.default.router_solicitations -1    设置接收的IPv6路由器请求数
+    3类: net.ipv6.conf.default.seg6_enabled 0    禁用IPv6段路由（Segment Routing）
+    3类: net.ipv6.conf.default.suppress_frag_ndisc 1    禁止通过通告片段来防止IPv6碎片化
+    3类: net.ipv6.conf.default.temp_prefered_lft 86400    设置IPv6临时地址优
+    3类: net.ipv6.conf.default.temp_valid_lft 604800    设置IPv6临时地址有效期
+    3类: net.ipv6.conf.default.use_oif_addrs_only 0    允许使用非本地地址作为源地址发送IPv6报文
+    3类: net.ipv6.conf.default.use_optimistic 0    禁用IPv6优化的地址生成
+    3类: net.ipv6.conf.default.use_tempaddr 0    禁用IPv6临时地址
+  2类: IPv6特定接口-enp1s0接口配置
+    3类: net.ipv6.conf.enp1s0.accept_dad 1    允许IPv6冲突检测
+    3类: net.ipv6.conf.enp1s0.accept_ra 0    禁止接收IPv6路由通告
+    3类: net.ipv6.conf.enp1s0.accept_ra_defrtr 1    允许接收默认路由信息
+    3类: net.ipv6.conf.enp1s0.accept_ra_from_local 0    禁止从本地接口接收路由通告
+    3类: net.ipv6.conf.enp1s0.accept_ra_min_hop_limit 1    设置接收路由通告的最小跳限
+    3类: net.ipv6.conf.enp1s0.accept_ra_mtu 1    设置接收路由通告的最大传输单元
+    3类: net.ipv6.conf.enp1s0.accept_ra_pinfo 1    允许接收IPv6路由信息选项
+    3类: net.ipv6.conf.enp1s0.accept_ra_rt_info_max_plen 0    设置接收路由通告的最大前缀长度
+    3类: net.ipv6.conf.enp1s0.accept_ra_rt_info_min_plen 0    设置接收路由通告的最小前缀长度
+    3类: net.ipv6.conf.enp1s0.accept_ra_rtr_pref 1    允许接收路由通告的路由器优先级信息
+    3类: net.ipv6.conf.enp1s0.accept_redirects 1    允许接收IPv6重定向
+    3类: net.ipv6.conf.enp1s0.accept_source_route 0    禁止接受IPv6源路由选项
+    3类: net.ipv6.conf.enp1s0.addr_gen_mode 1    设置IPv6地址生成模式
+    3类: net.ipv6.conf.enp1s0.autoconf 1    允许IPv6自动配置
+    3类: net.ipv6.conf.enp1s0.dad_transmits 1    设置IPv6冲突检测重传次数
+    3类: net.ipv6.conf.enp1s0.disable_ipv6 0    启用IPv6功能
+    3类: net.ipv6.conf.enp1s0.disable_policy 0    启用IPv6流控策略
+    3类: net.ipv6.conf.enp1s0.drop_unicast_in_l2_multicast 0    允许接收L2组播报文的单播报文
+    3类: net.ipv6.conf.enp1s0.drop_unsolicited_na 0    允许发送不经过确认的NA报文
+    3类: net.ipv6.conf.enp1s0.enhanced_dad 1    启用增强的IPv6冲突检测
+    3类: net.ipv6.conf.enp1s0.force_mld_version 0    不强制使用指定版本的MLD协议
+    3类: net.ipv6.conf.enp1s0.force_tllao 0    不强制使用指定的链路层地址选项
+    3类: net.ipv6.conf.enp1s0.forwarding 0    禁止IPv6路由转发
+    3类: net.ipv6.conf.enp1s0.hop_limit 64    设置默认IPv6跳数限制
+    3类: net.ipv6.conf.enp1s0.ignore_routes_with_linkdown 0    允许使用离线路由表
+    3类: net.ipv6.conf.enp1s0.keep_addr_on_down 0    禁止保持下线的IPv6地址
+    3类: net.ipv6.conf.enp1s0.max_addresses 16    设置IPv6接口上的最大地址数
+    3类: net.ipv6.conf.enp1s0.max_desync_factor 600    设置IPv6地址重同步的最大因子
+    3类: net.ipv6.conf.enp1s0.mc_forwarding 0    禁止IPv6组播转发
+    3类: net.ipv6.conf.enp1s0.mldv1_unsolicited_report_interval 10000    设置MLDv1主动报告间隔时间
+    3类: net.ipv6.conf.enp1s0.mldv2_unsolicited_report_interval 1000    设置MLDv2主动报告间隔时间
+    3类: net.ipv6.conf.enp1s0.mtu 1500    设置IPv6 MTU
+    3类: net.ipv6.conf.enp1s0.ndisc_notify 0    禁用IPv6邻居发现通知
+    3类: net.ipv6.conf.enp1s0.ndisc_tclass 0    设置IPv6邻居发现报文的通知类别
+    3类: net.ipv6.conf.enp1s0.optimistic_dad 0    禁用IPv6乐观的冲突检测
+    3类: net.ipv6.conf.enp1s0.proxy_ndp 0    禁用IPv6代理邻居发现协议
+    3类: net.ipv6.conf.enp1s0.regen_max_retry 3    设置IPv6地址重生成的最大尝试次数
+    3类: net.ipv6.conf.enp1s0.router_probe_interval 60    设置IPv6路由器探测间隔时间
+    3类: net.ipv6.conf.enp1s0.router_solicitation_delay 1    设置IPv6路由器请求延迟时间
+    3类: net.ipv6.conf.enp1s0.router_solicitation_interval 4    设置IPv6路由器请求间隔时间
+    3类: net.ipv6.conf.enp1s0.router_solicitation_max_interval 3600    设置IPv6路由器请求最大间隔时间
+    3类: net.ipv6.conf.enp1s0.router_solicitations -1    设置接收的IPv6路由器请求数
+    3类: net.ipv6.conf.enp1s0.seg6_enabled 0    禁用IPv6段路由（Segment Routing）
+    3类: net.ipv6.conf.enp1s0.suppress_frag_ndisc 1    禁止通过通告片段来防止IPv6碎片化
+    3类: net.ipv6.conf.enp1s0.temp_prefered_lft 86400    设置IPv6临时地址优先有效期
+    3类: net.ipv6.conf.enp1s0.temp_valid_lft 604800    设置IPv6临时地址有效期
+    3类: net.ipv6.conf.enp1s0.use_oif_addrs_only 0    允许使用非本地地址作为源地址发送IPv6报文
+    3类: net.ipv6.conf.enp1s0.use_optimistic 0    禁用IPv6优化的地址生成
+    3类: net.ipv6.conf.enp1s0.use_tempaddr 0    禁用IPv6临时地址
+  2类: IPv6特定接口-lo接口配置
+    3类: net.ipv6.conf.lo.accept_dad -1    禁止IPv6冲突检测（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra 1    允许接收IPv6路由通告（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_defrtr 1    允许接收默认路由信息（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_from_local 0    禁止从本地接口接收路由通告（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_min_hop_limit 1    设置接收路由通告的最小跳限（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_mtu 1    设置接收路由通告的最大传输单元（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_pinfo 1    允许接收IPv6路由信息选项（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_rt_info_max_plen 0    设置接收路由通告的最大前缀长度（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_rt_info_min_plen 0    设置接收路由通告的最小前缀长度（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_ra_rtr_pref 1    允许接收路由通告的路由器优先级信息（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_redirects 1    允许接收IPv6重定向（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.accept_source_route 0    禁止接受IPv6源路由选项（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.addr_gen_mode 0    设置IPv6地址生成模式（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.autoconf 1    允许IPv6自动配置（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.dad_transmits 1    设置IPv6冲突检测重传次数（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.disable_ipv6 0    启用IPv6功能（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.disable_policy 0    启用IPv6流控策略（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.drop_unicast_in_l2_multicast 0    允许接收L2组播报文的单播报文（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.drop_unsolicited_na 0    允许发送不经过确认的NA报文（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.enhanced_dad 1    启用增强的IPv6冲突检测（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.force_mld_version 0    不强制使用指定版本的MLD协议（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.force_tllao 0    不强制使用指定的链路层地址选项（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.forwarding 0    禁止IPv6路由转发（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.hop_limit 64    设置默认IPv6跳数限制（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.ignore_routes_with_linkdown 0    允许使用离线路由表（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.keep_addr_on_down 0    禁止保持下线的IPv6地址（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.max_addresses 16    设置IPv6接口上的最大地址数（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.max_desync_factor 600    设置IPv6地址重同步的最大因子（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.mc_forwarding 0    禁止IPv6组播转发（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.mldv1_unsolicited_report_interval 10000    设置MLDv1未确认报告的发送间隔（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.mldv2_unsolicited_report_interval 1000    设置MLDv2未确认报告的发送间隔（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.mtu 65536    设置IPv6接口的最大传输单元（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.ndisc_notify 0    禁用发送NDISC通知（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.ndisc_tclass 0    设置发送NDISC通知的流量类别（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.optimistic_dad 0    禁用IPv6乐观的地址生成（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.proxy_ndp 0    禁用IPv6代理NDP（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.regen_max_retry 3    设置IPv6地址生成的最大重试次数（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.router_probe_interval 60    设置IPv6路由器探测的间隔时间（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.router_solicitation_delay 1    设置IPv6路由器探测的延迟时间（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.router_solicitation_interval 4    设置IPv6路由器探测的间隔时间（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.router_solicitation_max_interval 3600    设置IPv6路由器探测的最大间隔时间（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.router_solicitations -1    设置IPv6路由器探测的次数（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.seg6_enabled 0    禁用IPv6 Segment Routing（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.suppress_frag_ndisc 1    允许发送分段报文的NDISC通知（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.temp_prefered_lft 86400    设置IPv6临时地址优先生存时间（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.temp_valid_lft 604800    设置IPv6临时地址有效期（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.use_oif_addrs_only 0    允许使用非本地地址作为源地址发送IPv6报文（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.use_optimistic 0    禁用IPv6优化的地址生成（仅适用于回环接口）
+    3类: net.ipv6.conf.lo.use_tempaddr -1    禁止使用IPv6临时地址（仅适用于回环接口）
+  2类: IPv6特定接口-virbr0接口配置
+    3类: net.ipv6.conf.virbr0.accept_dad 1    允许IPv6冲突检测（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra 0    禁止接收IPv6路由通告（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_defrtr 1    允许接收默认路由信息（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_from_local 0    禁止从本地接口接收路由通告（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_min_hop_limit 1    设置接收路由通告的最小跳限（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_mtu 1    设置接收路由通告的最大传输单元（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_pinfo 1    允许接收IPv6路由信息选项（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_rt_info_max_plen 0    设置接收路由通告的最大前缀长度（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_rt_info_min_plen 0    设置接收路由通告的最小前缀长度（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_ra_rtr_pref 1    允许接收路由通告的路由器优先级信息（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_redirects 1    允许接收IPv6重定向（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.accept_source_route 0    禁止接受IPv6源路由选项（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.addr_gen_mode 0    设置IPv6地址生成模式（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.autoconf 0    禁止IPv6自动配置（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.dad_transmits 1    设置IPv6冲突检测重传次数（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.disable_ipv6 1    禁用IPv6功能（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.disable_policy 0    启用IPv6流控策略（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.drop_unicast_in_l2_multicast 0    允许在L2组播中传送未组播的单播流量（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.drop_unsolicited_na 0    允许丢弃未请求的IPv6邻居通告（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.enhanced_dad 1    启用增强的IPv6冲突检测（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.force_mld_version 0    设置强制使用的MLD版本（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.force_tllao 0    设置是否在IPv6 Neighbor Solicitation中强制使用TLLAO（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.forwarding 0    禁止IPv6转发（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.hop_limit 64    设置IPv6数据包的跳数限制（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.ignore_routes_with_linkdown 0    允许忽略掉线的IPv6路由（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.keep_addr_on_down 0    在接口关闭时保留IPv6地址（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.max_addresses 16    设置IPv6接口允许的最大地址数（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.max_desync_factor 600    设置IPv6地址生成的最大偏差因子（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.mc_forwarding 0    禁止IPv6多播转发（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.mldv1_unsolicited_report_interval 10000    设置MLDv1未确认报告的发送间隔（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.mldv2_unsolicited_report_interval 1000    设置MLDv2未确认报告的发送间隔（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.mtu 1500    设置IPv6接口的最大传输单元（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.ndisc_notify 0    禁用发送NDISC通知（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.ndisc_tclass 0    设置发送NDISC通知的流量类别（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.optimistic_dad 0    禁用IPv6乐观的地址生成（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.proxy_ndp 0    禁用IPv6代理NDP（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.regen_max_retry 3    设置IPv6地址生成的最大重试次数（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.router_probe_interval 60    设置IPv6路由器探测的间隔时间（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.router_solicitation_delay 1    设置IPv6路由器探测的延迟时间（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.router_solicitation_interval 4    设置IPv6路由器探测的间隔时间（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.router_solicitation_max_interval 3600    设置IPv6路由器探测的最大间隔时间（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.router_solicitations -1    设置IPv6路由器探测的次数（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.seg6_enabled 0    禁用IPv6 Segment Routing（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.suppress_frag_ndisc 1    允许发送分段报文的NDISC通知（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.temp_valid_lft 604800    设置IPv6临时地址有效生存时间（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.use_oif_addrs_only 0    允许只使用接口关联的IPv6地址（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.use_optimistic 0    禁用IPv6优化地址生成（仅适用于virbr0接口）
+    3类: net.ipv6.conf.virbr0.use_tempaddr 0    禁用IPv6临时地址生成（仅适用于virbr0接口）
+  2类: IPv6多路径配置
+    3类: net.ipv6.fib_multipath_hash_fields 7    设置IPv6多路径哈希计算所使用的字段（适用于多路径的情况）
+    3类: net.ipv6.fib_multipath_hash_policy 0    设置IPv6多路径哈希计算的策略（适用于多路径的情况）
+  2类: IPv6流标签配置
+    3类: net.ipv6.flowlabel_consistency 1    设置IPv6流标签的一致性（适用于所有接口）
+    3类: net.ipv6.flowlabel_reflect 0    设置IPv6流标签的反射（适用于所有接口）
+    3类: net.ipv6.flowlabel_state_ranges 0    设置IPv6流标签状态范围（适用于所有接口）
+    3类: net.ipv6.fwmark_reflect 0    禁用IPv6防火墙标记的反射（适用于所有接口）
+    3类: net.ipv6.icmp.ratelimit 1000    设置IPv6 ICMP消息的发送速率限制（适用于所有接口）
+    3类: net.ipv6.idgen_delay 1    设置IPv6地址生成延迟时间（适用于所有接口）
+    3类: net.ipv6.idgen_retries 3    设置IPv6地址生成的最大重试次数（适用于所有接口）
+  2类: IPv6分片配置
+    3类: net.ipv6.ip6frag_high_thresh 4194304    设置IPv6分片高阈值（适用于所有接口）
+    3类: net.ipv6.ip6frag_low_thresh 3145728    设置IPv6分片低阈值（适用于所有接口）
+    3类: net.ipv6.ip6frag_secret_interval 0    设置IPv6分片重组的时间间隔（适用于所有接口）
+    3类: net.ipv6.ip6frag_time 60    设置IPv6分片重组的最大时间（适用于所有接口）
+    3类: net.ipv6.ip_nonlocal_bind 0    禁止IPv6套接字绑定到非本地地址（适用于所有接口）
+    3类: net.ipv6.max_dst_opts_length 2147483647    设置IPv6目标选项长度的最大值（适用于所有接口）
+    3类: net.ipv6.max_dst_opts_number 8    设置IPv6目标选项数目的最大值（适用于所有接口）
+    3类: net.ipv6.max_hbh_length 2147483647    设置IPv6目标地址选项长度的最大值（适用于所有接口）
+    3类: net.ipv6.max_hbh_opts_number 8    设置IPv6目标地址选项数目的最大值（适用于所有接口）
+    3类: net.ipv6.mld_max_msf 64    设置MLD（Multicast Listener Discovery）的最大查询状态记录数（适用于所有接口）
+    3类: net.ipv6.mld_qrv 2    设置MLD（Multicast Listener Discovery）查询报文的版本（适用于所有接口）
+  2类: IPv6邻居发现协议-默认接口-配置
+    3类: net.ipv6.neigh.default.anycast_delay 100    设置IPv6邻居缺省接口的任播延迟时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.app_solicit 0    设置IPv6邻居缺省接口的地址解析请求次数（适用于所有接口）
+    3类: net.ipv6.neigh.default.base_reachable_time_ms 30000    设置IPv6邻居缺省接口的基本可达时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.delay_first_probe_time 5    设置IPv6邻居缺省接口的第一次探测的延迟时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.gc_interval 30    设置IPv6邻居缺省接口的垃圾收集间隔时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.gc_stale_time 60    设置IPv6邻居缺省接口的垃圾收集的过期时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.gc_thresh1 128    设置IPv6邻居缺省接口的垃圾收集的阈值1（适用于所有接口）
+    3类: net.ipv6.neigh.default.gc_thresh2 512    设置IPv6邻居缺省接口的垃圾收集的阈值2（适用于所有接口）
+    3类: net.ipv6.neigh.default.gc_thresh3 1024    设置IPv6邻居缺省接口的垃圾收集的阈值3（适用于所有接口）
+    3类: net.ipv6.neigh.default.locktime 0    设置IPv6邻居缺省接口的锁定时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.mcast_resolicit 0    设置IPv6邻居缺省接口的组播地址解析请求次数（适用于所有接口）
+    3类: net.ipv6.neigh.default.mcast_solicit 3    设置IPv6邻居缺省接口的组播地址解析请求次数（适用于所有接口）
+    3类: net.ipv6.neigh.default.proxy_delay 80    设置IPv6邻居缺省接口的代理邻居的延迟时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.proxy_qlen 64    设置IPv6邻居缺省接口的代理邻
+    3类: net.ipv6.neigh.default.retrans_time_ms 1000    设置IPv6邻居缺省接口的重传时间（适用于所有接口）
+    3类: net.ipv6.neigh.default.ucast_solicit 3    设置IPv6邻居缺省接口的单播地址解析请求次数（适用于所有接口）
+    3类: net.ipv6.neigh.default.unres_qlen 101    设置IPv6邻居缺省接口的未解析队列长度（适用于所有接口）
+    3类: net.ipv6.neigh.default.unres_qlen_bytes 212992    设置IPv6邻居缺省接口的未解析队列字节数（适用于所有接口）
+  2类: IPv6邻居发现协议-enp1s0接口-配置
+    3类: net.ipv6.neigh.enp1s0.anycast_delay 100    设置IPv6邻居enp1s0接口的任播延迟时间
+    3类: net.ipv6.neigh.enp1s0.app_solicit 0    设置IPv6邻居enp1s0接口的地址解析请求次数
+    3类: net.ipv6.neigh.enp1s0.base_reachable_time_ms 30000    设置IPv6邻居enp1s0接口的基本可达时间
+    3类: net.ipv6.neigh.enp1s0.delay_first_probe_time 5    设置IPv6邻居enp1s0接口的第一次探测的延迟时间
+    3类: net.ipv6.neigh.enp1s0.gc_stale_time 60    设置IPv6邻居enp1s0接口的垃圾收集的过期时间
+    3类: net.ipv6.neigh.enp1s0.locktime 0    设置IPv6邻居enp1s0接口的锁定时间
+    3类: net.ipv6.neigh.enp1s0.mcast_resolicit 0    设置IPv6邻居enp1s0接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.enp1s0.mcast_solicit 3    设置IPv6邻居enp1s0接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.enp1s0.proxy_delay 80    设置IPv6邻居enp1s0接口的代理邻居的延迟时间
+    3类: net.ipv6.neigh.enp1s0.proxy_qlen 64    设置IPv6邻居enp1s0接口的代理邻居的队列长度
+    3类: net.ipv6.neigh.enp1s0.retrans_time_ms 1000    设置IPv6邻居enp1s0接口的重传时间
+    3类: net.ipv6.neigh.enp1s0.ucast_solicit 3    设置IPv6邻居enp1s0接口的单播地址解析请求次数
+    3类: net.ipv6.neigh.enp1s0.unres_qlen 101    设置IPv6邻居enp1s0接口的未解析队列长度
+    3类: net.ipv6.neigh.enp1s0.unres_qlen_bytes 212992    设置IPv6邻居enp1s0接口的未解析队列字节数
+  2类: IPv6邻居发现协议-lo接口-配置
+    3类: net.ipv6.neigh.lo.anycast_delay 100    设置IPv6邻居lo接口的任播延迟时间
+    3类: net.ipv6.neigh.lo.app_solicit 0    设置IPv6邻居lo接口的地址解析请求次数
+    3类: net.ipv6.neigh.lo.base_reachable_time_ms 30000    设置IPv6邻居lo接口的基本可达时间
+    3类: net.ipv6.neigh.lo.delay_first_probe_time 5    设置IPv6邻居lo接口的第一次探测的延迟时间
+    3类: net.ipv6.neigh.lo.gc_stale_time 60    设置IPv6邻居lo接口的垃圾收集的过期时间
+    3类: net.ipv6.neigh.lo.locktime 0    设置IPv6邻居lo接口的锁定时间
+    3类: net.ipv6.neigh.lo.mcast_resolicit 0    设置IPv6邻居lo接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.lo.mcast_solicit 3    设置IPv6邻居lo接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.lo.proxy_delay 80    设置IPv6邻居lo接口的代理邻居的延迟时间
+    3类: net.ipv6.neigh.lo.proxy_qlen 64    设置IPv6邻居lo接口的代理邻居的队列长度
+    3类: net.ipv6.neigh.lo.retrans_time_ms 1000    设置IPv6邻居lo接口的重传时间
+    3类: net.ipv6.neigh.lo.ucast_solicit 3    设置IPv6邻居lo接口的单播地址解析请求次数
+    3类: net.ipv6.neigh.lo.unres_qlen 101    设置IPv6邻居lo接口的未解析队列长度
+    3类: net.ipv6.neigh.lo.unres_qlen_bytes 212992    设置IPv6邻居lo接口的未解析队列字节数
+  2类: IPv6邻居发现协议-virbr0接口-配置
+    3类: net.ipv6.neigh.virbr0.anycast_delay 100    设置IPv6邻居virbr0接口的任播延迟时间
+    3类: net.ipv6.neigh.virbr0.app_solicit 0    设置IPv6邻居virbr0接口的地址解析请求次数
+    3类: net.ipv6.neigh.virbr0.base_reachable_time_ms 30000    设置IPv6邻居virbr0接口的基本可达时间
+    3类: net.ipv6.neigh.virbr0.delay_first_probe_time 5    设置IPv6邻居virbr0接口的第一次探测的延迟时间
+    3类: net.ipv6.neigh.virbr0.gc_stale_time 60    设置IPv6邻居virbr0接口的垃圾收集的过期时间
+    3类: net.ipv6.neigh.virbr0.locktime 0    设置IPv6邻居virbr0接口的锁定时间
+    3类: net.ipv6.neigh.virbr0.mcast_resolicit 0    设置IPv6邻居virbr0接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.virbr0.mcast_solicit 3    设置IPv6邻居virbr0接口的组播地址解析请求次数
+    3类: net.ipv6.neigh.virbr0.proxy_delay 80    设置IPv6邻居virbr0接口的代理邻居的延迟时间
+    3类: net.ipv6.neigh.virbr0.proxy_qlen 64    设置IPv6邻居virbr0接口的代理邻居的队列长度
+    3类: net.ipv6.neigh.virbr0.retrans_time_ms 1000    设置IPv6邻居virbr0接口的重传时间
+    3类: net.ipv6.neigh.virbr0.ucast_solicit 3    设置IPv6邻居virbr0接口的单播地址解析请求次数
+    3类: net.ipv6.neigh.virbr0.unres_qlen 101    设置IPv6邻居virbr0接口的未解析队列长度
+    3类: net.ipv6.neigh.virbr0.unres_qlen_bytes 212992    设置IPv6邻居virbr0接口的未解析队列字节数
+    3类: net.ipv6.route.gc_elasticity 9    设置IPv6路由垃圾收集的弹性值
+    3类: net.ipv6.route.gc_interval 30    设置IPv6路由垃圾收集的时间间隔
+    3类: net.ipv6.route.gc_min_interval 0    设置IPv6路由垃圾收集的最小时间间隔
+    3类: net.ipv6.route.gc_min_interval_ms 500    设置IPv6路由垃圾收集的最小时间间隔（以毫秒为单位）
+    3类: net.ipv6.route.gc_thresh 1024    设置IPv6路由垃圾收集的阈值
+    3类: net.ipv6.route.gc_timeout 60    设置IPv6路由垃圾收集的超时时间
+    3类: net.ipv6.route.max_size 4096    设置IPv6路由最大缓存项数目
+    3类: net.ipv6.route.min_adv_mss 1220    设置IPv6路由最小通告的MSS值
+    3类: net.ipv6.route.mtu_expires 600    设置IPv6路由MTU的过期时间
+    3类: net.ipv6.seg6_flowlabel 0    设置IPv6 SEG6流标签
+    3类: net.ipv6.xfrm6_gc_thresh 32768    设置IPv6 XFRM缓存阈值
+  2类: MPTCP配置
+    3类: net.mptcp.add_addr_timeout 120    MPTCP添加地址的超时时间为120秒
+    3类: net.mptcp.enabled 0    禁用MPTCP功能，值为0表示禁用
+    3类: net.mptcp.stale_loss_cnt 4    MPTCP报告拥塞的阈值
+  2类: 网络连接跟踪基本配置
+    3类: net.netfilter.nf_conntrack_acct 0    禁用网络连接跟踪的计费统计功能，值为0表示禁用
+    3类: net.netfilter.nf_conntrack_buckets 65536    设置网络连接跟踪表的哈希桶数目
+    3类: net.netfilter.nf_conntrack_checksum 1    开启网络连接跟踪的数据包校验和功能，值为1表示开启
+    3类: net.netfilter.nf_conntrack_count 1    开启网络连接跟踪表中的计数功能，值为1表示开启
+  2类: 网络连接跟踪DCCP协议配置
+    3类: net.netfilter.nf_conntrack_dccp_loose 1    开启DCCP协议的宽松连接跟踪模式，值为1表示开启
+    3类: net.netfilter.nf_conntrack_dccp_timeout_closereq 64    设置DCCP连接关闭请求的超时时间为64秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_closing 64    设置DCCP连接关闭状态的超时时间为64秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_open 43200    设置DCCP连接打开状态的超时时间为43200秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_partopen 480    设置DCCP连接部分打开状态的超时时间为480秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_request 240    设置DCCP连接请求状态的超时时间为240秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_respond 480    设置DCCP连接响应状态的超时时间为480秒
+    3类: net.netfilter.nf_conntrack_dccp_timeout_timewait 240    设置DCCP连接TIME_WAIT状态的超时时间为240秒
+  2类: 网络连接跟踪事件与预期连接配置
+    3类: net.netfilter.nf_conntrack_events 1    开启网络连接跟踪的事件记录功能，值为1表示开启
+    3类: net.netfilter.nf_conntrack_expect_max 1024    设置预期的网络连接跟踪表最大数目为1024
+  2类: 网络连接跟踪IPv6分片配置
+    3类: net.netfilter.nf_conntrack_frag6_high_thresh 4194304    设置IPv6分片网络连接跟踪表的高阈值为4194304
+    3类: net.netfilter.nf_conntrack_frag6_low_thresh 3145728    设置IPv6分片网络连接跟踪表的低阈值为3145728
+    3类: net.netfilter.nf_conntrack_frag6_timeout 60    设置IPv6分片网络连接跟踪表的超时时间为60秒
+  2类: 网络连接跟踪通用与特定协议超时配置
+    3类: net.netfilter.nf_conntrack_generic_timeout 600    设置通用网络连接跟踪表的超时时间为600秒
+    3类: net.netfilter.nf_conntrack_helper 0    禁用网络连接跟踪的协议助手功能，值为0表示禁用
+    3类: net.netfilter.nf_conntrack_icmp_timeout 30    设置ICMP协议的网络连接跟踪超时时间为30秒
+    3类: net.netfilter.nf_conntrack_icmpv6_timeout 30    设置ICMPv6协议的网络连接跟踪超时时间为30秒
+    3类: net.netfilter.nf_conntrack_log_invalid 0    禁用网络连接跟踪记录无效数据包的功能，值为0表示禁用
+    3类: net.netfilter.nf_conntrack_max 262144    设置网络连接跟踪表的最大条目数为262144
+  2类: 网络连接跟踪SCTP协议超时配置
+    3类: net.netfilter.nf_conntrack_sctp_timeout_closed 10    设置SCTP协议的连接关闭状态的超时时间为10秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_cookie_echoed 3    设置SCTP协议的COOKIE_ECHOED状态的超时时间为3秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_cookie_wait 3    设置SCTP协议的COOKIE_WAIT状态的超时时间为3秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_established 432000    设置SCTP协议的连接建立状态的超时时间为432000秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_heartbeat_acked 210    设置SCTP协议的HEARTBEAT_ACKED状态的超时时间为210秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_heartbeat_sent 30    设置SCTP协议的HEARTBEAT_SENT状态的超时时间为30秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_shutdown_ack_sent 3    设置SCTP协议的SHUTDOWN_ACK_SENT状态的超时时间为3秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_shutdown_recd 0    设置SCTP协议的SHUTDOWN_RECD状态的超时时间为0秒
+    3类: net.netfilter.nf_conntrack_sctp_timeout_shutdown_sent 0    设置SCTP协议的SHUTDOWN_SENT状态的超时时间为0秒
+  2类: 网络连接跟踪TCP配置
+    3类: net.netfilter.nf_conntrack_tcp_be_liberal 0    禁用TCP协议的BE_LIBERAL模式，值为0表示禁用
+    3类: net.netfilter.nf_conntrack_tcp_loose 1    开启TCP协议的宽松连接跟踪模式，值为1表示开启
+    3类: net.netfilter.nf_conntrack_tcp_max_retrans 3    设置TCP协议的最大重传次数为3
+    3类: net.netfilter.nf_conntrack_tcp_timeout_close 10    设置TCP协议的连接关闭状态的超时时间为10秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_close_wait 60    设置TCP协议的CLOSE_WAIT状态的超时时间为60秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_established 432000    设置TCP协议的连接建立状态的超时时间为432000秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_fin_wait 120    设置TCP协议的FIN_WAIT状态的超时时间为120秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_last_ack 30    设置TCP协议的LAST_ACK状态的超时时间为30秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_max_retrans 300    设置TCP协议的连接异常后 netfilter 连接跟踪的保持时间
+    3类: net.netfilter.nf_conntrack_tcp_timeout_syn_recv 60    设置TCP协议的SYN_RECV状态的超时时间为60秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_syn_sent 120    设置TCP协议的SYN_SENT状态的超时时间为120秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_time_wait 120    设置TCP协议的TIME_WAIT状态的超时时间为120秒
+    3类: net.netfilter.nf_conntrack_tcp_timeout_unacknowledged 300    设置TCP协议的未确认状态的超时时间为300秒
+    3类: net.netfilter.nf_conntrack_timestamp 0    禁用网络连接跟踪的时间戳功能，值为0表示禁用
+    3类: net.netfilter.nf_conntrack_udp_timeout 30    设置UDP协议的网络连接跟踪超时时间为30秒
+    3类: net.netfilter.nf_conntrack_udp_timeout_stream 120    设置UDP协议的流跟踪超时时间为120秒
+    3类: net.netfilter.nf_flowtable_tcp_timeout 30    设置TCP协议的FlowTable超时时间为30秒
+    3类: net.netfilter.nf_flowtable_udp_timeout 30    设置UDP协议的FlowTable超时时间为30秒
+  2类: 网络连接跟踪日志记录配置
+    3类: net.netfilter.nf_log.0 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.1 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.10 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.11 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.12 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.2 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.3 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.4 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.5 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.6 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.7 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.8 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log.9 NONE    禁用网络连接跟踪日志记录
+    3类: net.netfilter.nf_log_all_netns 0    禁用网络连接跟踪日志记录在所有的Network Namespace中，值为0表示禁用
+    3类: net.nf_conntrack_max 262144    设置网络连接跟踪的最大条目数为262144
+    3类: net.unix.max_dgram_qlen 512    设置UNIX域套接字的最大队列长度为512
+1类: Sun RPC相关参数
+    3类: sunrpc.max_resvport 1023    设置Sun RPC的保留端口的最大值为1023
+    3类: sunrpc.min_resvport 665    设置Sun RPC的保留端口的最小值为665
+    3类: sunrpc.nfs_debug 0x0000    NFS客户端调试标志，值为0x0000表示禁用调试
+    3类: sunrpc.nfsd_debug 0x0000    NFS服务器调试标志，值为0x0000表示禁用调试
+    3类: sunrpc.nlm_debug 0x0000    Network Lock Manager调试标志，值为0x0000表示禁用调试
+    3类: sunrpc.rpc_debug 0x0000    RPC调试标志，值为0x0000表示禁用调试
+    3类: sunrpc.tcp_fin_timeout 15    设置TCP连接的FIN_WAIT2状态的超时时间为15秒
+    3类: sunrpc.tcp_max_slot_table_entries 65536    设置Sun RPC的TCP最大槽表条目数为65536
+    3类: sunrpc.tcp_slot_table_entries 2    设置Sun RPC的TCP槽表条目数为2
+    3类: sunrpc.transports tcp 1048576    设置Sun RPC的TCP传输参数，最大数据包大小为1048576字节
+    3类: sunrpc.transports udp 32768    设置Sun RPC的UDP传输参数，最大数据包大小为32768字节
+    3类: sunrpc.udp_slot_table_entries 16    设置Sun RPC的UDP槽表条目数为16
+1类: 用户命名空间相关参数
+    3类: user.max_cgroup_namespaces 61543    设置用户的Cgroup命名空间最大数目为61543
+    3类: user.max_inotify_instances 128    设置用户的inotify实例最大数目为128
+    3类: user.max_inotify_watches 117245    设置用户的inotify监视项最大数目为117245
+    3类: user.max_ipc_namespaces 61543    设置用户的IPC命名空间最大数目为61543
+    3类: user.max_mnt_namespaces 61543    设置用户的Mount命名空间最大数目为61543
+    3类: user.max_net_namespaces 61543    设置用户的Network命名空间最大数目为61543
+    3类: user.max_pid_namespaces 61543    设置用户的PID命名空间最大数目为61543
+    3类: user.max_time_namespaces 61543    设置用户的Time命名空间最大数目为61543
+    3类: user.max_user_namespaces 61543    设置用户的User命名空间最大数目为61543
+    3类: user.max_uts_namespaces 61543    设置用户的UTS命名空间最大数目为61543
+    3类: vm.admin_reserve_kbytes 8192    设置管理员保留内存大小为8192KB
+1类: 内存管理相关参数
+    3类: vm.block_dump 0    禁用块层面的调试跟踪，值为0表示禁用
+    3类: vm.compact_unevictable_allowed 1    允许紧缩非可驻留页，值为1表示允许
+    3类: vm.compaction_proactiveness 0    设置页面紧缩的主动性为0
+    3类: vm.dirty_background_bytes 0    设置脏页后台刷新的阈值为0字节
+    3类: vm.dirty_background_ratio 10    设置脏页后台刷新的阈值为10%
+    3类: vm.dirty_bytes 0    设置脏页内存膨胀的阈值为0字节
+    3类: vm.dirty_expire_centisecs 3000    设置脏页过期时间为3000毫秒
+    3类: vm.dirty_ratio 40    设置脏页内存膨胀的阈值为40%
+    3类: vm.dirty_writeback_centisecs 500    设置脏页回写时间为500毫秒
+    3类: vm.dirtytime_expire_seconds 43200    设置脏页的过期时间为43200秒
+    3类: vm.drop_caches 0    禁用页面缓存清理，值为0表示禁用
+    3类: vm.extfrag_threshold 500    设置外部碎片的阈值为500页
+    3类: vm.force_cgroup_v2_swappiness 0    禁用强制控制组V2的Swappiness设置，值为0表示禁用
+    3类: vm.hugetlb_shm_group 0    设置HugeTLB共享内存的组ID为0，表示所有组可用
+    3类: vm.laptop_mode 0    禁用笔记本模式，值为0表示禁用
+    3类: vm.legacy_va_layout 0    禁用Legacy VA layout，值为0表示禁用
+    3类: vm.lowmem_reserve_ratio 256    256    32    0    0    设置低内存保留比例，用于系统进入内存紧张时保留一部分内存
+    3类: vm.max_map_count 65530    设置
+    3类: vm.memory_failure_early_kill 0    禁用内存错误早期处理杀掉进程，值为0表示禁用
+    3类: vm.memory_failure_recovery 1    开启内存错误恢复功能，值为1表示开启
+    3类: vm.min_free_kbytes 67584    设置最小空闲内存为67584KB
+    3类: vm.min_slab_ratio 5    设置最小Slab比例为5%
+    3类: vm.min_unmapped_ratio 1    设置最小未映射比例为1%
+    3类: vm.mmap_min_addr 4096    设置进程的最小mmap地址为4096
+    3类: vm.mmap_rnd_bits 28    设置mmap的随机位数为28
+    3类: vm.mmap_rnd_compat_bits 8    设置mmap的兼容随机位数为8
+    3类: vm.nr_hugepages 0    设置HugeTLB的分配数量为0
+    3类: vm.nr_hugepages_mempolicy 0    设置NUMA节点的HugeTLB分配数量为0
+    3类: vm.nr_overcommit_hugepages 0    设置超额提交的HugeTLB分配数量为0
+    3类: vm.numa_stat 1    开启NUMA统计信息记录，值为1表示开启
+    3类: vm.numa_zonelist_order Node    设置NUMA的Zonelist排序方式为按Node
+    3类: vm.oom_dump_tasks 1    开启OOM Killer时转储进程的信息，值为1表示开启
+    3类: vm.oom_kill_allocating_task 0    禁用OOM Killer杀掉分配内存的进程，值为0表示禁用
+    3类: vm.overcommit_kbytes 0    设置超额提交的内存大小为0KB
+    3类: vm.overcommit_memory 0    设置内存超额提交模式为不允许超额提交，值为0表示不允许
+    3类: vm.overcommit_ratio 50    设置内存超额提交比例为50%
+    3类: vm.page-cluster 3    设置页面聚集数目为3
+    3类: vm.page_lock_unfairness 5    设置页面锁的不公平性因子为5
+    3类: vm.panic_on_oom 0    禁用内存不足时的系统崩溃，值为0表示禁用
+    3类: vm.percpu_pagelist_fraction 0    设置percpu页表分配的内存比例为0%
+    3类: vm.stat_interval 1    设置虚拟内存统计信息的间隔为1秒
+    3类: vm.swappiness 10    设置交换内存使用倾向为10
+    3类: vm.user_reserve_kbytes 131072    设置用户空间保留内存为131072KB
+    3类: vm.vfs_cache_pressure 100    设置VFS缓存压力为100
+    3类: vm.watermark_boost_factor 15000    设置内存水位的提升因子为15000
+    3类: vm.watermark_scale_factor 10    设置内存水位的缩放因子为10
+    3类: vm.zone_reclaim_mode 0    设置内存区域回收模式为不回收，值为0表示不回收

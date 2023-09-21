@@ -1,0 +1,17 @@
+{
+    "prefixes": [
+      {
+        "prefix": "net.ipv4",
+        "regex": "^net\\.ipv4\\..*"
+      },
+      {
+        "prefix": "kernel",
+        "regex": "^kernel\\..*"
+      },
+      {
+        "prefix": "other_prefix",
+        "regex": "^your_custom_regex_here"
+      }
+    ]
+  }
+  

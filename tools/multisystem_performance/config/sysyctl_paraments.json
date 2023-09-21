@@ -1,0 +1,3696 @@
+{
+    "ABI (Application Binary Interface) 相关设置": {
+        "abi.vsyscall32": {
+            "value": "1",
+            "define": "启用32位系统调用接口，可能用于兼容旧的32位应用程序"
+        }
+    },
+    "加密 (Crypto) 相关设置": {
+        "crypto.fips_enabled": {
+            "value": "0    FIPS (Federal Information Processing Standards)",
+            "define": "加密标准未启用"
+        },
+        "crypto.fips_name": {
+            "value": "Red Hat Enterprise Linux 8",
+            "define": "FIPS加密标准名称"
+        },
+        "crypto.fips_version": {
+            "value": "4.18.0-499.el8.x86_64",
+            "define": "FIPS加密标准版本"
+        }
+    },
+    "调试 (Debug) 相关设置": {
+        "debug.exception-trace": {
+            "value": "1",
+            "define": "启用异常追踪"
+        },
+        "debug.kprobes-optimization": {
+            "value": "1",
+            "define": "启用kprobes优化"
+        }
+    },
+    "设备 (Device) 相关设置": {
+        "dev.hpet.max-user-freq": {
+            "value": "64    HPET (High Precision Event Timer)",
+            "define": "最大用户频率为64"
+        },
+        "dev.i915.oa_max_sample_rate": {
+            "value": "100000    i915驱动OA",
+            "define": "(OpeAnaylstics)的最大采样率为100000"
+        },
+        "dev.i915.perf_stream_paranoid": {
+            "value": "1",
+            "define": "i915驱动性能流控制开启"
+        },
+        "dev.mac_hid.mouse_button2_keycode": {
+            "value": "97",
+            "define": "鼠标按钮2的键值设置为97"
+        },
+        "dev.mac_hid.mouse_button3_keycode": {
+            "value": "100",
+            "define": "鼠标按钮3的键值设置为100"
+        },
+        "dev.mac_hid.mouse_button_emulation": {
+            "value": "0",
+            "define": "禁用鼠标按钮仿真"
+        }
+    },
+    "RAID 相关设置": {
+        "dev.raid.speed_limit_max": {
+            "value": "200000",
+            "define": "RAID速度上限为200000"
+        },
+        "dev.raid.speed_limit_min": {
+            "value": "1000",
+            "define": "RAID速度下限为1000"
+        }
+    },
+    "SCSI 相关设置": {
+        "dev.scsi.logging_level": {
+            "value": "0",
+            "define": "禁用SCSI命令日志记录"
+        }
+    },
+    "文件系统 (File System) 相关设置": {
+        "fs.aio-max-nr": {
+            "value": "1048576    AIO (Asynchronous",
+            "define": "I/O)最大请求数为1048576"
+        },
+        "fs.aio-nr": {
+            "value": "0",
+            "define": "当前进行中的AIO请求数为0"
+        },
+        "fs.binfmt_misc.status": {
+            "value": "enabled",
+            "define": "binfmt_misc模块状态为enabled"
+        },
+        "fs.dentry-state": {
+            "value": "109771    84353    45    0    17793    0",
+            "define": "文件系统dentry状态"
+        },
+        "fs.dir-notify-enable": {
+            "value": "1",
+            "define": "启用目录通知功能"
+        },
+        "fs.epoll.max_user_watches": {
+            "value": "3226624",
+            "define": "单个用户可以设置的epoll观察者数目为3226624"
+        },
+        "fs.file-max": {
+            "value": "1569928",
+            "define": "系统同时打开的文件描述符上限为1569928"
+        },
+        "fs.file-nr": {
+            "value": "5440    0    1569928",
+            "define": "当前已分配的文件描述符数为5440"
+        }
+    },
+    "Inode与Dentry": {
+        "fs.inode-nr": {
+            "value": "84488    618",
+            "define": "文件系统inode统计"
+        },
+        "fs.inode-state": {
+            "value": "84488    618    0    0    0    0    0",
+            "define": "文件系统inode状态"
+        },
+        "文件监控": {
+            "fs.inotify.max_queued_events": {
+                "value": "16384",
+                "define": "inotify队列中最大事件数为16384"
+            },
+            "fs.inotify.max_user_instances": {
+                "value": "128",
+                "define": "单个用户可以设置的inotify实例数目为128"
+            },
+            "fs.inotify.max_user_watches": {
+                "value": "117245",
+                "define": "单个用户可以设置的inotify观察数目为117245"
+            },
+            "fs.lease-break-time": {
+                "value": "45",
+                "define": "租约终止时间为45秒"
+            },
+            "fs.leases-enable": {
+                "value": "1",
+                "define": "启用文件锁定"
+            },
+            "fs.mount-max": {
+                "value": "100000",
+                "define": "文件系统挂载点数上限为100000"
+            }
+        },
+        "管道与消息队列1": {
+            "fs.mqueue.msg_default": {
+                "value": "10",
+                "define": "POSIX消息队列的默认消息数目为10"
+            },
+            "fs.mqueue.msg_max": {
+                "value": "10",
+                "define": "POSIX消息队列的最大消息数目为10"
+            },
+            "fs.mqueue.msgsize_default": {
+                "value": "8192",
+                "define": "POSIX消息队列的默认消息大小为8192字节"
+            },
+            "fs.mqueue.msgsize_max": {
+                "value": "8192",
+                "define": "POSIX消息队列的最大消息大小为8192字节"
+            },
+            "fs.mqueue.queues_max": {
+                "value": "256",
+                "define": "POSIX消息队列的最大队列数目为256"
+            },
+            "fs.nr_open": {
+                "value": "1048576",
+                "define": "单个进程可以打开的文件描述符数目上限为1048576"
+            },
+            "fs.overflowgid": {
+                "value": "65534    指定文件系统的GID (group ID)",
+                "define": "当文件系统出现错误时的溢出组ID"
+            },
+            "fs.overflowuid": {
+                "value": "65534    指定文件系统的UID (user ID)",
+                "define": "当文件系统出现错误时的溢出用户ID"
+            }
+        },
+        "管道与消息队列2": {
+            "fs.pipe-max-size": {
+                "value": "1048576",
+                "define": "管道缓冲区最大大小为1048576字节"
+            },
+            "fs.pipe-user-pages-hard": {
+                "value": "0",
+                "define": "使用pipe缓冲区硬限制，限制为0"
+            },
+            "fs.pipe-user-pages-soft": {
+                "value": "16384",
+                "define": "使用pipe缓冲区软限制，限制为16384"
+            }
+        },
+        "文件访问控制": {
+            "fs.protected_fifos": {
+                "value": "0",
+                "define": "不保护FIFO文件"
+            },
+            "fs.protected_hardlinks": {
+                "value": "1",
+                "define": "保护硬链接，阻止非特权用户创建硬链接"
+            },
+            "fs.protected_regular": {
+                "value": "0",
+                "define": "不保护常规文件"
+            },
+            "fs.protected_symlinks": {
+                "value": "1",
+                "define": "保护符号链接，阻止非特权用户创建符号链接"
+            }
+        },
+        "配额管理": {
+            "fs.quota.allocated_dquots": {
+                "value": "0",
+                "define": "当前分配的磁盘配额数量为0"
+            },
+            "fs.quota.cache_hits": {
+                "value": "0",
+                "define": "磁盘配额缓存命中数为0"
+            },
+            "fs.quota.drops": {
+                "value": "0",
+                "define": "磁盘配额被删除数为0"
+            },
+            "fs.quota.free_dquots": {
+                "value": "0",
+                "define": "空闲磁盘配额数量为0"
+            },
+            "fs.quota.lookups": {
+                "value": "0",
+                "define": "磁盘配额查找数为0"
+            },
+            "fs.quota.reads": {
+                "value": "0",
+                "define": "磁盘配额读取数为0"
+            },
+            "fs.quota.syncs": {
+                "value": "0",
+                "define": "磁盘配额同步数为0"
+            },
+            "fs.quota.warnings": {
+                "value": "1",
+                "define": "磁盘配额警告数为1"
+            },
+            "fs.quota.writes": {
+                "value": "0",
+                "define": "磁盘配额写入数为0"
+            },
+            "fs.suid_dumpable": {
+                "value": "0",
+                "define": "设置suid程序在转储核心文件时不包含任何敏感信息"
+            }
+        },
+        "XFS 文件系统相关设置": {
+            "fs.xfs.error_level": {
+                "value": "3",
+                "define": "设置XFS文件系统错误等级为3"
+            },
+            "fs.xfs.filestream_centisecs": {
+                "value": "3000",
+                "define": "XFS文件系统流文件分配时间间隔为3000毫秒"
+            },
+            "fs.xfs.inherit_noatime": {
+                "value": "1",
+                "define": "继承noatime标志，保留不更新文件访问时间"
+            },
+            "fs.xfs.inherit_nodefrag": {
+                "value": "1",
+                "define": "继承nodefrag标志，保留不允许碎片化文件"
+            },
+            "fs.xfs.inherit_nodump": {
+                "value": "1",
+                "define": "继承nodump标志，保留不将文件包含在备份中"
+            },
+            "fs.xfs.inherit_nosymlinks": {
+                "value": "0",
+                "define": "继承nosymlinks标志，保留允许符号链接"
+            },
+            "fs.xfs.inherit_sync": {
+                "value": "1",
+                "define": "继承sync标志，保留同步写入"
+            },
+            "fs.xfs.irix_sgid_inherit": {
+                "value": "0    IRIX",
+                "define": "sgid继承标志，保留不继承sgid位"
+            },
+            "fs.xfs.irix_symlink_mode": {
+                "value": "0",
+                "define": "IRIX符号链接模式标志，保留不允许以绝对路径打开符号链接"
+            },
+            "fs.xfs.panic_mask": {
+                "value": "0",
+                "define": "XFS内核恐慌掩码设置为0"
+            },
+            "fs.xfs.rotorstep": {
+                "value": "1",
+                "define": "XFS元数据加锁器的转子步长为1"
+            },
+            "fs.xfs.speculative_cow_prealloc_lifetime": {
+                "value": "300",
+                "define": "XFS文件预分配的写时复制寿命为300秒"
+            },
+            "fs.xfs.speculative_prealloc_lifetime": {
+                "value": "300",
+                "define": "XFS文件预分配寿命为300秒"
+            },
+            "fs.xfs.stats_clear": {
+                "value": "0",
+                "define": "清除XFS文件系统统计信息的标志为0"
+            },
+            "fs.xfs.xfssyncd_centisecs": {
+                "value": "3000",
+                "define": "XFS同步刷新时间为3000毫秒"
+            }
+        }
+    },
+    "内核 (Kernel) 相关设置": {
+        "kernel.acct": {
+            "value": "4    2    30",
+            "define": "启用进程账户和启动信息记录，缓冲区大小为4KB，每隔30秒记录到文件系统"
+        },
+        "kernel.acpi_video_flags": {
+            "value": "0",
+            "define": "禁用ACPI视频扩展"
+        },
+        "kernel.auto_msgmni": {
+            "value": "0",
+            "define": "自动计算消息队列的最大标识符数目为0"
+        },
+        "kernel.bootloader_type": {
+            "value": "6",
+            "define": "启动加载器类型为6"
+        },
+        "kernel.bootloader_version": {
+            "value": "38",
+            "define": "启动加载器版本为38"
+        },
+        "kernel.bpf_stats_enabled": {
+            "value": "0",
+            "define": "禁用BPF统计"
+        },
+        "内核进程及任务相关1": {
+            "kernel.cad_pid": {
+                "value": "1    CAD",
+                "define": "(Ctrl-Alt-Del)进程的PID为1"
+            },
+            "kernel.cap_last_cap": {
+                "value": "40",
+                "define": "系统中支持的最后一个能力为40"
+            },
+            "kernel.core_pattern": {
+                "value": "|/usr/lib/systemd/systemd-coredump %P %u %g %s %t %c %h %e",
+                "define": "设置核心转储模式，使用systemd-coredump处理"
+            },
+            "kernel.core_pipe_limit": {
+                "value": "16",
+                "define": "核心转储管道限制为16"
+            },
+            "kernel.core_uses_pid": {
+                "value": "1",
+                "define": "核心转储文件名中使用PID"
+            },
+            "kernel.ctrl-alt-del": {
+                "value": "0",
+                "define": "禁用Ctrl-Alt-Del组合键的处理"
+            },
+            "kernel.dmesg_restrict": {
+                "value": "0",
+                "define": "禁用非特权用户访问dmesg"
+            },
+            "kernel.domainname": {
+                "value": "(none)",
+                "define": "系统域名设置为(none)"
+            },
+            "kernel.firmware_config.force_sysfs_fallback": {
+                "value": "0",
+                "define": "不强制使用sysfs回退来查找固件配置"
+            },
+            "kernel.firmware_config.ignore_sysfs_fallback": {
+                "value": "0",
+                "define": "不忽略sysfs回退来查找固件配置"
+            },
+            "kernel.ftrace_dump_on_oops": {
+                "value": "0",
+                "define": "不在oops发生时转储ftrace跟踪缓冲区"
+            },
+            "kernel.ftrace_enabled": {
+                "value": "1",
+                "define": "启用ftrace跟踪"
+            },
+            "kernel.hardlockup_all_cpu_backtrace": {
+                "value": "0",
+                "define": "不在所有CPU上的硬锁定发生时转储回溯"
+            },
+            "kernel.hardlockup_panic": {
+                "value": "1",
+                "define": "在硬锁定发生时触发内核恐慌"
+            },
+            "kernel.hostname": {
+                "value": "localhost.localdomain",
+                "define": "主机名设置为localhost.localdomain"
+            }
+        },
+        "内核进程及任务相关2": {
+            "kernel.hung_task_check_count": {
+                "value": "4194304",
+                "define": "检查挂起任务的次数为4194304"
+            },
+            "kernel.hung_task_panic": {
+                "value": "0",
+                "define": "在挂起任务发生时不触发内核恐慌"
+            },
+            "kernel.hung_task_timeout_secs": {
+                "value": "120",
+                "define": "挂起任务超时时间为120秒"
+            },
+            "kernel.hung_task_warnings": {
+                "value": "10",
+                "define": "挂起任务的警告次数为10"
+            },
+            "kernel.io_delay_type": {
+                "value": "0",
+                "define": "使用PIO作为io_delay的类型"
+            },
+            "kernel.kexec_load_disabled": {
+                "value": "0",
+                "define": "允许使用kexec来加载新内核"
+            }
+        },
+        "Key 相关设置": {
+            "kernel.keys.gc_delay": {
+                "value": "300",
+                "define": "Key处理延迟为300秒"
+            },
+            "kernel.keys.maxbytes": {
+                "value": "20000",
+                "define": "每个key的最大长度为20000字节"
+            },
+            "kernel.keys.maxkeys": {
+                "value": "200",
+                "define": "每个用户可以拥有的keys数目上限为200"
+            },
+            "kernel.keys.persistent_keyring_expiry": {
+                "value": "259200",
+                "define": "永久key的过期时间为259200秒"
+            },
+            "kernel.keys.root_maxbytes": {
+                "value": "25000000",
+                "define": "根用户每个key的最大长度为25000000字节"
+            },
+            "kernel.keys.root_maxkeys": {
+                "value": "1000000",
+                "define": "根用户可以拥有的keys数目上限为1000000"
+            },
+            "kernel.kptr_restrict": {
+                "value": "1",
+                "define": "限制KPTR访问，允许仅内核代码使用指针反解"
+            }
+        },
+        "内核锁相关": {
+            "kernel.max_lock_depth": {
+                "value": "1024",
+                "define": "锁的最大嵌套深度为1024"
+            },
+            "kernel.max_rcu_stall_to_panic": {
+                "value": "0    不在RCU",
+                "define": "stall发生时触发内核恐慌"
+            }
+        },
+        "内核模块相关": {
+            "kernel.modprobe": {
+                "value": "/sbin/modprobe",
+                "define": "指定modprobe命令路径为/sbin/modprobe"
+            },
+            "kernel.modules_disabled": {
+                "value": "0",
+                "define": "允许加载和卸载内核模块"
+            }
+        },
+        "内核内存相关": {
+            "kernel.msg_next_id": {
+                "value": "-1",
+                "define": "消息队列的下一个标识符为-1"
+            },
+            "kernel.msgmax": {
+                "value": "8192",
+                "define": "消息队列中单个消息的最大大小为8192字节"
+            },
+            "kernel.msgmnb": {
+                "value": "16384",
+                "define": "消息队列中单个队列的最大大小为16384字节"
+            },
+            "kernel.msgmni": {
+                "value": "32000",
+                "define": "系统范围内的消息队列最大标识符数目为32000"
+            },
+            "kernel.ngroups_max": {
+                "value": "65536",
+                "define": "用户所属的最大组数为65536"
+            },
+            "kernel.nmi_watchdog": {
+                "value": "1    启用NMI",
+                "define": "watchdog"
+            },
+            "kernel.ns_last_pid": {
+                "value": "131565",
+                "define": "最后一个PID命名空间的PID为131565"
+            }
+        },
+        "内核NUMA相关": {
+            "kernel.numa_balancing": {
+                "value": "0",
+                "define": "禁用NUMA均衡"
+            },
+            "kernel.numa_balancing_scan_delay_ms": {
+                "value": "1000",
+                "define": "NUMA均衡扫描延迟为1000毫秒"
+            },
+            "kernel.numa_balancing_scan_period_max_ms": {
+                "value": "60000",
+                "define": "NUMA均衡扫描周期最大值为60000毫秒"
+            },
+            "kernel.numa_balancing_scan_period_min_ms": {
+                "value": "1000",
+                "define": "NUMA均衡扫描周期最小值为1000毫秒"
+            },
+            "kernel.numa_balancing_scan_size_mb": {
+                "value": "256",
+                "define": "NUMA均衡扫描的大小为256MB"
+            },
+            "kernel.osrelease": {
+                "value": "4.18.0-499.el8.x86_64",
+                "define": "内核版本号为4.18.0-499.el8.x86_64"
+            },
+            "kernel.ostype": {
+                "value": "Linux",
+                "define": "操作系统类型为Linux"
+            },
+            "kernel.overflowgid": {
+                "value": "65534",
+                "define": "指定在inode中使用的溢出GID为65534"
+            },
+            "kernel.overflowuid": {
+                "value": "65534",
+                "define": "指定在inode中使用的溢出UID为65534"
+            }
+        },
+        "Panic 相关设置": {
+            "kernel.panic": {
+                "value": "0",
+                "define": "内核恐慌设置为0，不在内核崩溃时触发重启"
+            },
+            "kernel.panic_on_io_nmi": {
+                "value": "0",
+                "define": "不在I/O错误NMI发生时触发内核恐慌"
+            },
+            "kernel.panic_on_oops": {
+                "value": "1",
+                "define": "在内核oops发生时触发内核恐慌"
+            },
+            "kernel.panic_on_rcu_stall": {
+                "value": "0    不在RCU",
+                "define": "stall发生时触发内核恐慌"
+            },
+            "kernel.panic_on_unrecovered_nmi": {
+                "value": "0",
+                "define": "不在未恢复的NMI发生时触发内核恐慌"
+            },
+            "kernel.panic_on_warn": {
+                "value": "0",
+                "define": "不在警告级别的内核消息发生时触发内核恐慌"
+            },
+            "kernel.panic_print": {
+                "value": "0",
+                "define": "不在内核恐慌时打印内核栈"
+            }
+        },
+        "内核性能事件相关": {
+            "kernel.perf_cpu_time_max_percent": {
+                "value": "25",
+                "define": "限制内核性能事件所占CPU时间的最大百分比为25"
+            },
+            "kernel.perf_event_max_contexts_per_stack": {
+                "value": "8",
+                "define": "允许的内核性能事件上下文数目为8"
+            },
+            "kernel.perf_event_max_sample_rate": {
+                "value": "100000",
+                "define": "允许的内核性能事件最大采样率为100000次/秒"
+            },
+            "kernel.perf_event_max_stack": {
+                "value": "127",
+                "define": "允许的内核性能事件最大栈深度为127"
+            },
+            "kernel.perf_event_mlock_kb": {
+                "value": "516",
+                "define": "锁定内核性能事件的内存为516KB"
+            },
+            "kernel.perf_event_paranoid": {
+                "value": "2",
+                "define": "设置内核性能事件的安全级别为2"
+            }
+        },
+        "内核进程及任务相关": {
+            "kernel.pid_max": {
+                "value": "4194304",
+                "define": "单个PID命名空间中允许的最大PID数目为4194304"
+            }
+        },
+        "关机命令设置": {
+            "kernel.poweroff_cmd": {
+                "value": "/sbin/poweroff",
+                "define": "设置关机命令为/sbin/poweroff"
+            }
+        },
+        "内核打印相关": {
+            "kernel.print-fatal-signals": {
+                "value": "0",
+                "define": "不在进程fatal信号时打印进程信息"
+            },
+            "kernel.printk": {
+                "value": "4    4    1    7    设置内核打印级别，依次为console loglevel, default message loglevel, minimum console loglevel, default console",
+                "define": "loglevel"
+            },
+            "kernel.printk_delay": {
+                "value": "0",
+                "define": "内核打印延迟为0毫秒"
+            },
+            "kernel.printk_devkmsg": {
+                "value": "ratelimit",
+                "define": "设置内核打印到/dev/kmsg的方式为ratelimit"
+            },
+            "kernel.printk_ratelimit": {
+                "value": "5",
+                "define": "内核打印速率限制为5次/秒"
+            },
+            "kernel.printk_ratelimit_burst": {
+                "value": "10",
+                "define": "内核打印速率限制突发次数为10次"
+            }
+        },
+        "伪终端相关**": {
+            "kernel.pty.max": {
+                "value": "4096",
+                "define": "伪终端设备的最大数量为4096"
+            },
+            "kernel.pty.nr": {
+                "value": "2",
+                "define": "系统中伪终端的数量为2"
+            },
+            "kernel.pty.reserve": {
+                "value": "1024",
+                "define": "保留伪终端数量为1024"
+            }
+        },
+        "内核随机数相关": {
+            "kernel.random.boot_id": {
+                "value": "01f51ec3-c876-4067-ae67-f2dcc27375c8",
+                "define": "启动时生成的随机引导ID为01f51ec3-c876-4067-ae67-f2dcc27375c8"
+            },
+            "kernel.random.entropy_avail": {
+                "value": "1415",
+                "define": "随机数池的熵可用值为1415"
+            },
+            "kernel.random.poolsize": {
+                "value": "4096",
+                "define": "随机数池大小为4096字节"
+            },
+            "kernel.random.read_wakeup_threshold": {
+                "value": "64",
+                "define": "随机数读唤醒阈值为64字节"
+            },
+            "kernel.random.urandom_min_reseed_secs": {
+                "value": "60",
+                "define": "重种子随机数池的最小时间间隔为60秒"
+            },
+            "kernel.random.uuid": {
+                "value": "0cf92d90-e5f0-44f7-bb10-33c725158255",
+                "define": "启动时生成的随机UUID为0cf92d90-e5f0-44f7-bb10-33c725158255"
+            },
+            "kernel.random.write_wakeup_threshold": {
+                "value": "896",
+                "define": "随机数写唤醒阈值为896字节"
+            },
+            "kernel.randomize_va_space": {
+                "value": "2    随机化内核空间布局，使用Full",
+                "define": "ASLR模式"
+            }
+        },
+        "其他内核相关配置*": {
+            "kernel.real-root-dev": {
+                "value": "0",
+                "define": "指定真实的根设备为/dev/sda"
+            },
+            "kernel.rh_flags": {
+                "value": "",
+                "define": "kernel.rh_flags"
+            }
+        },
+        "调度器相关设置**": {
+            "kernel.sched_autogroup_enabled": {
+                "value": "0",
+                "define": "禁用自动创建调度组"
+            },
+            "kernel.sched_cfs_bandwidth_slice_us": {
+                "value": "5000",
+                "define": "CFS调度器的带宽切片时间为5000微秒"
+            },
+            "kernel.sched_child_runs_first": {
+                "value": "0",
+                "define": "子进程在父进程之前运行"
+            },
+            "kernel.sched_deadline_period_max_us": {
+                "value": "4194304",
+                "define": "Deadline调度器的最大周期为4194304微秒"
+            },
+            "kernel.sched_deadline_period_min_us": {
+                "value": "100",
+                "define": "Deadline调度器的最小周期为100微秒"
+            }
+        },
+        "CPU0的SMT调度域": {
+            "kernel.sched_domain.cpu0.domain0.busy_factor": {
+                "value": "16",
+                "define": "第一个CPU核的SMT调度域的忙因子为16"
+            },
+            "kernel.sched_domain.cpu0.domain0.cache_nice_tries": {
+                "value": "0",
+                "define": "第一个CPU核的SMT调度域的缓存Nice尝试数为0"
+            },
+            "kernel.sched_domain.cpu0.domain0.flags": {
+                "value": "4783",
+                "define": "第一个CPU核的SMT调度域的标志位为4783"
+            },
+            "kernel.sched_domain.cpu0.domain0.imbalance_pct": {
+                "value": "110",
+                "define": "第一个CPU核的SMT调度域的不平衡百分比为110%"
+            },
+            "kernel.sched_domain.cpu0.domain0.max_interval": {
+                "value": "4",
+                "define": "第一个CPU核的SMT调度域的最大间隔为4"
+            },
+            "kernel.sched_domain.cpu0.domain0.max_newidle_lb_cost": {
+                "value": "2656",
+                "define": "第一个CPU核的SMT调度域的最大Newidle负载均衡代价为2656"
+            },
+            "kernel.sched_domain.cpu0.domain0.min_interval": {
+                "value": "2",
+                "define": "第一个CPU核的SMT调度域的最小间隔为2"
+            },
+            "kernel.sched_domain.cpu0.domain0.name": {
+                "value": "SMT",
+                "define": "第一个CPU核的SMT调度域的名称为SMT"
+            }
+        },
+        "CPU0 MC调度域设置": {
+            "kernel.sched_domain.cpu0.domain1.busy_factor": {
+                "value": "16",
+                "define": "第一个CPU核的MC调度域的忙因子为16"
+            },
+            "kernel.sched_domain.cpu0.domain1.cache_nice_tries": {
+                "value": "1",
+                "define": "第一个CPU核的MC调度域的缓存Nice尝试数为1"
+            },
+            "kernel.sched_domain.cpu0.domain1.flags": {
+                "value": "4655",
+                "define": "第一个CPU核的MC调度域的标志位为4655"
+            },
+            "kernel.sched_domain.cpu0.domain1.imbalance_pct": {
+                "value": "117",
+                "define": "第一个CPU核的MC调度域的不平衡百分比为117%"
+            },
+            "kernel.sched_domain.cpu0.domain1.max_interval": {
+                "value": "24",
+                "define": "第一个CPU核的MC调度域的最大间隔为24"
+            },
+            "kernel.sched_domain.cpu0.domain1.max_newidle_lb_cost": {
+                "value": "5189",
+                "define": "第一个CPU核的MC调度域的最大Newidle负载均衡代价为5189"
+            },
+            "kernel.sched_domain.cpu0.domain1.min_interval": {
+                "value": "12",
+                "define": "第一个CPU核的MC调度域的最小间隔为12"
+            },
+            "kernel.sched_domain.cpu0.domain1.name": {
+                "value": "MC",
+                "define": "第一个CPU核的MC调度域的名称为MC"
+            }
+        },
+        "CPU1的SMT调度域": {
+            "kernel.sched_domain.cpu1.domain0.busy_factor": {
+                "value": "16",
+                "define": "第二个CPU核的SMT调度域的忙因子为16"
+            },
+            "kernel.sched_domain.cpu1.domain0.cache_nice_tries": {
+                "value": "0",
+                "define": "第二个CPU核的SMT调度域的缓存Nice尝试数为0"
+            },
+            "kernel.sched_domain.cpu1.domain0.flags": {
+                "value": "4783",
+                "define": "第二个CPU核的SMT调度域的标志位为4783"
+            },
+            "kernel.sched_domain.cpu1.domain0.imbalance_pct": {
+                "value": "110",
+                "define": "第二个CPU核的SMT调度域的不平衡百分比为110%"
+            },
+            "kernel.sched_domain.cpu1.domain0.max_interval": {
+                "value": "4",
+                "define": "第二个CPU核的SMT调度域的最大间隔为4"
+            },
+            "kernel.sched_domain.cpu1.domain0.max_newidle_lb_cost": {
+                "value": "3202",
+                "define": "第二个CPU核的SMT调度域的最大Newidle负载均衡代价为3202"
+            },
+            "kernel.sched_domain.cpu1.domain0.min_interval": {
+                "value": "2",
+                "define": "第二个CPU核的SMT调度域的最小间隔为2"
+            },
+            "kernel.sched_domain.cpu1.domain0.name": {
+                "value": "SMT",
+                "define": "第二个CPU核的SMT调度域的名称为SMT"
+            }
+        },
+        "CPU1的MC调度域": {
+            "kernel.sched_domain.cpu1.domain1.busy_factor": {
+                "value": "16",
+                "define": "第二个CPU核的MC调度域的忙因子为16"
+            },
+            "kernel.sched_domain.cpu1.domain1.cache_nice_tries": {
+                "value": "1",
+                "define": "第二个CPU核的MC调度域的缓存Nice尝试数为1"
+            },
+            "kernel.sched_domain.cpu1.domain1.flags": {
+                "value": "4655",
+                "define": "第二个CPU核的MC调度域的标志位为4655"
+            },
+            "kernel.sched_domain.cpu1.domain1.imbalance_pct": {
+                "value": "117",
+                "define": "第二个CPU核的MC调度域的不平衡百分比为117%"
+            },
+            "kernel.sched_domain.cpu1.domain1.max_interval": {
+                "value": "24",
+                "define": "第二个CPU核的MC调度域的最大间隔为24"
+            },
+            "kernel.sched_domain.cpu1.domain1.max_newidle_lb_cost": {
+                "value": "4296",
+                "define": "第二个CPU核的MC调度域的最大Newidle负载均衡代价为4296"
+            },
+            "kernel.sched_domain.cpu1.domain1.min_interval": {
+                "value": "12",
+                "define": "第二个CPU核的MC调度域的最小间隔为12"
+            },
+            "kernel.sched_domain.cpu1.domain1.name": {
+                "value": "MC",
+                "define": "第二个CPU核的MC调度域的名称为MC"
+            }
+        },
+        "调度器相关设置": {
+            "...": {
+                "value": "",
+                "define": "（以下是其他CPU核的调度域参数，类似上述内容）"
+            },
+            "kernel.sched_energy_aware": {
+                "value": "1",
+                "define": "启用调度能量感知功能"
+            },
+            "kernel.sched_latency_ns": {
+                "value": "24000000",
+                "define": "调度器的延迟为24000000纳秒"
+            },
+            "kernel.sched_migration_cost_ns": {
+                "value": "500000",
+                "define": "调度迁移的成本为500000纳秒"
+            },
+            "kernel.sched_min_granularity_ns": {
+                "value": "10000000",
+                "define": "最小调度粒度为10000000纳秒"
+            },
+            "kernel.sched_nr_migrate": {
+                "value": "32",
+                "define": "每次调度迁移允许的最大任务数为32"
+            },
+            "kernel.sched_rr_timeslice_ms": {
+                "value": "100    Round",
+                "define": "Robin调度器的时间片为100毫秒"
+            },
+            "kernel.sched_rt_period_us": {
+                "value": "1000000",
+                "define": "实时调度器的周期为1000000微秒"
+            },
+            "kernel.sched_rt_runtime_us": {
+                "value": "950000",
+                "define": "实时调度器的运行时间为950000微秒"
+            },
+            "kernel.sched_schedstats": {
+                "value": "0",
+                "define": "禁用调度器统计信息"
+            },
+            "kernel.sched_tunable_scaling": {
+                "value": "1",
+                "define": "启用调度器可调整性"
+            },
+            "kernel.sched_wakeup_granularity_ns": {
+                "value": "15000000",
+                "define": "调度唤醒的粒度为15000000纳秒"
+            }
+        },
+        "系统调用过滤设置": {
+            "kernel.seccomp.actions_avail": {
+                "value": "kill_process kill_thread trap errno trace log allow",
+                "define": "支持的seccomp系统调用过滤动作包括：杀死进程、杀死线程、跟踪、记录错误号、记录调用、允许"
+            },
+            "kernel.seccomp.actions_logged": {
+                "value": "kill_process kill_thread trap errno trace log",
+                "define": "记录的seccomp系统调用过滤动作包括：杀死进程、杀死线程、跟踪、记录错误号、记录调用"
+            }
+        },
+        "信号量相关设置": {
+            "kernel.sem": {
+                "value": "32000\t1024000000\t500\t32000",
+                "define": "信号量相关参数：信号量数组个数为32000，信号量值的最大值为1024000000，信号量操作的最大值为500，单个进程拥有的信号量最大数为32000"
+            },
+            "kernel.sem_next_id": {
+                "value": "-1",
+                "define": "下一个信号量的ID为-1"
+            }
+        },
+        "共享内存相关设置": {
+            "kernel.shm_next_id": {
+                "value": "-1",
+                "define": "下一个共享内存的ID为-1"
+            },
+            "kernel.shm_rmid_forced": {
+                "value": "0",
+                "define": "禁止删除共享内存段"
+            },
+            "kernel.shmall": {
+                "value": "18446744073692774399",
+                "define": "共享内存段总大小为18446744073692774399页"
+            },
+            "kernel.shmmax": {
+                "value": "18446744073692774399",
+                "define": "单个共享内存段的最大大小为18446744073692774399字节"
+            },
+            "kernel.shmmni": {
+                "value": "4096",
+                "define": "最大共享内存段的数目为4096"
+            }
+        },
+        "软件看门狗定时器设置": {
+            "kernel.soft_watchdog": {
+                "value": "1",
+                "define": "启用软件看门狗定时器"
+            },
+            "kernel.softlockup_all_cpu_backtrace": {
+                "value": "0",
+                "define": "软锁定检测发生时，不打印所有CPU的回溯信息"
+            },
+            "kernel.softlockup_panic": {
+                "value": "0",
+                "define": "软锁定检测发生时，不进行内核崩溃转储"
+            },
+            "kernel.stack_tracer_enabled": {
+                "value": "0",
+                "define": "禁用内核堆栈跟踪"
+            },
+            "kernel.sysctl_writes_strict": {
+                "value": "1",
+                "define": "严格执行sysctl值的写入权限"
+            },
+            "kernel.sysrq": {
+                "value": "16    SysRq键的功能被限制为Magic",
+                "define": "SysRq键和控制台日志记录"
+            },
+            "kernel.tainted": {
+                "value": "0",
+                "define": "内核没有被污染，没有使用非开源模块或有问题的模块"
+            },
+            "kernel.threads-max": {
+                "value": "123086",
+                "define": "最大线程数为123086"
+            },
+            "kernel.timer_migration": {
+                "value": "1",
+                "define": "启用定时器的迁移"
+            },
+            "kernel.traceoff_on_warning": {
+                "value": "0",
+                "define": "不在内核警告时关闭跟踪功能"
+            },
+            "kernel.tracepoint_printk": {
+                "value": "0",
+                "define": "禁用tracepoint_printk"
+            },
+            "kernel.unknown_nmi_panic": {
+                "value": "0",
+                "define": "未知NMI发生时，不进行内核崩溃转储"
+            },
+            "kernel.unprivileged_bpf_disabled": {
+                "value": "1",
+                "define": "禁用非特权用户的BPF"
+            },
+            "kernel.usermodehelper.bset": {
+                "value": "4294967295\t511",
+                "define": "usermodehelper组的权限掩码为4294967295，用户权限掩码为511"
+            },
+            "kernel.usermodehelper.inheritable": {
+                "value": "4294967295\t511",
+                "define": "usermodehelper组的可继承权限掩码为4294967295，用户可继承权限掩码为511"
+            },
+            "kernel.version": {
+                "value": "#1 SMP Thu Jun 22 12:08:06 UTC 2023    内核版本信息：#1 SMP Thu Jun 22 12:08:06 UTC",
+                "define": "2023"
+            }
+        },
+        "硬件看门狗定时器设置": {
+            "kernel.watchdog": {
+                "value": "1",
+                "define": "启用硬件看门狗定时器"
+            },
+            "kernel.watchdog_cpumask": {
+                "value": "0-11    硬件看门狗定时器适用于CPU",
+                "define": "0到11"
+            },
+            "kernel.watchdog_thresh": {
+                "value": "10",
+                "define": "看门狗定时器阈值为10秒"
+            },
+            "kernel.yama.ptrace_scope": {
+                "value": "0    Yama",
+                "define": "LSM允许任何进程使用ptrace系统调用跟踪其他进程的执行"
+            }
+        }
+    },
+    "网络核心 (net.core) 相关设置": {
+        "BPF (Berkeley Packet Filter) JIT编译器设置": {
+            "net.core.bpf_jit_enable": {
+                "value": "1    启用BPF (Berkeley Packet Filter)",
+                "define": "JIT编译器"
+            },
+            "net.core.bpf_jit_harden": {
+                "value": "1    提高BPF",
+                "define": "JIT编译器的安全性"
+            },
+            "net.core.bpf_jit_kallsyms": {
+                "value": "1    在BPF",
+                "define": "JIT编译器中支持内核符号导出"
+            },
+            "net.core.bpf_jit_limit": {
+                "value": "264241152    BPF",
+                "define": "JIT编译器的内存限制"
+            }
+        },
+        "忙时数据包轮询模式设置": {
+            "net.core.busy_poll": {
+                "value": "0",
+                "define": "启用忙时数据包轮询模式"
+            },
+            "net.core.busy_read": {
+                "value": "0",
+                "define": "启用忙时读取模式"
+            }
+        },
+        "队列调度器设置": {
+            "net.core.default_qdisc": {
+                "value": "fq_codel",
+                "define": "默认队列调度器设置为fq_codel"
+            }
+        },
+        "网络接口权重设置": {
+            "net.core.dev_weight": {
+                "value": "64",
+                "define": "接口权重设置为64"
+            },
+            "net.core.dev_weight_rx_bias": {
+                "value": "1",
+                "define": "接口接收方向权重偏置设置为1"
+            },
+            "net.core.dev_weight_tx_bias": {
+                "value": "1",
+                "define": "接口发送方向权重偏置设置为1"
+            },
+            "net.core.fb_tunnels_only_for_init_net": {
+                "value": "0",
+                "define": "允许其他网络命名空间使用转发隧道设备"
+            },
+            "net.core.flow_limit_cpu_bitmap": {
+                "value": "000",
+                "define": "CPU位图用于限制流量"
+            },
+            "net.core.flow_limit_table_len": {
+                "value": "4096",
+                "define": "用于流量限制的表长度"
+            },
+            "net.core.max_skb_frags": {
+                "value": "17",
+                "define": "数据包内允许的最大分片数"
+            },
+            "net.core.message_burst": {
+                "value": "10",
+                "define": "允许发送的最大突发消息数"
+            },
+            "net.core.message_cost": {
+                "value": "5",
+                "define": "消息成本设置为5"
+            },
+            "net.core.netdev_budget": {
+                "value": "300",
+                "define": "每个网络设备处理预算设置为300"
+            },
+            "net.core.netdev_budget_usecs": {
+                "value": "2000",
+                "define": "每个网络设备处理预算时间设置为2000微秒"
+            },
+            "net.core.netdev_max_backlog": {
+                "value": "1000",
+                "define": "网络设备接收队列的最大长度"
+            },
+            "net.core.netdev_rss_key": {
+                "value": "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00    RSS (Receive Side Scaling)",
+                "define": "密钥设置"
+            },
+            "net.core.netdev_tstamp_prequeue": {
+                "value": "1",
+                "define": "接收时间戳预队列设置为1"
+            },
+            "net.core.optmem_max": {
+                "value": "81920",
+                "define": "socket选项内存最大限制设置为81920"
+            },
+            "net.core.rmem_default": {
+                "value": "212992",
+                "define": "默认接收缓冲区大小设置为212992"
+            },
+            "net.core.rmem_max": {
+                "value": "212992",
+                "define": "最大接收缓冲区大小设置为212992"
+            },
+            "net.core.rps_default_mask": {
+                "value": "000",
+                "define": "默认的RPS掩码"
+            },
+            "net.core.rps_sock_flow_entries": {
+                "value": "0    RPS (Receive Packet Steering)",
+                "define": "分流表的大小"
+            },
+            "net.core.somaxconn": {
+                "value": "2048",
+                "define": "监听套接字最大连接数设置为2048"
+            },
+            "net.core.tstamp_allow_data": {
+                "value": "1",
+                "define": "允许数据包接收时间戳设置为1"
+            },
+            "net.core.warnings": {
+                "value": "0",
+                "define": "禁用网络核心警告"
+            }
+        }
+    },
+    "IPv4 配置项": {
+        "IPv4全局接口配置": {
+            "net.ipv4.cipso_cache_bucket_size": {
+                "value": "10    CIPSO (Common IP Security Option)",
+                "define": "缓存桶大小设置为10"
+            },
+            "net.ipv4.cipso_cache_enable": {
+                "value": "1",
+                "define": "启用CIPSO缓存"
+            },
+            "net.ipv4.cipso_rbm_optfmt": {
+                "value": "0",
+                "define": "CIPSO可选项格式设置为0"
+            },
+            "net.ipv4.cipso_rbm_strictvalid": {
+                "value": "1    严格验证CIPSO RBM (Remote-Label-Based Mandatory Access",
+                "define": "Control)"
+            },
+            "net.ipv4.conf.all.accept_local": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包"
+            },
+            "net.ipv4.conf.all.accept_redirects": {
+                "value": "0",
+                "define": "不接受重定向数据包"
+            },
+            "net.ipv4.conf.all.accept_source_route": {
+                "value": "0",
+                "define": "不接受源路由数据包"
+            },
+            "net.ipv4.conf.all.arp_accept": {
+                "value": "0    不接受ARP (Address Resolution Protocol)",
+                "define": "请求"
+            },
+            "net.ipv4.conf.all.arp_announce": {
+                "value": "0",
+                "define": "不修改发送的ARP请求的源IP地址"
+            },
+            "net.ipv4.conf.all.arp_filter": {
+                "value": "0",
+                "define": "禁用ARP过滤"
+            },
+            "net.ipv4.conf.all.arp_ignore": {
+                "value": "0",
+                "define": "不忽略ARP请求"
+            },
+            "net.ipv4.conf.all.arp_notify": {
+                "value": "0",
+                "define": "不通知ARP地址冲突"
+            },
+            "net.ipv4.conf.all.bc_forwarding": {
+                "value": "0",
+                "define": "不进行广播数据包转发"
+            },
+            "net.ipv4.conf.all.bootp_relay": {
+                "value": "0    禁用BOOTP (Bootstrap Protocol)",
+                "define": "中继代理"
+            },
+            "net.ipv4.conf.all.disable_policy": {
+                "value": "0",
+                "define": "不禁用源路由数据包处理"
+            },
+            "net.ipv4.conf.all.disable_xfrm": {
+                "value": "0    不禁用IPsec (IP Security)",
+                "define": "XFRM(传输层安全扩展)"
+            },
+            "net.ipv4.conf.all.drop_gratuitous_arp": {
+                "value": "0",
+                "define": "不丢弃不必要的ARP响应"
+            },
+            "net.ipv4.conf.all.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "不丢弃在二层多播组中的单播数据包"
+            },
+            "net.ipv4.conf.all.force_igmp_version": {
+                "value": "0    不强制使用IGMP (Internet Group Management Protocol)",
+                "define": "版本"
+            },
+            "net.ipv4.conf.all.forwarding": {
+                "value": "1",
+                "define": "开启IP转发功能"
+            },
+            "net.ipv4.conf.all.igmpv2_unsolicited_report_interval": {
+                "value": "10000    IGMPv2",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.all.igmpv3_unsolicited_report_interval": {
+                "value": "1000    IGMPv3",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.all.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "不忽略与已关闭的接口相关的路由"
+            },
+            "net.ipv4.conf.all.log_martians": {
+                "value": "0",
+                "define": "不记录欺骗攻击尝试的日志"
+            },
+            "net.ipv4.conf.all.mc_forwarding": {
+                "value": "0",
+                "define": "不进行多播数据包转发"
+            },
+            "net.ipv4.conf.all.medium_id": {
+                "value": "0",
+                "define": "网络介质类型标识设置为0"
+            },
+            "net.ipv4.conf.all.promote_secondaries": {
+                "value": "0",
+                "define": "不使IP别名地址成为主地址"
+            },
+            "net.ipv4.conf.all.proxy_arp": {
+                "value": "0",
+                "define": "不开启ARP代理"
+            },
+            "net.ipv4.conf.all.proxy_arp_pvlan": {
+                "value": "0",
+                "define": "不开启ARP代理专用虚拟局域网"
+            },
+            "net.ipv4.conf.all.route_localnet": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包作为路由"
+            },
+            "net.ipv4.conf.all.rp_filter": {
+                "value": "1",
+                "define": "开启反向路径过滤，用于防止IP欺骗攻击"
+            },
+            "net.ipv4.conf.all.secure_redirects": {
+                "value": "0",
+                "define": "不接受安全重定向"
+            },
+            "net.ipv4.conf.all.send_redirects": {
+                "value": "0",
+                "define": "不发送重定向数据包"
+            },
+            "net.ipv4.conf.all.shared_media": {
+                "value": "1",
+                "define": "支持共享介质类型"
+            },
+            "net.ipv4.conf.all.src_valid_mark": {
+                "value": "0",
+                "define": "不启用源地址合法标记"
+            },
+            "net.ipv4.conf.all.tag": {
+                "value": "0",
+                "define": "网络设备标记设置为0"
+            },
+            "net.ipv4.conf.all.ugc_tstamp": {
+                "value": "0",
+                "define": "不启用ugc时间戳"
+            },
+            "net.ipv4.conf.all.pim_rp_warn": {
+                "value": "1    开启PIM (Protocol Independent Multicast) RP (Rendezvous",
+                "define": "Point)警告"
+            }
+        },
+        "IPv4默认接口配置": {
+            "net.ipv4.conf.default.accept_local": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包"
+            },
+            "net.ipv4.conf.default.accept_redirects": {
+                "value": "0",
+                "define": "不接受重定向数据包"
+            },
+            "net.ipv4.conf.default.accept_source_route": {
+                "value": "0",
+                "define": "不接受源路由数据包"
+            },
+            "net.ipv4.conf.default.arp_accept": {
+                "value": "0    不接受ARP (Address Resolution Protocol)",
+                "define": "请求"
+            },
+            "net.ipv4.conf.default.arp_announce": {
+                "value": "0",
+                "define": "不修改发送的ARP请求的源IP地址"
+            },
+            "net.ipv4.conf.default.arp_filter": {
+                "value": "0",
+                "define": "禁用ARP过滤"
+            },
+            "net.ipv4.conf.default.arp_ignore": {
+                "value": "0",
+                "define": "不忽略ARP请求"
+            },
+            "net.ipv4.conf.default.arp_notify": {
+                "value": "0",
+                "define": "不通知ARP地址冲突"
+            },
+            "net.ipv4.conf.default.bc_forwarding": {
+                "value": "0",
+                "define": "不进行广播数据包转发"
+            },
+            "net.ipv4.conf.default.bootp_relay": {
+                "value": "0    禁用BOOTP (Bootstrap Protocol)",
+                "define": "中继代理"
+            },
+            "net.ipv4.conf.default.disable_policy": {
+                "value": "0",
+                "define": "不禁用源路由数据包处理"
+            },
+            "net.ipv4.conf.default.drop_gratuitous_arp": {
+                "value": "0",
+                "define": "不丢弃不必要的ARP响应"
+            },
+            "net.ipv4.conf.default.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "不丢弃在二层多播组中的单播数据包"
+            },
+            "net.ipv4.conf.default.force_igmp_version": {
+                "value": "0    不强制使用IGMP (Internet Group Management Protocol)",
+                "define": "版本"
+            },
+            "net.ipv4.conf.default.forwarding": {
+                "value": "1",
+                "define": "开启IP转发功能"
+            },
+            "net.ipv4.conf.default.igmpv2_unsolicited_report_interval": {
+                "value": "10000    IGMPv2",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.default.igmpv3_unsolicited_report_interval": {
+                "value": "1000    IGMPv3",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.default.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "不忽略与已关闭的接口相关的路由"
+            },
+            "net.ipv4.conf.default.log_martians": {
+                "value": "0",
+                "define": "不记录欺骗攻击尝试的日志"
+            },
+            "net.ipv4.conf.default.mc_forwarding": {
+                "value": "0",
+                "define": "不进行多播数据包转发"
+            },
+            "net.ipv4.conf.default.medium_id": {
+                "value": "0",
+                "define": "网络介质类型标识设置为0"
+            },
+            "net.ipv4.conf.default.promote_secondaries": {
+                "value": "0",
+                "define": "不使IP别名地址成为主地址"
+            },
+            "net.ipv4.conf.default.proxy_arp": {
+                "value": "0",
+                "define": "不开启ARP代理"
+            },
+            "net.ipv4.conf.default.proxy_arp_pvlan": {
+                "value": "0",
+                "define": "不开启ARP代理专用虚拟局域网"
+            },
+            "net.ipv4.conf.default.route_localnet": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包作为路由"
+            },
+            "net.ipv4.conf.default.rp_filter": {
+                "value": "1",
+                "define": "开启反向路径过滤，用于防止IP欺骗攻击"
+            },
+            "net.ipv4.conf.default.secure_redirects": {
+                "value": "0",
+                "define": "不接受安全重定向"
+            },
+            "net.ipv4.conf.default.send_redirects": {
+                "value": "0",
+                "define": "不发送重定向数据包"
+            },
+            "net.ipv4.conf.default.shared_media": {
+                "value": "1",
+                "define": "支持共享介质类型"
+            },
+            "net.ipv4.conf.default.src_valid_mark": {
+                "value": "0",
+                "define": "不启用源地址合法标记"
+            },
+            "net.ipv4.conf.default.tag": {
+                "value": "0",
+                "define": "网络设备标记设置为0"
+            },
+            "net.ipv4.conf.default.ugc_tstamp": {
+                "value": "0",
+                "define": "不启用ugc时间戳"
+            },
+            "net.ipv4.conf.default.disable_xfrm": {
+                "value": "0    不禁用IPsec (IP Security)",
+                "define": "XFRM(传输层安全扩展)"
+            },
+            "net.ipv4.conf.default.pim_rp_warn": {
+                "value": "1    开启PIM (Protocol Independent Multicast) RP (Rendezvous",
+                "define": "Point)警告"
+            }
+        },
+        "IPv4 eth0接口配置": {
+            "net.ipv4.conf.eth0.accept_local": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包"
+            },
+            "net.ipv4.conf.eth0.accept_redirects": {
+                "value": "0",
+                "define": "不接受重定向数据包"
+            },
+            "net.ipv4.conf.eth0.accept_source_route": {
+                "value": "0",
+                "define": "不接受源路由数据包"
+            },
+            "net.ipv4.conf.eth0.arp_accept": {
+                "value": "0    不接受ARP (Address Resolution Protocol)",
+                "define": "请求"
+            },
+            "net.ipv4.conf.eth0.arp_announce": {
+                "value": "0",
+                "define": "不修改发送的ARP请求的源IP地址"
+            },
+            "net.ipv4.conf.eth0.arp_filter": {
+                "value": "0",
+                "define": "禁用ARP过滤"
+            },
+            "net.ipv4.conf.eth0.arp_ignore": {
+                "value": "0",
+                "define": "不忽略ARP请求"
+            },
+            "net.ipv4.conf.eth0.arp_notify": {
+                "value": "0",
+                "define": "不通知ARP地址冲突"
+            },
+            "net.ipv4.conf.eth0.bc_forwarding": {
+                "value": "0",
+                "define": "不进行广播数据包转发"
+            },
+            "net.ipv4.conf.eth0.bootp_relay": {
+                "value": "0    禁用BOOTP (Bootstrap Protocol)",
+                "define": "中继代理"
+            },
+            "net.ipv4.conf.eth0.disable_policy": {
+                "value": "0",
+                "define": "不禁用源路由数据包处理"
+            },
+            "net.ipv4.conf.eth0.drop_gratuitous_arp": {
+                "value": "0",
+                "define": "不丢弃不必要的ARP响应"
+            },
+            "net.ipv4.conf.eth0.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "不丢弃在二层多播组中的单播数据包"
+            },
+            "net.ipv4.conf.eth0.force_igmp_version": {
+                "value": "0    不强制使用IGMP (Internet Group Management Protocol)",
+                "define": "版本"
+            },
+            "net.ipv4.conf.eth0.forwarding": {
+                "value": "1",
+                "define": "开启IP转发功能"
+            },
+            "net.ipv4.conf.eth0.igmpv2_unsolicited_report_interval": {
+                "value": "10000    IGMPv2",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.eth0.igmpv3_unsolicited_report_interval": {
+                "value": "1000    IGMPv3",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.eth0.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "不忽略与已关闭的接口相关的路由"
+            },
+            "net.ipv4.conf.eth0.log_martians": {
+                "value": "0",
+                "define": "不记录欺骗攻击尝试的日志"
+            },
+            "net.ipv4.conf.eth0.mc_forwarding": {
+                "value": "0",
+                "define": "不进行多播数据包转发"
+            },
+            "net.ipv4.conf.eth0.medium_id": {
+                "value": "0",
+                "define": "网络介质类型标识设置为0"
+            },
+            "net.ipv4.conf.eth0.promote_secondaries": {
+                "value": "0",
+                "define": "不使IP别名地址成为主地址"
+            },
+            "net.ipv4.conf.eth0.proxy_arp": {
+                "value": "0",
+                "define": "不开启ARP代理"
+            },
+            "net.ipv4.conf.eth0.proxy_arp_pvlan": {
+                "value": "0",
+                "define": "不开启ARP代理专用虚拟局域网"
+            },
+            "net.ipv4.conf.eth0.route_localnet": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包作为路由"
+            },
+            "net.ipv4.conf.eth0.rp_filter": {
+                "value": "1",
+                "define": "开启反向路径过滤，用于防止IP欺骗攻击"
+            },
+            "net.ipv4.conf.eth0.secure_redirects": {
+                "value": "0",
+                "define": "不接受安全重定向"
+            },
+            "net.ipv4.conf.eth0.send_redirects": {
+                "value": "0",
+                "define": "不发送重定向数据包"
+            },
+            "net.ipv4.conf.eth0.shared_media": {
+                "value": "1",
+                "define": "支持共享介质类型"
+            },
+            "net.ipv4.conf.eth0.src_valid_mark": {
+                "value": "0",
+                "define": "不启用源地址合法标记"
+            },
+            "net.ipv4.conf.eth0.tag": {
+                "value": "0",
+                "define": "网络设备标记设置为0"
+            },
+            "net.ipv4.conf.eth0.ugc_tstamp": {
+                "value": "0",
+                "define": "不启用ugc时间戳"
+            },
+            "net.ipv4.conf.eth0.disable_xfrm": {
+                "value": "0    不禁用IPsec (IP Security)",
+                "define": "XFRM(传输层安全扩展)"
+            },
+            "net.ipv4.conf.eth0.pim_rp_warn": {
+                "value": "1    开启PIM (Protocol Independent Multicast) RP (Rendezvous",
+                "define": "Point)警告"
+            }
+        },
+        "IPv4 lo接口配置": {
+            "net.ipv4.conf.lo.accept_local": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包"
+            },
+            "net.ipv4.conf.lo.accept_redirects": {
+                "value": "0",
+                "define": "不接受重定向数据包"
+            },
+            "net.ipv4.conf.lo.accept_source_route": {
+                "value": "0",
+                "define": "不接受源路由数据包"
+            },
+            "net.ipv4.conf.lo.arp_accept": {
+                "value": "0    不接受ARP (Address Resolution Protocol)",
+                "define": "请求"
+            },
+            "net.ipv4.conf.lo.arp_announce": {
+                "value": "0",
+                "define": "不修改发送的ARP请求的源IP地址"
+            },
+            "net.ipv4.conf.lo.arp_filter": {
+                "value": "0",
+                "define": "禁用ARP过滤"
+            },
+            "net.ipv4.conf.lo.arp_ignore": {
+                "value": "0",
+                "define": "不忽略ARP请求"
+            },
+            "net.ipv4.conf.lo.arp_notify": {
+                "value": "0",
+                "define": "不通知ARP地址冲突"
+            },
+            "net.ipv4.conf.lo.bc_forwarding": {
+                "value": "0",
+                "define": "不进行广播数据包转发"
+            },
+            "net.ipv4.conf.lo.bootp_relay": {
+                "value": "0    禁用BOOTP (Bootstrap Protocol)",
+                "define": "中继代理"
+            },
+            "net.ipv4.conf.lo.disable_policy": {
+                "value": "0",
+                "define": "不禁用源路由数据包处理"
+            },
+            "net.ipv4.conf.lo.drop_gratuitous_arp": {
+                "value": "0",
+                "define": "不丢弃不必要的ARP响应"
+            },
+            "net.ipv4.conf.lo.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "不丢弃在二层多播组中的单播数据包"
+            },
+            "net.ipv4.conf.lo.force_igmp_version": {
+                "value": "0    不强制使用IGMP (Internet Group Management Protocol)",
+                "define": "版本"
+            },
+            "net.ipv4.conf.lo.forwarding": {
+                "value": "0",
+                "define": "不开启IP转发功能"
+            },
+            "net.ipv4.conf.lo.igmpv2_unsolicited_report_interval": {
+                "value": "10000    IGMPv2",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.lo.igmpv3_unsolicited_report_interval": {
+                "value": "1000    IGMPv3",
+                "define": "非请求报告的间隔时间"
+            },
+            "net.ipv4.conf.lo.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "不忽略与已关闭的接口相关的路由"
+            },
+            "net.ipv4.conf.lo.log_martians": {
+                "value": "0",
+                "define": "不记录欺骗攻击尝试的日志"
+            },
+            "net.ipv4.conf.lo.mc_forwarding": {
+                "value": "0",
+                "define": "不进行多播数据包转发"
+            },
+            "net.ipv4.conf.lo.medium_id": {
+                "value": "0",
+                "define": "网络介质类型标识设置为0"
+            },
+            "net.ipv4.conf.lo.promote_secondaries": {
+                "value": "0",
+                "define": "不使IP别名地址成为主地址"
+            },
+            "net.ipv4.conf.lo.proxy_arp": {
+                "value": "0",
+                "define": "不开启ARP代理"
+            },
+            "net.ipv4.conf.lo.proxy_arp_pvlan": {
+                "value": "0",
+                "define": "不开启ARP代理专用虚拟局域网"
+            },
+            "net.ipv4.conf.lo.route_localnet": {
+                "value": "0",
+                "define": "不接受来自本地主机的数据包作为路由"
+            },
+            "net.ipv4.conf.lo.rp_filter": {
+                "value": "0",
+                "define": "关闭反向路径过滤，允许所有源地址的数据包进入接口"
+            },
+            "net.ipv4.conf.lo.secure_redirects": {
+                "value": "0",
+                "define": "不接受安全重定向"
+            },
+            "net.ipv4.conf.lo.send_redirects": {
+                "value": "0",
+                "define": "不发送重定向数据包"
+            },
+            "net.ipv4.conf.lo.shared_media": {
+                "value": "1",
+                "define": "支持共享介质类型"
+            },
+            "net.ipv4.conf.lo.src_valid_mark": {
+                "value": "0",
+                "define": "不启用源地址合法标记"
+            },
+            "net.ipv4.conf.lo.tag": {
+                "value": "0",
+                "define": "网络设备标记设置为0"
+            },
+            "net.ipv4.conf.lo.ugc_tstamp": {
+                "value": "0",
+                "define": "不启用ugc时间戳"
+            },
+            "net.ipv4.conf.lo.disable_xfrm": {
+                "value": "0    不禁用IPsec (IP Security)",
+                "define": "XFRM(传输层安全扩展)"
+            },
+            "net.ipv4.conf.lo.pim_rp_warn": {
+                "value": "1    开启PIM (Protocol Independent Multicast) RP (Rendezvous",
+                "define": "Point)警告"
+            }
+        }
+    },
+    "IPv6 相关设置": {
+        "IPv6全局设置": {
+            "net.ipv6.anycast_src_echo_reply": {
+                "value": "0",
+                "define": "启用任播源地址回复功能"
+            },
+            "net.ipv6.auto_flowlabels": {
+                "value": "1",
+                "define": "自动分配IPv6流标签"
+            },
+            "net.ipv6.bindv6only": {
+                "value": "0",
+                "define": "允许IPv6套接字绑定到IPv4套接字"
+            },
+            "net.ipv6.calipso_cache_bucket_size": {
+                "value": "10",
+                "define": "设置Calipso缓存桶大小"
+            },
+            "net.ipv6.calipso_cache_enable": {
+                "value": "1",
+                "define": "启用Calipso缓存"
+            }
+        },
+        "IPv6所有接口默认配置": {
+            "net.ipv6.conf.all.accept_dad": {
+                "value": "0",
+                "define": "禁用IPv6冲突检测"
+            },
+            "net.ipv6.conf.all.accept_ra": {
+                "value": "1",
+                "define": "允许接收IPv6路由通告"
+            },
+            "net.ipv6.conf.all.accept_ra_defrtr": {
+                "value": "1",
+                "define": "允许接收默认路由信息"
+            },
+            "net.ipv6.conf.all.accept_ra_from_local": {
+                "value": "0",
+                "define": "禁止从本地接口接收路由通告"
+            },
+            "net.ipv6.conf.all.accept_ra_min_hop_limit": {
+                "value": "1",
+                "define": "设置接收路由通告的最小跳限"
+            },
+            "net.ipv6.conf.all.accept_ra_mtu": {
+                "value": "1",
+                "define": "设置接收路由通告的最大传输单元"
+            },
+            "net.ipv6.conf.all.accept_ra_pinfo": {
+                "value": "1",
+                "define": "允许接收IPv6路由信息选项"
+            },
+            "net.ipv6.conf.all.accept_ra_rt_info_max_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最大前缀长度"
+            },
+            "net.ipv6.conf.all.accept_ra_rt_info_min_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最小前缀长度"
+            },
+            "net.ipv6.conf.all.accept_ra_rtr_pref": {
+                "value": "1",
+                "define": "允许接收路由通告的路由器优先级信息"
+            },
+            "net.ipv6.conf.all.accept_redirects": {
+                "value": "1",
+                "define": "允许接收IPv6重定向"
+            },
+            "net.ipv6.conf.all.accept_source_route": {
+                "value": "0",
+                "define": "禁止接受IPv6源路由选项"
+            },
+            "net.ipv6.conf.all.addr_gen_mode": {
+                "value": "0",
+                "define": "禁止自动地址生成"
+            },
+            "net.ipv6.conf.all.autoconf": {
+                "value": "1",
+                "define": "允许IPv6自动配置"
+            },
+            "net.ipv6.conf.all.dad_transmits": {
+                "value": "1",
+                "define": "设置IPv6冲突检测重传次数"
+            },
+            "net.ipv6.conf.all.disable_ipv6": {
+                "value": "0",
+                "define": "启用IPv6功能"
+            },
+            "net.ipv6.conf.all.disable_policy": {
+                "value": "0",
+                "define": "启用IPv6流控策略"
+            },
+            "net.ipv6.conf.all.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "允许接收L2组播报文的单播报文"
+            },
+            "net.ipv6.conf.all.drop_unsolicited_na": {
+                "value": "0",
+                "define": "允许发送不经过确认的NA报文"
+            },
+            "net.ipv6.conf.all.enhanced_dad": {
+                "value": "1",
+                "define": "启用增强的IPv6冲突检测"
+            },
+            "net.ipv6.conf.all.force_mld_version": {
+                "value": "0",
+                "define": "不强制使用指定版本的MLD协议"
+            },
+            "net.ipv6.conf.all.force_tllao": {
+                "value": "0",
+                "define": "不强制使用指定的链路层地址选项"
+            },
+            "net.ipv6.conf.all.forwarding": {
+                "value": "0",
+                "define": "禁止IPv6路由转发"
+            },
+            "net.ipv6.conf.all.hop_limit": {
+                "value": "64",
+                "define": "设置默认IPv6跳数限制"
+            },
+            "net.ipv6.conf.all.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "允许使用离线路由表"
+            },
+            "net.ipv6.conf.all.keep_addr_on_down": {
+                "value": "0",
+                "define": "禁止保持下线的IPv6地址"
+            },
+            "net.ipv6.conf.all.max_addresses": {
+                "value": "16",
+                "define": "设置IPv6接口上的最大地址数"
+            },
+            "net.ipv6.conf.all.max_desync_factor": {
+                "value": "600",
+                "define": "设置IPv6地址重同步的最大因子"
+            },
+            "net.ipv6.conf.all.mc_forwarding": {
+                "value": "0",
+                "define": "禁止IPv6组播转发"
+            },
+            "net.ipv6.conf.all.mldv1_unsolicited_report_interval": {
+                "value": "10000",
+                "define": "设置MLDv1主动报告间隔时间"
+            },
+            "net.ipv6.conf.all.mldv2_unsolicited_report_interval": {
+                "value": "1000",
+                "define": "设置MLDv2主动报告间隔时间"
+            },
+            "net.ipv6.conf.all.mtu": {
+                "value": "1280",
+                "define": "设置IPv6默认MTU"
+            },
+            "net.ipv6.conf.all.ndisc_notify": {
+                "value": "0",
+                "define": "禁用IPv6邻居发现通知"
+            },
+            "net.ipv6.conf.all.ndisc_tclass": {
+                "value": "0",
+                "define": "设置IPv6邻居发现报文的通知类别"
+            },
+            "net.ipv6.conf.all.optimistic_dad": {
+                "value": "0",
+                "define": "禁用IPv6乐观的冲突检测"
+            },
+            "net.ipv6.conf.all.proxy_ndp": {
+                "value": "0",
+                "define": "禁用IPv6代理邻居发现协议"
+            },
+            "net.ipv6.conf.all.regen_max_retry": {
+                "value": "3",
+                "define": "设置IPv6地址重生成的最大尝试次数"
+            },
+            "net.ipv6.conf.all.router_probe_interval": {
+                "value": "60",
+                "define": "设置IPv6路由器探测间隔时间"
+            },
+            "net.ipv6.conf.all.router_solicitation_delay": {
+                "value": "1",
+                "define": "设置IPv6路由器请求延迟时间"
+            },
+            "net.ipv6.conf.all.router_solicitation_interval": {
+                "value": "4",
+                "define": "设置IPv6路由器请求间隔时间"
+            },
+            "net.ipv6.conf.all.router_solicitation_max_interval": {
+                "value": "3600",
+                "define": "设置IPv6路由器请求最大间隔时间"
+            },
+            "net.ipv6.conf.all.router_solicitations": {
+                "value": "-1",
+                "define": "设置接收的IPv6路由器请求数"
+            },
+            "net.ipv6.conf.all.seg6_enabled": {
+                "value": "0    禁用IPv6段路由（Segment",
+                "define": "Routing）"
+            },
+            "net.ipv6.conf.all.suppress_frag_ndisc": {
+                "value": "1",
+                "define": "禁止通过通告片段来防止IPv6碎片化"
+            },
+            "net.ipv6.conf.all.temp_prefered_lft": {
+                "value": "86400",
+                "define": "设置IPv6临时地址优先生存时间"
+            },
+            "net.ipv6.conf.all.temp_valid_lft": {
+                "value": "604800",
+                "define": "设置IPv6临时地址有效生存时间"
+            },
+            "net.ipv6.conf.all.use_oif_addrs_only": {
+                "value": "0",
+                "define": "允许使用IPv6输出接口地址"
+            },
+            "net.ipv6.conf.all.use_optimistic": {
+                "value": "0",
+                "define": "禁用IPv6乐观的地址生成"
+            },
+            "net.ipv6.conf.all.use_tempaddr": {
+                "value": "0",
+                "define": "禁用IPv6临时地址生成"
+            }
+        },
+        "IPv6接口默认配置": {
+            "net.ipv6.conf.default.accept_dad": {
+                "value": "1",
+                "define": "允许IPv6冲突检测"
+            },
+            "net.ipv6.conf.default.accept_ra": {
+                "value": "1",
+                "define": "允许接收IPv6路由通告"
+            },
+            "net.ipv6.conf.default.accept_ra_defrtr": {
+                "value": "1",
+                "define": "允许接收默认路由信息"
+            },
+            "net.ipv6.conf.default.accept_ra_from_local": {
+                "value": "0",
+                "define": "禁止从本地接口接收路由通告"
+            },
+            "net.ipv6.conf.default.accept_ra_min_hop_limit": {
+                "value": "1",
+                "define": "设置接收路由通告的最小跳限"
+            },
+            "net.ipv6.conf.default.accept_ra_mtu": {
+                "value": "1",
+                "define": "设置接收路由通告的最大传输单元"
+            },
+            "net.ipv6.conf.default.accept_ra_pinfo": {
+                "value": "1",
+                "define": "允许接收IPv6路由信息选项"
+            },
+            "net.ipv6.conf.default.accept_ra_rt_info_max_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最大前缀长度"
+            },
+            "net.ipv6.conf.default.accept_ra_rt_info_min_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最小前缀长度"
+            },
+            "net.ipv6.conf.default.accept_ra_rtr_pref": {
+                "value": "1",
+                "define": "允许接收路由通告的路由器优先级信息"
+            },
+            "net.ipv6.conf.default.accept_redirects": {
+                "value": "1",
+                "define": "允许接收IPv6重定向"
+            },
+            "net.ipv6.conf.default.accept_source_route": {
+                "value": "0",
+                "define": "禁止接受IPv6源路由选项"
+            },
+            "net.ipv6.conf.default.addr_gen_mode": {
+                "value": "0",
+                "define": "禁止自动地址生成"
+            },
+            "net.ipv6.conf.default.autoconf": {
+                "value": "1",
+                "define": "允许IPv6自动配置"
+            },
+            "net.ipv6.conf.default.dad_transmits": {
+                "value": "1",
+                "define": "设置IPv6冲突检测重传次数"
+            },
+            "net.ipv6.conf.default.disable_ipv6": {
+                "value": "0",
+                "define": "启用IPv6功能"
+            },
+            "net.ipv6.conf.default.disable_policy": {
+                "value": "0",
+                "define": "启用IPv6流控策略"
+            },
+            "net.ipv6.conf.default.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "允许接收L2组播报文的单播报文"
+            },
+            "net.ipv6.conf.default.drop_unsolicited_na": {
+                "value": "0",
+                "define": "允许发送不经过确认的NA报文"
+            },
+            "net.ipv6.conf.default.enhanced_dad": {
+                "value": "1",
+                "define": "启用增强的IPv6冲突检测"
+            },
+            "net.ipv6.conf.default.force_mld_version": {
+                "value": "0",
+                "define": "不强制使用指定版本的MLD协议"
+            },
+            "net.ipv6.conf.default.force_tllao": {
+                "value": "0",
+                "define": "不强制使用指定的链路层地址选项"
+            },
+            "net.ipv6.conf.default.forwarding": {
+                "value": "0",
+                "define": "禁止IPv6路由转发"
+            },
+            "net.ipv6.conf.default.hop_limit": {
+                "value": "64",
+                "define": "设置默认IPv6跳数限制"
+            },
+            "net.ipv6.conf.default.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "允许使用离线路由表"
+            },
+            "net.ipv6.conf.default.keep_addr_on_down": {
+                "value": "0",
+                "define": "禁止保持下线的IPv6地址"
+            },
+            "net.ipv6.conf.default.max_addresses": {
+                "value": "16",
+                "define": "设置IPv6接口上的最大地址数"
+            },
+            "net.ipv6.conf.default.max_desync_factor": {
+                "value": "600",
+                "define": "设置IPv6地址重同步的最大因子"
+            },
+            "net.ipv6.conf.default.mc_forwarding": {
+                "value": "0",
+                "define": "禁止IPv6组播转发"
+            },
+            "net.ipv6.conf.default.mldv1_unsolicited_report_interval": {
+                "value": "10000",
+                "define": "设置MLDv1主动报告间隔时间"
+            },
+            "net.ipv6.conf.default.mldv2_unsolicited_report_interval": {
+                "value": "1000",
+                "define": "设置MLDv2主动报告间隔时间"
+            },
+            "net.ipv6.conf.default.mtu": {
+                "value": "1280",
+                "define": "设置IPv6默认MTU"
+            },
+            "net.ipv6.conf.default.ndisc_notify": {
+                "value": "0",
+                "define": "禁用IPv6邻居发现通知"
+            },
+            "net.ipv6.conf.default.ndisc_tclass": {
+                "value": "0",
+                "define": "设置IPv6邻居发现报文的通知类别"
+            },
+            "net.ipv6.conf.default.optimistic_dad": {
+                "value": "0",
+                "define": "禁用IPv6乐观的冲突检测"
+            },
+            "net.ipv6.conf.default.proxy_ndp": {
+                "value": "0",
+                "define": "禁用IPv6代理邻居发现协议"
+            },
+            "net.ipv6.conf.default.regen_max_retry": {
+                "value": "3",
+                "define": "设置IPv6地址重生成的最大尝试次数"
+            },
+            "net.ipv6.conf.default.router_probe_interval": {
+                "value": "60",
+                "define": "设置IPv6路由器探测间隔时间"
+            },
+            "net.ipv6.conf.default.router_solicitation_delay": {
+                "value": "1",
+                "define": "设置IPv6路由器请求延迟时间"
+            },
+            "net.ipv6.conf.default.router_solicitation_interval": {
+                "value": "4",
+                "define": "设置IPv6路由器请求间隔时间"
+            },
+            "net.ipv6.conf.default.router_solicitation_max_interval": {
+                "value": "3600",
+                "define": "设置IPv6路由器请求最大间隔时间"
+            },
+            "net.ipv6.conf.default.router_solicitations": {
+                "value": "-1",
+                "define": "设置接收的IPv6路由器请求数"
+            },
+            "net.ipv6.conf.default.seg6_enabled": {
+                "value": "0    禁用IPv6段路由（Segment",
+                "define": "Routing）"
+            },
+            "net.ipv6.conf.default.suppress_frag_ndisc": {
+                "value": "1",
+                "define": "禁止通过通告片段来防止IPv6碎片化"
+            },
+            "net.ipv6.conf.default.temp_prefered_lft": {
+                "value": "86400",
+                "define": "设置IPv6临时地址优"
+            },
+            "net.ipv6.conf.default.temp_valid_lft": {
+                "value": "604800",
+                "define": "设置IPv6临时地址有效期"
+            },
+            "net.ipv6.conf.default.use_oif_addrs_only": {
+                "value": "0",
+                "define": "允许使用非本地地址作为源地址发送IPv6报文"
+            },
+            "net.ipv6.conf.default.use_optimistic": {
+                "value": "0",
+                "define": "禁用IPv6优化的地址生成"
+            },
+            "net.ipv6.conf.default.use_tempaddr": {
+                "value": "0",
+                "define": "禁用IPv6临时地址"
+            }
+        },
+        "IPv6特定接口-enp1s0接口配置": {
+            "net.ipv6.conf.enp1s0.accept_dad": {
+                "value": "1",
+                "define": "允许IPv6冲突检测"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra": {
+                "value": "0",
+                "define": "禁止接收IPv6路由通告"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_defrtr": {
+                "value": "1",
+                "define": "允许接收默认路由信息"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_from_local": {
+                "value": "0",
+                "define": "禁止从本地接口接收路由通告"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_min_hop_limit": {
+                "value": "1",
+                "define": "设置接收路由通告的最小跳限"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_mtu": {
+                "value": "1",
+                "define": "设置接收路由通告的最大传输单元"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_pinfo": {
+                "value": "1",
+                "define": "允许接收IPv6路由信息选项"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_rt_info_max_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最大前缀长度"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_rt_info_min_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最小前缀长度"
+            },
+            "net.ipv6.conf.enp1s0.accept_ra_rtr_pref": {
+                "value": "1",
+                "define": "允许接收路由通告的路由器优先级信息"
+            },
+            "net.ipv6.conf.enp1s0.accept_redirects": {
+                "value": "1",
+                "define": "允许接收IPv6重定向"
+            },
+            "net.ipv6.conf.enp1s0.accept_source_route": {
+                "value": "0",
+                "define": "禁止接受IPv6源路由选项"
+            },
+            "net.ipv6.conf.enp1s0.addr_gen_mode": {
+                "value": "1",
+                "define": "设置IPv6地址生成模式"
+            },
+            "net.ipv6.conf.enp1s0.autoconf": {
+                "value": "1",
+                "define": "允许IPv6自动配置"
+            },
+            "net.ipv6.conf.enp1s0.dad_transmits": {
+                "value": "1",
+                "define": "设置IPv6冲突检测重传次数"
+            },
+            "net.ipv6.conf.enp1s0.disable_ipv6": {
+                "value": "0",
+                "define": "启用IPv6功能"
+            },
+            "net.ipv6.conf.enp1s0.disable_policy": {
+                "value": "0",
+                "define": "启用IPv6流控策略"
+            },
+            "net.ipv6.conf.enp1s0.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "允许接收L2组播报文的单播报文"
+            },
+            "net.ipv6.conf.enp1s0.drop_unsolicited_na": {
+                "value": "0",
+                "define": "允许发送不经过确认的NA报文"
+            },
+            "net.ipv6.conf.enp1s0.enhanced_dad": {
+                "value": "1",
+                "define": "启用增强的IPv6冲突检测"
+            },
+            "net.ipv6.conf.enp1s0.force_mld_version": {
+                "value": "0",
+                "define": "不强制使用指定版本的MLD协议"
+            },
+            "net.ipv6.conf.enp1s0.force_tllao": {
+                "value": "0",
+                "define": "不强制使用指定的链路层地址选项"
+            },
+            "net.ipv6.conf.enp1s0.forwarding": {
+                "value": "0",
+                "define": "禁止IPv6路由转发"
+            },
+            "net.ipv6.conf.enp1s0.hop_limit": {
+                "value": "64",
+                "define": "设置默认IPv6跳数限制"
+            },
+            "net.ipv6.conf.enp1s0.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "允许使用离线路由表"
+            },
+            "net.ipv6.conf.enp1s0.keep_addr_on_down": {
+                "value": "0",
+                "define": "禁止保持下线的IPv6地址"
+            },
+            "net.ipv6.conf.enp1s0.max_addresses": {
+                "value": "16",
+                "define": "设置IPv6接口上的最大地址数"
+            },
+            "net.ipv6.conf.enp1s0.max_desync_factor": {
+                "value": "600",
+                "define": "设置IPv6地址重同步的最大因子"
+            },
+            "net.ipv6.conf.enp1s0.mc_forwarding": {
+                "value": "0",
+                "define": "禁止IPv6组播转发"
+            },
+            "net.ipv6.conf.enp1s0.mldv1_unsolicited_report_interval": {
+                "value": "10000",
+                "define": "设置MLDv1主动报告间隔时间"
+            },
+            "net.ipv6.conf.enp1s0.mldv2_unsolicited_report_interval": {
+                "value": "1000",
+                "define": "设置MLDv2主动报告间隔时间"
+            },
+            "net.ipv6.conf.enp1s0.mtu": {
+                "value": "1500    设置IPv6",
+                "define": "MTU"
+            },
+            "net.ipv6.conf.enp1s0.ndisc_notify": {
+                "value": "0",
+                "define": "禁用IPv6邻居发现通知"
+            },
+            "net.ipv6.conf.enp1s0.ndisc_tclass": {
+                "value": "0",
+                "define": "设置IPv6邻居发现报文的通知类别"
+            },
+            "net.ipv6.conf.enp1s0.optimistic_dad": {
+                "value": "0",
+                "define": "禁用IPv6乐观的冲突检测"
+            },
+            "net.ipv6.conf.enp1s0.proxy_ndp": {
+                "value": "0",
+                "define": "禁用IPv6代理邻居发现协议"
+            },
+            "net.ipv6.conf.enp1s0.regen_max_retry": {
+                "value": "3",
+                "define": "设置IPv6地址重生成的最大尝试次数"
+            },
+            "net.ipv6.conf.enp1s0.router_probe_interval": {
+                "value": "60",
+                "define": "设置IPv6路由器探测间隔时间"
+            },
+            "net.ipv6.conf.enp1s0.router_solicitation_delay": {
+                "value": "1",
+                "define": "设置IPv6路由器请求延迟时间"
+            },
+            "net.ipv6.conf.enp1s0.router_solicitation_interval": {
+                "value": "4",
+                "define": "设置IPv6路由器请求间隔时间"
+            },
+            "net.ipv6.conf.enp1s0.router_solicitation_max_interval": {
+                "value": "3600",
+                "define": "设置IPv6路由器请求最大间隔时间"
+            },
+            "net.ipv6.conf.enp1s0.router_solicitations": {
+                "value": "-1",
+                "define": "设置接收的IPv6路由器请求数"
+            },
+            "net.ipv6.conf.enp1s0.seg6_enabled": {
+                "value": "0    禁用IPv6段路由（Segment",
+                "define": "Routing）"
+            },
+            "net.ipv6.conf.enp1s0.suppress_frag_ndisc": {
+                "value": "1",
+                "define": "禁止通过通告片段来防止IPv6碎片化"
+            },
+            "net.ipv6.conf.enp1s0.temp_prefered_lft": {
+                "value": "86400",
+                "define": "设置IPv6临时地址优先有效期"
+            },
+            "net.ipv6.conf.enp1s0.temp_valid_lft": {
+                "value": "604800",
+                "define": "设置IPv6临时地址有效期"
+            },
+            "net.ipv6.conf.enp1s0.use_oif_addrs_only": {
+                "value": "0",
+                "define": "允许使用非本地地址作为源地址发送IPv6报文"
+            },
+            "net.ipv6.conf.enp1s0.use_optimistic": {
+                "value": "0",
+                "define": "禁用IPv6优化的地址生成"
+            },
+            "net.ipv6.conf.enp1s0.use_tempaddr": {
+                "value": "0",
+                "define": "禁用IPv6临时地址"
+            }
+        },
+        "IPv6特定接口-lo接口配置": {
+            "net.ipv6.conf.lo.accept_dad": {
+                "value": "-1",
+                "define": "禁止IPv6冲突检测（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra": {
+                "value": "1",
+                "define": "允许接收IPv6路由通告（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_defrtr": {
+                "value": "1",
+                "define": "允许接收默认路由信息（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_from_local": {
+                "value": "0",
+                "define": "禁止从本地接口接收路由通告（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_min_hop_limit": {
+                "value": "1",
+                "define": "设置接收路由通告的最小跳限（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_mtu": {
+                "value": "1",
+                "define": "设置接收路由通告的最大传输单元（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_pinfo": {
+                "value": "1",
+                "define": "允许接收IPv6路由信息选项（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_rt_info_max_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最大前缀长度（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_rt_info_min_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最小前缀长度（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_ra_rtr_pref": {
+                "value": "1",
+                "define": "允许接收路由通告的路由器优先级信息（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_redirects": {
+                "value": "1",
+                "define": "允许接收IPv6重定向（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.accept_source_route": {
+                "value": "0",
+                "define": "禁止接受IPv6源路由选项（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.addr_gen_mode": {
+                "value": "0",
+                "define": "设置IPv6地址生成模式（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.autoconf": {
+                "value": "1",
+                "define": "允许IPv6自动配置（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.dad_transmits": {
+                "value": "1",
+                "define": "设置IPv6冲突检测重传次数（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.disable_ipv6": {
+                "value": "0",
+                "define": "启用IPv6功能（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.disable_policy": {
+                "value": "0",
+                "define": "启用IPv6流控策略（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "允许接收L2组播报文的单播报文（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.drop_unsolicited_na": {
+                "value": "0",
+                "define": "允许发送不经过确认的NA报文（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.enhanced_dad": {
+                "value": "1",
+                "define": "启用增强的IPv6冲突检测（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.force_mld_version": {
+                "value": "0",
+                "define": "不强制使用指定版本的MLD协议（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.force_tllao": {
+                "value": "0",
+                "define": "不强制使用指定的链路层地址选项（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.forwarding": {
+                "value": "0",
+                "define": "禁止IPv6路由转发（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.hop_limit": {
+                "value": "64",
+                "define": "设置默认IPv6跳数限制（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "允许使用离线路由表（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.keep_addr_on_down": {
+                "value": "0",
+                "define": "禁止保持下线的IPv6地址（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.max_addresses": {
+                "value": "16",
+                "define": "设置IPv6接口上的最大地址数（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.max_desync_factor": {
+                "value": "600",
+                "define": "设置IPv6地址重同步的最大因子（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.mc_forwarding": {
+                "value": "0",
+                "define": "禁止IPv6组播转发（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.mldv1_unsolicited_report_interval": {
+                "value": "10000",
+                "define": "设置MLDv1未确认报告的发送间隔（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.mldv2_unsolicited_report_interval": {
+                "value": "1000",
+                "define": "设置MLDv2未确认报告的发送间隔（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.mtu": {
+                "value": "65536",
+                "define": "设置IPv6接口的最大传输单元（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.ndisc_notify": {
+                "value": "0",
+                "define": "禁用发送NDISC通知（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.ndisc_tclass": {
+                "value": "0",
+                "define": "设置发送NDISC通知的流量类别（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.optimistic_dad": {
+                "value": "0",
+                "define": "禁用IPv6乐观的地址生成（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.proxy_ndp": {
+                "value": "0",
+                "define": "禁用IPv6代理NDP（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.regen_max_retry": {
+                "value": "3",
+                "define": "设置IPv6地址生成的最大重试次数（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.router_probe_interval": {
+                "value": "60",
+                "define": "设置IPv6路由器探测的间隔时间（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.router_solicitation_delay": {
+                "value": "1",
+                "define": "设置IPv6路由器探测的延迟时间（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.router_solicitation_interval": {
+                "value": "4",
+                "define": "设置IPv6路由器探测的间隔时间（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.router_solicitation_max_interval": {
+                "value": "3600",
+                "define": "设置IPv6路由器探测的最大间隔时间（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.router_solicitations": {
+                "value": "-1",
+                "define": "设置IPv6路由器探测的次数（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.seg6_enabled": {
+                "value": "0    禁用IPv6 Segment",
+                "define": "Routing（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.suppress_frag_ndisc": {
+                "value": "1",
+                "define": "允许发送分段报文的NDISC通知（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.temp_prefered_lft": {
+                "value": "86400",
+                "define": "设置IPv6临时地址优先生存时间（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.temp_valid_lft": {
+                "value": "604800",
+                "define": "设置IPv6临时地址有效期（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.use_oif_addrs_only": {
+                "value": "0",
+                "define": "允许使用非本地地址作为源地址发送IPv6报文（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.use_optimistic": {
+                "value": "0",
+                "define": "禁用IPv6优化的地址生成（仅适用于回环接口）"
+            },
+            "net.ipv6.conf.lo.use_tempaddr": {
+                "value": "-1",
+                "define": "禁止使用IPv6临时地址（仅适用于回环接口）"
+            }
+        },
+        "IPv6特定接口-virbr0接口配置": {
+            "net.ipv6.conf.virbr0.accept_dad": {
+                "value": "1",
+                "define": "允许IPv6冲突检测（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra": {
+                "value": "0",
+                "define": "禁止接收IPv6路由通告（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_defrtr": {
+                "value": "1",
+                "define": "允许接收默认路由信息（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_from_local": {
+                "value": "0",
+                "define": "禁止从本地接口接收路由通告（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_min_hop_limit": {
+                "value": "1",
+                "define": "设置接收路由通告的最小跳限（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_mtu": {
+                "value": "1",
+                "define": "设置接收路由通告的最大传输单元（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_pinfo": {
+                "value": "1",
+                "define": "允许接收IPv6路由信息选项（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_rt_info_max_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最大前缀长度（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_rt_info_min_plen": {
+                "value": "0",
+                "define": "设置接收路由通告的最小前缀长度（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_ra_rtr_pref": {
+                "value": "1",
+                "define": "允许接收路由通告的路由器优先级信息（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_redirects": {
+                "value": "1",
+                "define": "允许接收IPv6重定向（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.accept_source_route": {
+                "value": "0",
+                "define": "禁止接受IPv6源路由选项（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.addr_gen_mode": {
+                "value": "0",
+                "define": "设置IPv6地址生成模式（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.autoconf": {
+                "value": "0",
+                "define": "禁止IPv6自动配置（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.dad_transmits": {
+                "value": "1",
+                "define": "设置IPv6冲突检测重传次数（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.disable_ipv6": {
+                "value": "1",
+                "define": "禁用IPv6功能（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.disable_policy": {
+                "value": "0",
+                "define": "启用IPv6流控策略（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.drop_unicast_in_l2_multicast": {
+                "value": "0",
+                "define": "允许在L2组播中传送未组播的单播流量（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.drop_unsolicited_na": {
+                "value": "0",
+                "define": "允许丢弃未请求的IPv6邻居通告（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.enhanced_dad": {
+                "value": "1",
+                "define": "启用增强的IPv6冲突检测（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.force_mld_version": {
+                "value": "0",
+                "define": "设置强制使用的MLD版本（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.force_tllao": {
+                "value": "0    设置是否在IPv6 Neighbor",
+                "define": "Solicitation中强制使用TLLAO（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.forwarding": {
+                "value": "0",
+                "define": "禁止IPv6转发（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.hop_limit": {
+                "value": "64",
+                "define": "设置IPv6数据包的跳数限制（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.ignore_routes_with_linkdown": {
+                "value": "0",
+                "define": "允许忽略掉线的IPv6路由（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.keep_addr_on_down": {
+                "value": "0",
+                "define": "在接口关闭时保留IPv6地址（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.max_addresses": {
+                "value": "16",
+                "define": "设置IPv6接口允许的最大地址数（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.max_desync_factor": {
+                "value": "600",
+                "define": "设置IPv6地址生成的最大偏差因子（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.mc_forwarding": {
+                "value": "0",
+                "define": "禁止IPv6多播转发（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.mldv1_unsolicited_report_interval": {
+                "value": "10000",
+                "define": "设置MLDv1未确认报告的发送间隔（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.mldv2_unsolicited_report_interval": {
+                "value": "1000",
+                "define": "设置MLDv2未确认报告的发送间隔（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.mtu": {
+                "value": "1500",
+                "define": "设置IPv6接口的最大传输单元（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.ndisc_notify": {
+                "value": "0",
+                "define": "禁用发送NDISC通知（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.ndisc_tclass": {
+                "value": "0",
+                "define": "设置发送NDISC通知的流量类别（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.optimistic_dad": {
+                "value": "0",
+                "define": "禁用IPv6乐观的地址生成（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.proxy_ndp": {
+                "value": "0",
+                "define": "禁用IPv6代理NDP（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.regen_max_retry": {
+                "value": "3",
+                "define": "设置IPv6地址生成的最大重试次数（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.router_probe_interval": {
+                "value": "60",
+                "define": "设置IPv6路由器探测的间隔时间（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.router_solicitation_delay": {
+                "value": "1",
+                "define": "设置IPv6路由器探测的延迟时间（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.router_solicitation_interval": {
+                "value": "4",
+                "define": "设置IPv6路由器探测的间隔时间（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.router_solicitation_max_interval": {
+                "value": "3600",
+                "define": "设置IPv6路由器探测的最大间隔时间（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.router_solicitations": {
+                "value": "-1",
+                "define": "设置IPv6路由器探测的次数（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.seg6_enabled": {
+                "value": "0    禁用IPv6 Segment",
+                "define": "Routing（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.suppress_frag_ndisc": {
+                "value": "1",
+                "define": "允许发送分段报文的NDISC通知（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.temp_valid_lft": {
+                "value": "604800",
+                "define": "设置IPv6临时地址有效生存时间（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.use_oif_addrs_only": {
+                "value": "0",
+                "define": "允许只使用接口关联的IPv6地址（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.use_optimistic": {
+                "value": "0",
+                "define": "禁用IPv6优化地址生成（仅适用于virbr0接口）"
+            },
+            "net.ipv6.conf.virbr0.use_tempaddr": {
+                "value": "0",
+                "define": "禁用IPv6临时地址生成（仅适用于virbr0接口）"
+            }
+        },
+        "IPv6多路径配置": {
+            "net.ipv6.fib_multipath_hash_fields": {
+                "value": "7",
+                "define": "设置IPv6多路径哈希计算所使用的字段（适用于多路径的情况）"
+            },
+            "net.ipv6.fib_multipath_hash_policy": {
+                "value": "0",
+                "define": "设置IPv6多路径哈希计算的策略（适用于多路径的情况）"
+            }
+        },
+        "IPv6流标签配置": {
+            "net.ipv6.flowlabel_consistency": {
+                "value": "1",
+                "define": "设置IPv6流标签的一致性（适用于所有接口）"
+            },
+            "net.ipv6.flowlabel_reflect": {
+                "value": "0",
+                "define": "设置IPv6流标签的反射（适用于所有接口）"
+            },
+            "net.ipv6.flowlabel_state_ranges": {
+                "value": "0",
+                "define": "设置IPv6流标签状态范围（适用于所有接口）"
+            },
+            "net.ipv6.fwmark_reflect": {
+                "value": "0",
+                "define": "禁用IPv6防火墙标记的反射（适用于所有接口）"
+            },
+            "net.ipv6.icmp.ratelimit": {
+                "value": "1000    设置IPv6",
+                "define": "ICMP消息的发送速率限制（适用于所有接口）"
+            },
+            "net.ipv6.idgen_delay": {
+                "value": "1",
+                "define": "设置IPv6地址生成延迟时间（适用于所有接口）"
+            },
+            "net.ipv6.idgen_retries": {
+                "value": "3",
+                "define": "设置IPv6地址生成的最大重试次数（适用于所有接口）"
+            }
+        },
+        "IPv6分片配置": {
+            "net.ipv6.ip6frag_high_thresh": {
+                "value": "4194304",
+                "define": "设置IPv6分片高阈值（适用于所有接口）"
+            },
+            "net.ipv6.ip6frag_low_thresh": {
+                "value": "3145728",
+                "define": "设置IPv6分片低阈值（适用于所有接口）"
+            },
+            "net.ipv6.ip6frag_secret_interval": {
+                "value": "0",
+                "define": "设置IPv6分片重组的时间间隔（适用于所有接口）"
+            },
+            "net.ipv6.ip6frag_time": {
+                "value": "60",
+                "define": "设置IPv6分片重组的最大时间（适用于所有接口）"
+            },
+            "net.ipv6.ip_nonlocal_bind": {
+                "value": "0",
+                "define": "禁止IPv6套接字绑定到非本地地址（适用于所有接口）"
+            },
+            "net.ipv6.max_dst_opts_length": {
+                "value": "2147483647",
+                "define": "设置IPv6目标选项长度的最大值（适用于所有接口）"
+            },
+            "net.ipv6.max_dst_opts_number": {
+                "value": "8",
+                "define": "设置IPv6目标选项数目的最大值（适用于所有接口）"
+            },
+            "net.ipv6.max_hbh_length": {
+                "value": "2147483647",
+                "define": "设置IPv6目标地址选项长度的最大值（适用于所有接口）"
+            },
+            "net.ipv6.max_hbh_opts_number": {
+                "value": "8",
+                "define": "设置IPv6目标地址选项数目的最大值（适用于所有接口）"
+            },
+            "net.ipv6.mld_max_msf": {
+                "value": "64    设置MLD（Multicast Listener",
+                "define": "Discovery）的最大查询状态记录数（适用于所有接口）"
+            },
+            "net.ipv6.mld_qrv": {
+                "value": "2    设置MLD（Multicast Listener",
+                "define": "Discovery）查询报文的版本（适用于所有接口）"
+            }
+        },
+        "IPv6邻居发现协议-默认接口-配置": {
+            "net.ipv6.neigh.default.anycast_delay": {
+                "value": "100",
+                "define": "设置IPv6邻居缺省接口的任播延迟时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.app_solicit": {
+                "value": "0",
+                "define": "设置IPv6邻居缺省接口的地址解析请求次数（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.base_reachable_time_ms": {
+                "value": "30000",
+                "define": "设置IPv6邻居缺省接口的基本可达时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.delay_first_probe_time": {
+                "value": "5",
+                "define": "设置IPv6邻居缺省接口的第一次探测的延迟时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.gc_interval": {
+                "value": "30",
+                "define": "设置IPv6邻居缺省接口的垃圾收集间隔时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.gc_stale_time": {
+                "value": "60",
+                "define": "设置IPv6邻居缺省接口的垃圾收集的过期时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.gc_thresh1": {
+                "value": "128",
+                "define": "设置IPv6邻居缺省接口的垃圾收集的阈值1（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.gc_thresh2": {
+                "value": "512",
+                "define": "设置IPv6邻居缺省接口的垃圾收集的阈值2（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.gc_thresh3": {
+                "value": "1024",
+                "define": "设置IPv6邻居缺省接口的垃圾收集的阈值3（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.locktime": {
+                "value": "0",
+                "define": "设置IPv6邻居缺省接口的锁定时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.mcast_resolicit": {
+                "value": "0",
+                "define": "设置IPv6邻居缺省接口的组播地址解析请求次数（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.mcast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居缺省接口的组播地址解析请求次数（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.proxy_delay": {
+                "value": "80",
+                "define": "设置IPv6邻居缺省接口的代理邻居的延迟时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.proxy_qlen": {
+                "value": "64",
+                "define": "设置IPv6邻居缺省接口的代理邻"
+            },
+            "net.ipv6.neigh.default.retrans_time_ms": {
+                "value": "1000",
+                "define": "设置IPv6邻居缺省接口的重传时间（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.ucast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居缺省接口的单播地址解析请求次数（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.unres_qlen": {
+                "value": "101",
+                "define": "设置IPv6邻居缺省接口的未解析队列长度（适用于所有接口）"
+            },
+            "net.ipv6.neigh.default.unres_qlen_bytes": {
+                "value": "212992",
+                "define": "设置IPv6邻居缺省接口的未解析队列字节数（适用于所有接口）"
+            }
+        },
+        "IPv6邻居发现协议-enp1s0接口-配置": {
+            "net.ipv6.neigh.enp1s0.anycast_delay": {
+                "value": "100",
+                "define": "设置IPv6邻居enp1s0接口的任播延迟时间"
+            },
+            "net.ipv6.neigh.enp1s0.app_solicit": {
+                "value": "0",
+                "define": "设置IPv6邻居enp1s0接口的地址解析请求次数"
+            },
+            "net.ipv6.neigh.enp1s0.base_reachable_time_ms": {
+                "value": "30000",
+                "define": "设置IPv6邻居enp1s0接口的基本可达时间"
+            },
+            "net.ipv6.neigh.enp1s0.delay_first_probe_time": {
+                "value": "5",
+                "define": "设置IPv6邻居enp1s0接口的第一次探测的延迟时间"
+            },
+            "net.ipv6.neigh.enp1s0.gc_stale_time": {
+                "value": "60",
+                "define": "设置IPv6邻居enp1s0接口的垃圾收集的过期时间"
+            },
+            "net.ipv6.neigh.enp1s0.locktime": {
+                "value": "0",
+                "define": "设置IPv6邻居enp1s0接口的锁定时间"
+            },
+            "net.ipv6.neigh.enp1s0.mcast_resolicit": {
+                "value": "0",
+                "define": "设置IPv6邻居enp1s0接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.enp1s0.mcast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居enp1s0接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.enp1s0.proxy_delay": {
+                "value": "80",
+                "define": "设置IPv6邻居enp1s0接口的代理邻居的延迟时间"
+            },
+            "net.ipv6.neigh.enp1s0.proxy_qlen": {
+                "value": "64",
+                "define": "设置IPv6邻居enp1s0接口的代理邻居的队列长度"
+            },
+            "net.ipv6.neigh.enp1s0.retrans_time_ms": {
+                "value": "1000",
+                "define": "设置IPv6邻居enp1s0接口的重传时间"
+            },
+            "net.ipv6.neigh.enp1s0.ucast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居enp1s0接口的单播地址解析请求次数"
+            },
+            "net.ipv6.neigh.enp1s0.unres_qlen": {
+                "value": "101",
+                "define": "设置IPv6邻居enp1s0接口的未解析队列长度"
+            },
+            "net.ipv6.neigh.enp1s0.unres_qlen_bytes": {
+                "value": "212992",
+                "define": "设置IPv6邻居enp1s0接口的未解析队列字节数"
+            }
+        },
+        "IPv6邻居发现协议-lo接口-配置": {
+            "net.ipv6.neigh.lo.anycast_delay": {
+                "value": "100",
+                "define": "设置IPv6邻居lo接口的任播延迟时间"
+            },
+            "net.ipv6.neigh.lo.app_solicit": {
+                "value": "0",
+                "define": "设置IPv6邻居lo接口的地址解析请求次数"
+            },
+            "net.ipv6.neigh.lo.base_reachable_time_ms": {
+                "value": "30000",
+                "define": "设置IPv6邻居lo接口的基本可达时间"
+            },
+            "net.ipv6.neigh.lo.delay_first_probe_time": {
+                "value": "5",
+                "define": "设置IPv6邻居lo接口的第一次探测的延迟时间"
+            },
+            "net.ipv6.neigh.lo.gc_stale_time": {
+                "value": "60",
+                "define": "设置IPv6邻居lo接口的垃圾收集的过期时间"
+            },
+            "net.ipv6.neigh.lo.locktime": {
+                "value": "0",
+                "define": "设置IPv6邻居lo接口的锁定时间"
+            },
+            "net.ipv6.neigh.lo.mcast_resolicit": {
+                "value": "0",
+                "define": "设置IPv6邻居lo接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.lo.mcast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居lo接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.lo.proxy_delay": {
+                "value": "80",
+                "define": "设置IPv6邻居lo接口的代理邻居的延迟时间"
+            },
+            "net.ipv6.neigh.lo.proxy_qlen": {
+                "value": "64",
+                "define": "设置IPv6邻居lo接口的代理邻居的队列长度"
+            },
+            "net.ipv6.neigh.lo.retrans_time_ms": {
+                "value": "1000",
+                "define": "设置IPv6邻居lo接口的重传时间"
+            },
+            "net.ipv6.neigh.lo.ucast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居lo接口的单播地址解析请求次数"
+            },
+            "net.ipv6.neigh.lo.unres_qlen": {
+                "value": "101",
+                "define": "设置IPv6邻居lo接口的未解析队列长度"
+            },
+            "net.ipv6.neigh.lo.unres_qlen_bytes": {
+                "value": "212992",
+                "define": "设置IPv6邻居lo接口的未解析队列字节数"
+            }
+        },
+        "IPv6邻居发现协议-virbr0接口-配置": {
+            "net.ipv6.neigh.virbr0.anycast_delay": {
+                "value": "100",
+                "define": "设置IPv6邻居virbr0接口的任播延迟时间"
+            },
+            "net.ipv6.neigh.virbr0.app_solicit": {
+                "value": "0",
+                "define": "设置IPv6邻居virbr0接口的地址解析请求次数"
+            },
+            "net.ipv6.neigh.virbr0.base_reachable_time_ms": {
+                "value": "30000",
+                "define": "设置IPv6邻居virbr0接口的基本可达时间"
+            },
+            "net.ipv6.neigh.virbr0.delay_first_probe_time": {
+                "value": "5",
+                "define": "设置IPv6邻居virbr0接口的第一次探测的延迟时间"
+            },
+            "net.ipv6.neigh.virbr0.gc_stale_time": {
+                "value": "60",
+                "define": "设置IPv6邻居virbr0接口的垃圾收集的过期时间"
+            },
+            "net.ipv6.neigh.virbr0.locktime": {
+                "value": "0",
+                "define": "设置IPv6邻居virbr0接口的锁定时间"
+            },
+            "net.ipv6.neigh.virbr0.mcast_resolicit": {
+                "value": "0",
+                "define": "设置IPv6邻居virbr0接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.virbr0.mcast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居virbr0接口的组播地址解析请求次数"
+            },
+            "net.ipv6.neigh.virbr0.proxy_delay": {
+                "value": "80",
+                "define": "设置IPv6邻居virbr0接口的代理邻居的延迟时间"
+            },
+            "net.ipv6.neigh.virbr0.proxy_qlen": {
+                "value": "64",
+                "define": "设置IPv6邻居virbr0接口的代理邻居的队列长度"
+            },
+            "net.ipv6.neigh.virbr0.retrans_time_ms": {
+                "value": "1000",
+                "define": "设置IPv6邻居virbr0接口的重传时间"
+            },
+            "net.ipv6.neigh.virbr0.ucast_solicit": {
+                "value": "3",
+                "define": "设置IPv6邻居virbr0接口的单播地址解析请求次数"
+            },
+            "net.ipv6.neigh.virbr0.unres_qlen": {
+                "value": "101",
+                "define": "设置IPv6邻居virbr0接口的未解析队列长度"
+            },
+            "net.ipv6.neigh.virbr0.unres_qlen_bytes": {
+                "value": "212992",
+                "define": "设置IPv6邻居virbr0接口的未解析队列字节数"
+            },
+            "net.ipv6.route.gc_elasticity": {
+                "value": "9",
+                "define": "设置IPv6路由垃圾收集的弹性值"
+            },
+            "net.ipv6.route.gc_interval": {
+                "value": "30",
+                "define": "设置IPv6路由垃圾收集的时间间隔"
+            },
+            "net.ipv6.route.gc_min_interval": {
+                "value": "0",
+                "define": "设置IPv6路由垃圾收集的最小时间间隔"
+            },
+            "net.ipv6.route.gc_min_interval_ms": {
+                "value": "500",
+                "define": "设置IPv6路由垃圾收集的最小时间间隔（以毫秒为单位）"
+            },
+            "net.ipv6.route.gc_thresh": {
+                "value": "1024",
+                "define": "设置IPv6路由垃圾收集的阈值"
+            },
+            "net.ipv6.route.gc_timeout": {
+                "value": "60",
+                "define": "设置IPv6路由垃圾收集的超时时间"
+            },
+            "net.ipv6.route.max_size": {
+                "value": "4096",
+                "define": "设置IPv6路由最大缓存项数目"
+            },
+            "net.ipv6.route.min_adv_mss": {
+                "value": "1220",
+                "define": "设置IPv6路由最小通告的MSS值"
+            },
+            "net.ipv6.route.mtu_expires": {
+                "value": "600",
+                "define": "设置IPv6路由MTU的过期时间"
+            },
+            "net.ipv6.seg6_flowlabel": {
+                "value": "0    设置IPv6",
+                "define": "SEG6流标签"
+            },
+            "net.ipv6.xfrm6_gc_thresh": {
+                "value": "32768    设置IPv6",
+                "define": "XFRM缓存阈值"
+            }
+        },
+        "MPTCP配置": {
+            "net.mptcp.add_addr_timeout": {
+                "value": "120",
+                "define": "MPTCP添加地址的超时时间为120秒"
+            },
+            "net.mptcp.enabled": {
+                "value": "0",
+                "define": "禁用MPTCP功能，值为0表示禁用"
+            },
+            "net.mptcp.stale_loss_cnt": {
+                "value": "4",
+                "define": "MPTCP报告拥塞的阈值"
+            }
+        },
+        "网络连接跟踪基本配置": {
+            "net.netfilter.nf_conntrack_acct": {
+                "value": "0",
+                "define": "禁用网络连接跟踪的计费统计功能，值为0表示禁用"
+            },
+            "net.netfilter.nf_conntrack_buckets": {
+                "value": "65536",
+                "define": "设置网络连接跟踪表的哈希桶数目"
+            },
+            "net.netfilter.nf_conntrack_checksum": {
+                "value": "1",
+                "define": "开启网络连接跟踪的数据包校验和功能，值为1表示开启"
+            },
+            "net.netfilter.nf_conntrack_count": {
+                "value": "1",
+                "define": "开启网络连接跟踪表中的计数功能，值为1表示开启"
+            }
+        },
+        "网络连接跟踪DCCP协议配置": {
+            "net.netfilter.nf_conntrack_dccp_loose": {
+                "value": "1",
+                "define": "开启DCCP协议的宽松连接跟踪模式，值为1表示开启"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_closereq": {
+                "value": "64",
+                "define": "设置DCCP连接关闭请求的超时时间为64秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_closing": {
+                "value": "64",
+                "define": "设置DCCP连接关闭状态的超时时间为64秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_open": {
+                "value": "43200",
+                "define": "设置DCCP连接打开状态的超时时间为43200秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_partopen": {
+                "value": "480",
+                "define": "设置DCCP连接部分打开状态的超时时间为480秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_request": {
+                "value": "240",
+                "define": "设置DCCP连接请求状态的超时时间为240秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_respond": {
+                "value": "480",
+                "define": "设置DCCP连接响应状态的超时时间为480秒"
+            },
+            "net.netfilter.nf_conntrack_dccp_timeout_timewait": {
+                "value": "240",
+                "define": "设置DCCP连接TIME_WAIT状态的超时时间为240秒"
+            }
+        },
+        "网络连接跟踪事件与预期连接配置": {
+            "net.netfilter.nf_conntrack_events": {
+                "value": "1",
+                "define": "开启网络连接跟踪的事件记录功能，值为1表示开启"
+            },
+            "net.netfilter.nf_conntrack_expect_max": {
+                "value": "1024",
+                "define": "设置预期的网络连接跟踪表最大数目为1024"
+            }
+        },
+        "网络连接跟踪IPv6分片配置": {
+            "net.netfilter.nf_conntrack_frag6_high_thresh": {
+                "value": "4194304",
+                "define": "设置IPv6分片网络连接跟踪表的高阈值为4194304"
+            },
+            "net.netfilter.nf_conntrack_frag6_low_thresh": {
+                "value": "3145728",
+                "define": "设置IPv6分片网络连接跟踪表的低阈值为3145728"
+            },
+            "net.netfilter.nf_conntrack_frag6_timeout": {
+                "value": "60",
+                "define": "设置IPv6分片网络连接跟踪表的超时时间为60秒"
+            }
+        },
+        "网络连接跟踪通用与特定协议超时配置": {
+            "net.netfilter.nf_conntrack_generic_timeout": {
+                "value": "600",
+                "define": "设置通用网络连接跟踪表的超时时间为600秒"
+            },
+            "net.netfilter.nf_conntrack_helper": {
+                "value": "0",
+                "define": "禁用网络连接跟踪的协议助手功能，值为0表示禁用"
+            },
+            "net.netfilter.nf_conntrack_icmp_timeout": {
+                "value": "30",
+                "define": "设置ICMP协议的网络连接跟踪超时时间为30秒"
+            },
+            "net.netfilter.nf_conntrack_icmpv6_timeout": {
+                "value": "30",
+                "define": "设置ICMPv6协议的网络连接跟踪超时时间为30秒"
+            },
+            "net.netfilter.nf_conntrack_log_invalid": {
+                "value": "0",
+                "define": "禁用网络连接跟踪记录无效数据包的功能，值为0表示禁用"
+            },
+            "net.netfilter.nf_conntrack_max": {
+                "value": "262144",
+                "define": "设置网络连接跟踪表的最大条目数为262144"
+            }
+        },
+        "网络连接跟踪SCTP协议超时配置": {
+            "net.netfilter.nf_conntrack_sctp_timeout_closed": {
+                "value": "10",
+                "define": "设置SCTP协议的连接关闭状态的超时时间为10秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_cookie_echoed": {
+                "value": "3",
+                "define": "设置SCTP协议的COOKIE_ECHOED状态的超时时间为3秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_cookie_wait": {
+                "value": "3",
+                "define": "设置SCTP协议的COOKIE_WAIT状态的超时时间为3秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_established": {
+                "value": "432000",
+                "define": "设置SCTP协议的连接建立状态的超时时间为432000秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_heartbeat_acked": {
+                "value": "210",
+                "define": "设置SCTP协议的HEARTBEAT_ACKED状态的超时时间为210秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_heartbeat_sent": {
+                "value": "30",
+                "define": "设置SCTP协议的HEARTBEAT_SENT状态的超时时间为30秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_shutdown_ack_sent": {
+                "value": "3",
+                "define": "设置SCTP协议的SHUTDOWN_ACK_SENT状态的超时时间为3秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_shutdown_recd": {
+                "value": "0",
+                "define": "设置SCTP协议的SHUTDOWN_RECD状态的超时时间为0秒"
+            },
+            "net.netfilter.nf_conntrack_sctp_timeout_shutdown_sent": {
+                "value": "0",
+                "define": "设置SCTP协议的SHUTDOWN_SENT状态的超时时间为0秒"
+            }
+        },
+        "网络连接跟踪TCP配置": {
+            "net.netfilter.nf_conntrack_tcp_be_liberal": {
+                "value": "0",
+                "define": "禁用TCP协议的BE_LIBERAL模式，值为0表示禁用"
+            },
+            "net.netfilter.nf_conntrack_tcp_loose": {
+                "value": "1",
+                "define": "开启TCP协议的宽松连接跟踪模式，值为1表示开启"
+            },
+            "net.netfilter.nf_conntrack_tcp_max_retrans": {
+                "value": "3",
+                "define": "设置TCP协议的最大重传次数为3"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_close": {
+                "value": "10",
+                "define": "设置TCP协议的连接关闭状态的超时时间为10秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_close_wait": {
+                "value": "60",
+                "define": "设置TCP协议的CLOSE_WAIT状态的超时时间为60秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_established": {
+                "value": "432000",
+                "define": "设置TCP协议的连接建立状态的超时时间为432000秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_fin_wait": {
+                "value": "120",
+                "define": "设置TCP协议的FIN_WAIT状态的超时时间为120秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_last_ack": {
+                "value": "30",
+                "define": "设置TCP协议的LAST_ACK状态的超时时间为30秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_max_retrans": {
+                "value": "300    设置TCP协议的连接异常后 netfilter",
+                "define": "连接跟踪的保持时间"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_syn_recv": {
+                "value": "60",
+                "define": "设置TCP协议的SYN_RECV状态的超时时间为60秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_syn_sent": {
+                "value": "120",
+                "define": "设置TCP协议的SYN_SENT状态的超时时间为120秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_time_wait": {
+                "value": "120",
+                "define": "设置TCP协议的TIME_WAIT状态的超时时间为120秒"
+            },
+            "net.netfilter.nf_conntrack_tcp_timeout_unacknowledged": {
+                "value": "300",
+                "define": "设置TCP协议的未确认状态的超时时间为300秒"
+            },
+            "net.netfilter.nf_conntrack_timestamp": {
+                "value": "0",
+                "define": "禁用网络连接跟踪的时间戳功能，值为0表示禁用"
+            },
+            "net.netfilter.nf_conntrack_udp_timeout": {
+                "value": "30",
+                "define": "设置UDP协议的网络连接跟踪超时时间为30秒"
+            },
+            "net.netfilter.nf_conntrack_udp_timeout_stream": {
+                "value": "120",
+                "define": "设置UDP协议的流跟踪超时时间为120秒"
+            },
+            "net.netfilter.nf_flowtable_tcp_timeout": {
+                "value": "30",
+                "define": "设置TCP协议的FlowTable超时时间为30秒"
+            },
+            "net.netfilter.nf_flowtable_udp_timeout": {
+                "value": "30",
+                "define": "设置UDP协议的FlowTable超时时间为30秒"
+            }
+        },
+        "网络连接跟踪日志记录配置": {
+            "net.netfilter.nf_log.0": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.1": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.10": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.11": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.12": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.2": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.3": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.4": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.5": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.6": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.7": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.8": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log.9": {
+                "value": "NONE",
+                "define": "禁用网络连接跟踪日志记录"
+            },
+            "net.netfilter.nf_log_all_netns": {
+                "value": "0    禁用网络连接跟踪日志记录在所有的Network",
+                "define": "Namespace中，值为0表示禁用"
+            },
+            "net.nf_conntrack_max": {
+                "value": "262144",
+                "define": "设置网络连接跟踪的最大条目数为262144"
+            },
+            "net.unix.max_dgram_qlen": {
+                "value": "512",
+                "define": "设置UNIX域套接字的最大队列长度为512"
+            }
+        }
+    },
+    "Sun RPC相关参数": {
+        "sunrpc.max_resvport": {
+            "value": "1023    设置Sun",
+            "define": "RPC的保留端口的最大值为1023"
+        },
+        "sunrpc.min_resvport": {
+            "value": "665    设置Sun",
+            "define": "RPC的保留端口的最小值为665"
+        },
+        "sunrpc.nfs_debug": {
+            "value": "0x0000",
+            "define": "NFS客户端调试标志，值为0x0000表示禁用调试"
+        },
+        "sunrpc.nfsd_debug": {
+            "value": "0x0000",
+            "define": "NFS服务器调试标志，值为0x0000表示禁用调试"
+        },
+        "sunrpc.nlm_debug": {
+            "value": "0x0000    Network Lock",
+            "define": "Manager调试标志，值为0x0000表示禁用调试"
+        },
+        "sunrpc.rpc_debug": {
+            "value": "0x0000",
+            "define": "RPC调试标志，值为0x0000表示禁用调试"
+        },
+        "sunrpc.tcp_fin_timeout": {
+            "value": "15",
+            "define": "设置TCP连接的FIN_WAIT2状态的超时时间为15秒"
+        },
+        "sunrpc.tcp_max_slot_table_entries": {
+            "value": "65536    设置Sun",
+            "define": "RPC的TCP最大槽表条目数为65536"
+        },
+        "sunrpc.tcp_slot_table_entries": {
+            "value": "2    设置Sun",
+            "define": "RPC的TCP槽表条目数为2"
+        },
+        "sunrpc.transports": {
+            "value": "udp 32768    设置Sun",
+            "define": "RPC的UDP传输参数，最大数据包大小为32768字节"
+        },
+        "sunrpc.udp_slot_table_entries": {
+            "value": "16    设置Sun",
+            "define": "RPC的UDP槽表条目数为16"
+        }
+    },
+    "用户命名空间相关参数": {
+        "user.max_cgroup_namespaces": {
+            "value": "61543",
+            "define": "设置用户的Cgroup命名空间最大数目为61543"
+        },
+        "user.max_inotify_instances": {
+            "value": "128",
+            "define": "设置用户的inotify实例最大数目为128"
+        },
+        "user.max_inotify_watches": {
+            "value": "117245",
+            "define": "设置用户的inotify监视项最大数目为117245"
+        },
+        "user.max_ipc_namespaces": {
+            "value": "61543",
+            "define": "设置用户的IPC命名空间最大数目为61543"
+        },
+        "user.max_mnt_namespaces": {
+            "value": "61543",
+            "define": "设置用户的Mount命名空间最大数目为61543"
+        },
+        "user.max_net_namespaces": {
+            "value": "61543",
+            "define": "设置用户的Network命名空间最大数目为61543"
+        },
+        "user.max_pid_namespaces": {
+            "value": "61543",
+            "define": "设置用户的PID命名空间最大数目为61543"
+        },
+        "user.max_time_namespaces": {
+            "value": "61543",
+            "define": "设置用户的Time命名空间最大数目为61543"
+        },
+        "user.max_user_namespaces": {
+            "value": "61543",
+            "define": "设置用户的User命名空间最大数目为61543"
+        },
+        "user.max_uts_namespaces": {
+            "value": "61543",
+            "define": "设置用户的UTS命名空间最大数目为61543"
+        },
+        "vm.admin_reserve_kbytes": {
+            "value": "8192",
+            "define": "设置管理员保留内存大小为8192KB"
+        }
+    },
+    "内存管理相关参数": {
+        "vm.block_dump": {
+            "value": "0",
+            "define": "禁用块层面的调试跟踪，值为0表示禁用"
+        },
+        "vm.compact_unevictable_allowed": {
+            "value": "1",
+            "define": "允许紧缩非可驻留页，值为1表示允许"
+        },
+        "vm.compaction_proactiveness": {
+            "value": "0",
+            "define": "设置页面紧缩的主动性为0"
+        },
+        "vm.dirty_background_bytes": {
+            "value": "0",
+            "define": "设置脏页后台刷新的阈值为0字节"
+        },
+        "vm.dirty_background_ratio": {
+            "value": "10",
+            "define": "设置脏页后台刷新的阈值为10%"
+        },
+        "vm.dirty_bytes": {
+            "value": "0",
+            "define": "设置脏页内存膨胀的阈值为0字节"
+        },
+        "vm.dirty_expire_centisecs": {
+            "value": "3000",
+            "define": "设置脏页过期时间为3000毫秒"
+        },
+        "vm.dirty_ratio": {
+            "value": "40",
+            "define": "设置脏页内存膨胀的阈值为40%"
+        },
+        "vm.dirty_writeback_centisecs": {
+            "value": "500",
+            "define": "设置脏页回写时间为500毫秒"
+        },
+        "vm.dirtytime_expire_seconds": {
+            "value": "43200",
+            "define": "设置脏页的过期时间为43200秒"
+        },
+        "vm.drop_caches": {
+            "value": "0",
+            "define": "禁用页面缓存清理，值为0表示禁用"
+        },
+        "vm.extfrag_threshold": {
+            "value": "500",
+            "define": "设置外部碎片的阈值为500页"
+        },
+        "vm.force_cgroup_v2_swappiness": {
+            "value": "0",
+            "define": "禁用强制控制组V2的Swappiness设置，值为0表示禁用"
+        },
+        "vm.hugetlb_shm_group": {
+            "value": "0",
+            "define": "设置HugeTLB共享内存的组ID为0，表示所有组可用"
+        },
+        "vm.laptop_mode": {
+            "value": "0",
+            "define": "禁用笔记本模式，值为0表示禁用"
+        },
+        "vm.legacy_va_layout": {
+            "value": "0    禁用Legacy VA",
+            "define": "layout，值为0表示禁用"
+        },
+        "vm.lowmem_reserve_ratio": {
+            "value": "256    256    32    0    0",
+            "define": "设置低内存保留比例，用于系统进入内存紧张时保留一部分内存"
+        },
+        "vm.max_map_count": {
+            "value": "65530",
+            "define": "设置"
+        },
+        "最大内存映射区域数目为65530": {
+            "value": "",
+            "define": "最大内存映射区域数目为65530"
+        },
+        "vm.memory_failure_early_kill": {
+            "value": "0",
+            "define": "禁用内存错误早期处理杀掉进程，值为0表示禁用"
+        },
+        "vm.memory_failure_recovery": {
+            "value": "1",
+            "define": "开启内存错误恢复功能，值为1表示开启"
+        },
+        "vm.min_free_kbytes": {
+            "value": "67584",
+            "define": "设置最小空闲内存为67584KB"
+        },
+        "vm.min_slab_ratio": {
+            "value": "5",
+            "define": "设置最小Slab比例为5%"
+        },
+        "vm.min_unmapped_ratio": {
+            "value": "1",
+            "define": "设置最小未映射比例为1%"
+        },
+        "vm.mmap_min_addr": {
+            "value": "4096",
+            "define": "设置进程的最小mmap地址为4096"
+        },
+        "vm.mmap_rnd_bits": {
+            "value": "28",
+            "define": "设置mmap的随机位数为28"
+        },
+        "vm.mmap_rnd_compat_bits": {
+            "value": "8",
+            "define": "设置mmap的兼容随机位数为8"
+        },
+        "vm.nr_hugepages": {
+            "value": "0",
+            "define": "设置HugeTLB的分配数量为0"
+        },
+        "vm.nr_hugepages_mempolicy": {
+            "value": "0",
+            "define": "设置NUMA节点的HugeTLB分配数量为0"
+        },
+        "vm.nr_overcommit_hugepages": {
+            "value": "0",
+            "define": "设置超额提交的HugeTLB分配数量为0"
+        },
+        "vm.numa_stat": {
+            "value": "1",
+            "define": "开启NUMA统计信息记录，值为1表示开启"
+        },
+        "vm.numa_zonelist_order": {
+            "value": "Node",
+            "define": "设置NUMA的Zonelist排序方式为按Node"
+        },
+        "vm.oom_dump_tasks": {
+            "value": "1    开启OOM",
+            "define": "Killer时转储进程的信息，值为1表示开启"
+        },
+        "vm.oom_kill_allocating_task": {
+            "value": "0    禁用OOM",
+            "define": "Killer杀掉分配内存的进程，值为0表示禁用"
+        },
+        "vm.overcommit_kbytes": {
+            "value": "0",
+            "define": "设置超额提交的内存大小为0KB"
+        },
+        "vm.overcommit_memory": {
+            "value": "0",
+            "define": "设置内存超额提交模式为不允许超额提交，值为0表示不允许"
+        },
+        "vm.overcommit_ratio": {
+            "value": "50",
+            "define": "设置内存超额提交比例为50%"
+        },
+        "vm.page-cluster": {
+            "value": "3",
+            "define": "设置页面聚集数目为3"
+        },
+        "vm.page_lock_unfairness": {
+            "value": "5",
+            "define": "设置页面锁的不公平性因子为5"
+        },
+        "vm.panic_on_oom": {
+            "value": "0",
+            "define": "禁用内存不足时的系统崩溃，值为0表示禁用"
+        },
+        "vm.percpu_pagelist_fraction": {
+            "value": "0",
+            "define": "设置percpu页表分配的内存比例为0%"
+        },
+        "vm.stat_interval": {
+            "value": "1",
+            "define": "设置虚拟内存统计信息的间隔为1秒"
+        },
+        "vm.swappiness": {
+            "value": "10",
+            "define": "设置交换内存使用倾向为10"
+        },
+        "vm.user_reserve_kbytes": {
+            "value": "131072",
+            "define": "设置用户空间保留内存为131072KB"
+        },
+        "vm.vfs_cache_pressure": {
+            "value": "100",
+            "define": "设置VFS缓存压力为100"
+        },
+        "vm.watermark_boost_factor": {
+            "value": "15000",
+            "define": "设置内存水位的提升因子为15000"
+        },
+        "vm.watermark_scale_factor": {
+            "value": "10",
+            "define": "设置内存水位的缩放因子为10"
+        },
+        "vm.zone_reclaim_mode": {
+            "value": "0",
+            "define": "设置内存区域回收模式为不回收，值为0表示不回收"
+        }
+    }
+}
