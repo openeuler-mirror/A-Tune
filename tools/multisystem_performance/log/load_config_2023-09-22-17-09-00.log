@@ -1,0 +1,22 @@
+2023-09-22 17:09:00,975 - root - INFO - loac_check.py start
+2023-09-22 17:09:00,975 - root - INFO - get_parameters.py start
+2023-09-22 17:09:00,976 - root - INFO - 检查: UnixBench 工具是否存在
+2023-09-22 17:09:00,976 - root - ERROR - tools 目录下不存在 UnixBench
+2023-09-22 17:09:03,488 - root - INFO - 尝试下载 UnixBench
+2023-09-22 17:09:03,489 - root - ERROR - 下载UnixBench失败
+2023-09-22 17:09:03,489 - root - ERROR - UnixBench 缺失
+2023-09-22 17:09:03,817 - root - INFO - netperf 已存在，命令行版本
+2023-09-22 17:09:14,156 - root - INFO - 输入密码：********
+2023-09-22 17:09:14,162 - paramiko.transport - INFO - Connected (version 2.0, client OpenSSH_8.0)
+2023-09-22 17:09:14,218 - paramiko.transport - INFO - Authentication (password) successful!
+2023-09-22 17:09:14,218 - root - INFO - {'172.22.70.189'} 与 {'172.22.60.188'} 连通性测试成功
+2023-09-22 17:09:14,218 - root - INFO - 获取系统版本为 openEuler
+2023-09-22 17:09:14,219 - root - INFO - sysctl_res_file_name = 'sysctl@openEuler.txt',ulimit_res_file_name = 'ulimit@openEuler.txt',save_difflib_res = 'differ-2023-09-22-17-09-00.txt',save_statistical_res = 'statistical-2023-09-22-17-09-00.txt' 
+2023-09-22 17:09:14,228 - root - INFO - run command 'sysctl -a'
+2023-09-22 17:09:14,229 - root - INFO - run_sysctl_command_and_save_result successfully, save in './data/sysctl@openEuler.txt'
+2023-09-22 17:09:14,230 - root - INFO - run command 'ulimit -a'
+2023-09-22 17:09:14,230 - root - INFO - run_ulimit_command_and_save_result successfully, save in './data/ulimit@openEuler.txt'
+2023-09-22 17:09:19,718 - root - INFO - compare file1 = './data/sysctl@openEuler.txt', file2 = './data/sysctl@CentOSStream.txt'
+2023-09-22 17:09:19,719 - root - INFO - text1 in './data/sysctl@openEuler.txt', text2 in './data/sysctl@CentOSStream.txt'
+2023-09-22 17:09:19,719 - root - INFO - compare file1 and file2 by difflib successfully
+2023-09-22 17:09:19,729 - root - INFO - save diff_result to file './data/differ-2023-09-22-17-09-00.txt' successfully

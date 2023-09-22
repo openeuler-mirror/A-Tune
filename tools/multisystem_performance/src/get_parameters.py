@@ -1,14 +1,25 @@
+#!/usr/bin/bash
+
+# Copyright (c) 2022 Huawei Technologies Co., Ltd.
+# A-Tune is licensed under the Mulan PSL v2.
+# You can use this software according to the terms and conditions of the Mulan PSL v2.
+# You may obtain a copy of Mulan PSL v2 at:
+#     http://license.coscl.org.cn/MulanPSL2
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
+# PURPOSE.
+# See the Mulan PSL v2 for more details.
+
+# #############################################
+# @Author    :   westtide
+# @Contact   :   tocokeo@outlook.com
+# @Date      :   2023/9/22
+# @License   :   Mulan PSL v2
+# @Desc      :   get parameters from system
+# #############################################
+
 import difflib
 from load_check import *
-
-
-# 获取当前时间戳
-log_file = f'./log/get_sysctl_ulimit_{timestamp}.log'
-file_handler = logging.FileHandler(log_file)
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-logging.getLogger().addHandler(file_handler)
-logging.getLogger().setLevel(logging.INFO)
-logging.info('This is a log message')
 
 
 # 获取 linux 版本，CentOS Steam 或者 OpenEuler
@@ -19,7 +30,7 @@ def get_os_version():
             for line in file:
                 if line.startswith("NAME="):
                     linux_version = line.strip().split("=")[1].strip('"').replace(" ", "")
-                    logging.info('获取系统版本为 %s', linux_version, extra={'logfile': log_file})
+                    logging.info('获取当前系统版本为 %s', linux_version, extra={'logfile': log_file})
                     break
     except FileNotFoundError:
         logging.error('failed: \'cat /etc/os-release\' ', extra={'logfile': log_file})
@@ -34,10 +45,10 @@ def run_sysctl_command_and_save_result(file_name):
     with open(file_name, "w") as output_file:
         process = subprocess.Popen(bash_command, shell=True, stdout=output_file, stderr=subprocess.PIPE)
         _, stderr = process.communicate()
-        logging.info('run command \'%s\'', bash_command, extra={'logfile': log_file})
+        logging.info('运行命令 \'%s\'', bash_command, extra={'logfile': log_file})
         if process.returncode != 0:
             print(f"命令执行出错：{stderr.decode()}")
-            logging.error('failed: run command \'%s\' ', bash_command, extra={'logfile': log_file})
+            logging.error('失败: 运行命令  \'%s\' ', bash_command, extra={'logfile': log_file})
 
 
 # bash: "ulimit -a" 存储在ulimit@$linux-version$中
@@ -46,29 +57,30 @@ def run_ulimit_command_and_save_result(file_name):
     with open(file_name, "w") as output_file:
         process = subprocess.Popen(bash_command, shell=True, stdout=output_file, stderr=subprocess.PIPE)
         _, stderr = process.communicate()
-        logging.info('run command \'%s\'', bash_command, extra={'logfile': log_file})
+        logging.info('运行命令  \'%s\'', bash_command, extra={'logfile': log_file})
         if process.returncode != 0:
             print(f"命令执行出错：{stderr.decode()}")
-            logging.error('failed: run command \'%s\' ', bash_command, extra={'logfile': log_file})
+            logging.error('失败: 运行命令 \'%s\' ', bash_command, extra={'logfile': log_file})
 
 
-# 执行sysctl -a与ulimit -a命令并保存结果
+# 执行sysctl -a 与 ulimit -a命令并保存结果
 def run_command_save(sysctl_res_file_name, ulimit_res_file_name):
     # 执行sysctl -a命令并保存结果到sysctl@xxx.txt文件中
     run_sysctl_command_and_save_result("./data/" + sysctl_res_file_name)
-    logging.info('run_sysctl_command_and_save_result successfully, save in \'%s\'', "./data/" + sysctl_res_file_name,
+    logging.info('成功：run_sysctl_command_and_save_result, 保存：\'%s\'', "./data/" + sysctl_res_file_name,
                  extra={'logfile': log_file})
     # 执行ulimit -a命令并保存结果到ulimit@xxx.txt文件中
     run_ulimit_command_and_save_result("./data/" + ulimit_res_file_name)
-    logging.info('run_ulimit_command_and_save_result successfully, save in \'%s\'', "./data/" + ulimit_res_file_name,
+    logging.info('成功：run_ulimit_command_and_save_result, 保存在：\'%s\'', "./data/" + ulimit_res_file_name,
                  extra={'logfile': log_file})
 
 
-# 使用difflib的比较，保存比较结果diff_result到文件save_difflib_res
+# 使用 difflib 的比较，保存比较结果 diff_result 到文件 save_difflib_res
 def use_differ_res(os_version, sysctl_res_file_name, save_difflib_res):
     # 根据当前操作系统匹配对方的sysctl@xxx文件，使用scp获取对方配置
     file1 = sysctl_res_file_name
     if os_version == "openEuler":
+        # 后期这里会替换为适应两种模式的命令
         command = "scp west1@172.22.60.188:~/my_ospp/data/sysctl@CentOSStream.txt ./data/ "
         try:
             subprocess.run(command, shell=True, check=True)
@@ -76,6 +88,7 @@ def use_differ_res(os_version, sysctl_res_file_name, save_difflib_res):
             print(f"执行命令出错：{e}")
         file2 = "sysctl@CentOSStream.txt"
     else:
+        # 后期这里会替换为适应两种模式的命令
         command = "scp west2@172.22.60.189:~/my_ospp/data/sysctl@openEuler.txt ./data/ "
         try:
             subprocess.run(command, shell=True, check=True)
