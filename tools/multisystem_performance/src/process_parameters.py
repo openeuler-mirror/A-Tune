@@ -3,7 +3,7 @@ from load_check import *
 import json
 
 
-def prgcess_parameters():
+def process_parameters():
     with open('config/config.json') as f:
         data = json.load(f)
 

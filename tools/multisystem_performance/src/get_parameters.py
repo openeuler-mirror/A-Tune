@@ -1,6 +1,8 @@
 import difflib
 from load_check import *
 
+
+# 获取当前时间戳
 log_file = f'./log/get_sysctl_ulimit_{timestamp}.log'
 file_handler = logging.FileHandler(log_file)
 file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))

@@ -1,5 +1,7 @@
 import os
 
+
+# 用于清理 /log 下的日志文件
 def clean_files_with_prefix(directory, prefix):
     for filename in os.listdir(directory):
         if filename.startswith(prefix) and filename.endswith(".log"):
@@ -10,9 +12,10 @@ def clean_files_with_prefix(directory, prefix):
             except OSError as e:
                 print(f"删除文件 {filename} 时出现错误：{e}")
 
+
 # 使用示例
 data_directory = "./log/"
-prefix_to_clean = ["get_sysctl_ulimit","load_config"]
+prefix_to_clean = ["get_sysctl_ulimit", "load_config"]
 
 for prefix in prefix_to_clean:
     clean_files_with_prefix(data_directory, prefix)
