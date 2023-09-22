@@ -56,3 +56,26 @@ db_analysis_type = ["CPU.STAT.usr", "CPU.STAT.nice", "CPU.STAT.sys", "CPU.STAT.i
 # db_passwd_key = 
 # db_passwd_iv = 
 # db_user_passwd = 
+
+#################################### bottleneck ###############################
+[bottleneck]
+# computing
+cpu_stat_util = 80
+cpu_stat_cutil = 80
+perf_stat_ipc = 1
+
+# memory
+mem_bandwidth_total_util = 70
+mem_vmstat_util_swap = 70
+mem_vmstat_util_cpu = 70
+
+# network
+net_stat_ifutil = 70
+net_estat_errs = 1
+
+# network I/O
+net_stat_rxkbs = 70
+net_stat_txkbs = 70
+
+# disk I/OF
+storage_stat_util = 70
