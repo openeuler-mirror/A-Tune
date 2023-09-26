@@ -33,7 +33,7 @@ from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
-
+from analysis.optimizer.BO_tuning_manager import BO_Optimizer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class Optimizer(multiprocessing.Process):
 
     def __init__(self, name, params, child_conn, prj_name, engine="bayes",
                  max_eval=50, sel_feature=False, x0=None, y0=None,
-                 n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs"):
+                 n_random_starts=20, split_count=5, noise=0.00001 ** 2, feature_selector="wefs", history_path=None):
         super().__init__(name=name)
         self.knobs = self.check_multiple_params(params)
         self.child_conn = child_conn
@@ -62,6 +62,10 @@ class Optimizer(multiprocessing.Process):
             self.ref = []
         self._n_random_starts = 20 if n_random_starts is None else n_random_starts
         self.feature_selector = feature_selector
+        if history_path is None:
+            self.history_path = []
+        else:
+            self.history_path = history_path
 
     def build_space(self):
         """build space"""
@@ -322,7 +326,7 @@ class Optimizer(multiprocessing.Process):
                 options = gstuning_manager.get_options_index(options)
             elif self.engine == 'GA':
                 from analysis.optimizer.gatuning_manager import GATuning
-                gatuning_manager = GATuning(self.knobs,self.child_conn)
+                gatuning_manager = GATuning(self.knobs, self.child_conn)
                 params = gatuning_manager.GA()
             elif self.engine == 'lhs':
                 from analysis.optimizer.knob_sampling_manager import KnobSamplingManager
@@ -357,11 +361,19 @@ class Optimizer(multiprocessing.Process):
             elif self.engine == 'ppo':
                 from analysis.optimizer.ppotuning_manager import PPOOptimizer
                 ppo_opt = PPOOptimizer(
-                        self.knobs, self.child_conn, self.max_eval)
+                    self.knobs, self.child_conn, self.max_eval)
                 best_params = ppo_opt.run()
                 final_param = dict(finished=True, param=best_params)
                 self.child_conn.send(final_param)
                 return best_params
+
+            elif self.engine == 'Bayesian_Transfer':
+                bo_opt = BO_Optimizer(self.knobs, self.child_conn, self.max_eval,
+                                      prj_name=self.project_name + "_tlbo_" + str(int(round(time.time() * 1000))),
+                                      history_path=self.history_path)
+                best_params = bo_opt.run()
+                final_param = dict(finished=True, param=best_params)
+                self.child_conn.send(final_param)
 
             LOGGER.info("Minimization procedure has been completed.")
         except ValueError as value_error:

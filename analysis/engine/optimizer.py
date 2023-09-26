@@ -69,7 +69,8 @@ class Optimizer(Resource):
                                      noise=args.get("noise"),
                                      sel_feature=args.get("feature_filter") or \
                                                  args.get("sel_feature"),
-                                     feature_selector=args.get("feature_selector"))
+                                     feature_selector=args.get("feature_selector"),
+                                     history_path=args.get("history_path"))
         engine.start()
 
         value = {}
