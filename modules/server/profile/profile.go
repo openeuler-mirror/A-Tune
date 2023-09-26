@@ -758,6 +758,7 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 			optimizer.Content = reply.GetContent()
 			optimizer.Restart = reply.GetRestart()
 			optimizer.RandomStarts = reply.GetRandomStarts()
+			optimizer.HistoryPath=reply.GetHistoryPath()
 			optimizer.FeatureFilterEngine = reply.GetFeatureFilterEngine()
 			optimizer.FeatureFilterIters = reply.GetFeatureFilterIters()
 			optimizer.SplitCount = reply.GetSplitCount()

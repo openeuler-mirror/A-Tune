@@ -51,6 +51,7 @@ type Optimizer struct {
 	SplitCount          int32
 	EvalFluctuation     float64
 	RandomStarts        int32
+	HistoryPath         []string
 	OptimizerPutURL     string
 	FinalEval           string
 	Engine              string

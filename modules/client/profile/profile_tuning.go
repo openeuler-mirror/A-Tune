@@ -128,6 +128,7 @@ func profileTunning(ctx *cli.Context) error {
 			Name:                ctx.String("project"),
 			Restart:             ctx.Bool("restart"),
 			RandomStarts:        prj.RandomStarts,
+			HistoryPath:         prj.HistoryPath,
 			Engine:              prj.Engine,
 			State:               state,
 			Content:             []byte(strconv.Itoa(int(prj.Iterations))),

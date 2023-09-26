@@ -28,6 +28,7 @@ type OptimizerPostBody struct {
 	Knobs           []Knob     `json:"knobs"`
 	Engine          string     `json:"engine"`
 	RandomStarts    int32      `json:"random_starts"`
+	HistoryPath     []string   `json:"history_path"`
 	Xref            [][]string `json:"x_ref,omitempty"`
 	Yref            []string   `json:"y_ref,omitempty"`
 	FeatureFilter   bool       `json:"feature_filter"`

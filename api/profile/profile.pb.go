@@ -36,6 +36,7 @@ const (
 	TuningMessage_Threshold        TuningMessageStatus = 8
 	TuningMessage_JobCreate        TuningMessageStatus = 9
 	TuningMessage_GetInitialConfig TuningMessageStatus = 10
+	TuningMessage_GetHistoryPath   TuningMessageStatus = 11
 )
 
 var TuningMessageStatus_name = map[int32]string{
@@ -50,6 +51,7 @@ var TuningMessageStatus_name = map[int32]string{
 	8:  "Threshold",
 	9:  "JobCreate",
 	10: "GetInitialConfig",
+	11: "GetHistoryPath",
 }
 
 var TuningMessageStatus_value = map[string]int32{
@@ -64,6 +66,7 @@ var TuningMessageStatus_value = map[string]int32{
 	"Threshold":        8,
 	"JobCreate":        9,
 	"GetInitialConfig": 10,
+	"GetHistoryPath": 11,
 }
 
 func (x TuningMessageStatus) String() string {
@@ -673,6 +676,7 @@ type TuningMessage struct {
 	EvalFluctuation      float64             `protobuf:"fixed64,14,opt,name=EvalFluctuation,proto3" json:"EvalFluctuation,omitempty"`
 	FeatureSelector      string              `protobuf:"bytes,15,opt,name=FeatureSelector,proto3" json:"FeatureSelector,omitempty"`
 	InitialConfig        string              `protobuf:"bytes,16,opt,name=InitialConfig,proto3" json:"InitialConfig,omitempty"`
+	HistoryPath          []string            `protobuf:"bytes,17,opt,name=HistoryPath,proto3" json:"HistoryPath,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -736,6 +740,13 @@ func (m *TuningMessage) GetRandomStarts() int32 {
 		return m.RandomStarts
 	}
 	return 0
+}
+
+func (m *TuningMessage) GetHistoryPath() []string {
+	if m != nil {
+		return m.HistoryPath
+	}
+	return nil
 }
 
 func (m *TuningMessage) GetFeatureFilterEngine() string {

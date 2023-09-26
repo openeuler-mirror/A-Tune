@@ -58,6 +58,7 @@ type YamlPrjCli struct {
 	RandomStarts        int32      `yaml:"random_starts"`
 	Benchmark           string     `yaml:"benchmark"`
 	Engine              string     `yaml:"engine"`
+	HistoryPath         []string   `yaml:"history_path"`
 	FeatureFilterEngine string     `yaml:"feature_filter_engine"`
 	FeatureFilterCycle  int32      `yaml:"feature_filter_cycle"`
 	FeatureFilterIters  int32      `yaml:"feature_filter_iters"`
