@@ -5,14 +5,16 @@ The tool is used for bisection analysising the commits.
 import subprocess
 import os
 import re
-import sys
 import logging
+import argparse
+import shutil
+import urllib.request
 from collections import namedtuple
 
 
 def extract_execution_time(text):
     """Extract the execution time from a given text."""
-    match = re.search(r"Compile script executed in (\d+) milliseconds\.", text)
+    match = re.search(r"Script executed in (\d+) milliseconds.", text)
     return float(match.group(1)) if match else -1
 
 
@@ -21,11 +23,11 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-def get_commits(commit_start, commit_stop, path_project):
+def get_commits(commit_start, commit_stop, path_project, log_path):
     """Fetches commits within a given range."""
     logging.info("Fetching commits...")
     commits_file_name = "commits.txt"
-    commits_file_path = f"{path_project}/{commits_file_name}"
+    commits_file_path = f"{log_path}/{commits_file_name}"
 
     # Check if commits file exits
     if os.path.exists(commits_file_path):
@@ -38,7 +40,8 @@ def get_commits(commit_start, commit_stop, path_project):
             all_commits = subprocess.getoutput(
                 "git rev-list --reverse HEAD").split('\n')
             # Create a file with rw-r--r-- permission
-            fd = os.open(commits_file_path, os.O_WRONLY | os.O_CREAT, 0o644)
+            fd = os.open(f"../../logs/commits.txt",
+                         os.O_WRONLY | os.O_CREAT, 0o644)
             try:
                 with os.fdopen(fd, 'w') as file:
                     file.write('\n'.join(all_commits))
@@ -69,11 +72,14 @@ def get_commits(commit_start, commit_stop, path_project):
 def compile_project(commit, script_path, output_log_path):
     """Compiles the project at a specific commit."""
     logging.info(f"Compiling FFmpeg at commit {commit}...")
+    log_file_name = "/compile.log"
+    log_file_path = f"{output_log_path}/{log_file_name}"
+
     # Create a file with rw-r--r-- permission
-    fd = os.open(output_log_path, os.O_WRONLY |
+    fd = os.open(log_file_path, os.O_WRONLY |
                  os.O_CREAT | os.O_APPEND, 0o644)
     try:
-        # Re-compile the project and redirect the compilation information to output_log_path
+        # Re-compile the project and redirect the compilation information to log_file_path
         with os.fdopen(fd, 'a') as file:
             subprocess.run([script_path, commit], stdout=file, stderr=file)
     except:
@@ -94,6 +100,52 @@ def benchmark(script_path):
         return -1
 
 
+def download_and_setup_demo_mode():
+    """Download and set up the requirements of demo mode."""
+    ffmpeg_url = "https://github.com/FFmpeg/FFmpeg.git"
+    project_path = "../projects/FFmpeg"
+
+    # Check and create the project directory
+    os.makedirs(os.path.dirname(project_path), exist_ok=True)
+
+    # Find the git executable dynamiclly
+    git_executable = shutil.which("git")
+    if git_executable is None:
+        raise Exception(
+            "Git executable not found. Please make sure git is intalled and in your system's PATH.")
+
+    if os.path.exists(project_path):
+        # FFmpeg directory exists, checkout master branch and pull the latest changes
+        logging.info("Updating FFmpeg...")
+        subprocess.run(
+            [git_executable, "-C", project_path, "checkout", "master"])
+        subprocess.run([git_executable, "-C", project_path, "pull"])
+    else:
+        # FFmpeg directory does not exits, clone the repository
+        logging.info("Download FFmpeg...")
+
+        subprocess.run([git_executable, "clone", ffmpeg_url, project_path])
+
+    logging.info("FFmpeg downloaded and set up successfully.")
+
+    # Set up the demo video directory and download the demo video
+    video_url = "https://github.com/digmouse233/Demo-Video-A-Tune/raw/main/akiyo_cif.y4m"
+    video_dir = "../data/"
+    video_path = os.path.join(video_dir, "akiyo_cif.y4m")
+
+    # Ensure the video directory exists
+    os.makedirs(video_dir, exist_ok=True)
+    
+    if not os.path.exists(video_path):
+        logging.info("Downloading demo videos...")
+        urllib.request.urlretrieve(video_url, video_path)
+        logging.info("Demo video downloaded and set up successfully.")
+    else:
+        logging.info("Demo video already exists, no need to re-download.")
+
+    return project_path
+
+
 # Define a named tuple to hold the function parameters
 MainArguments = namedtuple('MainArguments', ['start_commit', 'stop_commit', 'compile_script_path',
                                              'project_path', 'benchmark_script_path', 'log_path'])
@@ -106,7 +158,7 @@ def main(args):
 
     # Get the list of commits within the specified range
     commits = get_commits(
-        args.start_commit, args.stop_commit, args.project_path)
+        args.start_commit, args.stop_commit, args.project_path, args.log_path)
 
     left = 0
     right = len(commits) - 1
@@ -114,14 +166,14 @@ def main(args):
     best_improvement = -1
 
     # Calculate the execution time at the start commit
-    compile_project(commits[left], compile_script_path, log_path)
-    start_benchmark = benchmark(benchmark_script_path)
+    compile_project(commits[left], args.compile_script_path, args.log_path)
+    start_benchmark = benchmark(args.benchmark_script_path)
     logging.info(
         f"Start commit {commits[left]} executed in {start_benchmark} milliseconds.")
 
     # Calculate the execution time at the end commit
-    compile_project(commits[right], compile_script_path, log_path)
-    end_benchmark = benchmark(benchmark_script_path)
+    compile_project(commits[right], args.compile_script_path, args.log_path)
+    end_benchmark = benchmark(args.benchmark_script_path)
     logging.info(
         f"End commit {commits[right]} executed in {end_benchmark} milliseconds.")
 
@@ -133,8 +185,9 @@ def main(args):
         # Handle cases where the commit may not be suitable for benchmarking
         mid_benchmark = -1
         while mid < right and mid_benchmark == -1:
-            compile_project(commits[mid], compile_script_path, log_path)
-            mid_benchmark = benchmark(benchmark_script_path)
+            compile_project(
+                commits[mid], args.compile_script_path, args.log_path)
+            mid_benchmark = benchmark(args.benchmark_script_path)
             if mid_benchmark == -1:
                 mid = mid + 1
 
@@ -165,27 +218,52 @@ def main(args):
     logging.info(f"The benchmark of the best commit is {best_benchmark}")
 
 
-# Entry point of the script
 if __name__ == "__main__":
-    # Check if the correct number of command-line arguments is provided
-    if len(sys.argv) < 6:
-        logging.error("Usage: python script.py <start_commit> <stop_commit> "
-                      "<compile_script_path> <project_path> <benchmark_script_path> [log_path]")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='Bisection analysis tool.')
+    parser.add_argument('--demo', action='store_true', help='Run in demo mode')
+    parser.add_argument('start_commit', nargs='?', help='Start commit hash')
+    parser.add_argument('stop_commit', nargs='?', help='Stop commit hash')
+    parser.add_argument('compile_script_path', nargs='?',
+                        help='Path to the compilation script')
+    parser.add_argument('project_path', nargs='?',
+                        help='Path to the project directory')
+    parser.add_argument('benchmark_script_path', nargs='?',
+                        help='Path to the benchmarking script')
+    parser.add_argument('log_path', nargs='?',
+                        default="../logs", help='Path to the log file')
 
-    # Parse command-line arguments
-    start_commit = sys.argv[1]
-    stop_commit = sys.argv[2]
-    compile_script_path = sys.argv[3]  # Path to the compilation script
-    project_path = sys.argv[4]  # Path to the project directory
-    benchmark_script_path = sys.argv[5]  # Path to the benchmarking script
-    log_path = sys.argv[6] if len(sys.argv) > 6 else "../logs/compile.log"
+    args = parser.parse_args()
 
-    # Create the directory for the log file if it doesn't exist
-    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+    if args.demo:
+        logging.info("Running in demo mode...")
 
-    # Call the main function with the parsed arguments
-    args = MainArguments(start_commit, stop_commit, compile_script_path,
-                         project_path, benchmark_script_path, log_path)
+        # Download and set up FFmpeg, and get the project path
+        args.project_path = download_and_setup_demo_mode()
 
+        # Set other parameters for the demo mode
+        args.start_commit = "a1928dff2c498ab9439d997bdc93fc98d2862cb0"
+        args.stop_commit = "c7049013247ac6c4851cf1b4ad6e22f0461a775a"
+        args.compile_script_path = "../scripts/demo_compile.sh"
+        args.benchmark_script_path = "../scripts/demo_benchmark.sh"
+
+        # Create the directory for the log file if it doesn't exist
+        if not os.path.exists(args.log_path):
+            os.mkdir(args.log_path)
+    else:
+        # Ensure all necessary arguments are provided
+        if not all([
+            args.start_commit,
+            args.stop_commit,
+            args.compile_script_path,
+            args.project_path,
+            args.benchmark_script_path
+        ]):
+            parser.error(
+                "All positional arguments are required if not running in demo mode.")
+
+        # Create the directory for the log file if it doesn't exist
+        if not os.path.exists(args.log_path):
+            os.mkdir(args.log_path)
+
+    # Call the main function with the parsed argument
     main(args)
