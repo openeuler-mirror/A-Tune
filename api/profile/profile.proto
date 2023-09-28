@@ -121,6 +121,7 @@ message TuningMessage {
         Threshold = 8;
         JobCreate = 9;
         GetInitialConfig = 10;
+	GetHistoryPath = 11;
     }
     status state = 4;
     int32 RandomStarts = 5;
@@ -135,6 +136,7 @@ message TuningMessage {
     double EvalFluctuation = 14;
     string FeatureSelector = 15;
     string InitialConfig = 16;
+    []string HistoryPath = 17;
 }
 
 message TuningHistory {
