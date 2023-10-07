@@ -1009,7 +1009,7 @@ class MemNuma(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1111,7 +1111,7 @@ class MemTopo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1213,7 +1213,7 @@ class MemBandwidth(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1315,7 +1315,7 @@ class MemVmstat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1417,7 +1417,7 @@ class MemUtilStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1519,7 +1519,7 @@ class NetInfo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1621,7 +1621,7 @@ class NetStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1723,7 +1723,7 @@ class NetEStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1825,7 +1825,7 @@ class NetTopo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -1927,7 +1927,7 @@ class PerfStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2029,7 +2029,7 @@ class PerfTop(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2131,7 +2131,7 @@ class CpuInfo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2233,7 +2233,7 @@ class CpuStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2335,7 +2335,7 @@ class CpuTopo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2437,7 +2437,7 @@ class IoStat(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2539,7 +2539,7 @@ class StorageTopo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2641,7 +2641,7 @@ class SysBiosInfo(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2743,7 +2743,7 @@ class SysLdavg(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2845,7 +2845,7 @@ class SysTasks(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
@@ -2947,7 +2947,7 @@ class SysFdUtil(monitor.common.Monitor)
  |      
  |      :param fmt: The option for format(fmt)
  |      :param path: The path to output, None for pass through
- |      :param para: Multi-options for get(para) and decode(para), should be splited by ";"
+ |      :param para: Multi-options for get(para) and decode(para), should be split by ";"
  |      :returns None: Success
  |      :returns info: Success, output info
  |      :returns Exceptions: Fail, with info
