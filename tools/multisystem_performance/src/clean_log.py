@@ -33,7 +33,6 @@ def clean_files_with_prefix(directory, prefix):
                 print(f"删除文件 {filename} 时出现错误：{e}")
 
 
-# 使用示例
 data_directory = "./log/"
 prefix_to_clean = ["get_sysctl_ulimit", "load_config"]
 

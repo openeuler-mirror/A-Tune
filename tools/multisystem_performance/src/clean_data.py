@@ -33,7 +33,6 @@ def clean_files_with_prefix(directory, prefix):
                 print(f"删除文件 {filename} 时出现错误：{e}")
 
 
-# 使用示例
 data_directory = "./data/"
 prefix_to_clean = ["differ-2023", "statistical-2023"]
 

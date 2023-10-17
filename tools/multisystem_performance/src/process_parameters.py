@@ -18,83 +18,141 @@
 # @Desc      :   process parameters and save result to file
 # #############################################
 
-from get_parameters import *
-from load_check import *
+import os
 import json
+import logging
+
+from get_parameters import run_command_and_save_by_mode, differ_sysctl_res, \
+    PC1_VERSION, PC2_VERSION
+from load_check import host_test_body, communication_test_body, timestamp
+
+SELECTED_MODE = None
 
 
 def process_parameters():
-    logging.info('process_parameters.py start')
+    """
+    读取配置文件config.json后根据选择的测试模式执行测试连通性,封装了process_differ
+    """
+
+    logging.info('开始: process_parameters.py')
     with open('config/config.json') as f:
         data = json.load(f)
 
     # 选择测试模式
-    selected_mode = input("host_test:1 \ncommunication_test):2\n请选择测试模式(1/2):\n")
+    global SELECTED_MODE
+    SELECTED_MODE = input("(1)host_test模式: 支持3台PC, (2)communication_test模式:支持2台PC. 请选择测试模式(1/2):")
+    logging.info(f'选择的测试模式为: {SELECTED_MODE}')
 
-    if selected_mode == '1':
+    if SELECTED_MODE == '1':
         host_test_body(data)
-
-    if selected_mode == '2':
+    if SELECTED_MODE == '2':
         communication_test_body(data)
-
     else:
-        print("无效的模式选择")
+        print("无效的模式选择,请重新运行程序")
         exit(1)
 
-    logging.info('get_parameters.py start')
-    os_version = get_os_version()
+    process_differ(data)
 
-    sysctl_res_file_name = "sysctl@" + os_version + ".txt"
-    ulimit_res_file_name = "ulimit@" + os_version + ".txt"
-    save_difflib_res = f"differ-{timestamp}.txt"
-    save_statistical_res = f"statistical-{timestamp}.txt"
-    # 统计比较结果:列表格式
-    file2lack = []
-    file2modify = []
-    file2add = []
-    file1 = ""
-    file2 = ""
 
-    logging.info(
-        "sysctl_res_file_name = \'%s\',ulimit_res_file_name = \'%s\',save_difflib_res = \'%s\',save_statistical_res = "
-        "\'%s\' ",
-        sysctl_res_file_name, ulimit_res_file_name, save_difflib_res, save_statistical_res,
-        extra={'logfile': log_file})
+def process_differ(data):
+    """
+    读取比较结果文件,统计比较结果,并保存到文件
+    封装了 run_command_and_save_by_mode 和 differ_sysctl_res 两个函数
+    data: 读取的配置文件config.json
+    """
 
-    run_command_save(sysctl_res_file_name, ulimit_res_file_name)
+    file2_lack = []
+    file2_modify = []
+    file2_new = []  # 统计比较结果:列表格式
+    save_differ_sysctl_res = f'differ-{timestamp}.txt'  # 保存比较结果的文件名, 参数会被传递到differ_sysctl_res 函数
+    save_statistical_res = f'statistical-{timestamp}.txt'  # 保存统计结果的文件名, 参数会被传递到statistical_res 函数
 
-    use_differ_res(os_version, sysctl_res_file_name, save_difflib_res)
+    '''
+    根据测试模式选择运行命令 
+    host 模式: PC1 与 PC2 的 4 个文件
+    communication 模式: local 与 remote 的 4 个文件
+    格式: local_file = f'./data/{cmd}@{os_version}-{timestamp}.txt' 应该不会冲突
+    '''
+    run_command_and_save_by_mode(SELECTED_MODE, data)
 
-    # 读取比较结果文件
-    with open("./data/" + save_difflib_res) as f:
-        lines = f.readlines()
+    '''
+    根据测试模式进行 differ 比较
+    host 模式: 比较 PC1 与 PC2 的 sysctl
+    communication 模式: 比较 local 与 remote 的 sysctl
+    根据 timestamp 避免文件冲突
+    '''
+    differ_sysctl_res(SELECTED_MODE, save_differ_sysctl_res)
 
-        for i, line in enumerate(lines):
-            if line.startswith('-'):
-                if lines[i + 2].startswith('-') or lines[i + 2].startswith(' '):
-                    file2lack.append(line.strip())
-                elif lines[i + 2].startswith('+'):
-                    file2modify.append(line.strip())
-                elif lines[i + 2].startswith('?'):
-                    if lines[i + 4].startswith('+') and lines[i + 6].startswith('?'):
-                        file2modify.append(line.strip())
-            elif line.startswith('+'):
-                file2add.append(line.strip())
+    # 读取比较结果文件 save_differ_sysctl_res
+    try:
+        with open(f'./data/{save_differ_sysctl_res}') as f:
+            logging.info(f'./data/{save_differ_sysctl_res} as f ')
+            lines = f.readlines()
+    except FileNotFoundError as e:
+        logging.info(f'{e}file not found')
 
+    for i, line in enumerate(lines):
+        if line.startswith('-'):
+            if lines[i + 2].startswith('-') or lines[i + 2].startswith(' '):
+                file2_lack.append(line.strip())
+            elif lines[i + 2].startswith('+'):
+                file2_modify.append(line.strip())
+            elif lines[i + 2].startswith('?'):
+                if lines[i + 4].startswith('+') and lines[i + 6].startswith('?'):
+                    file2_modify.append(line.strip())
+        elif line.startswith('+'):
+            file2_new.append(line.strip())
+
+    logging.info(f'file2_lack: {file2_lack}')
+    logging.info(f'file2_new: {file2_new}')
+    logging.info(f'file2_modify: {file2_modify}')
     # 统计比较结果:字典格式
     file2lack_dict = {line.strip('-+ \n').split('=', 1)[0]: line.strip('-+ \n').split('=', 1)[1].strip() for line in
-                      file2lack}
+                      file2_lack}
     file2add_dict = {line.strip('-+ \n').split('=', 1)[0]: line.strip('-+ \n').split('=', 1)[1].strip() for line in
-                     file2add}
+                     file2_new}
     file2modify_dict = {line.strip('-+ \n').split('=', 1)[0]: line.strip('-+ \n').split('=', 1)[1].strip() for line in
-                        file2modify}
+                        file2_modify}
 
     # 打印统计结果
-    print("file1: " + file1 + ", file2: " + file2 + " 统计结果为：")
-    print("file2 缺失的行有: " + str(len(file2lack)) + "行")
-    print("file2 增加的行有: " + str(len(file2add)) + "行")
-    print("file2 修改的行有: " + str(len(file2modify)) + "行")
+    print(f'file1:"./data/sysctl@{PC1_VERSION}-{timestamp}.txt", file2:"./data/sysctl@{PC2_VERSION}-{timestamp}.txt",'
+          f'统计结果为: ')
+    print("file2 缺失的行有: " + str(len(file2lack_dict)) + "行")
+    logging.info(f'file2 缺失的行有: {str(len(file2lack_dict))}行')
+    print("file2 增加的行有: " + str(len(file2add_dict)) + "行")
+    logging.info(f'file2 增加的行有: {str(len(file2add_dict))}行')
+    print("file2 修改的行有: " + str(len(file2modify_dict)) + "行")
+    logging.info(f'file2 修改的行有: {str(len(file2modify_dict))}行')
 
-    # 在原来的代码末尾，添加调用保存结果到文件的函数
-    analyse_result_to_file(file2lack_dict, file2add_dict, file2modify_dict, file1, file2, file2lack, file2add,
-                           file2modify, save_statistical_res)
+    result_str = ""
+    result_str += "file1 与 file2 的比较统计结果为：\n"
+    result_str += "file2 缺失的行有: " + str(len(file2_lack)) + "行\n"
+    result_str += "file2 增加的行有: " + str(len(file2_new)) + "行\n"
+    result_str += "file2 修改的行有: " + str(len(file2_modify)) + "行\n"
+    result_str += "====================================================================\n"
+    result_str += "file2 缺失的行有：\n"
+    for k, v in file2lack_dict.items():
+        result_str += k + " " + v + "\n"
+    result_str += "====================================================================\n"
+    result_str += "file2 增加的行有：\n"
+    for k, v in file2add_dict.items():
+        result_str += k + " " + v + "\n"
+    result_str += "====================================================================\n"
+    result_str += "file2 修改的行有：\n"
+    for k, v in file2modify_dict.items():
+        result_str += k + " " + v + "\n"
+
+    # 保存统计结果到文件
+    try:
+        with open(f'./data/{save_statistical_res}', "w") as file:
+            file.write(result_str)
+            os.chmod(f'./data/{save_statistical_res}', 0o644)
+        print(f'成功:统计结果已成功保存到文件:{save_statistical_res}')
+        logging.info(f'成功:统计结果已成功保存到文件:./data/{save_statistical_res}')
+    except IOError:
+        print("失败:保存文件时出现错误,请检查路径和文件权限,查阅日志获得更多信息")
+        logging.error(f'IOError:保存文件时出现错误,请检查路径和文件权限,查阅日志获得更多信息')
+
+
+def get_mode():
+    return SELECTED_MODE
