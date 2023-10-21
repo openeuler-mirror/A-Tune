@@ -84,6 +84,7 @@ type ClassifyPostBody struct {
 
 // RespClassify : the response of classify model
 type RespClassify struct {
+	Bottleneck int  `json:"bottleneck_binary"`
 	ResourceLimit string  `json:"resource_limit"`
 	WorkloadType  string  `json:"workload_type"`
 	Percentage    float32 `json:"percentage"`
@@ -518,7 +519,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	subProcess = false
 
-	workloadType, resourceLimit, err := s.classify(respCollectPost.Path, message.GetModel())
+	bottleneck, workloadType, resourceLimit, err := s.classify(respCollectPost.Path, message.GetModel())
 	if err != nil {
 		_ = stream.Send(&PB.AckCheck{Name: err.Error()})
 		return err
@@ -575,13 +576,42 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	log.Infof("workload %s support app: %s", workloadType, apps)
 	log.Infof("workload %s resource limit: %s, cluster result resource limit: %s",
-		workloadType, apps, resourceLimit)
+		workloadType, apps, resourceLimit)	
+
+	var step int = 3
+	cpuExist := bottleneck&16 > 0
+	memExist := bottleneck&8 > 0
+	netQualityExist := bottleneck&4 > 0
+	netIOExist := bottleneck&2 > 0
+	diskIOExist := bottleneck&1 > 0
+
+	if message.Bottleneck {
+		if bottleneck == 0 {
+			 _ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. Current System does not detected the five bottlenecks of Computing, Memory, Network, Network I/O and disk I/O", step)})
+			log.Infof("Current System does not detected the five bottlenecks of Computing, Memory, Network, Network I/O and disk I/O")
+		} else {
+			bottleneckTypes := []string{"Computing", "Memory", "Network", "Network I/O", "disk I/O"}
+			bottlenecks := []string{}
+			boolValues := []bool{cpuExist, memExist, netQualityExist, netIOExist, diskIOExist}
+			
+			for i, exist := range boolValues {
+				if exist {
+					bottlenecks = append(bottlenecks, bottleneckTypes[i])
+				}
+			}
+			bottlenecksStr := strings.Join(bottlenecks, ", ")
+			_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. Current System bottlenecks: %s", step, bottlenecksStr)})
+			log.Infof("Current System bottlenecks: %s", bottlenecksStr)
+		}
+		step++
+	}
 
 	if message.Characterization {
 		return nil
 	}
-
-	_ = stream.Send(&PB.AckCheck{Name: "\n 3. Build the best resource model..."})
+	
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. Build the best resource model...", step)})
+	step++
 
 	//5. get the profile type depend on the workload type
 	profileType := classProfile.Result[0].ProfileType
@@ -591,14 +621,43 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 		return fmt.Errorf("no profile or invalid profiles were specified")
 	}
 
+	if message.Bottleneck {
+		bottleneck_profiles := []struct {
+			bottleneck bool
+			profile    string
+		}{
+			{cpuExist, "include-compute-intensive"},
+			{memExist, "include-memory-intensive"},
+			{netQualityExist, "include-network-intensive"},
+			{netIOExist, "include-network-intensive"},
+			{diskIOExist, "include-io-intensive"},
+		}
+		for _, c := range bottleneck_profiles {
+			if c.bottleneck {
+				exists := false
+				for _, existingProfile := range profileNames {
+					if existingProfile == c.profile {
+						exists = true
+						break
+					}
+				}
+				if !exists {
+					profileNames = append(profileNames, c.profile)
+				}
+			}
+		}
+	}
+
 	//6. get the profile info depend on the profile type
-	log.Infof("the resource model of the profile type is %s", profileType)
-	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 4. Match profile: %s", profileType)})
+	log.Infof("the resource model of the profile type is %s", strings.Join(profileNames, ", "))
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. Match profile: %s", step, strings.Join(profileNames, ", "))})
+	step++
 	pro, _ := profile.Load(profileNames)
 	pro.SetWorkloadType(workloadType)
 	pro.SetCollectionId(collectionId)
-
-	_ = stream.Send(&PB.AckCheck{Name: "\n 5. begin to set static profile"})
+	
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. begin to set static profile", step)})
+	step++
 	log.Infof("begin to set static profile")
 
 	//static profile setting
@@ -633,7 +692,8 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	}
 
 	log.Info("begin to dynamic tuning depending on rules")
-	_ = stream.Send(&PB.AckCheck{Name: "\n 6. begin to set dynamic profile"})
+	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n %d. begin to set dynamic profile", step)})
+	step++
 	if err := tuning.RuleTuned(workloadType); err != nil {
 		return err
 	}
@@ -1431,14 +1491,15 @@ func (s *ProfileServer) collection(npipe string, time string) (*RespCollectorPos
 	return respCollectPost, nil
 }
 
-func (s *ProfileServer) classify(dataPath string, customeModel string) (string, string, error) {
+func (s *ProfileServer) classify(dataPath string, customeModel string) (int, string, string, error) {
 	//2. send the collected data to the model for completion type identification
 	var resourceLimit string
 	var workloadType string
+	var bottleneck int
 	localPath, timestamp, err := utils.ChangeFileName(dataPath)
 	if err != nil {
 		log.Errorf("Failed to change file name: %v", localPath)
-		return workloadType, resourceLimit, err
+		return bottleneck, workloadType, resourceLimit, err
 	}
 	defer os.Remove(localPath)
 
@@ -1448,13 +1509,13 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 	_, err = os.OpenFile(logPath, os.O_WRONLY|os.O_CREATE, 0640)
 	if err != nil {
 		log.Errorf("Failed to create log file: %v", err)
-		return workloadType, resourceLimit, err
+		return bottleneck, workloadType, resourceLimit, err
 	}
 
 	dataPath, err = Post("classification", "file", localPath)
 	if err != nil {
 		log.Errorf("Failed transfer file to server: %v", err)
-		return workloadType, resourceLimit, err
+		return bottleneck, workloadType, resourceLimit, err
 	}
 
 	body := new(ClassifyPostBody)
@@ -1466,14 +1527,15 @@ func (s *ProfileServer) classify(dataPath string, customeModel string) (string, 
 	}
 	respPostIns, err := body.Post()
 	if err != nil {
-		return workloadType, resourceLimit, err
+		return bottleneck, workloadType, resourceLimit, err
 	}
 
 	log.Infof("workload: %s, cluster result resource limit: %s",
 		respPostIns.WorkloadType, respPostIns.ResourceLimit)
 	resourceLimit = respPostIns.ResourceLimit
 	workloadType = respPostIns.WorkloadType
-	return workloadType, resourceLimit, nil
+	bottleneck = respPostIns.Bottleneck
+	return bottleneck, workloadType, resourceLimit, nil
 }
 
 func (s *ProfileServer) Getworkload() (string, error) {
@@ -1484,7 +1546,7 @@ func (s *ProfileServer) Getworkload() (string, error) {
 		return "", err
 	}
 
-	workload, _, err := s.classify(respCollectPost.Path, customeModel)
+	_, workload, _, err := s.classify(respCollectPost.Path, customeModel)
 	if err != nil {
 		return "", err
 	}

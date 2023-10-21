@@ -51,9 +51,10 @@ message AnalysisMessage {
 	string Name = 1;
 	string Model = 2;
 	bool Characterization = 3;
-	string Times = 4 ;
-	string Flag = 5;
-	string Id = 6;
+	bool Bottleneck = 4;
+	string Times = 5;
+	string Flag = 6;
+	string Id = 7;
 }
 
 message Ack {
