@@ -22,6 +22,7 @@ from flask_restful import Resource
 from flask_restful import marshal_with_field
 
 from analysis.optimizer.workload_characterization import WorkloadCharacterization
+from analysis.optimizer.app_characterization import AppCharacterization
 from analysis.engine.field import CLASSIFICATION_POST_FIELD
 from analysis.engine.parser import CLASSIFICATION_POST_PARSER
 from analysis.engine.utils import utils
@@ -48,14 +49,15 @@ class Classification(Resource):
         if data.empty:
             abort("data may be not exist")
 
-        classification = WorkloadCharacterization(model_path)
+        classification = AppCharacterization(model_path)
         resource_limit = ""
         if model is None:
-            resource_limit, workload_type, percentage = classification.identify(data)
+            bottleneck_binary, resource_limit, workload_type, percentage = classification.identify(data)
         else:
-            workload_type, percentage = classification.reidentify(data, model)
+            bottleneck_binary, workload_type, percentage = classification.reidentify(data, model)
 
         profile_name = {}
+        profile_name["bottleneck_binary"] = bottleneck_binary
         profile_name["workload_type"] = workload_type
         profile_name["percentage"] = percentage
         profile_name["resource_limit"] = resource_limit
