@@ -50,9 +50,9 @@ exec > >(tee -ia "$LOG_FILE")
 exec 2> >(tee -ia "$LOG_FILE" >&2)
 
 # Execute main loop and calculate execution time
-startTime=$(date +%s%3)
+startTime=$(date +%s%3N)
 executeMainLoop
-endTime=$(date +%s%3)
+endTime=$(date +%s%3N)
 executionDuration=$((endTime - startTime))
 
 # Log execution duration
