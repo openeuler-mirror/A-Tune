@@ -591,6 +591,22 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
 
 备注：user_passwd、passwd_key、passwd_iv均可通过运行tools/encrypt.py获取。
 
+**负载瓶颈阈值**
+
+可根据需要进行修改。
+
+- cpu_stat_util：CPU 利用率，表示 CPU 正在执行有用工作的时间百分比。数值越高，越可能存在CPU瓶颈。默认阈值为80。
+- cpu_stat_cutil: 系统中高负载 CPU 的平均利用率。数值越高，越可能存在CPU瓶颈。默认阈值为80。
+- perf_stat_ipc：每个周期的指令数（Instructions Per Cycle），表示 CPU 执行效率。数值越低，越可能存在CPU瓶颈。默认阈值为1。
+- mem_bandwidth_total_util：内存带宽总利用率，表示内存子系统的使用程度。数值越高，越可能存在内存瓶颈。默认阈值为70。
+- mem_vmstat_util_swap：交换空间利用率，表示使用交换空间的程度。数值越高，越可能存在内存瓶颈。默认阈值为70。
+- mem_vmstat_util_cpu：CPU 利用虚拟内存的程度。数值越高，越可能存在内存瓶颈。默认阈值为70。
+- net_stat_ifutil：网络接口利用率，表示网络带宽的使用程度。数值越高，越可能存在网络瓶颈。默认阈值为70。
+- net_estat_errs：网络错误数，表示网络传输过程中发生的错误数量。数值越高，越可能存在网络瓶颈。默认阈值为1。
+- net_stat_rxkbs：网络接收速率，表示从网络接收数据的速度。数值越高，越可能存在网络I\O瓶颈。默认阈值为70。
+- net_stat_txkbs：网络发送速率，表示向网络发送数据的速度。数值越高，越可能存在网络I\O瓶颈。默认阈值为70。
+- storage_stat_util：存储利用率，表示存储子系统的使用程度。数值越高，越可能存在硬盘I\O瓶颈。默认阈值为70。
+
 **配置示例**
 
 ```shell
@@ -638,6 +654,29 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
  # passwd_key =
  # passwd_iv =
  # user_passwd =
+
+ #################################### bottleneck ###############################
+ [bottleneck]
+ # computing
+ cpu_stat_util = 80
+ cpu_stat_cutil = 80
+ perf_stat_ipc = 1
+
+ # memory
+ mem_bandwidth_total_util = 70
+ mem_vmstat_util_swap = 70
+ mem_vmstat_util_cpu = 70
+
+ # network
+ net_stat_ifutil = 70
+ net_estat_errs = 1
+
+ # network I/O
+ net_stat_rxkbs = 70
+ net_stat_txkbs = 70
+
+ # disk I/OF
+ storage_stat_util = 70
 ```
 
 ## 2.5 启动A-Tune
@@ -842,6 +881,7 @@ Support profiles:
 | ---------------------- | ------------------------------------------ |
 | --model, -m            | 用户自训练产生的新模型                     |
 | --characterization, -c | 使用默认的模型进行应用识别，不进行自动优化 |
+| --bottleneck, -b       | 负载瓶颈识别，未使用characterization参数时可进行自动瓶颈优化 |
 
 **使用示例**
 
@@ -850,6 +890,14 @@ Support profiles:
   ```shell
   # atune-adm analysis --characterization
   ```
+
+- 使用默认的模型进行应用识别和负载瓶颈识别（目前支持算力、内存、网络、网络I\O、硬盘I\O五种瓶颈的识别），并进行自动优化（包括瓶颈优化）
+
+  ```shell
+  # atune-adm analysis --bottleneck
+  ```
+
+    备注：瓶颈识别的阈值可在配置文件`/etc/atuned/engine.cnf`进行修改，修改后需重启`atune-engine`服务。
 
 - 使用默认的模型进行应用识别，并进行自动优化
 

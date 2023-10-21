@@ -613,6 +613,22 @@ You can modify the following information base on database configuration.
 
 **Note**: User can use encrypt.py under ./tools folder to get user_passwd, passwd_key, passwd_iv.
 
+**Bottleneck threshold**
+
+You can modify the startup configuration as required.
+
+- **cpu_stat_util**: CPU utilization, indicating the percentage of time the CPU is performing useful work. The higher the number, the more likely there is a CPU bottleneck. The default threshold is 80.
+- **cpu_stat_cutil**: Average utilization of heavily loaded CPUs in the system. The higher the number, the more likely there is a CPU bottleneck. The default threshold is 80.
+- **perf_stat_ipc**: The number of instructions per cycle (Instructions Per Cycle), indicating CPU execution efficiency. The lower the number, the more likely there is a CPU bottleneck. The default threshold is 1.
+- **mem_bandwidth_total_util**: total memory bandwidth utilization, indicating the degree of usage of the memory subsystem. The higher the number, the more likely there is a memory bottleneck. The default threshold is 70.
+- **mem_vmstat_util_swap**: Swap space utilization, indicating the extent of swap space usage. The higher the number, the more likely there is a memory bottleneck. The default threshold is 70.
+- **mem_vmstat_util_cpu**: How much the CPU utilizes virtual memory. The higher the number, the more likely there is a memory bottleneck. The default threshold is 70.
+- **net_stat_ifutil**: Network interface utilization, indicating the degree of network bandwidth usage. The higher the number, the more likely there is a network bottleneck. The default threshold is 70.
+- **net_estat_errs**: Number of network errors, indicating the number of errors that occurred during network transmission. The higher the number, the more likely there is a network bottleneck. The default threshold is 1.
+- **net_stat_rxkbs**: Network reception rate, indicating the speed of receiving data from the network. The higher the value, the more likely there is a network I\O bottleneck. The default threshold is 70.
+- **net_stat_txkbs**: Network sending rate, indicating the speed of sending data to the network. The higher the value, the more likely there is a network I\O bottleneck. The default threshold is 70.
+- **storage_stat_util**: storage utilization, indicating the usage of the storage subsystem. The higher the value, the more likely there is a hard disk I\O bottleneck. The default threshold is 70.
+
 **Example**
 
 ```shell
@@ -660,6 +676,29 @@ You can modify the following information base on database configuration.
  # passwd_key =
  # passwd_iv =
  # user_passwd =
+
+  #################################### bottleneck ###############################
+ [bottleneck]
+ # computing
+ cpu_stat_util = 80
+ cpu_stat_cutil = 80
+ perf_stat_ipc = 1
+
+ # memory
+ mem_bandwidth_total_util = 70
+ mem_vmstat_util_swap = 70
+ mem_vmstat_util_cpu = 70
+
+ # network
+ net_stat_ifutil = 70
+ net_estat_errs = 1
+
+ # network I/O
+ net_stat_rxkbs = 70
+ net_stat_txkbs = 70
+
+ # disk I/O
+ storage_stat_util = 70
 ```
 
 ## 2.5 Starting A-Tune
@@ -856,6 +895,7 @@ Collect real-time statistics from the system to identify and automatically optim
 | ---------------------- | ------------------------------------------------------------ |
 | --model, -m            | New model generated after user self-training                 |
 | --characterization, -c | Use the default model for application identification and do not perform automatic optimization |
+| --bottleneck, -b       | Bottleneck identification, automatic bottleneck optimization can be performed when characterization parameters are not used |
 
 **Example**
 
@@ -864,6 +904,14 @@ Use the default model for application identification.
 ```shell
 # atune-adm analysis --characterization
 ```
+
+Use the default model for application identification and bottleneck identification (currently supporting the identification of five bottlenecks: computing, memory, network, network I\O, and disk I\O), and perform automatic optimization (including bottleneck optimization).
+
+```shell
+# atune-adm analysis --bottleneck
+```
+
+Note: The threshold for bottleneck identification can be modified in the configuration file `/etc/tuned/engine.cnf`. After modification, the `atune-engine` service needs to be restarted.
 
 Use the default model to identify applications and perform automatic tuning.
 
