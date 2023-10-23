@@ -112,6 +112,7 @@ fdisk -l | grep dev
 ```bash
 systemctl daemon-reload
 systemctl start atuned
+systemctl start atune-rest
 systemctl start atune-engine
 ```
 
@@ -119,6 +120,7 @@ systemctl start atune-engine
 
 ```bash
 systemctl status atuned
+systemctl status atune-rest
 systemctl status atune-engine
 ```
 
