@@ -54,6 +54,7 @@ class TranslateYaml:
         fstr.write('startworkload: \"\"\n')
         fstr.write('stopworkload: \"\"\n')
         fstr.write('object : \n')
+        fstr.close()
         return fstr.getvalue()
 
     @staticmethod
@@ -82,6 +83,7 @@ class TranslateYaml:
         :return: True or False, translation result.
         """
         self.out_file.write(self.get_head())
+        self.out_file.close()
         obj_list = self.read_line(content, line)
         if not obj_list:
             print(f"Empty workbook, stop translating {self.out_file}")
@@ -109,3 +111,4 @@ class TranslateYaml:
 
             if config_attr.name != '':
                 self.out_file.write(str(config_attr))
+                self.out_file.close()
