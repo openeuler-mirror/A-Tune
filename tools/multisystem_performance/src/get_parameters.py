@@ -145,6 +145,9 @@ def analyse_result_to_file(file2lack_dict, file2add_dict, file2modify_dict, file
     try:
         with open("./data/" + save_statistical_res, "w") as file:
             file.write(result_str)
+        logging.info(f'成功:统计结果已成功保存到文件:./data/{save_statistical_res}')
         print("统计结果已成功保存到文件: " + save_statistical_res)
     except IOError:
+        logging.error(f'Error:保存文件时出现错误,请检查路径和文件权限')
         print("保存文件时出现错误，请检查路径和文件权限。")
+
