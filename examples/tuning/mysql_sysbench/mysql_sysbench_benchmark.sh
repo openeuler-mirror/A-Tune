@@ -25,11 +25,11 @@ do
     fi
 done
 
-taskset -c 2,3 sysbench --config-file=sysbench_config.cfg oltp_read_write --tables=$TABLES --table-size=$TABLE_SIZE --time=300 --mysql-ignore-errors=8005 run  > sysbench_oltp_read_write.log
+taskset -c 2,3 sysbench --config-file=sysbench_config.cfg oltp_read_write --tables=$TABLES --table-size=$TABLE_SIZE --time=300 --mysql-ignore-errors=8005 run  > PATH//sysbench_oltp_read_write.log
 count=0
 while true
 do
-    val=$(cat mysql_sysbench/sysbench_oltp_read_write.log  | grep 'queries:' | awk -F '(' '{print $2}' | awk -F ' ' '{print $1}')
+    val=$(cat PATH/sysbench_oltp_read_write.log  | grep 'queries:' | awk -F '(' '{print $2}' | awk -F ' ' '{print $1}')
     if [ $val != "" ];then
         break
     elif [ $count == 10 ];then
