@@ -15,6 +15,7 @@ package profile
 
 import (
 	"fmt"
+	"regexp"
 	"io/ioutil"
 
 	"github.com/go-ini/ini"
@@ -89,11 +90,22 @@ func profileDefined(ctx *cli.Context) error {
 	if err := profileDefineCheck(ctx); err != nil {
 		return err
 	}
+
+
+	detectRule := `[./].*` 
+	detectPathchar := regexp.MustCompile(detectRule)
+
 	serviceType := ctx.Args().Get(0)
+	if detectPathchar.MatchString(serviceType) {
+		return fmt.Errorf("serviceType:%s cannot contain special path characters '/' or '.' ", serviceType)
+	}
 	if !utils.IsInputStringValid(serviceType) {
 		return fmt.Errorf("input:%s is invalid", serviceType)
 	}
 	applicationName := ctx.Args().Get(1)
+        if detectPathchar.MatchString(applicationName) {
+                return fmt.Errorf("applicationName:%s cannot contain special path characters '/' or '.' ", applicationName)
+        }
 	if !utils.IsInputStringValid(applicationName) {
 		return fmt.Errorf("input:%s is invalid", applicationName)
 	}
@@ -101,7 +113,9 @@ func profileDefined(ctx *cli.Context) error {
 	if !utils.IsInputStringValid(scenarioName) {
 		return fmt.Errorf("input:%s is invalid", scenarioName)
 	}
-
+        if detectPathchar.MatchString(scenarioName) {
+		return fmt.Errorf("scenarioName:%s cannot contain special path characters '/' or '.' ", scenarioName)
+        }
 	data, err := ioutil.ReadFile(ctx.Args().Get(3))
 	if err != nil {
 		return err
