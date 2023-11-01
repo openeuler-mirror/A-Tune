@@ -49,8 +49,10 @@ class Training(Resource):
             return "Illegal model name provide: {}".format(err), 400
 
         characterization = WorkloadCharacterization(model_path)
+        output_path = TRAINING_MODEL_PATH + model_name
+        if os.path.exists(output_path):
+            return "File already exists!", 400
         try:
-            output_path = TRAINING_MODEL_PATH + model_name
             characterization.retrain(data_path, output_path)
         except Exception as err:
             LOGGER.error(err)
