@@ -1277,8 +1277,32 @@ func (s *ProfileServer) Define(ctx context.Context, message *PB.DefineMessage) (
 	applicationName := message.GetApplicationName()
 	scenarioName := message.GetScenarioName()
 	content := string(message.GetContent())
-	profileName := serviceType + "-" + applicationName + "-" + scenarioName
 
+	detectRule := `[./].*`
+	detectPathchar := regexp.MustCompile(detectRule)
+
+	if detectPathchar.MatchString(serviceType) {
+		return &PB.Ack{}, fmt.Errorf("serviceType:%s cannot contain special path characters '/' or '.' ", serviceType)
+	}
+	if !utils.IsInputStringValid(serviceType) {
+		return &PB.Ack{}, fmt.Errorf("input:%s is invalid", serviceType)
+	}
+
+	if detectPathchar.MatchString(applicationName) {
+                return &PB.Ack{}, fmt.Errorf("applicationName:%s cannot contain special path characters '/' or '.' ", applicationName)
+        }
+	if !utils.IsInputStringValid(applicationName) {
+		return &PB.Ack{}, fmt.Errorf("input:%s is invalid", applicationName)
+	}
+
+	if detectPathchar.MatchString(scenarioName) {
+                return &PB.Ack{}, fmt.Errorf("scenarioName:%s cannot contain special path characters '/' or '.' ", scenarioName)
+        }
+	if !utils.IsInputStringValid(scenarioName) {
+		return &PB.Ack{}, fmt.Errorf("input:%s is invalid", scenarioName)
+	}
+
+	profileName := serviceType + "-" + applicationName + "-" + scenarioName
 	workloadTypeExist, err := sqlstore.ExistWorkloadType(profileName)
 	if err != nil {
 		return &PB.Ack{}, err
