@@ -39,6 +39,15 @@ class Collector(Resource):
         args = COLLECTOR_POST_PARSER.parse_args()
         current_app.logger.info(args)
         n_pipe = get_npipe(args.get("pipe"))
+
+        path = args.get("file")
+        path = os.path.abspath(path)
+        if not path.startswith("/var/atune_data/collection/"):
+            return "Files outside the /var/atune_data/collection/ directory cannot be modified.", 400
+
+        if os.path.exists(path):
+            return "File already exists!", 400
+
         monitors = []
         mpis = []
         field_name = []
@@ -91,7 +100,6 @@ class Collector(Resource):
         if n_pipe is not None:
             n_pipe.close()
 
-        path = args.get("file")
         save_file(path, data, field_name)
         result = {}
         result["path"] = path
