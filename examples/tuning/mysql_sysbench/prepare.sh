@@ -113,6 +113,16 @@ else
 	sed -i "s#stopworkload:.*#stopworkload: \"systemctl stop mysql\" #g" $path/mysql_sysbench_server.yaml
 fi
 
+echo "Setting the executable path of the MySQL database"
+if [ -f /usr/bin/mysql ]; then
+	sed -i 's/MySQL_EXEC_PATH/\/usr\/bin\/mysql/g' $path/set_params.sh
+elif [ -f /usr/local/mysql/bin/mysql ]; then
+	sed -i 's/MySQL_EXEC_PATH/\/usr\/local\/mysql\/bin\/mysql/g' $path/set_params.sh
+else
+	echo "Setting failed! No available mysql executable file is found."
+	exit 1
+fi
+
 echo "copy the server yaml file to /etc/atuned/tuning/"
 rm -rf /etc/atuned/tuning/mysql_sysbench_server.yaml
 sed -i "s#PATH#$path#g" $path/server.yaml
