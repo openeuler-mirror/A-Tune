@@ -61,7 +61,7 @@ object :
     name : "innodb_io_capacity"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_io_capacity'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_io_capacity'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_io_capacity'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_io_capacity $value"
         needrestart : "false"
         type : "continuous"
@@ -73,7 +73,7 @@ object :
     name : "innodb_spin_wait_delay"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_spin_wait_delay'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_spin_wait_delay'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_spin_wait_delay'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_io_capacity $value"
         needrestart : "false"
         type : "continuous"
@@ -85,7 +85,7 @@ object :
     name : "innodb_sync_spin_loops"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_sync_spin_loops'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_sync_spin_loops'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_sync_spin_loops'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_sync_spin_loops $value"
         needrestart : "false"
         type : "continuous"
@@ -97,7 +97,7 @@ object :
     name : "innodb_log_buffer_size"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_log_buffer_size'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_log_buffer_size'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_log_buffer_size'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_log_buffer_size $value"
         needrestart : "false"
         type : "discrete"
@@ -110,7 +110,7 @@ object :
     name : "innodb_lru_scan_depth"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_lru_scan_depth'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_lru_scan_depth'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_lru_scan_depth'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_lru_scan_depth $value"
         needrestart : "false"
         type : "continuous"
@@ -122,7 +122,7 @@ object :
     name : "innodb_thread_concurrency"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_thread_concurrency'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_thread_concurrency'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_thread_concurrency'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_thread_concurrency $value"
         needrestart : "false"
         type : "continuous"
@@ -134,7 +134,7 @@ object :
     name : "innodb_flush_log_at_trx_commit"
     info :
         desc : "MySQL [mysqld] parameters 'innodb_flush_log_at_trx_commit'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'innodb_flush_log_at_trx_commit'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'innodb_flush_log_at_trx_commit'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh innodb_flush_log_at_trx_commit $value"
         needrestart : "false"
         type : "continuous"
@@ -146,7 +146,7 @@ object :
     name : "sync_binlog"
     info :
         desc : "MySQL [mysqld] parameters 'sync_binlog'."
-        get : "export MYSQL_PWD=123456 && /usr/local/mysql/bin/mysql -uroot -e \"show variables like 'sync_binlog'\"|grep 'innodb'|awk -F ' ' '{print $NF}'"
+        get : "export MYSQL_PWD=123456 && MySQL_EXEC_PATH -uroot -e \"show variables like 'sync_binlog'\"|grep 'sync_binlog'|awk -F ' ' '{print $NF}'"
         set : "sh PATH/set_params.sh sync_binlog $value"
         needrestart : "false"
         type : "continuous"
