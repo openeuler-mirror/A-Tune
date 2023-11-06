@@ -116,8 +116,10 @@ fi
 echo "Setting the executable path of the MySQL database"
 if [ -f /usr/bin/mysql ]; then
 	sed -i 's/MySQL_EXEC_PATH/\/usr\/bin\/mysql/g' $path/set_params.sh
+	sed -i 's|MySQL_EXEC_PATH|/usr/bin/mysql|g'    $path/server.yaml
 elif [ -f /usr/local/mysql/bin/mysql ]; then
 	sed -i 's/MySQL_EXEC_PATH/\/usr\/local\/mysql\/bin\/mysql/g' $path/set_params.sh
+	sed -i 's|MySQL_EXEC_PATH|/usr/local/mysql/bin/mysql|g'      $path/server.yaml
 else
 	echo "Setting failed! No available mysql executable file is found."
 	exit 1
