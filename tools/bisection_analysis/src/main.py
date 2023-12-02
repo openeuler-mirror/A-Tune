@@ -129,7 +129,7 @@ def download_and_setup_demo_mode():
     logging.info("FFmpeg downloaded and set up successfully.")
 
     # Set up the demo video directory and download the demo video
-    video_url = "https://github.com/digmouse233/Demo-Video-A-Tune/raw/main/akiyo_cif.y4m"
+    video_url = "https://github.com/anjieyang/Demo-Video-A-Tune/blob/main/akiyo_cif.y4m"
     video_dir = "../data/"
     video_path = os.path.join(video_dir, "akiyo_cif.y4m")
 
