@@ -881,6 +881,10 @@ func (s *ProfileServer) Tuning(stream PB.ProfileMgr_TuningServer) error {
 UpgradeProfile method update the db file
 */
 func (s *ProfileServer) UpgradeProfile(profileInfo *PB.ProfileInfo, stream PB.ProfileMgr_UpgradeProfileServer) error {
+	if config.TransProtocol == "tcp" {
+		return fmt.Errorf("the upgrade command cannot be executed through TCP connections.")
+	}
+
 	isLocalAddr, err := SVC.CheckRpcIsLocalAddr(stream.Context())
 	if err != nil {
 		return err
