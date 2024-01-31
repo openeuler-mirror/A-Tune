@@ -20,6 +20,8 @@ from logging.handlers import SysLogHandler
 from flask import Flask
 from flask_restful import Api
 
+LOGGER = logging.getLogger(__name__)
+
 
 class App:
     """flask application"""
@@ -55,6 +57,9 @@ class App:
         self.add_resource()
         context = None
         if tls:
+            if not os.path.exists(cert_file) or not os.path.exists(key_file) or not os.path.exists(ca_file):
+                LOGGER.error("Startup failed. Please provide the authentication certificate.")
+                raise FileNotFoundError("Startup failed. Please provide the authentication certificate.")
             context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             context.load_cert_chain(certfile=cert_file, keyfile=key_file)
             context.load_verify_locations(ca_file)

@@ -1516,6 +1516,12 @@ Perform tuning.
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ```
 
+**Q4: The atuned or atune-engine service cannot be started, and the message "Startup failed. Please provide the authentication certificate." is displayed.**
+
+**Cause:** Missing the certificate file during communication. The default communication protocol of REST APIs in the atuned or atune-engine service is HTTPS.
+
+**Solution:** Providing the certificate file issued by the authority and saving it to the corresponding configuration directory. The default certificate directory of the atuned service is /etc/atuned/rest_certs/, and the default certificate directory of the atune-engine service is /etc/atuned/engine_certs/. You can also change the default certificate directory and certificate file name in the atuned.cnf and engine.cnf files under the /etc/atuned/ directory. For the development and commissioning environment, you can also make self-service signature certificate by following section 5.2.
+
 
 
 # 5 Appendixes
@@ -1529,3 +1535,67 @@ Perform tuning.
 | profile | Set of optimization items and optimal  parameter configuration. |
 
  
+## 5.2 Self-signature Certificate Manufacturing Method
+
+### 5.2.1 Creating a Certificate Directory
+
+```shell
+CERT_PATH=demo
+mkdir $CERT_PATH
+```
+
+### 5.2.2 Generating the RSA Key Pair for the CA
+
+```shell
+openssl genrsa -out $CERT_PATH/ca.key 2048
+```
+
+### 5.2.3 Generating the CA Root Certificate
+
+```shell
+openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $CERT_PATH/ca.key -out $CERT_PATH/ca.crt
+```
+
+### 5.2.4 Generating the Server Certificate
+
+```shell
+# The IP address can be changed according to the actual situation.
+IP_ADDR=localhost
+openssl genrsa -out $CERT_PATH/server.key 2048
+cp /etc/pki/tls/openssl.cnf $CERT_PATH
+if test $IP_ADDR == localhost; then
+    echo "[SAN]\nsubjectAltName=DNS:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=DNS:$IP_ADDR" > $CERT_PATH/extfile.cnf
+else
+    echo "[SAN]\nsubjectAltName=IP:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=IP:$IP_ADDR" > $CERT_PATH/extfile.cnf
+fi
+openssl req -new -subj "/CN=$IP_ADDR" -config $CERT_PATH/openssl.cnf \
+                -key $CERT_PATH/server.key -out $CERT_PATH/server.csr
+openssl x509 -req -sha256 -CA $CERT_PATH/ca.crt -CAkey $CERT_PATH/ca.key -CAcreateserial -days 3650 \
+                -extfile $CERT_PATH/extfile.cnf -in $CERT_PATH/server.csr -out $CERT_PATH/server.crt
+rm -rf $CERT_PATH/*.srl $CERT_PATH/*.csr $CERT_PATH/*.cnf
+```
+
+### 5.2.5 Generating the Client Certificate
+
+```shell
+# The IP address can be changed according to the actual situation.
+IP_ADDR=localhost
+openssl genrsa -out $CERT_PATH/client.key 2048
+cp /etc/pki/tls/openssl.cnf $CERT_PATH
+if test $IP_ADDR == localhost; then
+    echo "[SAN]\nsubjectAltName=DNS:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=DNS:$IP_ADDR" > $CERT_PATH/extfile.cnf
+else
+    echo "[SAN]\nsubjectAltName=IP:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=IP:$IP_ADDR" > $CERT_PATH/extfile.cnf
+fi
+openssl req -new -subj "/CN=$IP_ADDR" -config $CERT_PATH/openssl.cnf \
+                -key $CERT_PATH/client.key -out $CERT_PATH/client.csr
+openssl x509 -req -sha256 -CA $CERT_PATH/ca.crt -CAkey $CERT_PATH/ca.key -CAcreateserial -days 3650 \
+                -extfile $CERT_PATH/extfile.cnf -in $CERT_PATH/client.csr -out $CERT_PATH/client.crt
+rm -rf $CERT_PATH/*.srl $CERT_PATH/*.csr $CERT_PATH/*.cnf
+```
+
+

@@ -1501,6 +1501,15 @@ evaluations :
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ```
 
+**问题4：atuned或atune-engine服务无法启动，提示“Startup failed. Please provide the authentication certificate.”。**
+
+**原因：** atuned或atune-engine服务中的REST API默认通信协议为https，通信中缺少证书文件
+
+**解决方法：** 用户提供权威机构签发的证书文件并放入对应的配置目录下，其中atuned服务的默认证书>目录为/etc/atuned/rest_certs/，atune-engine服务的默认证书目录为/etc/atuned/engine_certs/，也可
+以通过/etc/atuned/目录下的atuned.cnf和engine.cnf配置文件修改默认证书目录和证书文件名。对于开发
+调试环境也可以通过5.2节方法制作的自签名证书进行服务通信。
+
+
 # 5 附录
 
 ## 5.1 术语和缩略语
@@ -1512,3 +1521,66 @@ evaluations :
 | profile | 优化项集合，最佳的参数配置 |
 
  
+## 5.2 自签名证书制作方法
+
+### 5.2.1 证书目录创建
+
+```shell
+CERT_PATH=demo
+mkdir $CERT_PATH
+```
+
+### 5.2.2 生成CA的RSA密钥对
+
+```shell
+openssl genrsa -out $CERT_PATH/ca.key 2048
+```
+
+### 5.2.3 生成CA根证书
+
+```shell
+openssl req -new -x509 -days 3650 -subj "/CN=ca" -key $CERT_PATH/ca.key -out $CERT_PATH/ca.crt
+```
+
+### 5.2.4 生成服务器证书
+
+```shell
+# ip地址可以根据实际情况修改
+IP_ADDR=localhost
+openssl genrsa -out $CERT_PATH/server.key 2048
+cp /etc/pki/tls/openssl.cnf $CERT_PATH
+if test $IP_ADDR == localhost; then
+    echo "[SAN]\nsubjectAltName=DNS:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=DNS:$IP_ADDR" > $CERT_PATH/extfile.cnf
+else
+    echo "[SAN]\nsubjectAltName=IP:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=IP:$IP_ADDR" > $CERT_PATH/extfile.cnf
+fi
+openssl req -new -subj "/CN=$IP_ADDR" -config $CERT_PATH/openssl.cnf \
+                -key $CERT_PATH/server.key -out $CERT_PATH/server.csr
+openssl x509 -req -sha256 -CA $CERT_PATH/ca.crt -CAkey $CERT_PATH/ca.key -CAcreateserial -days 3650 \
+                -extfile $CERT_PATH/extfile.cnf -in $CERT_PATH/server.csr -out $CERT_PATH/server.crt
+rm -rf $CERT_PATH/*.srl $CERT_PATH/*.csr $CERT_PATH/*.cnf
+```
+
+### 5.2.5 生成客户端证书
+
+```shell
+# ip地址可以根据实际情况修改
+IP_ADDR=localhost
+openssl genrsa -out $CERT_PATH/client.key 2048
+cp /etc/pki/tls/openssl.cnf $CERT_PATH
+if test $IP_ADDR == localhost; then
+    echo "[SAN]\nsubjectAltName=DNS:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=DNS:$IP_ADDR" > $CERT_PATH/extfile.cnf
+else
+    echo "[SAN]\nsubjectAltName=IP:$IP_ADDR" >> $CERT_PATH/openssl.cnf
+    echo "subjectAltName=IP:$IP_ADDR" > $CERT_PATH/extfile.cnf
+fi
+openssl req -new -subj "/CN=$IP_ADDR" -config $CERT_PATH/openssl.cnf \
+                -key $CERT_PATH/client.key -out $CERT_PATH/client.csr
+openssl x509 -req -sha256 -CA $CERT_PATH/ca.crt -CAkey $CERT_PATH/ca.key -CAcreateserial -days 3650 \
+                -extfile $CERT_PATH/extfile.cnf -in $CERT_PATH/client.csr -out $CERT_PATH/client.crt
+rm -rf $CERT_PATH/*.srl $CERT_PATH/*.csr $CERT_PATH/*.cnf
+```
+
