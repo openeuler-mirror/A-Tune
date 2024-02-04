@@ -33,7 +33,6 @@ from analysis.optimizer.abtest_tuning_manager import ABtestTuningManager
 from analysis.optimizer.gridsearch_tuning_manager import GridSearchTuningManager
 from analysis.optimizer.weighted_ensemble_feature_selector import WeightedEnsembleFeatureSelector
 from analysis.optimizer.variance_reduction_feature_selector import VarianceReductionFeatureSelector
-from analysis.optimizer.BO_tuning_manager import BO_Optimizer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -368,6 +367,7 @@ class Optimizer(multiprocessing.Process):
                 return best_params
 
             elif self.engine == 'Bayesian_Transfer':
+                from analysis.optimizer.BO_tuning_manager import BO_Optimizer
                 bo_opt = BO_Optimizer(self.knobs, self.child_conn, self.max_eval,
                                       prj_name=self.project_name + "_tlbo_" + str(int(round(time.time() * 1000))),
                                       history_path=self.history_path)
