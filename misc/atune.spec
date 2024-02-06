@@ -3,7 +3,7 @@
 
 Summary: AI auto tuning system
 Name: atune
-Version: 1.0.0
+Version: 1.2.0
 Release: 1
 License: Mulan PSL v2
 URL: https://gitee.com/openeuler/A-Tune
@@ -141,6 +141,9 @@ make models
 %systemd_postun_with_restart atuned.service
 
 %changelog
+* Tue Feb  6  zhoupengcheng<zhoupengcheng11@huawei.com> - 1.2.0-1
+- upgrade to v1.2.0
+
 * Mon Nov 15 2021 hanxinke<hanxinke@huawei.com> - 1.0.0-1
 - upgrade to v1.0.0
 
