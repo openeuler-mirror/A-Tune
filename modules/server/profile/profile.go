@@ -560,7 +560,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 	apps := classApps.Result[0].Apps
 	_ = stream.Send(&PB.AckCheck{Name: fmt.Sprintf("\n 2. Current System Workload Characterization is %s", apps)})
 
-	logFile, err := utils.GetLogFilePath(config.DefaultTempPath)
+	logFile, err := utils.GetLogFilePath(config.DefaultCollectionPath)
 	if err != nil {
 		return fmt.Errorf("get log file path failed: %v", err)
 	}
@@ -670,7 +670,7 @@ func (s *ProfileServer) Analysis(message *PB.AnalysisMessage, stream PB.ProfileM
 
 	_ = pro.RollbackActive(ch)
 
-	logPath, err := utils.GetLogFilePath(config.DefaultTempPath)
+	logPath, err := utils.GetLogFilePath(config.DefaultCollectionPath)
 	if err != nil {
 		return fmt.Errorf("get log file path failed: %v", err)
 	}
@@ -1506,7 +1506,7 @@ func (s *ProfileServer) collection(npipe string, time string) (*RespCollectorPos
 	collectorBody := new(CollectorPost)
 	collectorBody.SampleNum = sampleNum
 	collectorBody.Monitors = monitors
-	collectorBody.File = path.Join(config.DefaultTempPath, "test.csv")
+	collectorBody.File = path.Join(config.DefaultCollectionPath, "test.csv")
 	if npipe != "" {
 		collectorBody.Pipe = npipe
 	}
