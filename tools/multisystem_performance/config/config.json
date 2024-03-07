@@ -15,8 +15,7 @@
         "user":"west2"
       }
     },
-  
-    "communication_test": {  
+    "communication_test": {
       "mode": "communication_test",
       "local": {
         "ip": "172.22.70.189",

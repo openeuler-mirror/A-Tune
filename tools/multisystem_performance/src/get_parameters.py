@@ -18,136 +18,228 @@
 # @Desc      :   get parameters from system
 # #############################################
 
+import os
 import difflib
-from load_check import *
+import getpass
+import logging
+import subprocess
+
+import paramiko
+from load_check import timestamp
+from global_var import set_value, get_value
 
 
-# 获取 linux 版本，CentOS Steam 或者 OpenEuler
 def get_os_version():
-    linux_version = "Unknown"
+    """
+    获取 linux 版本，CentOS Steam 或者 OpenEuler
+    """
+    logging.info(f'开始: get_os_version')
+    linux_version = "Others"
     try:
-        with open("/etc/os-release", "r") as file:
-            for line in file:
-                if line.startswith("NAME="):
-                    linux_version = line.strip().split("=")[1].strip('"').replace(" ", "")
-                    logging.info('获取当前系统版本为 %s', linux_version, extra={'logfile': log_file})
-                    break
+        output = subprocess.run(['/bin/cat', '/etc/os-release'], shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output_text = output.stdout.decode('utf-8').strip('\n')
+        logging.info(f'output = {output} output_text = {output_text}')
+        if 'openEuler' in output_text:
+            linux_version = 'openEuler'
+            logging.info(f'获取当前系统版本为{linux_version}')
+        elif 'CentOS' in output_text:
+            linux_version = 'CentOS'
+            logging.info(f'获取当前系统版本为{linux_version}')
+        else:
+            linux_version = 'Others'
     except FileNotFoundError:
-        logging.error('failed: \'cat /etc/os-release\' ', extra={'logfile': log_file})
+        logging.error(f'failed: \'cat /etc/os-release\',linux_version = Unknown ')
         print("未找到 /etc/os-release 文件，请检查文件是否存在。")
-
     return linux_version
 
 
-# bash: "syscyl -a" 存储在sysctl@$linux-version$中
-def run_sysctl_command_and_save_result(file_name):
-    bash_command = "sysctl -a"
-    with open(file_name, "w") as output_file:
-        process = subprocess.Popen(bash_command, shell=True, stdout=output_file, stderr=subprocess.PIPE)
-        _, stderr = process.communicate()
-        logging.info('运行命令 \'%s\'', bash_command, extra={'logfile': log_file})
-        if process.returncode != 0:
-            print(f"命令执行出错：{stderr.decode()}")
-            logging.error('失败: 运行命令  \'%s\' ', bash_command, extra={'logfile': log_file})
+def run_command_and_save_result(cmd, file_dir):
+    """
+    在本地运行 cmd 命令并保存结果到 file_dir
+    cod: 命令
+    file_dir: 保存结果的路径
+    """
+    logging.info(f'开始: run_command_and_save_result')
+    try:
+        with open(file_dir, "w") as output_file:
+            process = subprocess.run(cmd, shell=False, stdout=output_file, stderr=subprocess.PIPE)
+            logging.info(f'成功:本地运行命令{cmd},保存结果到文件{file_dir}')
+            if process.returncode != 0:
+                print(f"失败:本地命令执行{cmd}出错,查阅日志获得更多信息")
+                logging.error(f'失败: 本地命令执行出错{cmd}出错,错误信息：{process.stderr.decode()} ')
+            os.chmod(file_dir, 0o644)
+    except Exception as e:
+        print(f"发生异常: {e}, 查阅日志获得更多信息")
+        logging.error(f'发生异常: {e}, cmd = {cmd}, file_dir = {file_dir}')
 
 
-# bash: "ulimit -a" 存储在ulimit@$linux-version$中
-def run_ulimit_command_and_save_result(file_name):
-    bash_command = "ulimit -a"
-    with open(file_name, "w") as output_file:
-        process = subprocess.Popen(bash_command, shell=True, stdout=output_file, stderr=subprocess.PIPE)
-        _, stderr = process.communicate()
-        logging.info('运行命令  \'%s\'', bash_command, extra={'logfile': log_file})
-        if process.returncode != 0:
-            print(f"命令执行出错：{stderr.decode()}")
-            logging.error('失败: 运行命令 \'%s\' ', bash_command, extra={'logfile': log_file})
+def local_run_sys_ulimit_save(sysctl_res_file_name, ulimit_res_file_name):
+    """
+    执行sysctl -a 与 ulimit -a命令并保存结果, 封装了 run_command_and_save_result
+    sysctl_res_file_name: 保存sysctl -a命令结果的文件名：
+    ulimit_res_file_name: 保存ulimit -a命令结果的文件名
+    """
+    logging.info(f'开始: local_run_sys_ulimit_save, sysctl_res_file_name = {sysctl_res_file_name}, '
+                 f'ulimit_res_file_name = {ulimit_res_file_name}')
+    local_sys_command = ['sysctl', '-a']
+    local_ulimit_command = ['ulimit', '-a']
+    if sysctl_res_file_name and ulimit_res_file_name:
+        run_command_and_save_result(local_sys_command, sysctl_res_file_name)
+        run_command_and_save_result(local_ulimit_command, ulimit_res_file_name)
 
 
-# 执行sysctl -a 与 ulimit -a命令并保存结果
-def run_command_save(sysctl_res_file_name, ulimit_res_file_name):
-    # 执行sysctl -a命令并保存结果到sysctl@xxx.txt文件中
-    run_sysctl_command_and_save_result("./data/" + sysctl_res_file_name)
-    logging.info('成功：run_sysctl_command_and_save_result, 保存：\'%s\'', "./data/" + sysctl_res_file_name,
-                 extra={'logfile': log_file})
-    # 执行ulimit -a命令并保存结果到ulimit@xxx.txt文件中
-    run_ulimit_command_and_save_result("./data/" + ulimit_res_file_name)
-    logging.info('成功：run_ulimit_command_and_save_result, 保存在：\'%s\'', "./data/" + ulimit_res_file_name,
-                 extra={'logfile': log_file})
+def remote_run_command_and_copy(remote):
+    """
+    在 remote 主机上执行 sysctl/ulimit 命令，并将结果保存到本机 ./data/{cmd}_{os_version}.txt
+    remote: {"user":"xxx","ip":"xxx"}
+    """
+    logging.info(f'开始: remote_run_command_and_copy')
+    if remote is None:
+        print("错误: 空参数")
+        logging.error(f'失败: remote is None')
+        return False
+
+    remote_user = remote["user"]
+    remote_ip = remote["ip"]
+    os_version = ""
+
+    if not remote_user or not remote_ip:
+        print("错误: 空参数")
+        logging.error(f'失败: remote_user and remote_ip is None')
+        return False
+
+    try:
+        # 连接远程主机
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        getpassword = getpass.getpass(f"正在连接: 请输入 {remote_user}@{remote_ip} 的密码: ")
+        logging.info(f'密码输入成功，正在连接 {remote_user}@{remote_ip}')
+        ssh_client.connect(hostname=remote_ip, username=remote_user, password=getpassword)
+        logging.info(f'成功: 连接 {remote_user}@{remote_ip}')
+
+        # 获取remote系统版本
+        get_os_cmd = 'cat /etc/os-release'
+        stdin, stdout, stderr = ssh_client.exec_command(get_os_cmd)
+        output_text = stdout.read().decode('utf-8').strip('\n')
+        os_version = 'openEuler' if 'openEuler' in output_text else 'CentOS'
+        logging.info(f'成功: 获取 {remote_user}@{remote_ip} 的系统版本为{os_version}')
+
+        cmds = ['sysctl', 'ulimit']
+        for cmd in cmds:
+            remote_cmd = f'{cmd} -a'
+            ssh_client.exec_command('cd ~/A-Tune/tools/multisystem_performance')
+            local_file = f'./data/{cmd}@{os_version}-{timestamp}.txt'
+            stdin, stdout, stderr = ssh_client.exec_command(remote_cmd)
+            logging.info(f'成功: 在 {remote_user}@{remote_ip} 上执行命令{remote_cmd}')
+            res = stdout.read().decode('utf-8')
+            with open(local_file, 'w') as file:
+                file.write(res)
+            logging.info('成功: 保存命令结果到本地文件{local_file}')
+            print(f'成功:在 {remote_ip} 上获取 {cmd} 参数,保存到本地文件{local_file}')
+
+        ssh_client.close()
+    except paramiko.AuthenticationException as auth_exception:
+        print(f"身份验证失败: {auth_exception}")
+        logging.error(f"身份验证失败: {auth_exception}")
+    except paramiko.SSHException as ssh_exception:
+        print(f"SSH 连接错误: {ssh_exception}")
+        logging.error(f"SSH 连接错误: {ssh_exception}")
+        logging.error(f'')
+    except Exception as e:
+        print(f"发生异常: {e}")
+        logging.error(f"发生异常: {e}")
+    return os_version
 
 
-# 使用 difflib 的比较，保存比较结果 diff_result 到文件 save_difflib_res
-def use_differ_res(os_version, sysctl_res_file_name, save_difflib_res):
-    # 根据当前操作系统匹配对方的sysctl@xxx文件，使用scp获取对方配置
-    file1 = sysctl_res_file_name
-    if os_version == "openEuler":
-        # 后期这里会替换为适应两种模式的命令
-        command = "scp west1@172.22.60.188:~/my_ospp/data/sysctl@CentOSStream.txt ./data/ "
-        try:
-            subprocess.run(command, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"执行命令出错：{e}")
-        file2 = "sysctl@CentOSStream.txt"
-    else:
-        # 后期这里会替换为适应两种模式的命令
-        command = "scp west2@172.22.60.189:~/my_ospp/data/sysctl@openEuler.txt ./data/ "
-        try:
-            subprocess.run(command, shell=True, check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"执行命令出错：{e}")
-        file2 = "sysctl@openEuler.txt"
+def run_command_and_save_by_mode(mode, data):
+    """
+    根据 mode 选择模式,在远程执行命令并保存结果到本地,封装了 remote_run_command_and_copy 和 local_run_sys_ulimit_save
+    mode: 1-host_test 模式, 2-communication_test 模式
+    data: json 配置文件，结构为{"user":"xxx","ip":"xxx"}
+    local: 本地保存结果的目录
+    """
 
-        # 使用difflib的比较file1与file2的结果
-    with open("./data/" + file1) as f1, open("./data/" + file2) as f2:
-        logging.info('compare file1 = \'%s\', file2 = \'%s\'', "./data/" + file1, "./data/" + file2,
-                     extra={'logfile': log_file})
+    logging.info(f'开始: run_command_and_save_by_mode')
+    if mode == '1':
+        # host_test 模式时，在local上远程控制pc1与pc2, 并将结果保存到./data/{cmd}_{os_version}.txt,返回值为 os_version
+        PC1_VERSION = remote_run_command_and_copy(data["host_test"]["pc1"])
+        PC2_VERSION = remote_run_command_and_copy(data["host_test"]["pc2"])
+        logging.info(f'pc1_version = {PC1_VERSION}, pc2_version = {PC2_VERSION}')
+        set_value('PC1_VERSION', PC1_VERSION)
+        set_value('PC2_VERSION', PC2_VERSION)
+
+    if mode == '2':
+        # Communication_test 模式: 在 local 上远程控制 remote, 并将结果保存到./data/{cmd}_{os_version}.txt,返回值为 os_version
+        LOCAL_VERSION = get_os_version()
+        set_value('LOCAL_VERSION', LOCAL_VERSION)
+        local_sys = f"./data/sysctl@{LOCAL_VERSION}-{timestamp}.txt"
+        local_ulimit = f"./data/ulimit@{LOCAL_VERSION}-{timestamp}.txt"
+        logging.info(f'local_version = {LOCAL_VERSION},local_sys = {local_sys},local_ulimit = {local_ulimit}')
+        if LOCAL_VERSION == 'Others':
+            print('本工具暂不支持该系统版本,请使用 CentOS 或 openEuler,继续使用可能出现错误,查阅日志获得更多信息')
+            logging.error(f'本工具暂不支持该系统版本,请使用 CentOS 或 openEuler')
+
+        # 保存本地sysctl -a 与 ulimit -a 命令结果
+        local_run_sys_ulimit_save(local_sys, local_ulimit)
+        # 在local上远程控制remote,并将结果保存到./data/{cmd}_{os_version}.txt
+        REMOTE_VERSION = remote_run_command_and_copy(data["communication_test"]["remote"])
+        set_value('REMOTE_VERSION', REMOTE_VERSION)
+        logging.info(f'remote_version = {REMOTE_VERSION},remote = {data["communication_test"]["remote"]}')
+
+
+def differ_sysctl_res(mode, save_differ_sysctl_res):
+    """
+    使用 difflib 比较，保存比较结果 diff_result 到文件 save_differ_sysctl_res
+    mode: 1-host_test 模式下读取pc1与pc2的文件
+          2-communication_test 模式下读取local与remote的文件
+    save_differ_sysctl_res: 指定保存differ结果的文件名
+    """
+
+    file1 = ''
+    file2 = ""
+    logging.info(f'开始: differ_sysctl_res')
+    PC1_VERSION = get_value('PC1_VERSION')
+    PC2_VERSION = get_value('PC2_VERSION')
+    LOCAL_VERSION = get_value('LOCAL_VERSION')
+    REMOTE_VERSION = get_value('REMOTE_VERSION')
+
+    if mode == '1':
+        # host_test 模式时，比较pc1与pc2的结果，已经存在local上，对比结果仍存在 local 上
+        # 只对比 sysctl -a 命令结果
+        file1 = f'./data/sysctl@{PC1_VERSION}-{timestamp}.txt'
+        file2 = f'./data/sysctl@{PC2_VERSION}-{timestamp}.txt'
+        set_value('file1', file1)
+        set_value('file2', file2)
+        logging.info(f'file1 = {file1}, file2 = {file2}')
+    if mode == '2':
+        # Communication_test 模式时，比较local与remote的结果，已经存在local上，对比结果仍存在 local 上
+        # 只对比 sysctl -a 命令结果
+        file1 = f'./data/sysctl@{LOCAL_VERSION}-{timestamp}.txt'
+        file2 = f'./data/sysctl@{REMOTE_VERSION}-{timestamp}.txt'
+        set_value('file1', file1)
+        set_value('file2', file2)
+        logging.info(f'file1 = {file1}, file2 = {file2}')
+    if not file1 or not file2:
+        print("错误: file1 or file2 is None")
+        logging.error(f'错误: file1 or file2 is None')
+
+    # 使用 difflib 的比较file1与file2的结果
+    with open(file1) as f1, open(file2) as f2:
+        logging.info(f'开始: compare file1 = {file1}, file2 = {file2}')
         text1 = f1.readlines()
         text2 = f2.readlines()
-        logging.info('text1 in \'%s\', text2 in \'%s\'', "./data/" + file1, "./data/" + file2,
-                     extra={'logfile': log_file})
+        logging.info(f'text1 in {file1}, text2 in {file2}')
     diff = difflib.Differ()
     diff_result = diff.compare(text1, text2)
-    logging.info('compare file1 and file2 by difflib successfully', extra={'logfile': log_file})
+    logging.info(f'成功: compare file1 and file2 by difflib')
 
-    # 保存比较结果diff_result到文件save_difflib_res
+    # 保存比较结果 diff_result 到文件 save_differ_sysctl_res
     try:
-        with open("./data/" + save_difflib_res, 'w') as file:
+        with open(f'./data/{save_differ_sysctl_res}', 'w') as file:
             file.write("".join(diff_result))
-        logging.info('save diff_result to file \'%s\' successfully', "./data/" + save_difflib_res,
-                     extra={'logfile': log_file})
-        print(f"比较结果已成功保存到文件: ./data/{save_difflib_res}")
+            os.chmod(f'./data/{save_differ_sysctl_res}', 0o644)
+        print(f'成功: 比较结果已保存到文件: ./data/{save_differ_sysctl_res}')
+        logging.info(f'成功: save diff_result to file ./data/{save_differ_sysctl_res}')
     except IOError:
-        logging.error('failed: save diff_result to file \'%s\' ', "./data/" + save_difflib_res,
-                      extra={'logfile': log_file})
-        print("保存文件时出现错误，请检查路径和文件权限。")
-
-
-# 显式分析保存比较结果到文件
-def analyse_result_to_file(file2lack_dict, file2add_dict, file2modify_dict, file1, file2, file2lack, file2add,
-                           file2modify, save_statistical_res):
-    result_str = ""
-    result_str += "file1: " + file1 + ", file2: " + file2 + " 统计结果为：\n"
-    result_str += "file2 缺失的行有: " + str(len(file2lack)) + "行\n"
-    result_str += "file2 增加的行有: " + str(len(file2add)) + "行\n"
-    result_str += "file2 修改的行有: " + str(len(file2modify)) + "行\n"
-    result_str += "====================================================================\n"
-    result_str += "file2 缺失的行有：\n"
-    for k, v in file2lack_dict.items():
-        result_str += k + " " + v + "\n"
-    result_str += "====================================================================\n"
-    result_str += "file2 增加的行有：\n"
-    for k, v in file2add_dict.items():
-        result_str += k + " " + v + "\n"
-    result_str += "====================================================================\n"
-    result_str += "file2 修改的行有：\n"
-    for k, v in file2modify_dict.items():
-        result_str += k + " " + v + "\n"
-
-    try:
-        with open("./data/" + save_statistical_res, "w") as file:
-            file.write(result_str)
-        logging.info(f'成功:统计结果已成功保存到文件:./data/{save_statistical_res}')
-        print("统计结果已成功保存到文件: " + save_statistical_res)
-    except IOError:
-        logging.error(f'Error:保存文件时出现错误,请检查路径和文件权限')
-        print("保存文件时出现错误，请检查路径和文件权限。")
-
+        print('保存文件时出现错误,请检查路径和文件权限,查阅日志获得更多信息')
+        logging.error(f'失败: save diff_result to file ./data/{save_differ_sysctl_res}')

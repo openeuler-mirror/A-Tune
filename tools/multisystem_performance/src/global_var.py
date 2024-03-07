@@ -13,34 +13,25 @@
 # #############################################
 # @Author    :   westtide
 # @Contact   :   tocokeo@outlook.com
-# @Date      :   2023/9/22
+# @Date      :   2023/10/22
 # @License   :   Mulan PSL v2
-# @Desc      :   main function of multisystem performance analysis
+# @Desc      :   global variables
 # #############################################
 
-from global_var import _init
-from run_benchmark import benchmark
-from load_check import dependence_check
-from modify_parameters import modify_parameters
-from process_parameters import process_parameters
+_global_dict = {}
 
 
-def main():
-
-    _init()
-
-    # 检查+-依赖
-    dependence_check()
-
-    # 获取、对比、存储参数参数
-    process_parameters()
-
-    # 修改 sysctl 参数 ulimit 参数
-    modify_parameters()
-
-    # 性能测试
-    benchmark()
+def _init():
+    global _global_dict
+    _global_dict = {}
 
 
-if __name__ == '__main__':
-    main()
+def set_value(key, value):
+    _global_dict[key] = value
+
+
+def get_value(key):
+    try:
+        return _global_dict[key]
+    except KeyError:
+        return None

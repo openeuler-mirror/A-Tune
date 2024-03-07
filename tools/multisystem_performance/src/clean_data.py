@@ -34,7 +34,7 @@ def clean_files_with_prefix(directory, prefix):
 
 
 data_directory = "./data/"
-prefix_to_clean = ["differ-2023", "statistical-2023"]
+prefix_to_clean = ["differ-2023", "statistical-2023", "backup_", "sysctl", "ulimit"]
 
 for prefix in prefix_to_clean:
     clean_files_with_prefix(data_directory, prefix)

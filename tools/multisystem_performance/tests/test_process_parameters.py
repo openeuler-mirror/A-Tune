@@ -23,9 +23,7 @@ import sys
 import logging
 import builtins
 
-
 import pytest
-
 sys.path.append("..")
 from tools.multisystem_performance.src.process_parameters import process_parameters, process_differ
 
