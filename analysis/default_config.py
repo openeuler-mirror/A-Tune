@@ -10,6 +10,9 @@
 # PURPOSE.
 # See the Mulan PSL v2 for more details.
 # Create: 2020-12-15
+import ast
+import logging
+
 
 """
 Default path config.
@@ -42,7 +45,9 @@ def get_or_default_bool(config, section, key, value):
 
 def get_or_default_list(config, section, key, value):
     """get or default list param"""
-    import ast
     if config.has_option(section, key):
-        return ast.literal_eval(config.get(section, key))
-    return []
+        try:
+            return ast.literal_eval(config.get(section, key))
+        except (SyntaxError, ValueError) as e:
+            logging.error(f"Error parsing list from config: {section}.{key}. Error: {e}")
+    return value
