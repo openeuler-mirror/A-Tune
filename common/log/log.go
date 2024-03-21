@@ -19,6 +19,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
+	"strings"
 
 	"github.com/go-ini/ini"
 	logrus "github.com/sirupsen/logrus"
@@ -42,6 +44,10 @@ func InitLogger(modes []string, cfg *ini.File) error {
 
 	_ = baseLogger.SetLevel(sec.Key("level").MustString("info"))
 	for _, mode := range modes {
+		logDir := sec.Key("log_dir").String()
+		if sec.HasKey("log_dir") && logDir != "" && strings.HasPrefix(logDir, "/var/log/") {
+			mode = "file"
+		}
 		switch mode {
 		case "console":
 			baseLogger.entry.Logger.Out = os.Stdout
@@ -52,10 +58,36 @@ func InitLogger(modes []string, cfg *ini.File) error {
 				baseLogger.Errorf("syslog hook init failed:%v", err)
 			}
 			baseLogger.entry.Logger.AddHook(syslogHook)
+		case "file":
+			dir := sec.Key("log_dir").MustString("/var/log/atune")
+			logFile, err := getLogFile(dir)
+			if err != nil {
+				baseLogger.Errorf("log file model init failed:%v", err)
+				return err
+			}
+			baseLogger.entry.Logger.Out = logFile
+			baseLogger.entry.Logger.Formatter = formatter
 		}
 	}
 
 	return nil
+}
+
+func getLogFile(baseDir string) (*os.File, error) {
+	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+		if err := os.MkdirAll(baseDir, 0755); err != nil {
+			return nil, nil
+		}
+	}
+	today := time.Now().Format("060102")
+	logFileName := filepath.Join(baseDir, fmt.Sprintf("atune-%s.log", today))
+
+	// check file exist status, if not create it
+	file, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+	return file, nil
 }
 
 func (log logger) withFileField() *logrus.Entry {
