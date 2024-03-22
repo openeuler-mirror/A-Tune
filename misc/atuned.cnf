@@ -72,6 +72,8 @@ tlsengineclientkeyfile = /etc/atuned/engine_certs/client.key
 [log]
 # either "debug", "info", "warn", "error", "critical", default is "info"
 level = info
+# you can set log_dir to specify the location where the log is written. default location is /var/log/messages
+# log_dir = "/var/log/atune"
 
 #################################### monitor ###############################
 [monitor]
