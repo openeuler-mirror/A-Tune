@@ -23,12 +23,15 @@ from flask_restful import Resource
 from analysis.ui.parser import UI_COMMAND_GET_PARSER
 from analysis.ui.config import UiConfig
 from analysis.engine import transfer_web
+from analysis.ui.util import authenticate
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
 
 class UiCommand(Resource):
     """restful api for web ui command page"""
+    method_decorators = [authenticate]
+
     def get(self, cmd):
         """restful api get"""
         if not cmd:
