@@ -47,6 +47,7 @@ class AtunedConfig:
     engine_client_cert = ''
     engine_client_key = ''
     level = ''
+    log_dir = None
     module = ''
     disk = ''
     network = ''
@@ -99,6 +100,9 @@ class AtunedConfig:
                                                             'tlsengineclientkeyfile',
                                                             ENGINE_CERT_PATH + 'client.key')
         AtunedConfig.level = get_or_default(config, 'log', 'level', 'info')
+        AtunedConfig.log_dir = get_or_default(config, 'log', 'log_dir', None)
+        if AtunedConfig.log_dir:
+            AtunedConfig.log_dir.strip('"')
         AtunedConfig.module = get_or_default(config, 'monitor', 'module', 'mem_topo, cpu_topo')
         AtunedConfig.disk = get_or_default(config, 'system', 'disk', 'sda')
         AtunedConfig.network = get_or_default(config, 'system', 'network', 'enp5s0')

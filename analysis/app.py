@@ -15,6 +15,7 @@
 Flask application initialization, including log configuration, restful api registration.
 """
 import os
+import datetime
 import ssl
 import logging
 from logging.handlers import SysLogHandler
@@ -35,26 +36,32 @@ class App:
         self.api = Api(self.app)
 
     @staticmethod
-    def config_log(level):
+    def config_log(level, log_dir):
         """app config log"""
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
-        logging_format = logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
-                                           '%(module)s [%(pathname)s:%(lineno)d] : %(message)s')
-        syslog_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
-        syslog_handler.setFormatter(logging_format)
-
+        find_custom_suit_log_dir = None
+        log_handler = None
+        if log_dir is not None:
+             log_file = os.path.join(log_dir, f"atune-{datetime.date.today().strftime('%m%d')}")
+             if "/var/log/atune" in log_file:
+                 log_handler = logging.FileHandler(log_file)
+                 find_custom_suit_log_dir = log_file
+        if not find_custom_suit_log_dir:
+            log_handler = SysLogHandler(address="/dev/log", facility=SysLogHandler.LOG_LOCAL0)
+        log_handler.setFormatter(logging.Formatter('atuned: %(asctime)s [%(levelname)s] '
+                                                       '%(module)s [%(pathname)s:%(lineno)d] : %(message)s'))
         root_logger = logging.getLogger()
         root_logger.setLevel(level)
-        root_logger.addHandler(syslog_handler)
+        root_logger.addHandler(log_handler)
 
     def add_resource(self):
         """flask app add resource"""
 
-    def startup_app(self, host, port, tls, cert_file, key_file, ca_file, log_level):
+    def startup_app(self, host, port, tls, cert_file, key_file, ca_file, log_level, log_dir):
         """start flask app"""
         level = logging.getLevelName(log_level.upper())
-        self.config_log(level)
+        self.config_log(level, log_dir)
         self.add_resource()
         context = None
         if tls:

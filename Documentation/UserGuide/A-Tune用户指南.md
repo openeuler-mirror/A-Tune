@@ -450,7 +450,8 @@ system为系统执行相关的优化需要用到的参数信息，必须根据�
 
 **日志信息**
 
-根据情况修改日志的级别，默认为info级别，日志信息打印在/var/log/messages中。
+根据情况修改日志的级别，默认为info级别，日志信息默认打印在/var/log/messages中。
+可以通过打开配置文件的log_dir选项指定日志写入的目录
 
 **monitor信息**
 
@@ -531,6 +532,8 @@ tuning为系统进行离线调优时需要用到的参数信息。
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
+ # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
+ # log_dir = "/var/log/atune"
 
  #################################### monitor ############################### 
  [monitor]
@@ -629,7 +632,9 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
- 
+ # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
+ # log_dir = "/var/log/atune"
+
  #################################### database ###############################
  [database]
  # enable database server

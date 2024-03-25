@@ -46,7 +46,7 @@ def main(filename):
     app_engine.startup_app(EngineConfig.engine_host, EngineConfig.engine_port,
                            EngineConfig.engine_tls,
                            EngineConfig.engine_server_cert, EngineConfig.engine_server_key,
-                           EngineConfig.engine_ca_file, EngineConfig.level)
+                           EngineConfig.engine_ca_file, EngineConfig.level, EngineConfig.log_dir)
 
 
 if __name__ == '__main__':
