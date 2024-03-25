@@ -24,6 +24,7 @@ from analysis.ui.config import UiConfig
 from analysis.ui.database import ui_tuning, ui_analysis, ui_user, ui_command
 from analysis.ui import offline
 from analysis.ui import echo
+from analysis.ui.cache import LocalCache
 
 class AppUI(App):
     """app ui"""
@@ -37,12 +38,17 @@ class AppUI(App):
         self.api.add_resource(offline.OfflineTunning, '/v2/UI/offline/<string:cmd>')
         self.api.add_resource(echo.EchoTunning, '/v2/UI/echo')
 
+    def add_cache(self):
+        """flask app ui add local cache"""
+        LocalCache.cache.init_app(self.app)
+
 
 def main(filename):
     """app main function"""
     if not UiConfig.initial_params(filename):
         return
     app_ui = AppUI()
+    app_ui.add_cache()
     app_ui.startup_app(UiConfig.ui_host, UiConfig.ui_port,
                            UiConfig.ui_tls,
                            UiConfig.ui_server_cert, UiConfig.ui_server_key,

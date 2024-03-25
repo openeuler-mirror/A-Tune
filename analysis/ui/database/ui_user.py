@@ -20,9 +20,10 @@ import json
 from flask import abort, request
 from flask_restful import Resource
 
+from analysis.ui.cache import LocalCache
 from analysis.ui.parser import UI_USER_GET_PARSER, UI_USER_POST_PARSER
 from analysis.ui.config import UiConfig
-from analysis.ui.util import JwtUtil, verify_server_connectivity, decode_server_password
+from analysis.ui.util import JwtUtil, verify_server_connectivity, decode_server_password, authenticate
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', '*')]
@@ -30,9 +31,11 @@ CORS = [('Access-Control-Allow-Origin', '*')]
 
 class UiUser(Resource):
     """restful api for web ui user login/profile page"""
+    method_decorators = [authenticate]
 
     def get(self, cmd):
         """restful api get"""
+
         if not cmd:
             abort(404, 'does not get command')
 
@@ -51,6 +54,11 @@ class UiUser(Resource):
             token = request.headers.get("Authorization")
             token_vaild, msg = jwt.is_token_vaild(token, uid)
             return json.dumps({'vaild': token_vaild, 'msg': msg}), 200, CORS
+
+        if cmd == 'signOut':
+            uid = args.get('userId')
+            res = LocalCache.pop(uid)
+            return json.dumps({'signOut': res}), 200, CORS
 
         if cmd == 'ipList':
             uid = args.get('userId')       
@@ -80,8 +88,16 @@ class UiUser(Resource):
             pwd = args.get('password')
             res, name = trigger_user.user_exist(email, pwd)
             if res == -1:
-                return json.dumps({'login': False}), 200, CORS
+                return json.dumps({'login': False, 'msg': '账号密码不正确'}), 200, CORS
+            # check if token is existed and valid
+            val = LocalCache.get(key=res)
+            if val is not None:
+                token_valid, msg = jwt.is_token_vaild(val, res)
+                if token_valid:
+                    return json.dumps({'login': False, 'msg': '您的账号已于其他平台上登录'}), 200, CORS
             token = jwt.encode({'user_id': res})
+            # put token into cache
+            LocalCache.put(res, token)
             return json.dumps({'login': True, 'user_id': res, 'user_name': name, 
                                 'token': token}), 200, CORS
 

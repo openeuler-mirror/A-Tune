@@ -15,15 +15,24 @@
 """
 Provide utility functions for ui
 """
+import json
 import socket
 import base64
 from datetime import datetime, timedelta
+from functools import wraps
 
 import jwt
 import paramiko
+from flask import request
 from paramiko import ssh_exception
 from paramiko.ssh_exception import AuthenticationException
 
+from analysis.ui.cache import LocalCache
+from analysis.ui.config import UiConfig
+
+NON_AUTHENTICATED_URL = ['/v1/UI/user/login', '/v1/UI/user/signUp', '/v1/UI/user/initialPage']
+
+CORS = [('Access-Control-Allow-Origin', '*')]
 
 class JwtUtil:
     """jwt util class"""
@@ -41,6 +50,8 @@ class JwtUtil:
     def is_token_vaild(self, token, uid):
         """Judge whether the token is valid"""
         try:
+            if LocalCache.get(uid) != token:
+                return False, "Token removed"
             payload = jwt.decode(jwt=token, key=self.secret, algorithms=['HS256'])
             if payload['user_id'] != uid:
                 return False, "Invalid user"
@@ -51,7 +62,22 @@ class JwtUtil:
             return False, "Token expired"
         except Exception:
             return False, "Verification failed"
-        
+
+    def is_token_legal(self, token):
+        """Judge whether the token is legal"""
+        try:
+            payload = jwt.decode(jwt=token, key=self.secret, algorithms=['HS256'])
+            uid = payload['user_id']
+            if LocalCache.get(uid) != token:
+                return False, "Illegal token"
+            return True, ""
+        except jwt.exceptions.InvalidSignatureError:
+            return False, "Illegal token"
+        except jwt.exceptions.ExpiredSignatureError:
+            return False, "Token expired"
+        except Exception:
+            return False, "Verification failed"
+
 
 def verify_server_connectivity(ip_addrs, ip_port, server_user, server_password):
     """Verify server connectivity"""
@@ -72,3 +98,20 @@ def verify_server_connectivity(ip_addrs, ip_port, server_user, server_password):
 
 def decode_server_password(pwd):
     return base64.b64decode(pwd)
+
+
+def authenticate(func):
+    """authentication decorator"""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        path = request.path
+        if path in NON_AUTHENTICATED_URL:
+            return func(*args, **kwargs)
+        token = request.headers.get('Authorization')
+        jwt = JwtUtil(UiConfig.jwt_secret)
+        token_valid, msg = jwt.is_token_legal(token)
+        if not token_valid:
+            return json.dumps({'valid': token_valid, 'msg': msg}), 200, CORS
+        else:
+            return func(*args, **kwargs)
+    return wrapper

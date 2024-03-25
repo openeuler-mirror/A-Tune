@@ -23,6 +23,7 @@ from flask_restful import Resource
 from analysis.ui.parser import UI_ROLE_GET_PARSER
 from analysis.ui.config import UiConfig
 from analysis.ui.database import trigger_user
+from analysis.ui.util import authenticate
 
 LOGGER = logging.getLogger(__name__)
 CORS = [('Access-Control-Allow-Origin', 'http://localhost:3000')]
@@ -30,6 +31,7 @@ CORS = [('Access-Control-Allow-Origin', 'http://localhost:3000')]
 
 class UiRole(Resource):
     """Role restful API used for role management"""
+    method_decorators = [authenticate]
 
     def get(self, cmd):
         """restful api get"""
