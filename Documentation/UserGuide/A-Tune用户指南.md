@@ -532,8 +532,10 @@ tuning为系统进行离线调优时需要用到的参数信息。
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
- # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
- # log_dir = "/var/log/atune"
+ # you can set log_dir to specify the location where the log is written,specified directory can only be under /var/log/atune,default location is /var/log/messages
+ # log_dir = /var/log/atune
+
+
 
  #################################### monitor ############################### 
  [monitor]
@@ -632,8 +634,9 @@ A-Tune engine配置文件/etc/atuned/engine.cnf的配置项说明如下：
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
- # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
- # log_dir = "/var/log/atune"
+ # you can set log_dir to specify the location where the log is written,specified directory can only be under /var/log/atune,default location is /var/log/messages
+ # log_dir = /var/log/atune
+
 
  #################################### database ###############################
  [database]
