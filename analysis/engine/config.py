@@ -31,6 +31,7 @@ class EngineConfig:
     engine_server_cert = ''
     engine_server_key = ''
     level = ''
+    log_dir = None
     db_enable = False
     database = ''
     db_host = ''
@@ -60,6 +61,9 @@ class EngineConfig:
             EngineConfig.engine_server_key = get_or_default(config, 'server',
                     'tlsengineserverkeyfile', ENGINE_CERT_PATH + 'server.key')
         EngineConfig.level = get_or_default(config, 'log', 'level', 'info')
+        EngineConfig.log_dir = get_or_default(config, 'log', 'level', None)
+        if EngineConfig.log_dir:
+            EngineConfig.log_dir..strip('"')
         EngineConfig.db_enable = get_or_default_bool(config, 'database', 'db_enable', False)
         if EngineConfig.db_enable:
             EngineConfig.database = get_or_default(config, 'database', 'database', 'PostgreSQL')

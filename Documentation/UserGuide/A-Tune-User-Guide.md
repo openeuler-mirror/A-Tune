@@ -474,6 +474,7 @@ System is the parameter information required for system optimization. You must m
 **Log information**
 
 Change the log level as required. The default log level is info. Log information is recorded in the **/var/log/messages** file.
+You can modify the configuration item log_dir to specify the log directory.
 
 **Monitor information**
 
@@ -553,6 +554,8 @@ Tuning is the parameter information required for offline tuning.
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
+ # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
+ # log_dir = "/var/log/atune"
 
  #################################### monitor ############################### 
  [monitor]
@@ -651,6 +654,8 @@ You can modify the startup configuration as required.
  [log]
  # either "debug", "info", "warn", "error", "critical", default is "info"
  level = info
+ # you can set log_dir to specify the location where the log is written. default location is /var/log/messages
+ # log_dir = "/var/log/atune"
 
  #################################### database ###############################
  [database]

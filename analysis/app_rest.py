@@ -42,7 +42,7 @@ def main(filename):
     app_engine = AppRest()
     app_engine.startup_app(AtunedConfig.rest_host, AtunedConfig.rest_port, AtunedConfig.rest_tls,
                            AtunedConfig.rest_server_cert, AtunedConfig.rest_server_key,
-                           AtunedConfig.rest_ca_file, AtunedConfig.level)
+                           AtunedConfig.rest_ca_file, AtunedConfig.level, AtunedConfig.log_dir)
 
 
 if __name__ == '__main__':
