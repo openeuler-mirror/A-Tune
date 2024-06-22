@@ -1,0 +1,19 @@
+project: "ceph"
+engine: "gbrt"
+iterations: 30
+random_starts: 2
+
+benchmark : "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/ceph_benchmark.sh"
+evaluations :
+    -
+        name: "bandwidth"
+        info:
+            get: "echo '$out' |grep 'bandwidth_val'| awk '{print $3}'"
+            type: "negative"
+            weight: 50
+    -
+        name: "iops_val"
+        info:
+            get: "echo '$out' |grep 'iops_val'| awk '{print $3}'"
+            type: "negative"
+            weight: 50
