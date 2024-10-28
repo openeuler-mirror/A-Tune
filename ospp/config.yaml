@@ -1,0 +1,60 @@
+api_key: "your_api_key_here"
+preknowledge_path: '/root/A-Tune/preknowledge.txt'
+log_file_path: '/var/log/messages'
+parameters:
+  - name: 'net.core.netdev_max_backlog'
+    info:
+      scope: [1000, 100000]
+      step: 1000
+      items: null
+      dtype: int
+  - name: 'net.ipv4.tcp_keepalive_time'
+    info:
+      scope: [600, 36000]
+      step: 600
+      items: null
+      dtype: int
+  - name: 'net.core.rmem_max'
+    info:
+      scope: [1048576, 67108864]
+      step: 1048576
+      items: null
+      dtype: int
+  - name: 'net.core.wmem_max'
+    info:
+      scope: [1048576, 67108864]
+      step: 1048576
+      items: null
+      dtype: int
+  - name: 'net.ipv4.tcp_tw_reuse'
+    info:
+      options: ['0', '1', '2']
+      dtype: str
+  - name: 'net.ipv4.ip_local_port_range'
+    info:
+      options: ['32768 60999', '1024 65535', '8192 65535']
+      dtype: str
+  - name: 'net.ipv4.tcp_max_tw_buckets'
+    info:
+      scope: [32768, 1048576]
+      step: 32768
+      items: null
+      dtype: int
+  - name: 'net.core.somaxconn'
+    info:
+      scope: [128, 65536]
+      step: 128
+      items: null
+      dtype: int
+  - name: 'net.ipv4.tcp_max_syn_backlog'
+    info:
+      scope: [1024, 262144]
+      step: 1024
+      items: null
+      dtype: int
+  - name: 'net.ipv4.tcp_fin_timeout'
+    info:
+      scope: [1, 120]
+      step: 1
+      items: null
+      dtype: int
