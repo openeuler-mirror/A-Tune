@@ -25,8 +25,8 @@ yum install -y atune-engine
 
 **注：** 直接安装后尝试执行`systemctl start atuned`会出现报错信息，原因是未配置认证证书，解决方法如下：
 1. 配置证书，使用https安全连接
- - 生成服务端和客户端的证书文件，并
- - 修改`/etc/atuned/atuned.cnf`中的60 ~ 62行、67 ~ 69行为证书文件的绝对路径，同时
+ - 生成服务端和客户端的证书文件
+ - 修改`/etc/atuned/atuned.cnf`中的60 ~ 62行、67 ~ 69行为证书文件的绝对路径
  - 修改`/etc/atuned/engine.cnf`中的23 ~ 25行为证书的绝对路径
  - 相关证书生成方式可参考代码仓中`Makefile`文件的"restcerts"和"enginecerts"
 2. 取消证书认证，使用http非安全连接
