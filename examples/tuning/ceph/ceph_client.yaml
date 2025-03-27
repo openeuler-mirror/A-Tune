@@ -3,7 +3,7 @@ engine: "gbrt"
 iterations: 30
 random_starts: 2
 
-benchmark : "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/ceph_benchmark.sh"
+benchmark : "sh PATH/ceph_benchmark.sh"
 evaluations :
     -
         name: "bandwidth"

@@ -7,7 +7,7 @@ object :
         name : "ceph.rbd_op_threads"
         info :
             desc : "The number of worker threads in the RBD client's thread pool."
-            get : "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh rbd_op_threads"
+            get : "sh PATH/get_ceph_param_info.sh rbd_op_threads"
             set : "ceph tell osd.* injectargs --rbd_op_threads ${value}"
             needrestart : "false"
             type : "discrete"
@@ -49,7 +49,7 @@ object :
         name : "filestore_max_sync_interval"
         info :
             desc : "maximum synchronization interval for logs to data disk"
-            get : "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh filestore_max_sync_interval"
+            get : "sh PATH/get_ceph_param_info.sh filestore_max_sync_interval"
             set : "ceph tell osd.* injectargs --filestore_max_sync_interval ${value}"
             needrestart : "false"
             type : "discrete"
@@ -63,7 +63,7 @@ object :
         name : "osd_map_cache_size"
         info :
             desc : "The cache for retaining the OSD map (in megabytes)."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_map_cache_size"
+            get: "sh PATH/get_ceph_param_info.sh osd_map_cache_size"
             set: "ceph tell osd.* injectargs --osd_map_cache_size ${value}"
             needrestart: "false"
             type: "discrete"
@@ -76,7 +76,7 @@ object :
         name: "filestore_min_sync_interval"
         info:
             desc: "minimum synchronization interval for logs to data disk"
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh filestore_min_sync_interval"
+            get: "sh PATH/get_ceph_param_info.sh filestore_min_sync_interval"
             set: "ceph tell osd.* injectargs --filestore_min_sync_interval ${value}"
             needrestart: "false"
             type: "discrete"
@@ -90,7 +90,7 @@ object :
         name : "filestore_op_threads"
         info :
             desc : "Control the number of threads executing file system operations in parallel."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh filestore_op_threads"
+            get: "sh PATH/get_ceph_param_info.sh filestore_op_threads"
             set: "ceph tell osd.* injectargs --filestore_op_threads ${value}"
             needrestart : "false"
             type : "discrete"
@@ -103,7 +103,7 @@ object :
         name : "osd_map_cache_size"
         info :
             desc : "The cache for retaining the OSD map (in megabytes)."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_map_cache_size"
+            get: "sh PATH/get_ceph_param_info.sh osd_map_cache_size"
             set: "ceph tell osd.* injectargs --osd_map_cache_size ${value}"
             needrestart: "false"
             type: "discrete"
@@ -116,7 +116,7 @@ object :
         name : "osd_max_write_size"
         info :
             desc : "The maximum amount of data an OSD can write in one operation (in megabytes)."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_max_write_size"
+            get: "sh PATH/get_ceph_param_info.sh osd_max_write_size"
             set: "ceph tell osd.* injectargs --osd_max_write_size ${value}"
             needrestart: "false"
             type: "discrete"
@@ -129,7 +129,7 @@ object :
         name : "ceph.osd_pool_default_size"
         info :
             desc : "default number of copies"
-            get : "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_pool_default_size"
+            get : "sh PATH/get_ceph_param_info.sh osd_pool_default_size"
             set : "ceph tell osd.* injectargs --osd_pool_default_size ${value}"
             needrestart : "false"
             type : "discrete"
@@ -143,7 +143,7 @@ object :
         name : "osd_deep_scrub_stride"
         info :
             desc : "The number of bytes allowed to be read during a deep scrub (in bytes)."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_deep_scrub_stride"
+            get: "sh PATH/get_ceph_param_info.sh osd_deep_scrub_stride"
             set: "ceph tell osd.* injectargs --osd_deep_scrub_stride ${value}"
             needrestart: "false"
             type: "discrete"
@@ -156,7 +156,7 @@ object :
         name : "filestore_queue_max_bytes"
         info :
             desc : "Maximum number of operations accepted by the data disk."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh filestore_queue_max_bytes"
+            get: "sh PATH/get_ceph_param_info.sh filestore_queue_max_bytes"
             set: "ceph tell osd.* injectargs --filestore_queue_max_bytes ${value}"
             needrestart : "false"
             type : "discrete"
@@ -169,7 +169,7 @@ object :
         name : "osd_client_message_size_cap"
         info :
             desc : "The maximum amount of data allowed by the client in memory (in bytes)."
-            get: "sh /root/workspace/A-Tune/A-Tune/examples/tuning/ceph/get_ceph_param_info.sh osd_client_message_size_cap"
+            get: "sh PATH/get_ceph_param_info.sh osd_client_message_size_cap"
             set: "ceph tell osd.* injectargs --osd_client_message_size_cap ${value}"
             needrestart: "false"
             type: "discrete"

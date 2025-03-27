@@ -1,5 +1,7 @@
 #!/bin/sh
 
+yum install -y jq
+
 path=$(
     cd "$(dirname "$0")"
     pwd
