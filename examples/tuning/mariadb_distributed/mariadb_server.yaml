@@ -1,0 +1,215 @@
+project: "mariadb"
+maxiterations: 100
+startworkload: "sh PATH/start_maraidb.sh"
+stopworkload: "sh PATH/stop_maraidb.sh"
+object : 
+  -
+    name : "mariadb.key_buffer_size"
+    info :
+        desc : "Index parameters of the myisam storage engine"
+        get : "sh PATH/get_mariadb_param_info.sh key_buffer_size"
+        set : "sh PATH/set_mariadb_param_info.sh key_buffer_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 1048576
+          - 53687091
+        step : 5048576
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.max_allowed_packet"
+    info :
+        desc : "Maximum number of received packets"
+        get : "sh PATH/get_mariadb_param_info.sh max_allowed_packet"
+        set : "sh PATH/set_mariadb_param_info.sh max_allowed_packet $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10485760
+          - 104857600
+        step : 5048576
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.table_open_cache"
+    info :
+        desc : "Table cache for storing data"
+        get : "sh PATH/get_mariadb_param_info.sh table_open_cache"
+        set : "sh PATH/set_mariadb_param_info.sh table_open_cache $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 16000
+          - 1000000
+        step : 50000
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.back_log"
+    info :
+        desc : "The number of new requests stored in the stack"
+        get : "sh PATH/get_mariadb_param_info.sh back_log"
+        set : "sh PATH/set_mariadb_param_info.sh back_log $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 500
+          - 4096
+        dtype : "int"
+  -
+    name : "mariadb.sort_buffer_size"
+    info :
+        desc : "Cache used for sorting"
+        get : "sh PATH/get_mariadb_param_info.sh sort_buffer_size"
+        set : "sh PATH/set_mariadb_param_info.sh sort_buffer_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 2560000
+          - 10485760
+        step : 102400
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.read_buffer_size"
+    info :
+        desc : "the buffer allocated to each thread during sequential table scanning."
+        get : "sh PATH/get_mariadb_param_info.sh read_buffer_size"
+        set : "sh PATH/set_mariadb_param_info.sh read_buffer_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10240000
+          - 104857600
+        step : 1024000
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.read_rnd_buffer_size"
+    info :
+        desc : "the buffer allocated to each thread when the table is read randomly"
+        get : "sh PATH/get_mariadb_param_info.sh read_rnd_buffer_size"
+        set : "sh PATH/set_mariadb_param_info.sh read_rnd_buffer_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10240000
+          - 104857600
+        step : 1024000
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.thread_cache_size"
+    info :
+        desc : "Number of threads saved in the cache that are reused"
+        get : "sh PATH/get_mariadb_param_info.sh thread_cache_size"
+        set : "sh PATH/set_mariadb_param_info.sh thread_cache_size $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 8
+          - 500
+        dtype : "int"
+  -
+    name : "mariadb.max_connections"
+    info :
+        desc : "the max number of connections"
+        get : "sh PATH/get_mariadb_param_info.sh max_connections"
+        set : "sh PATH/set_mariadb_param_info.sh max_connections $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 300
+          - 1500
+        dtype : "int"
+  -
+    name : "mariadb.max_heap_table_size"
+    info :
+        desc : "size of a memory table that can be created"
+        get : "sh PATH/get_mariadb_param_info.sh max_heap_table_size"
+        set : "sh PATH/set_mariadb_param_info.sh max_heap_table_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10240000
+          - 104857600
+        step : 1024000
+        items : 
+        dtype : "int"  
+  -
+    name : "mariadb.innodb_log_buffer_size"
+    info :
+        desc : "size of innodb log buffer"
+        get : "sh PATH/get_mariadb_param_info.sh innodb_log_buffer_size"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_log_buffer_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 10485760
+          - 104857600
+        step : 1048576
+        items : 
+        dtype : "int"
+  -
+    name : "mariadb.innodb_write_io_threads"
+    info :
+        desc : "size of innodb log buffer"
+        get : "sh PATH/get_mariadb_param_info.sh innodb_write_io_threads"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_write_io_threads $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 4
+          - 16 
+        dtype : "int"
+  -
+    name : "mariadb.innodb_read_io_threads"
+    info :
+        desc : "size of innodb log buffer"
+        get : "sh PATH/get_mariadb_param_info.sh innodb_read_io_threads"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_read_io_threads $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 4
+          - 16 
+        dtype : "int"
+  -
+    name : "innodb_buffer_pool_size"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_buffer_pool_size'."
+        get : "sh PATH/get_mariadb_param_info.sh innodb_buffer_pool_size"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_buffer_pool_size $value"
+        needrestart : "true"
+        type : "discrete"
+        scope :
+          - 21474836480
+          - 26843545600
+        step : 1073741824
+        items :
+        dtype : "int"
+  -
+    name : "innodb_buffer_pool_instances"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_buffer_pool_instances'."
+        get : "sh PATH/get_mariadb_param_info.sh innodb_buffer_pool_instances"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_buffer_pool_instances $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 1
+          - 8
+        dtype : "int"
+  -
+    name : "innodb_io_capacity"
+    info :
+        desc : "MySQL [mysqld] parameters 'innodb_io_capacity'."
+        get : "sh PATH/get_mariadb_param_info.sh innodb_io_capacity"
+        set : "sh PATH/set_mariadb_param_info.sh innodb_io_capacity $value"
+        needrestart : "true"
+        type : "continuous"
+        scope :
+          - 100
+          - 2000
+        dtype : "int"
