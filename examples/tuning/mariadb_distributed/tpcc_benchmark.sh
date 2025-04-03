@@ -60,4 +60,6 @@ wait $slave2_pid
 wait $master_pid
 
 total=$(awk '$1 == "average" { total += $3 } END { print total }' mariadb.log)
+total=$(printf "%.0f" "$total")
+
 echo $total > mariadb_tpmc.out
