@@ -30,8 +30,9 @@ export PATH=$JAVA_HOME/bin:$PATH
 source ~/.bashrc
 ```
 
-该步骤在两台压力机上都要执行
+该步骤在两台压力机上都要执行，包括A-Tune源码也需要下载到相同的路径，否则可能无法远程执行另外一台压力机的benchmark。
 ## 1.4 部署A-Tune环境
+部署环境时，需要保证两台压力机上的源代码路径是一致的，下文给出的参考方法是两台压力机都到root目录下克隆仓库，也可以根据实际环境进行路径的更改，但都需要保证两个压力机中代码路径的一致，便于后续远程执行benchmark命令。
 具体安装启动方式参考A-Tune README-zh 文档第一节“安装A-Tune”,A-Tune仓库链接：https://gitee.com/openeuler/A-Tune
 
 ```bash
@@ -46,7 +47,6 @@ systemctl start atune-engine
 ```bash
 cd ~
 git clone https://gitee.com/openeuler/A-Tune.git
-cd A-Tune/examples/tuning/mariadb_distributed
 ```
 进入目录A-Tune/examples/tuning/mariadb_distributed,并为tpcc创建目录
 ```bash
@@ -55,7 +55,7 @@ mkdir tpcc
 ```
 
 ## 1.5 tpcc部署
-两台压力机都需要部署
+两台压力机都需要部署，可以在一台压力机上配置完成后拷贝到另一台压力机上的相同路径。
 下载链接：
 https://master.dl.sourceforge.net/project/tpccruner/TPCCRunner_SRC_V1.00.zip?viasf=1
 ### 1.5.1 编译
@@ -68,8 +68,8 @@ mkdir log
 javac -d bin src/iomark/TPCCRunner/*.java
 ```
 ### 1.5.2 修改loader.properties文件
-在两台压力机上修改conf/example/mysql/loader.properties
-应手动修改对应测试机的ip，因为两台测试机中mariadb数据库中数据相似，因此这里的ip设置为其中一个测试机的ip即可
+在两台压力机上修改conf/example/mysql/loader.properties文件。
+应手动修改对应测试机的ip，一台压力机对应一台测试机。
 修改内容如下：
 ```bash
 driver=com.mysql.jdbc.Driver
@@ -130,10 +130,10 @@ masterAddress=127.0.0.1
 masterPort=27891
 
 driver=com.mysql.jdbc.Driver
-url=jdbc:mysql://9.82.179.1/hsdb
+url=jdbc:mysql://9.82.199.161/hsdb
 user=root
 #password=huawei
-poolSize=96
+poolSize=120
 
 userCount=100
 warehouseCount=500
@@ -154,10 +154,10 @@ skip-grant-tables
 ```
 ## 1.8 写入数据
 
-在两台测试机上执行，在解压后的tpcc目录，在数据库中创建数据
+在两台测试机上执行，下载TPCCRunner_SRC_V1.00.zip压缩包，解压后，在数据库中创建数据
 ```bash
-mysql -uroot -phuawei -vvv -n < sql/example/mysql/create_database.sql
-mysql -uroot -phuawei -vvv -n < sql/example/mysql/create_table.sql
+mysql -uroot -vvv -n < sql/example/mysql/create_database.sql
+mysql -uroot -vvv -n < sql/example/mysql/create_table.sql
 ```
 在两台压力机上执行,向数据库中加载数据
 ```bash
@@ -165,22 +165,24 @@ java -cp bin/:lib/mysql-connector-java-5.1.7-bin.jar iomark.TPCCRunner.Loader co
 ```
 在两台测试机上执行，在数据库中创建索引，加快查找速度
 ```bash
-mysql -uroot -phuawei -vvv -n < sql/example/mysql/create_index.sql
+mysql -uroot -vvv -n < sql/example/mysql/create_index.sql
 ```
 # 2.调优环境准备
 压力机相当于客户端节点
 ## 2.1 运行环境准备
-克隆A-Tune仓库
+进入A-Tune仓库
 ```bash
-cd ~
-git clone https://gitee.com/openeuler/A-Tune.git
 cd /root/A-Tune/examples/tuning/mariadb_distributed
 ```
 在压力机1上执行，运行prepare.sh脚本来替换调优文件中的路径，执行后还需输入压力机2的ip，和两台对应测试机的ip。
+在压力机1上执行后，可以使用scp命令拷贝到另一台压力机
 ```bash
 sh prepare.sh
 ```
-客户端ip相当于压力机ip，服务端ip相当于测试机ip，执行结果如下：
+本地执行命令的机器为client_ip_1，
+压力机2的为client_ip_2，
+两个mariadb数据库所在的测试机分别为server_ip_1、server_ip_2,
+执行结果如下：
 ```bash
 [root@localhost mariadb_distributed]# sh prepare.sh 
 path: /root/gitee/A-Tune/examples/tuning/mariadb_distributed
@@ -192,36 +194,14 @@ path: /root/gitee/A-Tune/examples/tuning/mariadb_distributed
 cp mariadb_server.yaml  to/etc/atuned/tuning
 finish prepare
 ```
-## 2.2 测试benchmark脚本能否正常运行
-在压力机1上的A-Tune/examples/tuning/mariadb_distributed目录下执行tpcc_benchmark.sh脚本，测试benchmark能否在调优环境中运行：
-```bash
-sh tpcc_benchmark.sh
-```
-可以通过观察mariadb.log,slave1.log,slave2.log日志文件来查看benchmark运行过程
-```bash
-tail -f tpcc/mariadb.log
-tail -f tpcc/slave1.log
-tail -f tpcc/slave2.log
-```
-## 2.3 测试benchmark脚本在远程机器上能否正常运行
-在压力机1上的A-Tune/examples/tuning/mariadb_distributed目录下执行tmp-remote.sh脚本，测试benchmark能否在调优环境中运行：
-```bash
-sh tmp-remote.sh
-```
-在压力机2上，A-Tune/examples/tuning/mariadb_distributed目录下可以观察mariadb.log,slave1.log,slave2.log日志文件来查看benchmark运行过程
-```bash
-tail -f tpcc/mariadb.log
-tail -f tpcc/slave1.log
-tail -f tpcc/slave2.log
-```
-## 2.4 运行总的benchmark脚本（可选）
-在压力机1上运行mariadb_benchmark.sh，该脚本同时进行本地和远程的benchmark运行，可以观察本地压力机mariadb.log日志来查看运行过程：
+
+## 2.2 运行总的benchmark脚本
+在压力机1上运行mariadb_benchmark.sh，该脚本同时进行本地和远程的benchmark运行，可以观察本地压力机debug_tpcc1.log日志、tpcc目录下的mariadb.log日志来查看运行过程：
 ```bash
 sh mariadb_benchmark.sh
 ```
-该脚本正常运行后证明benchmark基线数据可以正常获取。
 
-## 2.5 atune调优
+## 2.3 atune调优
 atune-adm tuning 是 A-Tune 的调优命令，它会根据mariadb_client.yaml中的配置文件对mariadb数据库进行调优。会根据环境和性能数据自动选择合适的调优策略，优化集群的性能。调优过程中，可以通过查看mariadb.log、debug.log日志来确定服务是否正常执行：
 ```bash
 atune-adm tuning --project mariadb --detail mariadb_client.yaml
@@ -242,7 +222,7 @@ Best Performance: (tpmc=396916.00), Performance Improvement Rate: 3.95%
  The 1th evaluation value: (tpmc=396916.00)(3.95%)
 ```
 
-## 2.6 恢复原有的配置参数（可选）
+## 2.4 恢复原有的配置参数（可选）
 原始的参数配置文件为/var/atuned/ceph-tuning-restore.conf。
 可以先执行如下命令恢复调优前的环境配置：
 ```bash
@@ -250,7 +230,8 @@ atune-adm tuning --restore --project mariadb
 ```
 # 3.主要文件功能介绍
 ## set_mariadb_param_info.sh
-该脚本在mariadb_server.yaml中使用，获取测试机1中mariadb相关的参数值,用来进行本地调优。（因为测试机1和测试机2中生成的mariadb数据比较接近，因此用使用第一个测试机的数据来进行调优）
+该脚本在mariadb_server.yaml中使用，获取测试机1中mariadb相关的参数值,用来进行本地调优。（因为两台测试机硬件规格和环境比较相似，因此用使用第一个测试机的数据来进行调优即可）
+如果需要扩展为不同机器的mariadb下发参数不同，可以扩展该脚本为两个参数，指定IP和参数名，用于给对应机器的参数进行下发。
 ```bash
 #!/bin/bash
 set -x
@@ -268,7 +249,7 @@ param=$1
 mysql -h SERVER_IP_1 -u root -e "SHOW VARIABLES LIKE '$1';" | grep -i "$1" | awk '{print $2}'
 ```
 ## set_mariadb_param_info.sh
-该脚本在mariadb_server.yaml中使用，分发获取到的mariadb调优参数到各个测试机中，提升mariadb服务的性能。
+该脚本用于下发参数到mariadb测试机节点，设置一对参数和值之后会将两个测试机节点设置相同的参数值，若需要多台机器设置不同的值此脚本需额外扩展一个参数IP用于指定对应机器进行参数下发
 ```bash
 #!/bin/bash
 set -x
@@ -289,7 +270,7 @@ ssh -q root@SERVER_IP_1 "bash -c 'grep -q \"^$param\" /etc/my.cnf && sed -i \"s/
 ssh -q root@SERVER_IP_2 "bash -c 'grep -q \"^$param\" /etc/my.cnf && sed -i \"s/^$param.*/$param = $value/g\" /etc/my.cnf || echo \"$param = $value\" >> /etc/my.cnf'"
 ```
 ## mariadb_benchmark.sh
-该脚本是总的benchmark执行脚本，用于获取基线数据，其中包含了本地执行benchmark和远程执行benchmark两个步骤。本地和远程执行benchmark脚本后会获取进程号，通过wait命令来保证同时结束。同时会将执行过程重定向到debug.log日志文件中。
+该脚本是整体的benchmark执行脚本，用于在两台压力机执行性能压测并汇总结果到压力机1上。tpcc_benchmark.sh为本地执行benchmark脚本，remote_benchmark.sh为远程执行另一台压力机的脚本，该脚本会阻塞进程直到所有机器执行完benchmark结果并输出到mariadb_tpmc.out文件，最终通过get_tpmc.sh脚本将结果求和得到最终tpmc指标反馈给atune。
 
 ```bash
 #!/bin/bash
@@ -305,7 +286,7 @@ wait $local
 wait $remote
 ```
 ## tpcc_benchmark.sh
-该脚本用来进行本地benchmark基线运行，主要是运行基于java的tpcc基准测试程序。三条命令执行后会将结果重定向mariadb.log、slave1.log、slave2.log日志文件中，可以通过观察该日志文件来获取执行信息。
+该脚本用来执行本地benchmark，基于tpcc-runner基准测试程序进行压测。命令执行后会将结果重定向mariadb.log、slave1.log、slave2.log日志文件中，可以通过观察该日志文件来获取执行信息。
 ```bash
 #!/bin/bash
 set -x
@@ -372,7 +353,7 @@ total=$(awk '$1 == "average" { total += $3 } END { print total }' mariadb.log)
 echo $total > mariadb_tpmc.out
 ```
 ## remote_benchmark.sh
-该脚本用来在远程执行压力机2的benchmark基线，需要保证远程压力机的路径和当前环境的中的路径一致，
+该脚本用来在远程执行压力机2的benchmark，需要保证远程压力机的路径和当前环境的中的路径一致。
 ```bash
 #!/bin/bash
 
