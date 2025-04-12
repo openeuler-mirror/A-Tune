@@ -202,15 +202,8 @@ class AppCharacterization(WorkloadCharacterization):
         :param feature_selection:  whether to perform feature extraction
         :param consider_perf: whether to consider perf indicators
         """
-        if consider_perf == None:
-            consider_perf = self.consider_perf
-            
-        data_features = self.get_consider_perf(consider_perf)
-        
         cpu_exist, mem_exist, net_quality_exist, net_io_exist, disk_io_exist = self.bottleneck.search_bottleneck(data)
         bottleneck_binary = (int(cpu_exist) << 4) | (int(mem_exist) << 3) | (int(net_quality_exist) << 2) | (int(net_io_exist) << 1) | int(disk_io_exist)
-
-        data = data[data_features]
 
         tencoder_path = os.path.join(self.model_path, "tencoder.pkl")
         aencoder_path = os.path.join(self.model_path, "aencoder.pkl")
@@ -225,6 +218,13 @@ class AppCharacterization(WorkloadCharacterization):
 
         type_model_clf = joblib.load(type_model_path)
         app_model_clf = joblib.load(app_model_path)
+
+        if consider_perf is None: 
+            consider_perf = (len(self.scaler.mean_) == len(data.columns))
+
+        data_features = self.get_consider_perf(consider_perf)
+
+        data = data[data_features]
 
         data = self.scaler.transform(data)
 
