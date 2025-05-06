@@ -1,0 +1,39 @@
+{"param_name": "kernel.sched_min_granularity_ns", "content": "kernel.sched_min_granularity_ns参数可能需要调整在以下情况：当系统负载极高，CPU调度粒度过小导致上下文切换频繁，影响性能时；或者在追求更精细的任务调度，减少任务切换延迟的场景下。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_wakeup_granularity_ns", "content": "kernel.sched_wakeup_granularity_ns参数可能需要调整在以下情况：当系统负载极高，频繁的轻量级唤醒导致调度开销增加，或者在对实时性要求严格的任务中，为了提高唤醒效率和任务响应时间时。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_child_runs_first", "content": "当系统负载较高，且CPU资源分配偏向于父进程而非子进程时，可能需要调整kernel.sched_child_runs_first参数以优化子进程的调度，提升整体系统响应速度和并发处理能力。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_latency_ns", "content": "kernel.sched_latency_ns 参数可能需要调整在以下情况：当系统面临高并发负载，导致任务调度延迟增加，影响服务响应时间，或者在需要优化实时性要求高的任务处理时，为了减少任务切换时延，以提升整体系统性能。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_tunable_scaling", "content": "kernel.sched_tunable_scaling 参数可能需要调整在以下情况：当系统的负载变化频繁，导致调度算法效率下降，影响到应用程序响应时间时；多核处理器环境中，为了优化CPU间任务调度的动态平衡；以及在需要最大化系统整体性能，同时避免过度调度导致的CPU利用率不均时。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_migration_cost_ns", "content": "当系统负载较高，频繁发生进程迁移导致性能下降，或者在分布式架构中存在大规模数据传输时，可能需要调整kernel.sched_migration_cost_ns参数以优化调度效率和资源利用。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_nr_migrate", "content": "kernel.sched_nr_migrate参数在系统中处理大量进程迁移，如负载均衡或虚拟机调度时，如果出现性能瓶颈、延迟增加或者资源分配不均，可能需要调整此参数以优化进程迁移效率。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_expire_centisecs", "content": "当系统频繁发生内存交换（脏页过多），导致磁盘I/O压力增大，应用响应速度下降时，可能需要调整vm.dirty_expire_centisecs参数来优化缓存策略，以平衡内存和磁盘的使用效率。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_background_ratio", "content": "当系统内存使用率持续高位，频繁发生内存交换到磁盘（swap-in），导致系统性能下降时，可能需要调整vm.dirty_background_ratio参数以优化内存管理，防止过多的脏页留在内存中影响整体响应速度。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_background_bytes", "content": "当系统内存使用率持续高位，频繁发生页面交换导致磁盘I/O压力增大，应用性能下降时，可能需要调整vm.dirty_background_bytes参数以优化内存管理，减少后台写脏数据到磁盘的行为，从而提升系统响应速度。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_ratio", "content": "当系统频繁发生内存交换（Dirty Pages），导致磁盘I/O压力增大，应用性能下降时，可能需要调整vm.dirty_ratio参数。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_bytes", "content": "当系统频繁发生内存交换（Dirty Bytes，即被写入到交换空间的内存量增加），导致性能下降或磁盘I/O压力增大时，可能需要调整vm.dirty_bytes参数。", "boottlneck_type": "system"}
+{"param_name": "vm.dirty_writeback_centisecs", "content": "当系统频繁发生内存交换（Dirty Pages），导致写回脏数据到磁盘的I/O压力增大，影响整体性能时，可能需要调整vm.dirty_writeback_centisecs参数，以优化数据写回策略，平衡内存使用和I/O负载。", "boottlneck_type": "system"}
+{"param_name": "vm.swappiness", "content": "当系统内存使用率持续较高，但应用程序仍需大量内存时，为了提高虚拟内存的利用效率，可以考虑调整 vm.swappiness 参数以牺牲部分 swap 空间来提升系统响应速度。", "boottlneck_type": "system"}
+{"param_name": "vm.vfs_cache_pressure", "content": "当系统中频繁进行大量文件读写操作，导致虚拟文件系统(VFS)缓存命中率下降，影响整体性能时，可能需要调整vm.vfs_cache_pressure参数以优化磁盘I/O性能。", "boottlneck_type": "system"}
+{"param_name": "vm.min_free_kbytes", "content": "当系统的内存使用率持续高位，导致系统性能下降，频繁触发swap交换，或者应用程序运行时出现内存不足错误（OOM Killer），此时可能需要调整vm.min_free_kbytes参数以保证足够的内存空间供内核预留，以防止因为最小空闲内存阈值过低引发的性能问题。", "boottlneck_type": "system"}
+{"param_name": "vm.watermark_scale_factor", "content": "当系统负载持续高位运行，CPU利用率超过阈值，且内存频繁交换导致性能下降时，可能需要调整vm.watermark_scale_factor参数以优化内存管理和调度。", "boottlneck_type": "system"}
+{"param_name": "vm.max_map_count", "content": "当系统面临大量内存映射文件、动态库加载或大数据处理，导致内存映射表满且影响性能时，需要调整vm.max_map_count参数以提高系统的内存映射能力。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.ip_local_port_range", "content": "当系统面临高并发连接压力，导致本地端口资源紧张，引发性能瓶颈或连接拒绝时，可能需要调整net.ipv4.ip_local_port_range参数以扩大可用的本地端口号范围，从而提高并发处理能力。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_thin_linear_timeouts", "content": "当系统中存在大量短连接且频繁建立与释放，导致TCP连接管理效率下降、服务器资源浪费或者性能瓶颈时，可能需要调整net.ipv4.tcp_thin_linear_timeouts参数。", "boottlneck_type": "system"}
+{"param_name": "net.core.somaxconn", "content": "当系统处理大量并发连接请求时，如果发现队列中的连接数持续增长，导致服务器响应变慢或者出现拒绝服务（Denial of Service, DoS）风险，就需要考虑调整net.core.somaxconn参数，以限制同时接受的最大连接数，以优化系统资源管理和防止资源耗尽。", "boottlneck_type": "system"}
+{"param_name": "net.core.rps_sock_flow_entries", "content": "当系统处理高并发连接，网络I/O瓶颈明显，且需要优化socket流控制以提高处理速度时，可能需要调整net.core.rps_sock_flow_entries参数。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_max_tw_buckets", "content": "当系统中存在大量TIME_WAIT状态的TCP连接，导致网络拥塞或者资源浪费时，可能需要调整net.ipv4.tcp_max_tw_buckets参数以优化套接字超时和重用策略。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_fin_timeout", "content": "当系统中存在大量TCP连接且频繁出现FIN(结束)包但超时未被正常关闭的情况，或者应用程序响应延迟，可能导致资源浪费时，可能需要调整net.ipv4.tcp_fin_timeout参数。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_sack", "content": "当系统中存在频繁的数据包丢失或者网络拥塞，导致应用性能下降，且使用TCP协议进行通信时，可能需要调整net.ipv4.tcp_sack参数以优化数据传输的可靠性和效率。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_tw_reuse", "content": "当系统中存在大量快速连接-断开（TIME_WAIT）状态的TCP连接，导致端口复用效率降低，影响服务性能或资源利用率时，可能需要调整net.ipv4.tcp_tw_reuse参数。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_max_syn_backlog", "content": "当系统面临高并发连接请求，导致TCP SYN队列堆积，引起网络拥塞或连接拒绝时，需要调整net.ipv4.tcp_max_syn_backlog参数以提高系统处理新连接的能力。", "boottlneck_type": "system"}
+{"param_name": "net.ipv4.tcp_synack_retries", "content": "当系统面临高并发连接请求，且出现频繁的SYN-ACK重传失败，导致连接建立速度变慢或者连接数受限时，可能需要调整net.ipv4.tcp_synack_retries参数以优化TCP连接处理性能。", "boottlneck_type": "system"}
+{"param_name": "vm.stat_interval", "content": "当系统负载高、频繁进行大量数据读写操作或者需要实时监控性能时，可能需要调整vm.stat_interval参数以提高系统资源统计的频率，以获得更及时的性能指标。", "boottlneck_type": "system"}
+{"param_name": "kernel.shmall", "content": "当系统内存资源紧张，进程间共享内存区域不足，导致系统性能下降或者出现段错误（segmentation fault）时，可能需要调整kernel.shmall参数以增大初始共享内存区大小。", "boottlneck_type": "system"}
+{"param_name": "kernel.shmmax", "content": "当系统内存资源紧张，进程间共享内存频繁且可能导致oom（out of memory）异常时，需要调整kernel.shmmax参数以限制共享内存的最大大小，以防止内存消耗过高影响整体系统稳定性。", "boottlneck_type": "system"}
+{"param_name": "kernel.shmmni", "content": "当系统处理大量并发线程或者内存密集型应用时，kernel.shmall和kernel.shmmni（共享内存的最大进程数）可能会达到上限，导致内存分配效率下降或出现错误，此时需要适当增加kernel.shmmni以优化内存管理，提高系统性能。", "boottlneck_type": "system"}
+{"param_name": "vm.overcommit_ratio", "content": "当系统资源紧张，内存被过度分配给其他进程导致性能下降，或者需要优化内存使用效率以提升虚拟内存的利用率时，可能需要调整vm.overcommit_ratio参数。", "boottlneck_type": "system"}
+{"param_name": "vm.zone_reclaim_mode", "content": "当系统资源紧张，内存分配频繁导致Zone（内存区域）不均衡，或者需要优化内存回收效率以提升整体性能时，可能需要调整vm.zone_reclaim_mode 参数。", "boottlneck_type": "system"}
+{"param_name": "vm.numa_stat", "content": "当系统中存在多核CPU架构并且中间件运行在非统一内存访问（NUMA）环境中，为了优化线程调度和内存访问效率，提高整体性能，可能需要调整vm.numa_stat参数。", "boottlneck_type": "system"}
+{"param_name": "vm.drop_caches", "content": "当系统内存压力大，频繁交换数据到磁盘导致性能下降时，可能需要调整vm.drop_caches参数来释放部分驻留内存量，通过主动清空部分页面缓存以缓解压力，提高系统响应速度。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_cfs_bandwidth_slice_us", "content": "kernel.sched_cfs_bandwidth_slice_us参数可能需要调整在以下情况：当系统负载较高，CPU分配给各个进程的时间片不均衡，导致某些服务响应延迟或者性能瓶颈出现时；或者在需要优化特定服务的CPU使用率，提升其运行效率，以保证整体系统资源利用率时。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_rt_runtime_us", "content": "当系统中的实时任务对响应时间有极高的要求，如嵌入式设备上的实时控制任务，或者在高并发场景下需要确保关键服务的低延迟，kernel.sched_rt_runtime_us 参数可能需要调整以优化实时任务的执行时间片，以保证其服务质量。", "boottlneck_type": "system"}
+{"param_name": "kernel.sched_autogroup_enabled", "content": "当系统负载较高，存在频繁的进程调度导致性能瓶颈，且发现与CPU亲和性相关的任务调度问题时，可能需要调整kernel.sched_autogroup_enabled参数以优化任务分组和资源分配。", "boottlneck_type": "system"}

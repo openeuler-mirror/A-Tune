@@ -1,9 +1,0 @@
-project: "nginx"
-maxiterations: 100
-startworkload: "/usr/sbin/nginx -c /etc/nginx/nginx.conf"
-stopworkload: "/usr/sbin/nginx -s stop; sleep 2"
-object : 
-  -
-    name : "nginx.access_log"
-  -
-    name : "nginx.error_log"
