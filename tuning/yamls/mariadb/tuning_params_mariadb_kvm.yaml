@@ -1,7 +1,0 @@
-project: "mariadb_kvm"
-maxiterations: 100
-startworkload: ""
-stopworkload: ""
-object : 
-  -
-    name : "vm.swappiness"

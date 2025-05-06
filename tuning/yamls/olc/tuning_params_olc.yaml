@@ -1,9 +1,0 @@
-project: "olc"
-maxiterations: 100
-startworkload: ""
-stopworkload: ""
-object : 
-  -
-    name : "net.core.rps_sock_flow_entries"
-  -
-    name : "prefetcher"

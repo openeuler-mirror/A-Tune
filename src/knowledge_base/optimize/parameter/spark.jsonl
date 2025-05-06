@@ -1,0 +1,9 @@
+{"param_name": "sql.files.maxPartitionBytes", "content": "在处理大数据文件时，如果Spark任务由于单个partition过大导致内存溢出或者性能下降，或者文件拆分不均衡影响并行计算效率时，需要进行调整。", "boottlneck_type": "spark"}
+{"param_name": "dynamicAllocation.maxExecutors", "content": "当Spark集群的资源利用率不均衡，任务处理速度波动较大，或者在应对大规模数据处理时需要提升并发执行能力，动态分配的最大执行器数量可能需要调整以优化工作负载分布和提高整体性能。", "boottlneck_type": "spark"}
+{"param_name": "executor.cores", "content": "当Spark应用程序在处理大规模数据或者并发任务时出现性能瓶颈，如执行时间过长、资源利用率低或者响应速度慢，以根据集群硬件资源和工作负载动态分配核心数，提高任务并行处理能力。", "boottlneck_type": "spark"}
+{"param_name": "sql.adaptive.maxNumPostShufflePartitions", "content": "当Spark在处理大规模数据集或者执行复杂的SQL查询时，如果发现任务分解后的post-shuffle分区过多导致内存消耗过大或性能瓶颈，或者由于网络带宽限制引起的数据传输延迟。", "boottlneck_type": "spark"}
+{"param_name": "executor.memory", "content": "需要调整的情况包括：当系统内存资源不足，导致Spark任务执行缓慢或者频繁触发内存溢出异常；处理大规模数据时，为了优化任务并行性和效率，提升计算性能；或者在分布式集群中，根据节点的实际内存大小动态调整，以充分利用硬件资源。", "boottlneck_type": "spark"}
+{"param_name": "executor.memoryOverhead", "content": "在Spark应用中，当任务执行器内存消耗频繁超过预期，导致内存溢出或者性能瓶颈时，需要调整以优化内存利用率，减少垃圾回收压力，提高整体集群效率。", "boottlneck_type": "spark"}
+{"param_name": "driver.cores", "content": "driver.cores参数在以下情况需要调整：当Spark应用的Driver进程需要处理大量数据或者并发任务时，为了提高任务调度和执行效率，需要增加可用的CPU核心数，以减少任务等待时间，避免资源瓶颈。然而，如果资源有限或者硬件性能不足，应适当减少此参数以防止内存溢出或性能下降。", "boottlneck_type": "spark"}
+{"param_name": "driver.memory", "content": "当Spark应用程序在运行时遇到内存瓶颈，导致任务失败或者性能下降，例如内存溢出错误、作业执行缓慢，以提供更多的内存资源来优化driver进程的性能。", "boottlneck_type": "spark"}
+{"param_name": "driver.memoryOve", "content": "在Spark应用程序的驱动程序内存消耗超过预期，导致任务调度或数据处理性能下降，内存不足时需要进行调整。", "boottlneck_type": "spark"}

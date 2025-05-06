@@ -1,1 +1,0 @@
-echo transactions: $RANDOM
