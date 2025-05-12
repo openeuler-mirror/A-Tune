@@ -19,6 +19,7 @@ def get_llm_response(prompt: str) -> str:
 
 def get_embedding(text: str) -> List[float]:
     data = {
+        "model": config["REMOTE_EMBEDDING_MODEL_NAME"],
         "texts": [text]
     }
     res = requests.post(url=config['REMOTE_EMBEDDING_ENDPOINT'], json=data, verify=False)

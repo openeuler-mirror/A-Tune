@@ -65,7 +65,8 @@ class KnobOptimizer(BaseOptimizer):
                         set_knob_cmd=set_knob_cmd | json.loads(line)
                 cmd_list = []
                 for knob in knobs:
-                    cmd_list.append(set_knob_cmd[knob])
+                    if konb in set_knob_cmd:
+                        cmd_list.append(set_knob_cmd[knob])
                 return False, self.get_bash_script(cmd_list)
             else:
                 pass
