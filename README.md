@@ -63,3 +63,7 @@ systemctl start sysstat
 export PYTHONPATH="`pwd`:$PYTHONPATH"
 python3 src/testmain.py
 ```
+
+### 常见问题解决
+
+见 [FAQ.md](./FAQ.md)
