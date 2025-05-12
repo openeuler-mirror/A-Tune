@@ -12,3 +12,5 @@ zhipuai==2.1.4.20230814
 requests==2.32.3
 langchain==0.3.4
 langchain-openai==0.2.3
+email-validator==2.2.0
+hpptx==0.27.2
