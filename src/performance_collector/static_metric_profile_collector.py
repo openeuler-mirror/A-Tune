@@ -3,7 +3,7 @@ import logging
 import json
 import re
 
-from src.performance_collector import static_profile_data
+from src.performance_collector import static_profile_collector
 from src.utils.shell_execute import cmd_pipeline, get_registered_cmd_funcs, SshClient
 from src.utils.thread_pool import ThreadPoolManager
 
@@ -22,7 +22,7 @@ class StaticMetricProfileCollector:
         self.sequential_pool = []
         self._add_tasks(
             # 获取这些模块所以注册的cmd parser接口，提交到线程池执行
-            static_profile_data
+            static_profile_collector
         )
 
     def _add_tasks(self, *args):
@@ -54,7 +54,7 @@ class StaticMetricProfileCollector:
 
 
 if __name__ == "__main__":
-    from utils.shell_execute import SshClient
+    from src.utils.shell_execute import SshClient
     ssh_client = SshClient(
         host_ip="YOUR_IP",
         host_port=22,
