@@ -62,3 +62,39 @@ data: {"id":"chatcmpl-603","object":"chat.completion.chunk","created":1747040993
 
 data: {"id":"chatcmpl-603","object":"chat.completion.chunk","created":1747040993,"model":"qwen2:72b","system_fingerprint":"fp_ollama","choices":[{"index":0,"delta":{"role":"assistant","content":"系统"},"finish_reason":null}]}
 ```
+
+2. 运行时，报错 `ValueError: Found array with 0 feature(s) (shape=(39, 0)) while a minimum of 1 is required by the normalize function.`
+
+错误栈：
+```
+Building index for system.jsonl...: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 39/39 [00:19<00:00,  1.99it/s]
+Traceback (most recent call last):
+  File "/root/workspace/eulercopilot/A-Tune/src/testmain.py", line 36, in <module>
+    plan, isfinish, feedback = testKnob.run()
+                               ^^^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/src/performance_optimizer/base_optimizer.py", line 155, in run
+    is_execute, optimization_plan = self.think(history=record)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/src/performance_optimizer/knob_optimizer.py", line 56, in think
+    knobs = rag.run()
+            ^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/src/utils/rag/knob_rag.py", line 154, in run
+    system_index, system_docs = self.build_index("system")
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/src/utils/rag/knob_rag.py", line 109, in build_index
+    normalized_embeddings = normalize(np.array(embeddings).astype('float32'))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/venv/lib64/python3.11/site-packages/sklearn/utils/_param_validation.py", line 213, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/venv/lib64/python3.11/site-packages/sklearn/preprocessing/_data.py", line 1933, in normalize
+    X = check_array(
+        ^^^^^^^^^^^^
+  File "/root/workspace/eulercopilot/A-Tune/venv/lib64/python3.11/site-packages/sklearn/utils/validation.py", line 1096, in check_array
+    raise ValueError(
+ValueError: Found array with 0 feature(s) (shape=(39, 0)) while a minimum of 1 is required by the normalize function.
+```
+原因：embedding 接口不匹配。
+
+解决方法：更新 REMOTE_EMBEDDING_ENDPOINT 配置为匹配的 embedding 接口 url。
+
