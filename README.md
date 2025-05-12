@@ -46,6 +46,7 @@ UVICORN_PORT: 8100
 
 REMOTE_EMBEDDING_ENDPOINT: "https://open.bigmodel.cn/api/paas/v4/embeddings"
 
+LLM_KEY: "any"
 LLM_URL: "http://9.82.33.59:11434/v1"
 LLM_MODEL_NAME: "qwen2:72b"
 LLM_MAX_TOKENS: "4096"
