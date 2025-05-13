@@ -103,7 +103,7 @@ value是可调参数的推荐取值，请根据上面的环境配置信息给出
 
 
 if __name__ == "__main__":
-    from src.utils.config import config
+    from src.config import config
     ssh_client = SshClient(
         host_ip=config["servers"][0]["ip"],
         host_port=22,

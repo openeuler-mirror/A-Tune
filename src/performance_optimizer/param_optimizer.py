@@ -117,7 +117,7 @@ class ParamOptimizer:
 
 
 if __name__ == "__main__":
-    from src.utils.config import config
+    from src.config import config
     ssh_client = SshClient(
         host_ip=config["servers"][0]["ip"],
         host_port=22,
