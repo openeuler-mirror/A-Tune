@@ -44,6 +44,7 @@ servers:
 UVICORN_IP: "0.0.0.0"
 UVICORN_PORT: 8100
 
+REMOTE_EMBEDDING_MODEL_NAME: "bge-m3"
 REMOTE_EMBEDDING_ENDPOINT: "https://open.bigmodel.cn/api/paas/v4/embeddings"
 
 LLM_KEY: "any"
