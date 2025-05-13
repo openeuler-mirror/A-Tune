@@ -14,6 +14,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         self.memory_analyzer = MemoryAnalyzer(data=self.data.get("Memory", {}))
         self.network_analyzer = NetworkAnalyzer(data=self.data.get("Network", {}))
         self.mysql_analyzer = MysqlAnalyzer(data=self.data.get("Mysql", {}))
+        self.thread_pool = ThreadPoolManager(max_workers=5)
     
     def analyze(
         self,
@@ -63,13 +64,26 @@ class PerformanceAnalyzer(BaseAnalyzer):
         return "UNKNOWN BOTTLENECKS" 
 
     def generate_report(self) -> Tuple[str, str]:
+        cpu_analyzer_task = self.thread_pool.add_task(self.cpu_analyzer.run)
+        disk_analyzer_task = self.thread_pool.add_task(self.disk_analyzer.run)
+        memory_analyzer_task = self.thread_pool.add_task(self.memory_analyzer.run)
+        network_analyzer_task = self.thread_pool.add_task(self.network_analyzer.run)
+        mysql_analyzer_task = self.thread_pool.add_task(self.mysql_analyzer.run)
+
+        self.thread_pool.run_all_task()
+        task_results = self.thread_pool.get_all_results()
+
+        report_results = {}
+        for task_result in task_results:
+            report_results[task_result.uuid] = task_result.result
+
         os_performance_report = ""
-        os_performance_report += self.cpu_analyzer.run()
-        os_performance_report += self.disk_analyzer.run()
-        os_performance_report += self.memory_analyzer.run()
-        os_performance_report += self.network_analyzer.run()
+        os_performance_report += report_results[cpu_analyzer_task]
+        os_performance_report += report_results[disk_analyzer_task]
+        os_performance_report += report_results[memory_analyzer_task]
+        os_performance_report += report_results[network_analyzer_task]
         app_performance_report = ""
-        app_performance_report += self.mysql_analyzer.run()
+        app_performance_report += report_results[mysql_analyzer_task]
         return os_performance_report, app_performance_report
     
     def run(self) -> Tuple[str, str]:

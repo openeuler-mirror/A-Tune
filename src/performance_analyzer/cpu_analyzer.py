@@ -4,29 +4,12 @@ from src.utils.thread_pool import ThreadPoolManager
 class CpuAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.thread_pool = ThreadPoolManager(max_workers=5)
     
     def analyze(self) -> str:
         report = "基于采集的系统指标, CPU初步的性能分析如下:\n"
-        # avg_load_report = self.avg_load_analysis()
-        # cpu_info_report = self.cpu_info_analysis()
-        # pid_info_report = self.pid_info_analysis()
-
-        self.thread_pool.add_task(self.avg_load_analysis)
-        self.thread_pool.add_task(self.cpu_info_analysis)
-        self.thread_pool.add_task(self.pid_info_analysis)
-
-        self.thread_pool.run_all_task()
-        task_results = self.thread_pool.get_all_results()
-
-        ask_results = []
-        for task_result in task_results:
-            if task_result.result.status_code == 0:
-                parsed_results.append(task_result.result.output)
-            else:
-                logging.error(f"error while execute task {task_result.func_name}, err_msg is {task_result.result.err_msg}")
-
-        (avg_load_report, cpu_info_report, pid_info_report) = ask_results
+        avg_load_report = self.avg_load_analysis()
+        cpu_info_report = self.cpu_info_analysis()
+        pid_info_report = self.pid_info_analysis()
 
         report += avg_load_report
         report += cpu_info_report
