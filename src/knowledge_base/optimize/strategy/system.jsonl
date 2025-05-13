@@ -1,0 +1,38 @@
+[
+    {
+        "策略名称": "禁用控制自动组调度特性", 
+        "策略是否可配置":"Y",
+        "优化步骤": "echo 0 > /proc/sys/kernel/sched_autogroup_enabled;sysctl -w kernel.sched_autogroup_enabled=0", 
+        "对应瓶颈点": "CPU-上下文切换/进程调度",
+        "功能说明": "控制自动组调度特性（Auto Group Scheduling）的启用与禁用。这个特性主要用于改进桌面（GUI）环境中进程的调度，以提供更好的响应性。该配置项一般在服务器场景默认关闭。",
+        "使用风险": "若设置为1，有可能对context1、pipe子项影响较大",
+        "使能状态检查":""
+    },
+    {
+        "策略名称": "使用numad服务优化NUMA内存访问", 
+        "策略是否可配置":"Y",
+        "优化步骤": "1. 安装numad包\n2. numad服务开启：systemctl start numad\n3. 配置 numad：根据需要修改 /etc/numad.conf 配置文件，以调整其行为。可以设置 NUMA 节点、内存使用阈值和其它参数。\n4. 绑定应用至 numad：在启动应用时，使用 numad 提供的 Mbind 特性，使应用程序能利用它的优化。可以通过以下命令行选项来实现：numad <your_application>  ", 
+        "对应瓶颈点": "MEM-内存访问时延",
+        "功能说明": "numad 是一个用于 NUMA（非一致性存储访问）架构下的内存分配的服务，旨在通过动态调整和优化内存使用来提高系统性能。\n1、自动内存分配：numad 会监控系统的内存使用情况，并自动将进程或线程的内存绑定到最合适的 NUMA 节点，最大限度地减少远程内存访问。 \n2、负载均衡：它能够分析系统上的负载，并在多个 NUMA 节点之间分配资源，以实现更好的性能和负载均衡。\n3、内存迁移：如果某个线程的内存块不再有效（例如，远程访问带来的延迟），numad 可以选择迁移该线程或进程的内存，以优化性能。",
+        "使用风险": "",
+        "使能状态检查":""
+    },
+    {
+        "策略名称": "CPU优化-调度策略",
+        "策略是否可配置": "Y",
+        "优化步骤": "echo 'performance' > /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor\n# 检查当前策略\ncat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor",
+        "对应瓶颈点": "CPU-调度延迟高",
+        "功能说明": "此策略通过以下方式优化CPU性能：\n1. 将CPU调节器设置为performance模式\n2. 禁用动态频率调整\n3. 使CPU始终以最高频率运行",
+        "使用风险": "可能导致：\n- CPU温度升高\n- 功耗增加\n- 不适合移动设备",
+        "使能状态检查": "grep 'performance' /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+    },
+    {
+        "策略名称": "网络优化-TCP缓冲区",
+        "策略是否可配置": "Y",
+        "优化步骤": "sysctl -w net.core.rmem_max=4194304\nsysctl -w net.core.wmem_max=4194304\nsysctl -p",
+        "对应瓶颈点": "NETWORK-吞吐量低",
+        "功能说明": "增大TCP缓冲区大小以提高网络吞吐量，特别适用于：\n- 大数据传输\n- 高延迟网络\n- 视频流服务",
+        "使用风险": "增加内存使用量，在内存受限的系统上可能：\n- 导致OOM killer被触发\n- 影响其他应用性能",
+        "使能状态检查": "sysctl net.core.rmem_max net.core.wmem_max"
+    }
+]
