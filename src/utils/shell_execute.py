@@ -16,7 +16,7 @@ cmds_registry = defaultdict(list)
 
 # 配置日志
 logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 
