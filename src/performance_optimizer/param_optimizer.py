@@ -64,7 +64,7 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        self.benchmark_callback(self.ssh_client)
+        return self.benchmark_callback(self.ssh_client)
 
     def apply_params(self, recommend_params):
         self.apply_params_callback(self.ssh_client, recommend_params)
