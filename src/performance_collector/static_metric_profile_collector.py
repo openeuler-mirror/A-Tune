@@ -48,7 +48,7 @@ class StaticMetricProfileCollector:
             if task_result.result.status_code == 0:
                 parsed_results[task_result.tag].update(task_result.result.output)
             else:
-                logging.error(f"error while execute task {task_result.func_name}, err_msg is {task_result.result.err_msg}")
+                logging.error(f"error while execute task {task_result.func_name}, err_msg is {task_result.err_msg}")
 
         return parsed_results
 
