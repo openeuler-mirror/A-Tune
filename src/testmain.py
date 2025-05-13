@@ -4,7 +4,7 @@ from src.performance_collector.metric_collector import MetricCollector
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_optimizer.knob_optimizer import KnobOptimizer
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
-from src.performance_collector.metric_profile_collector import MetricProfileCollector
+from src.performance_collector.static_metric_profile_collector import StaticMetricProfileCollector
 
 from src.utils.shell_execute import SshClient
 from src.config import config
@@ -29,7 +29,7 @@ ssh_client = SshClient(
 )
 
 logging.info(">>> 运行MetricProfileCollector：")
-metric_collector = MetricProfileCollector(
+metric_collector = StaticMetricProfileCollector(
     ssh_client=ssh_client,
     max_workers=5 
 )
