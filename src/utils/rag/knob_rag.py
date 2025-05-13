@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple, List
 import logging
 from sklearn.preprocessing import normalize
 from pathlib import Path
-from src.llm import get_llm_response, get_embedding
+from src.utils.llm import get_llm_response, get_embedding
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

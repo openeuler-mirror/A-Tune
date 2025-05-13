@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from abc import abstractmethod
 from typing import Dict, List, Any, Tuple
 from src.utils.shell_execute import remote_execute
-from src.llm import get_llm_response
+from src.utils.llm import get_llm_response
 import yaml
 import logging
 import os

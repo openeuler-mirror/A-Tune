@@ -1,4 +1,4 @@
-from src.llm import get_llm_response
+from src.utils.llm import get_llm_response
 from typing import Dict, Any
 from abc import ABC, abstractmethod
 
