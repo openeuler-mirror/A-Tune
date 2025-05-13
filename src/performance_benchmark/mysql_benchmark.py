@@ -17,5 +17,6 @@ def parse_mysql_sysbench(output: str) -> Dict:
         qps = match.group(1)
         return {"qps": qps}
     else:
+        print(output)
         raise RuntimeError("Failed to execute mysql benchmark")
 
