@@ -38,6 +38,7 @@ class ParamRecommender:
         # 静态指标
         self.static_profile = "\n".join(f"{k}: {v}" for k, v in static_profile.items())
         # 可调参数知识库
+        self.all_params = set()
         self.params_set = self.load_params_set()
         self.chunk_size = chunk_size
         self.performance_analysis_report = performance_analysis_report
@@ -47,6 +48,7 @@ class ParamRecommender:
         with open("./src/knowledge_base/params/mysql_params.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         for item in data:
+            self.all_params.add(item['name'])
             if item['info']['type'] == "discrete":
                 param_range = "、".join(list(map(str, item['info']['range'])))
             else:
@@ -57,7 +59,8 @@ class ParamRecommender:
     def run(self, history_result):
         resultset = {}
 
-        for i in range(0, len(self.params_set), self.chunk_size):
+        #for i in range(0, len(self.params_set), self.chunk_size):
+        for i in range(0, 2, self.chunk_size):
             cur_params_set = self.params_set[i : i + self.chunk_size]
             recommend_prompt = f"""
 # CONTEXT # 
@@ -78,7 +81,11 @@ class ParamRecommender:
             recommended_params = self.recommend(
                 history_result, optimized_idea, cur_params_set
             )
-            resultset.update(json_repair(recommended_params))
+            recommended_params_set = json_repair(recommended_params)
+            for param_name, param_value in recommended_params_set.items():
+                if param_name in self.all_params:
+                    resultset[param_name] = param_value
+
         return resultset
 
     def recommend(self, history_result, optimization_idea, cur_params_set):
@@ -95,8 +102,10 @@ class ParamRecommender:
 你可以调整的参数是：
 {params_set_str}
 请以json格式回答问题，key为可调参数名称，请根据上述的环境配置信息给出可调整的参数，若参数不相关则不要给出
-value是可调参数的推荐取值，请根据上面的环境配置信息给出可用的具体取值，不要给无法使用的参数取值。
-请勿给出除了json以外其他的回复。
+value是可调参数的推荐取值，请根据上面的环境配置信息给出合理的具体取值，请仔细确认各个值是否可以被mysql使用，避免设置后mysql无法启动。
+注意尽量避免设置不合理的值导致mysql出现死锁的情况。
+请注意若参数取值为数字类型，默认的单位为字节，请注意单位换算；若数字后面跟了单位，请使用字符串表示。
+请勿给出除了json以外其他的回复,切勿增加注释。
 """
         response = get_llm_response(prompt)
         return response
