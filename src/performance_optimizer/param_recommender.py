@@ -109,7 +109,7 @@ if __name__ == "__main__":
         delay=1.0,
     )
 
-    metric_collector = MetricProfileCollector(ssh_client=ssh_client, max_workers=5)
+    metric_collector = StaticMetricProfileCollector(ssh_client=ssh_client, max_workers=5)
 
     static_profile = metric_collector.run()
 
