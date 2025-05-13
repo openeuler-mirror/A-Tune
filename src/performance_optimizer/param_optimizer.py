@@ -95,6 +95,8 @@ class ParamOptimizer:
             # 达到预期效果，则退出循环
             if self.reached_goal(baseline, performance_result):
                 break
+            
+            last_result = performance_result
 
             history.append(
                 (
