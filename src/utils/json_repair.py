@@ -8,5 +8,8 @@ def json_repair(
     json_start = json_str.find('{')
     json_end = json_str.rfind('}') + 1
     json_str = json_str[json_start:json_end]
-    json_data = json.loads(json_str)
+    try:
+        json_data = json.loads(json_str)
+    except json.decoder.JSONDecodeError as e:
+        raise RuntimeError(f"failed to parse json, raw json_str is {json_str}")
     return json_data
