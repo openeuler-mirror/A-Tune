@@ -59,7 +59,7 @@ class ParamOptimizer:
         return self.slo_calc_callback(baseline, benchmark_result)
 
     def reached_goal(self, baseline, benchmark_result):
-        if self.improve_rate(baseline, benchmark_result) >= self.slo_goal:
+        if self.calc_improve_rate(baseline, benchmark_result) >= self.slo_goal:
             return True
         return False
 
