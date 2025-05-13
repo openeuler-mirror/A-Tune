@@ -3,6 +3,7 @@ import logging
 from src.performance_collector.metric_collector import MetricCollector
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_optimizer.knob_optimizer import KnobOptimizer
+from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.performance_collector.metric_profile_collector import MetricProfileCollector
 
 from src.utils.shell_execute import SshClient
