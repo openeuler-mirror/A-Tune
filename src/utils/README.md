@@ -4,15 +4,15 @@
 
 ```shell
 ├── __init__.py
-├── common.py						公共数据结构
-├── json_repair.py			从大模型回复中获取json
-├── llm.py							大模型统一接口调用模块
-├── metrics.py					指标定义和含义
+├── common.py			公共数据结构
+├── json_repair.py		从大模型回复中获取json
+├── llm.py			大模型统一接口调用模块
+├── metrics.py			指标定义和含义
 ├── rag
 │   ├── __init__.py			
-│   └── knob_rag.py			rag检索，推荐参数模块
+│   └── knob_rag.py		rag检索，推荐参数模块
 ├── shell_execute.py		远程执行命令模块
-└── thread_pool.py			线程池，用于批量并行执行任务
+└── thread_pool.py		线程池，用于批量并行执行任务
 ```
 
 
