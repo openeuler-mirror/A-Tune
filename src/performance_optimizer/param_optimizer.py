@@ -119,10 +119,10 @@ class ParamOptimizer:
 if __name__ == "__main__":
 
     ssh_client = SshClient(
-        host_ip="YOUR IP",
+        host_ip=config["servers"][0]["ip"],
         host_port=22,
         host_user="root",
-        host_password="YOUR PWD",
+        host_password=config["servers"][0]["password"],
         max_retries=3,
         delay=1.0,
     )
@@ -134,10 +134,10 @@ if __name__ == "__main__":
     print("正在采集负载信息...")
     app = "mysql"
     testCollector = MetricCollector(
-        host_ip="YOUR IP",
+        host_ip=config["servers"][0]["ip"],
         host_port=22,
         host_user="root",
-        host_password="YOUR PWD",
+        host_password=config["servers"][0]["password"],
         app=app,
     )
     data = testCollector.run()
