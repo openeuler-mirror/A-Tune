@@ -74,13 +74,14 @@ class ParamOptimizer:
         baseline = self.benchmark()
         # 保存每轮调优的结果，反思调优目标是否达到
         history = []
-        best_result = None
+        last_result = None
+        best_result = baseline
 
         for i in range(self.max_iterations):
-            ratio = self.calc_improve_rate(baseline, best_result)
+            ratio = self.calc_improve_rate(baseline, last_result)
 
             print(
-                f"[{i+1}/{self.max_iterations}] 最佳QPS：{best_result if best_result else baseline}, 性能提升：{ratio:.2%}"
+                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
             )
             # 未达成目标的情况下，根据调优结果与历史最优的参数，执行参数调优推荐，给出参数名和参数值
             recommend_params = self.param_recommender.run(history_result=history)
