@@ -5,6 +5,7 @@ from .network_analyzer import NetworkAnalyzer
 from .mysql_analyzer import MysqlAnalyzer
 from .base_analyzer import BaseAnalyzer
 from typing import Tuple
+from src.utils.thread_pool import ThreadPoolManager
 
 class PerformanceAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):

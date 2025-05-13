@@ -1,5 +1,4 @@
 from .base_analyzer import BaseAnalyzer
-from src.utils.thread_pool import ThreadPoolManager
 
 class CpuAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
