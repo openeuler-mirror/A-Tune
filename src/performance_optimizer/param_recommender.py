@@ -51,7 +51,7 @@ class ParamRecommender:
                 param_range = "、".join(item['info']['range'])
             else:
                 param_range = f"从{item['info']['range'][0]}到{item['info']['range'][1]}"
-            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']，}，参数的取值范围是：{param_range}")
+            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']}，参数的取值范围是：{param_range}")
         return params
 
     def run(self, history_result):
