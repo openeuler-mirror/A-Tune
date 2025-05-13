@@ -44,10 +44,14 @@ class ParamRecommender:
 
     def load_params_set(self):
         params = []
-        with open("./src/knowledge_base/params/mysql.json", "r", encoding="utf-8") as f:
+        with open("./src/knowledge_base/params/mysql_params.json", "r", encoding="utf-8") as f:
             data = json.load(f)
         for item in data:
-            params.append(f"{item['name']}:{item['info']['desc']}")
+            if item['info']['type'] == "discrete":
+                param_range = "、".join(item['info']['range'])
+            else:
+                param_range = f"从{item['info']['range'][0]}到{item['info']['range'][1]}"
+            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']，}，参数的取值范围是：{param_range}")
         return params
 
     def run(self, history_result):
@@ -99,12 +103,12 @@ value是可调参数的推荐取值，请根据上面的环境配置信息给出
 
 
 if __name__ == "__main__":
-
+    from src.utils.config import config
     ssh_client = SshClient(
-        host_ip="9.82.213.107",
+        host_ip=config["servers"][0]["ip"],
         host_port=22,
         host_user="root",
-        host_password="Huawei12#$",
+        host_password=config["servers"][0]["password"],
         max_retries=3,
         delay=1.0,
     )
@@ -115,10 +119,10 @@ if __name__ == "__main__":
 
     app = "mysql"
     testCollector = MetricCollector(
-        host_ip="YOUR IP",
+        host_ip=config["servers"][0]["ip"],
         host_port=22,
         host_user="root",
-        host_password="YOUR PWD",
+        host_password=config["servers"][0]["password"],
         app=app,
     )
     data = testCollector.run()

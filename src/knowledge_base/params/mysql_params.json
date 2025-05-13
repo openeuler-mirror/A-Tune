@@ -1,0 +1,849 @@
+[
+    {
+        "name": "innodb_adaptive_flushing",
+        "info": {
+            "desc": "该参数指定是否根据工作负载动态调整InnoDB缓冲池中脏页的刷新速率。启用自适应刷新机制可以提高性能，并缓解磁盘I/O瓶颈。取值为ON时启用自适应刷新，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_adaptive_flushing_lwm",
+        "info": {
+            "desc": "定义了自适应刷新启用时的低水位线，表示重做日志容量的百分比。增大此值可以提高写入性能，但可能会增加恢复时间，能够缓解磁盘IO瓶颈。默认值为10。",
+            "type": "continuous",
+            "range": [
+                0,
+                70
+            ],
+            "dtype": "int",
+            "default_value": 10
+        }
+    },
+    {
+        "name": "innodb_adaptive_hash_index",
+        "info": {
+            "desc": "自适应哈希索引是一种机制，允许InnoDB根据查询模式动态创建哈希索引，以加速查询。它可以缓解CPU瓶颈，提升查询性能。该参数取值为ON时启用，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_adaptive_hash_index_parts",
+        "info": {
+            "desc": "InnoDB自适应哈希索引的分区数量。增大此值可以提高哈希索引的性能，但可能会增加内存使用。可以缓解内存瓶颈。默认值为8，最大值为512，最小值为1。",
+            "type": "continuous",
+            "range": [
+                1,
+                512
+            ],
+            "dtype": "int",
+            "default_value": 8
+        }
+    },
+    {
+        "name": "innodb_adaptive_max_sleep_delay",
+        "info": {
+            "desc": "该参数允许InnoDB根据当前工作负载自动调整innodb_thread_sleep_delay的值。它定义了InnoDB在自适应最大睡眠延迟期间的最大延迟时间（以微秒为单位），可以帮助缓解CPU瓶颈，尤其是在高并发情况下。增大该值可以使InnoDB在等待锁时更长时间地休眠，从而减少CPU的使用率，减小该值则会使InnoDB更快地尝试获取锁。",
+            "type": "continuous",
+            "range": [
+                0,
+                1000000
+            ],
+            "dtype": "int",
+            "default_value": 150000
+        }
+    },
+    {
+        "name": "innodb_api_bk_commit_interval",
+        "info": {
+            "desc": "该参数定义了InnoDB memcached接口中空闲连接的自动提交时间间隔（以秒为单位）。增大该值可以减少提交操作的频率，从而帮助缓解CPU瓶颈，减小该值则会增加提交操作的频率，可能会影响性能。",
+            "type": "continuous",
+            "range": [
+                1,
+                1073741824
+            ],
+            "dtype": "int",
+            "default_value": 5
+        }
+    },
+    {
+        "name": "innodb_api_disable_rowlock",
+        "info": {
+            "desc": "该参数用于禁用InnoDB API在执行DML操作时的行锁定。设置为ON时禁用行锁定，设置为OFF时启用行锁定。禁用行锁定可能会导致性能下降，但在某些情况下可以帮助缓解CPU瓶颈。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_chunk_size",
+        "info": {
+            "desc": "该参数定义了InnoDB缓冲池的每个块的大小（以字节为单位）。增大该值可以减少块的数量，从而减少管理开销，减小该值则会增加块的数量，可能会提高并发性能。该参数对于缓解内存瓶颈非常重要。",
+            "type": "continuous",
+            "range": [
+                1048576,
+                "innodb_buffer_pool_size / innodb_buffer_pool_instances"
+            ],
+            "dtype": "int",
+            "default_value": 134217728
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_debug",
+        "info": {
+            "desc": "启用此选项允许在缓冲池大小小于1GB时使用多个缓冲池实例，忽略对`innodb_buffer_pool_instances`施加的1GB最小缓冲池大小限制。该选项仅在使用`WITH_DEBUG` CMake选项编译时可用。该参数用于启用或禁用InnoDB缓冲池的调试信息，帮助开发人员和DBA分析内存使用情况，主要影响内存瓶颈。取值为ON时启用调试，OFF时禁用调试。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_dump_at_shutdown",
+        "info": {
+            "desc": "指示是否在关闭时转储缓冲池的内容。启用此选项可以提高下次启动时的性能。取值为ON时启用，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "ON",
+                "OFF"
+            ],
+            "dtype": "string",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_dump_now",
+        "info": {
+            "desc": "该参数用于立即转储InnoDB缓冲池的内容到磁盘。它通常与参数innodb_buffer_pool_load_now结合使用，能够帮助缓解磁盘IO瓶颈，尤其是在重启后需要快速恢复数据时。取值为ON时表示立即转储，OFF时表示不转储。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "Boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_dump_pct",
+        "info": {
+            "desc": "该参数定义了在缓冲池转储时要转储的页面百分比。它指定了每个缓冲池中最近使用页面的百分比，以便在重启时更快地恢复数据。增大该值可以加快重启时的数据恢复速度，而减小该值则会减少转储的数据量，从而有助于缓解磁盘IO瓶颈。",
+            "type": "continuous",
+            "range": [
+                1,
+                100
+            ],
+            "dtype": "Integer",
+            "default_value": 25
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_filename",
+        "info": {
+            "desc": "指定缓冲池转储文件的名称，该文件保存由 `innodb_buffer_pool_dump_at_shutdown` 或 `innodb_buffer_pool_dump_now` 生成的表空间ID和页面ID列表。设置合适的文件名可以影响恢复性能，并有助于缓解磁盘IO瓶颈。建议使用默认值。",
+            "type": "discrete",
+            "range": [
+                "ib_buffer_pool"
+            ],
+            "dtype": "string",
+            "default_value": "ib_buffer_pool"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_instances",
+        "info": {
+            "desc": "设置缓冲池实例的数量，允许多个缓冲池实例并行处理请求，以提高性能。可以缓解内存瓶颈。建议在缓冲池大小大于1GB时使用多个实例。",
+            "type": "continuous",
+            "range": [
+                1,
+                64
+            ],
+            "dtype": "Integer",
+            "default_value": 8
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_in_core_file",
+        "info": {
+            "desc": "该参数指示是否将InnoDB缓冲池的内容写入核心转储文件。禁用该参数可以减少核心文件的大小，适用于故障排除。取值为ON时启用，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "Boolean",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_load_at_startup",
+        "info": {
+            "desc": "指示在MySQL服务器启动时，InnoDB缓冲池是否自动加载之前持有的页面，以提高启动性能。取值为ON时启用，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "ON",
+                "OFF"
+            ],
+            "dtype": "string",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_load_now",
+        "info": {
+            "desc": "该参数用于立即加载InnoDB缓冲池的内容，帮助缓解磁盘IO瓶颈，尤其在重启后需要快速恢复数据时。取值为ON时表示立即加载，OFF时表示不加载。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_buffer_pool_size",
+        "info": {
+            "desc": "设置InnoDB缓冲池的大小，缓冲池用于缓存数据和索引，以提高性能。增大该值可以减少磁盘I/O，提高读取性能，建议设置为系统内存的70%-80%。这是InnoDB最重要的参数之一，直接影响数据库的性能和响应速度。",
+            "type": "continuous",
+            "range": [
+                1048576,
+                {
+                    "64-bit": "18446744073709551615 (2^64-1)",
+                    "32-bit": "4294967295 (2^32-1)"
+                }
+            ],
+            "dtype": "int",
+            "default_value": 134217728
+        }
+    },
+    {
+        "name": "innodb_change_buffering",
+        "info": {
+            "desc": "该参数控制InnoDB如何缓冲对辅助索引的更改，优化写入操作，能够缓解磁盘I/O瓶颈。可选值包括：none（禁用）、inserts（仅插入）、deletes（仅删除）、changes（更改）、purges（清除）和all（全部）。",
+            "type": "discrete",
+            "range": [
+                "none",
+                "inserts",
+                "deletes",
+                "changes",
+                "purges",
+                "all"
+            ],
+            "dtype": "string",
+            "default_value": "all"
+        }
+    },
+    {
+        "name": "innodb_change_buffer_max_size",
+        "info": {
+            "desc": "该参数定义了InnoDB更改缓冲区的最大大小（以百分比表示），作为缓冲池总大小的一个百分比。增大该值可以提高写入性能，帮助缓解磁盘IO瓶颈，而减小该值则会限制更改缓冲区的大小，可能会影响性能。",
+            "type": "continuous",
+            "range": [
+                0,
+                50
+            ],
+            "dtype": "int",
+            "default_value": 25
+        }
+    },
+    {
+        "name": "innodb_checkpoint_disabled",
+        "info": {
+            "desc": "这是一个调试选项，用于禁用检查点机制，以强制在服务器退出时进行恢复。禁用检查点可能会导致性能下降，但在某些情况下可以提高写入性能，并缓解磁盘IO瓶颈。取值为ON时禁用，OFF时启用。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "string",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_checksum_algorithm",
+        "info": {
+            "desc": "指定如何生成和验证存储在InnoDB表空间磁盘块中的校验和，以确保数据完整性。可以缓解CPU瓶颈。可选值包括crc32、strict_crc32、innodb、strict_innodb、none和strict_none，建议使用crc32以获得较好的性能和安全性。",
+            "type": "discrete",
+            "range": [
+                "crc32",
+                "strict_crc32",
+                "innodb",
+                "strict_innodb",
+                "none",
+                "strict_none"
+            ],
+            "dtype": "string",
+            "default_value": "crc32"
+        }
+    },
+    {
+        "name": "innodb_commit_concurrency",
+        "info": {
+            "desc": "该参数控制同时提交的事务数量，允许多个线程并发提交以提高性能。适当调整此参数可以缓解CPU瓶颈，建议根据系统负载进行调整，通常设置为8或16。",
+            "type": "continuous",
+            "range": [
+                0,
+                1000
+            ],
+            "dtype": "int",
+            "default_value": 0
+        }
+    },
+    {
+        "name": "innodb_compression_level",
+        "info": {
+            "desc": "指定用于InnoDB压缩表和索引的zlib压缩级别。该参数控制数据压缩的强度，可以缓解磁盘IO瓶颈。取值范围为0（无压缩）到9（最大压缩），增大该值会增加CPU使用率，但可以减少磁盘空间的使用。",
+            "type": "discrete",
+            "range": [
+                0,
+                9
+            ],
+            "dtype": "int",
+            "default_value": 6
+        }
+    },
+    {
+        "name": "innodb_compression_pad_pct_max",
+        "info": {
+            "desc": "该参数定义了InnoDB压缩填充的最大百分比。它指定每个压缩页面中可以保留的最大空闲空间百分比。增大该值可以提高压缩效率，减小该值则可能会导致压缩效率下降，从而帮助缓解磁盘IO瓶颈。",
+            "type": "discrete",
+            "range": [
+                0,
+                75
+            ],
+            "dtype": "int",
+            "default_value": 50
+        }
+    },
+    {
+        "name": "innodb_concurrency_tickets",
+        "info": {
+            "desc": "该参数定义了InnoDB的并发票据数，决定了可以同时进入InnoDB的线程数量。增大该值可以提高并发性能，帮助缓解CPU瓶颈，而减小该值则可能导致性能下降。",
+            "type": "continuous",
+            "range": [
+                1,
+                4294967295
+            ],
+            "dtype": "int",
+            "default_value": 5000
+        }
+    },
+    {
+        "name": "innodb_ddl_threads",
+        "info": {
+            "desc": "该参数定义了InnoDB在执行DDL操作时可以使用的最大并行线程数。增大该值可以提高DDL操作的并发性，帮助缓解CPU瓶颈，而减小该值则可能导致性能下降。",
+            "type": "continuous",
+            "range": [
+                1,
+                64
+            ],
+            "dtype": "int",
+            "default_value": 4
+        }
+    },
+    {
+        "name": "innodb_default_row_format",
+        "info": {
+            "desc": "该参数定义了InnoDB表和用户创建的临时表的默认行格式。选择合适的行格式可以优化存储和性能，帮助缓解磁盘IO瓶颈。可选的行格式包括DYNAMIC、COMPRESSED、REDUNDANT和COMPACT。",
+            "type": "discrete",
+            "range": [
+                "REDUNDANT",
+                "COMPACT",
+                "DYNAMIC",
+                "COMPRESSED"
+            ],
+            "dtype": "enumeration",
+            "default_value": "DYNAMIC"
+        }
+    },
+    {
+        "name": "innodb_disable_sort_file_cache",
+        "info": {
+            "desc": "该参数用于禁用操作系统文件系统缓存，以便在进行合并排序的临时文件时提高性能。启用该参数（值为ON）可以帮助缓解磁盘IO瓶颈，而禁用缓存（值为OFF）可能会导致性能下降。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_doublewrite",
+        "info": {
+            "desc": "控制双写缓冲机制，以提高数据安全性。可以缓解磁盘IO瓶颈。MySQL 8.0.30及以上版本支持多种设置，取值为ON时启用，OFF时禁用，DETECT_AND_RECOVER和DETECT_ONLY用于检测和恢复。建议保持启用以防止数据丢失。",
+            "type": "discrete",
+            "range": [
+                "ON",
+                "OFF",
+                "DETECT_AND_RECOVER",
+                "DETECT_ONLY"
+            ],
+            "dtype": "enumeration",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_fast_shutdown",
+        "info": {
+            "desc": "控制InnoDB的快速关闭行为，影响关闭时的性能和数据安全性。可以缓解磁盘IO瓶颈。取值为0（完全关闭）、1（快速关闭）、2（最小关闭），建议使用1以平衡性能和安全性。",
+            "type": "discrete",
+            "range": [
+                0,
+                1,
+                2
+            ],
+            "dtype": "int",
+            "default_value": 1
+        }
+    },
+    {
+        "name": "innodb_file_per_table",
+        "info": {
+            "desc": "启用每个表使用独立的表空间文件，以提高管理灵活性和性能，能够缓解磁盘IO瓶颈。当取值为ON时启用，OFF时禁用。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_flushing_avg_loops",
+        "info": {
+            "desc": "该参数定义了InnoDB在平均循环中进行刷新操作的次数。它控制InnoDB保持之前计算的刷新状态快照的迭代次数，从而影响自适应刷新对变化工作负载的响应速度。增大该值可以减少刷新操作的频率，可能有助于缓解磁盘IO瓶颈，而减小该值则会增加刷新操作的频率，可能会影响性能。",
+            "type": "continuous",
+            "range": [
+                1,
+                1000
+            ],
+            "dtype": "int",
+            "default_value": 30
+        }
+    },
+    {
+        "name": "innodb_flush_log_at_trx_commit",
+        "info": {
+            "desc": "控制事务提交时日志的刷新策略，影响数据安全性和性能。取值为0（每秒刷新一次）、1（每次提交刷新）、2（每次提交写入内存）。建议根据数据安全性需求进行选择，适当调整可以缓解磁盘IO瓶颈。",
+            "type": "discrete",
+            "range": [
+                0,
+                1,
+                2
+            ],
+            "dtype": "int",
+            "default_value": 1
+        }
+    },
+    {
+        "name": "innodb_flush_method",
+        "info": {
+            "desc": "定义用于将数据刷新到InnoDB数据文件和日志文件的方法，这会影响I/O吞吐量。可以缓解磁盘I/O瓶颈。可选值包括fsync、O_DSYNC、littlesync、nosync、O_DIRECT、O_DIRECT_NO_FSYNC、unbuffered和normal。建议根据存储设备选择合适的刷新方法。",
+            "type": "discrete",
+            "range": [
+                "fsync",
+                "O_DSYNC",
+                "littlesync",
+                "nosync",
+                "O_DIRECT",
+                "O_DIRECT_NO_FSYNC",
+                "unbuffered",
+                "normal"
+            ],
+            "dtype": "String",
+            "default_value": [
+                "fsync",
+                "unbuffered"
+            ]
+        }
+    },
+    {
+        "name": "innodb_force_recovery",
+        "info": {
+            "desc": "该参数用于设置InnoDB的强制恢复模式，通常在严重故障排除情况下更改。它可以帮助在崩溃后恢复数据，主要影响磁盘IO瓶颈。取值范围为0到6，其中0表示正常模式，1到6表示不同级别的恢复模式，数值越大，恢复的限制越多。",
+            "type": "continuous",
+            "range": [
+                0,
+                6
+            ],
+            "dtype": "int",
+            "default_value": 0
+        }
+    },
+    {
+        "name": "innodb_ft_max_token_size",
+        "info": {
+            "desc": "该参数定义了InnoDB全文索引中最大令牌大小。它决定了可以被索引的单词的最大字符长度。增大该值可以允许更长的单词被索引，从而可能帮助缓解CPU瓶颈，减小该值则会限制索引的单词长度。",
+            "type": "continuous",
+            "range": [
+                10,
+                84
+            ],
+            "dtype": "int",
+            "default_value": 84
+        }
+    },
+    {
+        "name": "innodb_idle_flush_pct",
+        "info": {
+            "desc": "该参数限制了InnoDB在空闲时的页面刷新百分比。增大该值可以提高空闲时的刷新频率，从而帮助缓解磁盘IO瓶颈；减小该值则会减少空闲时的刷新频率，可能会影响性能。",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int",
+            "default_value": 100
+        }
+    },
+    {
+        "name": "innodb_io_capacity",
+        "info": {
+            "desc": "innodb_io_capacity变量定义了InnoDB后台任务可用的每秒I/O操作次数（IOPS）。该参数影响缓冲区刷新脏页的速率，建议根据存储设备的性能进行调整，通常设置为SAS 200，SSD 5000，PCI-E 10000-50000。",
+            "type": "continuous",
+            "range": [
+                100,
+                18446744073709551615
+            ],
+            "dtype": "int",
+            "default_value": 200
+        }
+    },
+    {
+        "name": "innodb_io_capacity_max",
+        "info": {
+            "desc": "innodb_io_capacity_max变量定义了InnoDB后台任务执行的最大I/O操作次数（IOPS）。该参数设置InnoDB的最大I/O容量，影响高负载情况下的I/O速率，可以缓解磁盘I/O瓶颈。建议根据存储设备的性能进行调整，通常设置为1000-20000。",
+            "type": "continuous",
+            "range": [
+                100,
+                "18446744073709551615"
+            ],
+            "dtype": "int",
+            "default_value": "2 * innodb_io_capacity, min of 2000"
+        }
+    },
+    {
+        "name": "innodb_lock_wait_timeout",
+        "info": {
+            "desc": "InnoDB事务在放弃之前等待行锁的时间（以秒为单位）。默认值为50秒。该参数影响事务的锁等待行为，可以缓解CPU瓶颈，建议根据应用需求进行调整。",
+            "type": "continuous",
+            "range": [
+                1,
+                1073741824
+            ],
+            "dtype": "int",
+            "default_value": 50
+        }
+    },
+    {
+        "name": "innodb_log_buffer_size",
+        "info": {
+            "desc": "InnoDB日志缓冲区的大小，单位为字节。增大此值可以提高写入性能，尤其是在高事务负载的情况下，能够缓解磁盘IO瓶颈。默认值为16MB，最小值为1KB，最大值为4GB。",
+            "type": "continuous",
+            "range": [
+                1024,
+                4294967295
+            ],
+            "dtype": "int",
+            "default_value": 16777216
+        }
+    },
+    {
+        "name": "innodb_log_files_in_group",
+        "info": {
+            "desc": "InnoDB日志文件组中的日志文件数量。增加此值可以提高并发写入性能，并缓解磁盘IO瓶颈。默认值为2，最小值为2，最大值为100。",
+            "type": "discrete",
+            "range": [
+                2,
+                100
+            ],
+            "dtype": "int",
+            "default_value": 2
+        }
+    },
+    {
+        "name": "innodb_log_file_size",
+        "info": {
+            "desc": "每个InnoDB日志文件的大小。增大此值可以提高恢复性能，尤其是在大事务的情况下。可以缓解磁盘IO瓶颈。默认值为48MB，最大值为512GB，最小值为1MB。",
+            "type": "continuous",
+            "range": [
+                1048576,
+                "512GB / innodb_log_files_in_group"
+            ],
+            "dtype": "int",
+            "default_value": 50331648
+        }
+    },
+    {
+        "name": "innodb_max_dirty_pages_pct",
+        "info": {
+            "desc": "InnoDB允许的最大脏页百分比。该参数控制InnoDB在缓冲池中允许的脏页的比例，默认值为90%。增大此值可以减少写入操作，但可能会增加恢复时间。建议在内存分配过大导致Swap占用严重时适当减小此值，以释放Swap空间。过大的值会导致每次更新需要交换的数据页过多，而过小的值则可能导致更新操作变慢。",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int",
+            "default_value": 90
+        }
+    },
+    {
+        "name": "innodb_max_dirty_pages_pct_lwm",
+        "info": {
+            "desc": "该参数定义了InnoDB允许的最小脏页百分比，表示在启用预刷写以控制脏页比例时的低水位线。增大该值可以减少写入操作的频率，减小该值则会增加写入操作的频率，可能会影响性能。",
+            "type": "continuous",
+            "range": [
+                0,
+                99.999
+            ],
+            "dtype": "Numeric",
+            "default_value": 10
+        }
+    },
+    {
+        "name": "innodb_max_purge_lag",
+        "info": {
+            "desc": "定义了期望的最大清除延迟。如果超过此值，将对INSERT、UPDATE和DELETE操作施加延迟。增大此值可以减少清除操作的频率，但可能会导致内存使用增加，从而缓解内存瓶颈。默认值为0，最大值为4294967295，最小值为0。",
+            "type": "discrete",
+            "range": [
+                0,
+                4294967295
+            ],
+            "dtype": "Integer",
+            "default_value": 0
+        }
+    },
+    {
+        "name": "innodb_numa_interleave",
+        "info": {
+            "desc": "启用NUMA内存交错。启用后可以提高多核系统的内存访问性能，缓解内存瓶颈。取值为ON/OFF，默认值为OFF。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "Boolean",
+            "default_value": "OFF"
+        }
+    },
+    {
+        "name": "innodb_old_blocks_pct",
+        "info": {
+            "desc": "指定InnoDB缓冲池中用于旧块子列表的近似百分比。增大此值可以增加旧块的使用，可能会提高查询性能，并缓解内存瓶颈。默认值为37，最大值为95，最小值为5。",
+            "type": "continuous",
+            "range": [
+                5,
+                95
+            ],
+            "dtype": "int",
+            "default_value": 37
+        }
+    },
+    {
+        "name": "innodb_old_blocks_time",
+        "info": {
+            "desc": "指定一个块在被插入到旧子列表后，首次访问后必须保持在该子列表中的时间（以毫秒为单位），在此时间到达后，该块可以被移动到新子列表。增大此值可以增加旧块的保留时间，可能会提高查询性能，并缓解内存瓶颈。默认值为1000毫秒。",
+            "type": "continuous",
+            "range": [
+                0,
+                4294967295
+            ],
+            "dtype": "int",
+            "default_value": 1000
+        }
+    },
+    {
+        "name": "innodb_open_files",
+        "info": {
+            "desc": "指定InnoDB可以同时打开的最大文件数。增大此值可以提高并发性能，尤其是在高负载情况下，并且可以缓解内存瓶颈。默认值为300。",
+            "type": "continuous",
+            "range": [
+                1,
+                65535
+            ],
+            "dtype": "int",
+            "default_value": 300
+        }
+    },
+    {
+        "name": "innodb_page_size",
+        "info": {
+            "desc": "指定InnoDB表空间的页面大小，影响存储效率和性能。可以缓解磁盘I/O瓶颈。可选值为4096、8192、16384、32768和65536字节。",
+            "type": "discrete",
+            "range": [
+                4096,
+                8192,
+                16384,
+                32768,
+                65536
+            ],
+            "dtype": "int",
+            "default_value": 16384
+        }
+    },
+    {
+        "name": "innodb_parallel_read_threads",
+        "info": {
+            "desc": "定义可以用于并行聚簇索引读取的线程数量。增大此值可以提高读取性能，尤其是在多核系统上，能够缓解CPU瓶颈。默认值为4，最小值为1，最大值为256。",
+            "type": "continuous",
+            "range": [
+                1,
+                256
+            ],
+            "dtype": "int",
+            "default_value": 4
+        }
+    },
+    {
+        "name": "innodb_read_ahead_threshold",
+        "info": {
+            "desc": "控制InnoDB使用的线性预读的敏感性，以便将页面预取到缓冲池中。增大此值可以提高顺序读取性能，但可能会增加随机读取的延迟，从而缓解磁盘IO瓶颈。默认值为56，最大值为64，最小值为0。",
+            "type": "continuous",
+            "range": [
+                0,
+                64
+            ],
+            "dtype": "int",
+            "default_value": 56
+        }
+    },
+    {
+        "name": "innodb_read_io_threads",
+        "info": {
+            "desc": "InnoDB读取操作的I/O线程数量。增大此值可以提高读取性能，尤其是在高并发情况下，能够缓解磁盘I/O瓶颈。默认值为4，最大值为64，最小值为1。",
+            "type": "continuous",
+            "range": [
+                1,
+                64
+            ],
+            "dtype": "int",
+            "default_value": 4
+        }
+    },
+    {
+        "name": "innodb_sync_array_size",
+        "info": {
+            "desc": "定义了互斥锁/锁等待数组的大小。增大此值可以提高高并发工作负载下的线程协调能力，尤其是在等待线程数量较多的情况下。此设置必须在MySQL实例启动时配置，之后无法更改。增大此值可以提高写入性能，尤其是在高负载情况下，能够缓解磁盘IO瓶颈。",
+            "type": "continuous",
+            "range": [
+                1,
+                1024
+            ],
+            "dtype": "int",
+            "default_value": 1
+        }
+    },
+    {
+        "name": "innodb_table_locks",
+        "info": {
+            "desc": "如果 `autocommit = 0`，`InnoDB` 会遵循 `LOCK TABLES`；MySQL 不会在 `LOCK TABLES ... WRITE` 之前返回，直到所有其他线程释放了对该表的所有锁。启用或禁用InnoDB表锁。启用后可以提高并发性能，缓解CPU瓶颈。取值为ON/OFF，默认值为ON。",
+            "type": "discrete",
+            "range": [
+                "OFF",
+                "ON"
+            ],
+            "dtype": "boolean",
+            "default_value": "ON"
+        }
+    },
+    {
+        "name": "innodb_thread_concurrency",
+        "info": {
+            "desc": "该参数定义了允许进入InnoDB的最大线程数。值为0（默认值）表示无限并发（无上限）。在高并发系统中，此变量用于性能调优。推荐设置为服务器CPU核心数的2倍，以优化并发操作。适当的设置可以提高CPU多核处理能力和并发量，但过高的值可能导致上下文切换增加，从而影响性能。",
+            "type": "continuous",
+            "range": [
+                0,
+                1000
+            ],
+            "dtype": "int",
+            "default_value": 0
+        }
+    },
+    {
+        "name": "innodb_thread_sleep_delay",
+        "info": {
+            "desc": "InnoDB线程休眠延迟，表示InnoDB线程在加入InnoDB队列之前的休眠时间，单位为微秒。增大此值可以减少CPU使用率，但可能会影响响应时间，适用于缓解CPU瓶颈。默认值为10000微秒，最大值为4294967295微秒，最小值为0微秒。",
+            "type": "continuous",
+            "range": [
+                0,
+                4294967295
+            ],
+            "dtype": "int",
+            "default_value": 10000
+        }
+    },
+    {
+        "name": "innodb_write_io_threads",
+        "info": {
+            "desc": "InnoDB写入操作的I/O线程数量。增大此值可以提高写入性能，尤其是在高并发情况下，能够缓解磁盘I/O瓶颈。默认值为4，最大值为64，最小值为1。",
+            "type": "continuous",
+            "range": [
+                1,
+                64
+            ],
+            "dtype": "int",
+            "default_value": 4
+        }
+    },
+    {
+        "name": "max_heap_table_size",
+        "info": {
+            "desc": "This variable sets the maximum size to which user-created MEMORY tables are permitted to grow. It can reduce disk I/O by keeping temporary tables in memory.",
+            "type": "continuous",
+            "range": [
+                16384,
+                18446744073709551615
+            ],
+            "dtype": "int",
+            "default_value": 16777216
+        }
+    },
+    {
+        "name": "thread_cache_size",
+        "info": {
+            "desc": "The number of threads cached to handle new connections. This variable can be increased to improve performance if you have a lot of new connections. It reduces CPU overhead from thread creation/destruction. Ideally set high enough so that most new connections use cached threads, but higher values consume more memory.",
+            "type": "continuous",
+            "range": [
+                0,
+                16384
+            ],
+            "dtype": "int",
+            "default_value": 9
+        }
+    },
+    {
+        "name": "tmp_table_size",
+        "info": {
+            "desc": "Defines the maximum size of internal in-memory temporary tables created by the MEMORY storage engine and, as of MySQL 8.0.28, the TempTable storage engine. If the size of a temporary table exceeds this value, it is converted to a disk-based table, which can alleviate memory and disk I/O. Higher values reduce disk usage but increase memory consumption.",
+            "type": "continuous",
+            "range": [
+                1024,
+                18446744073709551615
+            ],
+            "dtype": "int",
+            "default_value": 16777216
+        }
+    }
+]
