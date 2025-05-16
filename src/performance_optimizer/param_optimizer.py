@@ -43,7 +43,7 @@ class ParamOptimizer:
             slo_goal=slo_goal,
             performance_metric=performance_metric,
             static_profile=static_profile,
-            performance_analysis_report=performance_analysis_report,
+            performance_analysis_report=analysis_report,
         )
         self.max_iterations = max_iterations
         # 计算slo指标提升方式的回调函数，输入是benchmark返回的性能指标，输出是业务性能提升比例
@@ -135,6 +135,7 @@ if __name__ == "__main__":
     metric_collector = StaticMetricProfileCollector(ssh_client=ssh_client, max_workers=5)
 
     static_profile = metric_collector.run()
+    print("static_profile:", static_profile)
 
     print("正在采集负载信息...")
     app = "mysql"
@@ -146,10 +147,12 @@ if __name__ == "__main__":
         app=app,
     )
     data = testCollector.run()
-
+    print("data:", data)
     print("正在分析负载信息...")
     testAnalyzer = PerformanceAnalyzer(data=data)
     performance_analysis_report, bottleneck = testAnalyzer.run()
+    print("performance_analysis_report:", performance_analysis_report)
+    print("bottleneck:", bottleneck)
 
     def slo_calc_callback(baseline, benchmark_result):
         if baseline is None or abs(baseline) < 1e-9:
