@@ -3,6 +3,7 @@ from .disk_analyzer import DiskAnalyzer
 from .memory_analyzer import MemoryAnalyzer
 from .network_analyzer import NetworkAnalyzer
 from .mysql_analyzer import MysqlAnalyzer
+from .micro_dep_analyzer import MicroDepAnalyzer
 from .base_analyzer import BaseAnalyzer
 from typing import Tuple
 from src.utils.thread_pool import ThreadPoolManager
@@ -14,6 +15,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         self.disk_analyzer = DiskAnalyzer(data=self.data.get("Disk", {}))
         self.memory_analyzer = MemoryAnalyzer(data=self.data.get("Memory", {}))
         self.network_analyzer = NetworkAnalyzer(data=self.data.get("Network", {}))
+        self.micro_analyer = MicroDepAnalyzer(data=self.data.get("micro_dep", {}))
         self.mysql_analyzer = MysqlAnalyzer(data=self.data.get("Mysql", {}))
         self.thread_pool = ThreadPoolManager(max_workers=5)
     
@@ -69,6 +71,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         disk_analyzer_task = self.thread_pool.add_task(self.disk_analyzer.run)
         memory_analyzer_task = self.thread_pool.add_task(self.memory_analyzer.run)
         network_analyzer_task = self.thread_pool.add_task(self.network_analyzer.run)
+        micro_analyzer_task = self.thread_pool.add_task(self.micro_analyer.run)
         mysql_analyzer_task = self.thread_pool.add_task(self.mysql_analyzer.run)
 
         self.thread_pool.run_all_task()
@@ -83,6 +86,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         os_performance_report += report_results[disk_analyzer_task]
         os_performance_report += report_results[memory_analyzer_task]
         os_performance_report += report_results[network_analyzer_task]
+        os_performance_report += report_results[micro_analyzer_task]
         app_performance_report = ""
         app_performance_report += report_results[mysql_analyzer_task]
         return os_performance_report, app_performance_report
