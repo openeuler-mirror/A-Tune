@@ -25,16 +25,22 @@ from src.performance_benchmark.mysql_benchmark import parse_mysql_sysbench
 logging.disable(logging.CRITICAL)
 
 host_ip = config["servers"][0]["ip"]
+host_port = config["servers"][0]["port"]
+host_user = config["servers"][0]["host_user"]
 host_password = config["servers"][0]["password"]
-app="mysql"
+app = config["servers"][0]["app"]
+max_retries = config["servers"][0]["max_retries"]
+delay = config["servers"][0]["delay"]
+target_pid = config["servers"][0]["target_pid"]
+benchmark_cmd = config["benchmark_cmd"]
 
 ssh_client = SshClient(
     host_ip=host_ip,
-    host_port=22,
-    host_user="root",
+    host_port=host_port,
+    host_user=host_user,
     host_password=host_password,
-    max_retries=3,
-    delay=1.0    
+    max_retries=max_retries,
+    delay=delay
 )
 
 #logging.info(">>> 运行MetricProfileCollector：")
@@ -47,9 +53,7 @@ static_profile_info = static_metric_collector.run()
 print("static_profile:", static_profile_info)
 
 
-host_info = HostInfo(host_ip="9.82.230.156",host_port=22, host_password="Huawei12#$")
-target_pid = 2144391
-benchmark_cmd = "tail -f /dev/null"
+host_info = HostInfo(host_ip=host_ip,host_port=host_port, host_password=host_password)
 collect_mode = COLLECTMODE.ATTACH_MODE
 microDepCollector = MicroDepCollector(
     host_info=host_info,
@@ -64,8 +68,8 @@ print("microDepCollector data", micro_dep_dollector_data)
 print(">>> 运行MetricCollector：")
 metric_collector = MetricCollector(
     host_ip=host_ip,
-    host_port=22,
-    host_user="root",
+    host_port=host_port,
+    host_user=host_user,
     host_password=host_password,
     app=app
 )
@@ -95,7 +99,7 @@ def benchmark_callback(ssh_client):
         return 0.0
 
 param_optimizer = ParamOptimizer(
-    service_name="mysql",
+    service_name=app,
     performance_metric=PerformanceMetric.QPS,
     slo_goal=0.1,
     analysis_report=report,
@@ -109,16 +113,18 @@ param_optimizer = ParamOptimizer(
 param_optimizer.run()
 
 strategy_optimizer = StrategyOptimizer(
-    application="mysql",
+    application=app,
     bottle_neck=bottleneck,
     host_ip=host_ip,
-    host_port=22,
-    host_user="root",
+    host_port=host_port,
+    host_user=host_user,
     host_password=host_password,
     system_report=report,
     target_config_path=""
 )
-plan, isfinish, feedback = strategy_optimizer.run()
-print("plan:", plan)
-print("isfinish", isfinish)
-print("feedback", feedback)
+recommendations = strategy_optimizer.get_recommendations_json(
+    bottleneck,
+    top_k=1,
+    business_context="高并发Web服务，CPU负载主要集中在用户态处理"
+)
+print("推荐策略:", recommendations)
