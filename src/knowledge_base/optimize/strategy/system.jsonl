@@ -1,38 +1,272 @@
 [
     {
-        "策略名称": "禁用控制自动组调度特性", 
-        "策略是否可配置":"Y",
-        "优化步骤": "echo 0 > /proc/sys/kernel/sched_autogroup_enabled;sysctl -w kernel.sched_autogroup_enabled=0", 
-        "对应瓶颈点": "CPU-上下文切换/进程调度",
-        "功能说明": "控制自动组调度特性（Auto Group Scheduling）的启用与禁用。这个特性主要用于改进桌面（GUI）环境中进程的调度，以提供更好的响应性。该配置项一般在服务器场景默认关闭。",
-        "使用风险": "若设置为1，有可能对context1、pipe子项影响较大",
-        "使能状态检查":""
-    },
-    {
-        "策略名称": "使用numad服务优化NUMA内存访问", 
-        "策略是否可配置":"Y",
-        "优化步骤": "1. 安装numad包\n2. numad服务开启：systemctl start numad\n3. 配置 numad：根据需要修改 /etc/numad.conf 配置文件，以调整其行为。可以设置 NUMA 节点、内存使用阈值和其它参数。\n4. 绑定应用至 numad：在启动应用时，使用 numad 提供的 Mbind 特性，使应用程序能利用它的优化。可以通过以下命令行选项来实现：numad <your_application>  ", 
-        "对应瓶颈点": "MEM-内存访问时延",
-        "功能说明": "numad 是一个用于 NUMA（非一致性存储访问）架构下的内存分配的服务，旨在通过动态调整和优化内存使用来提高系统性能。\n1、自动内存分配：numad 会监控系统的内存使用情况，并自动将进程或线程的内存绑定到最合适的 NUMA 节点，最大限度地减少远程内存访问。 \n2、负载均衡：它能够分析系统上的负载，并在多个 NUMA 节点之间分配资源，以实现更好的性能和负载均衡。\n3、内存迁移：如果某个线程的内存块不再有效（例如，远程访问带来的延迟），numad 可以选择迁移该线程或进程的内存，以优化性能。",
+        "策略名称": "CPU调频策略设置为 performance",
+        "优化步骤": "echo performance | tee  /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor",
+        "优化前默认值": "performance",
+        "策略是否可直接配置": "Y",
         "使用风险": "",
-        "使能状态检查":""
+        "功能说明": "在performance模式下，CPU 将运行在最高频率，不会进行频率的动态调整，以满足性能需求。",
+        "使能状态检查": ""
     },
     {
-        "策略名称": "CPU优化-调度策略",
-        "策略是否可配置": "Y",
-        "优化步骤": "echo 'performance' > /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor\n# 检查当前策略\ncat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor",
-        "对应瓶颈点": "CPU-调度延迟高",
-        "功能说明": "此策略通过以下方式优化CPU性能：\n1. 将CPU调节器设置为performance模式\n2. 禁用动态频率调整\n3. 使CPU始终以最高频率运行",
-        "使用风险": "可能导致：\n- CPU温度升高\n- 功耗增加\n- 不适合移动设备",
-        "使能状态检查": "grep 'performance' /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor"
+        "策略名称": "优化 CPU 空闲状态下的性能",
+        "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\n或启动参数配置 haltpoll.enable=Y cpuidle-haltpoll.force=Y",
+        "优化前默认值": "N",
+        "策略是否可直接配置": "Y",
+        "使用风险": "5.X内核在ipi机制上变更导致上下文切换延时大大增加，通过使能haltpoll弥补其带来的性能损耗，但会增加功耗",
+        "功能说明": "haltpoll 允许 CPU 在处于空闲状态时执行一种新的待命状态，这种空闲状态称为 \"polling\"。在此状态下，CPU 不仅可以进入低功耗模式，还可以通过执行简单的循环或检查操作来快速响应中断和事件。\n启用 haltpoll，可以降低 CPU 响应中断的延迟。这对于实时应用或对延迟敏感的工作负载（如网络处理或高性能计算）非常有益，因为不会因进入深度睡眠状态而增加唤醒的时间。",
+        "使能状态检查": ""
     },
     {
-        "策略名称": "网络优化-TCP缓冲区",
-        "策略是否可配置": "Y",
-        "优化步骤": "sysctl -w net.core.rmem_max=4194304\nsysctl -w net.core.wmem_max=4194304\nsysctl -p",
-        "对应瓶颈点": "NETWORK-吞吐量低",
-        "功能说明": "增大TCP缓冲区大小以提高网络吞吐量，特别适用于：\n- 大数据传输\n- 高延迟网络\n- 视频流服务",
-        "使用风险": "增加内存使用量，在内存受限的系统上可能：\n- 导致OOM killer被触发\n- 影响其他应用性能",
-        "使能状态检查": "sysctl net.core.rmem_max net.core.wmem_max"
+        "策略名称": "tuned低时延配置",
+        "优化步骤": "tuned-adm profile latency-performance\ntuned-adm profile network-latency\ntuned-adm profile realtime\ntuned-adm profile cpu-partitioning",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "低时延配置通常会禁用节能特性，以确保系统性能。这可能导致系统能耗增加",
+        "功能说明": "Tuned 是 Linux 提供的性能调优工具，它提供了一系列预定义的配置模板，可以快速优化系统性能。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "haltpoll",
+        "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\n 或启动参数配置\nhaltpoll.enable=Y \ncpuidle-haltpoll.force=Y",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "主动轮询会占用更多的 CPU 资源，可能导致宿主机的其他虚拟机或进程得不到足够的 CPU 时间片",
+        "功能说明": "haltpoll是虚拟化环境中的一种低延迟优化技术，其核心思想是通过​​主动轮询替代被动等待​​来减少虚拟CPU（vCPU）的唤醒延迟：",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "禁用控制自动组调度特性",
+        "优化步骤": "echo 0 > /proc/sys/kernel/sched_autogroup_enabled",
+        "优化前默认值": 0,
+        "策略是否可直接配置": "Y",
+        "使用风险": "若设置为1，有可能对context1、pipe子项影响较大",
+        "功能说明": "控制自动组调度特性（Auto Group Scheduling）的启用与禁用。这个特性主要用于改进桌面（GUI）环境中进程的调度，以提供更好的响应性。该配置项一般在服务器场景默认关闭。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "降低内核vm数据统计频率",
+        "优化步骤": "echo 10 > /proc/sys/vm/stat_interval",
+        "优化前默认值": 1,
+        "策略是否可直接配置": "Y",
+        "使用风险": "",
+        "功能说明": "设置虚拟内存系统统计信息更新的时间间隔。具体来说，它决定了内核收集关于虚拟内存和其他系统性能指标的统计数据的频率。这些数据通常用于监控和性能调优。\n设置更高周期的好处：\n1. 减少系统开销：通过将统计信息的更新间隔设为较长的时间，可以减少内核的上下文切换和资源消耗，从而让系统有更多的资源用于处理实际的业务负载。\n2. 平衡实时性与性能：较长的更新间隔可以减少干扰，这样系统负载可以更平稳，不会因频繁的统计更新而受到影响。\n3. 提高监控的有效性：对于一些长期运行的服务来说，统计信息的频繁更新可能会增加不必要的噪音，通过设置较长的间隔，可以更好地观察到系统的整体表现，而不是短期波动。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "程序进程绑核到同一个片上",
+        "优化步骤": "1. 运行程序前设置绑核：taskset -c 0-7 ./test_program\n2. 运行中进程设置绑核：taskset -c 0-7 <pid>",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "仅针对个别子项有效，无法整体操作；需要依赖atune-runtime监控测试进程进行自动绑核",
+        "功能说明": "绑定进程到同一个 NUMA 节点内的核心，减少跨节点内存访问延迟，避免调度器迁移进程导致缓存失效。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "控制OpenMP程序中线程的 CPU 亲和性",
+        "优化步骤": "export GOMP_CPU_AFFINITY=0-$(($(nproc) - 1));\nexport OMP_DYNAMIC=\"false\";\nexport OMP_THREAD_LIMIT=\"192\";\nexport OMP_SCHEDULE=\"static\"",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "",
+        "功能说明": "将线程均匀分配到所有可用的 CPU 核心（如 0~N-1，N 为系统总逻辑核心数），目的是减少线程迁移开销、提升缓存局部性，从而优化多核并行性能。适用于 GCC 的 OpenMP 实现（如 libgomp）。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "网卡中断绑核",
+        "优化步骤": "systemctl stop irqbalance.service;\ncat /proc/interrupts | grep 网卡;\ncat /proc/irq/<中断号>/smp_affinity_list;\necho \"2-3\" > /proc/irq/<中断号>/smp_affinity_list;（2-3是绑定的cpu）",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "中断需要绑定到网卡所在NUMA节点的CPU核心上",
+        "功能说明": "网卡中断绑核是指将网卡的中断请求（IRQ）绑定到特定的CPU核心上，以优化系统的网络性能。在多核处理器系统中，这种优化可以减少CPU核心之间的上下文切换，提高中断处理效率，从而提升网络传输性能",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "用户态percpu缓存",
+        "优化步骤": "1.绑定进程到特定 CPU 核心\ntaskset -c 0,1 ./application\n2.绑定内存到本地 NUMA 节点\nnumactl --cpunodebind=0 --membind=0 ./application\nnumactl --localalloc ./application(如果希望避免跨 NUMA 节点访问，可以使用 --localalloc)\n3.使用高性能内存分配器\nexport LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so或者\nexport LD_PRELOAD=/usr/lib/libtcmalloc.so\n./application\n4.禁用透明大页（THP），启用大页内存\necho never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag\necho 1024 > /proc/sys/vm/nr_hugepages",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "CPU缓存可能分配到非本地NUMA节点内存",
+        "功能说明": "per-CPU 缓存是高性能编程中常用的优化技术，通过在用户态为每个CPU核心维护独立的数据缓存，减少多线程竞争和缓存一致性协议(如MESI)带来的性能损耗。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "hbase关键进程绑核",
+        "优化步骤": "taskset -c 0,1 <HMaster进程ID>",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "跨NUMA节点访问内存导致性能下降",
+        "功能说明": "绑核优化(CPU Affinity)是提升HBase性能的重要手段，通过将关键进程绑定到特定CPU核心",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "用户态低时延调度",
+        "优化步骤": "taskset -c 0,1 ./your_program\necho 1024 > /proc/sys/vm/nr_hugepages",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "优化可能导致系统资源（如CPU、内存）分配不均，引发不同任务或进程之间的资源竞争，从而影响整体性能",
+        "功能说明": "用户态低时延调度优化是一种针对高实时性需求场景的性能调优方法，旨在减少任务调度和执行的延迟。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "smt(调度时尽量使用本核，不用超线程的核)",
+        "优化步骤": "echo KEEP_ON_CORE > /sys/kernel/debug/sched/features\necho 200 > /proc/sys/kernel/sched_util_ratio",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "多个线程同时访问共享资源可能导致资源竞争，降低系统性能",
+        "功能说明": "SMT通过让单个物理核心模拟多个逻辑核心来提高硬件利用率",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "geust_idle_poll特性 （hbase随机读）",
+        "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\necho 400000 > /sys/module/haltpoll/parameters/guest_halt_poll_ns\n",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "如果轮询时间设置过大，可能会导致 CPU 使用率显著增加，尤其是在系统空闲时",
+        "功能说明": "geust_idle_poll特性是一种优化机制，用于减少虚拟机（Guest）中 vCPU 空闲时的上下文切换开销和任务唤醒延迟",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "clusteraware特性",
+        "优化步骤": "1. 宏依赖：CONFIG_SCHED_CLUSTER\n2. 使能：echo 1 > /proc/sys/kernel/sched_cluster\n3. 去使能：echo 0 > /proc/sys/kernel/sched_cluster",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "在集群环境中，多个节点可能会竞争有限的资源（如CPU、内存、网络带宽等），导致性能瓶",
+        "功能说明": "Cluster-Aware（集群感知）特性是指软件或系统能够自动识别集群环境，并在多节点之间协调资源管理、故障恢复和数据同步，以确保高可用性（HA）、负载均衡和一致性。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "网卡中断绑核",
+        "优化步骤": "systemctl stop irqbalance.service\ncat /proc/interrupts | grep 网卡\ncat /proc/irq/<中断号>/smp_affinity_list\necho \"2-3\" > /proc/irq/<中断号>/smp_affinity_list（2-3是绑定的cpu）",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "中断需要绑定到网卡所在NUMA节点的CPU核心上",
+        "功能说明": "网卡中断绑核是指将网卡的中断请求（IRQ）绑定到特定的CPU核心上，以优化系统的网络性能。在多核处理器系统中，这种优化可以减少CPU核心之间的上下文切换，提高中断处理效率，从而提升网络传输性能",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "geust_idle_poll特性 ",
+        "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\necho 400000 > /sys/module/haltpoll/parameters/guest_halt_poll_ns\n",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "如果轮询时间设置过大，可能会导致 CPU 使用率显著增加，尤其是在系统空闲时",
+        "功能说明": "geust_idle_poll特性是一种优化机制，用于减少虚拟机（Guest）中 vCPU 空闲时的上下文切换开销和任务唤醒延迟",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "arm：预取关闭，X86：预取开启",
+        "优化步骤": "预取关闭：echo 0 > /sys/block/<device>/queue/read_ahead_kb\n预取开启：echo value > /sys/block/<device>/queue/read_ahead_kb（value是非零值）",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "预取的数据可能并不是程序实际需要的数据，导致缓存中存储了大量无用数据，从而将真正有用的数据挤出缓存，降低缓存命中率",
+        "功能说明": "预取是一种性能优化技术，用于提前将数据加载到内存中，以减少磁盘I/O延迟，从而提高数据访问速度。\nX86架构适合高性能计算，预取功能可以显著提升性能；而ARM架构注重低功耗和高效率，关闭预取功能可以更好地满足其设计目标",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "异步IO",
+        "优化步骤": "修改mysql配置文件：\n[mysqld]\ninnodb_use_native_aio = 1",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "异步写操作未完成时系统崩溃可能导致数据丢失",
+        "功能说明": "异步 I/O（Asynchronous I/O, AIO） 是一种重要的性能优化手段。它通过将 I/O 操作从主线程中解耦，减少阻塞和等待时间，从而提高数据库的整体吞吐量和响应速度。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "使用numad服务优化NUMA内存访问",
+        "优化步骤": "1. 安装numad包\n2. numad服务开启：systemctl start numad\n3. 配置 numad：根据需要修改 /etc/numad.conf 配置文件，以调整其行为。可以设置 NUMA 节点、内存使用阈值和其它参数。\n4. 绑定应用至 numad：在启动应用时，使用 numad 提供的 Mbind 特性，使应用程序能利用它的优化。可以通过以下命令行选项来实现：numad <your_application>  ",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "",
+        "功能说明": "numad 是一个用于 NUMA（非一致性存储访问）架构下的内存分配的服务，旨在通过动态调整和优化内存使用来提高系统性能。\n1、自动内存分配：numad 会监控系统的内存使用情况，并自动将进程或线程的内存绑定到最合适的 NUMA 节点，最大限度地减少远程内存访问。\n2、负载均衡：它能够分析系统上的负载，并在多个 NUMA 节点之间分配资源，以实现更好的性能和负载均衡。\n3、内存迁移：如果某个线程的内存块不再有效（例如，远程访问带来的延迟），numad 可以选择迁移该线程或进程的内存，以优化性能。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "numa绑核",
+        "优化步骤": "taskset -c 0,1 mysqld",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "如果绑核配置不当，可能导致进程访问远程内存，从而增加内存访问延迟",
+        "功能说明": "在NUMA架构中，系统被划分为多个节点（NUMA节点），每个节点包含一个或多个CPU核心以及本地内存。CPU访问本地内存的速度比访问其他节点的内存（远程内存）要快得多。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "任务调度",
+        "优化步骤": "echo STEAL > /sys/kernel/debug/sched_features\necho NO_SIS_UTIL > /sys/kernel/debug/sched_features\necho SIS_PROP > /sys/kernel/debug/sched_features",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "频繁的任务迁移可能导致 CPU 缓存失效，降低性能。",
+        "功能说明": "通过任务调度动态调整内核调度器特性，优化任务分配和资源利用，提升系统性能。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "代码段、malloc大页调优(仅针对4K页内核)",
+        "优化步骤": "# 禁用透明大页\necho never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag\n# 临时设置大页(重启后失效)\necho $huge_pages > /proc/sys/vm/nr_hugepages\n# 永久设置大页\necho \"vm.nr_hugepages = $huge_pages\" >> /etc/sysctl.conf\nsysctl -p",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "如果应用程序只需要少量内存，分配大页会导致内存浪费。",
+        "功能说明": "malloc 是标准 C 库提供的动态内存分配函数，默认情况下它使用操作系统的普通页（通常是 4KB）。在高性能场景下（例如 MySQL 数据库或其他需要频繁分配大块内存的应用），这种默认行为可能导致性能瓶颈。为了提升性能，可以通过配置和代码调整，使 malloc 使用 大页内存（Huge Pages） ，从而减少内存管理开销并提高访问效率。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "tcmalloc大页",
+        "优化步骤": "# 预留大页（例如预留1024个2MB大页）\necho 1024 > /proc/sys/vm/nr_hugepages\n# 通过环境变量启用大页支持\nexport TCMALLOC_USE_HUGE_PAGES=1\n# 指定大页阈值（默认2MB，可调整为1GB页）\nexport TCMALLOC_HUGE_PAGE_THRESHOLD=2097152  # 2MB\nLD_PRELOAD=\"/usr/lib/libtcmalloc.so\" ./your_program",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "大页分配导致内存浪费，以及跨NUMA节点访问大页性能下降",
+        "功能说明": "TCMalloc（Thread-Caching Malloc）是一种高性能的内存分配器，它通过多级缓存结构优化内存分配性能。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "6.6内核以上\n动态复合页代码段/so大页等等",
+        "优化步骤": "程序复合页：\necho always > /sys/kernel/mm/transparent_hugepage/hugepages-<size>/enabled\necho 0x{xxx} > /sys/kernel/mm/transparent_hugepage/thp_exec_enabled\necho 4 > /sys/kernel/mm/transparent_hugepage/pcp_allow_high_order\necho 1 > /sys/kernel/mm/transparent_hugepage/thp_mapping_align\n文件复合页：\nmount -t ext4 -o buffered_iomap /dev/sda1 /mnt\nmount -t ext4 -o nobuffered_iomap /dev/sda1 /mnt\nUUID=xxx /         ext4   buffered_iomap        0 0\nUUID=xxx /         ext4   nobuffered_iomap        0 0\nmount -o remount,nobuffered_iomap /mnt\nmount -o remount,buffered_iomap /mnt",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "大页未充分利用导致内存浪费",
+        "功能说明": "动态复合页代码段/so大页，允许将多个常规页（通常4KB）​​动态组合​​成更大的复合页（如2MB），而无需预先分配大页内存",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "透明大页关闭",
+        "优化步骤": "echo never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "关闭透明大页后，系统不再尝试将小页面合并为大页面，这可能会导致内存碎片化增加，尤其是在长时间运行的应用程序中",
+        "功能说明": "透明大页是 Linux 内核的一项内存管理优化技术，旨在自动使用大页（HugePages）来提升内存访问效率，减少 TLB（Translation Lookaside Buffer）缺失，从而提高系统性能。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "设置堆栈空间上限和用户进程内存上限",
+        "优化步骤": "ulimit -s unlimited\nulimit -l 2097152",
+        "优化前默认值": "1. 8192\n2. 65536",
+        "策略是否可直接配置": "Y",
+        "使用风险": "621子项需要放开系统资源限制，并且子项使用openmp，需设置CPU亲和性，否则测试波动较大，设置CPU亲和性后测试结果较优",
+        "功能说明": "1. 对于一些需要大量堆栈空间的程序，例如复杂的递归算法或需要高内存使用的应用（如大数据处理或复杂计算），将堆栈大小设置为无限制，可以保证程序正常运行。\n2. 锁定内存的目的在于防止这些内存区域被交换到磁盘上。这对于实时系统或对性能要求极高的应用尤为重要，因为将数据交换到磁盘会涉及延迟，可能会影响程序的响应时间。\n3. 通过管理线程的亲和性，可以优化程序性能、提高资源利用率，减少上下文切换。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "卸载内核网络数据包过滤模块",
+        "优化步骤": "客户端卸载内核模块iptable_security,iptable_raw,iptable_nat,iptable_mangle",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "使用iptable命令查询相关表时，内核自动加载相关模块，额外引入热点ipt_do_table",
+        "功能说明": "内核模块 iptable_security、iptable_raw、iptable_nat 和 iptable_mangle 是 Linux 系统中用于网络流量控制和数据包处理的组成部分。\n1. iptable_security 模块为 Netfilter 提供更强的安全功能，主要用于访问控制策略的实施，可以根据包的安全上下文来决定包的处理方式。\n2. iptable_raw 模块允许不进行连接跟踪的原始数据包处理。通过使用这个模块，可以在数据包进入连接跟踪之前对它们进行过滤。\n3. iptable_nat 模块是用于实现网络地址转换（NAT）的，它能够在数据包经过时改变其源地址或目标地址。常用于实现路由器和防火墙功能。\n4. iptable_mangle 模块用于修改数据包的标头信息，包括 QoS（服务质量）标记、TTL（生存时间）等。它主要用于数据流量的修改和精细控制。\n这些内核模块可在网络流量控制、安全性和数据包处理方面提供增强功能，但也会引入一定的性能开销。\n去除后对UDP_STREAM可带来一定的性能提升。",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "网络参数",
+        "优化步骤": "sysctl -w net.ipv4.tcp_autocorking=0\nsysctl -w net.core.gro_normal_batch=1",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "禁用 TCP 自动填充可能会导致更多的小数据包发送，从而增加网络带宽的使用",
+        "功能说明": "TCP 自动填充（Autocorking）是一种优化机制，用于减少 TCP 数据包的发送次数，通过将多个小数据包合并为一个较大的数据包来提高网络效率。然而，在某些场景下，自动填充可能会导致不必要的延迟。将 tcp_autocorking 设置为 0 可以禁用这一特性，从而减少延迟，适用于对实时性要求较高的场景。\ngro_normal_batch 参数用于控制通用接收卸载（Generic Receive Offload, GRO）的批量处理数量。GRO 是一种网络优化技术，用于将多个小的数据包合并为一个较大的数据包，以减少处理开销。将 gro_normal_batch 设置为 1 可以减少批量处理的数量，从而降低延迟，提高网络响应速度\n",
+        "使能状态检查": ""
+    },
+    {
+        "策略名称": "网络参数，Netfilter 相关表的优化\n",
+        "优化步骤": "echo 0 > /proc/sys/net/bridge/bridge-nf-call-arptables\necho 0 > /proc/sys/net/bridge/bridge-nf-call-iptables\necho 0 > /proc/sys/net/bridge/bridge-nf-call-ip6tables",
+        "优化前默认值": "",
+        "策略是否可直接配置": "Y",
+        "使用风险": "能导致某些安全策略（如防火墙规则）无法生效，从而增加安全风险",
+        "功能说明": "这些事是对 Netfilter 相关表的优化，具体来说是减少网桥（bridge）与 Netfilter 防火墙表（如 iptables、ip6tables 和 arptables）之间的交互。这种优化通常用于提高网络性能，尤其是在虚拟化和容器化环境中",
+        "使能状态检查": ""
     }
 ]
