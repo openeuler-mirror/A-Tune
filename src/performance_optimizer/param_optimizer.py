@@ -44,6 +44,7 @@ class ParamOptimizer:
             performance_metric=performance_metric,
             static_profile=static_profile,
             performance_analysis_report=analysis_report,
+            ssh_client = ssh_client
         )
         self.max_iterations = max_iterations
         # 计算slo指标提升方式的回调函数，输入是benchmark返回的性能指标，输出是业务性能提升比例
@@ -90,10 +91,6 @@ class ParamOptimizer:
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
-
-            # 达到预期效果，则退出循环
-            if self.reached_goal(baseline, performance_result):
-                break
             
             last_result = performance_result
 
@@ -111,6 +108,11 @@ class ParamOptimizer:
                 best_result = max(best_result, performance_result)
             
             ratio = self.calc_improve_rate(baseline, last_result)
+
+            # 达到预期效果，则退出循环
+            if self.reached_goal(baseline, performance_result):
+                print(f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}")
+                break
 
             print(
                 f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"

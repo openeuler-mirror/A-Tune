@@ -28,6 +28,7 @@ class ParamRecommender:
         static_profile: str,
         performance_analysis_report: str,
         chunk_size=20,
+        ssh_client=None
     ):
         # 待调优app名称
         self.service_name = service_name
@@ -39,6 +40,7 @@ class ParamRecommender:
         self.static_profile = "\n".join(f"{k}: {v}" for k, v in static_profile.items())
         # 可调参数知识库
         self.all_params = set()
+        self.ssh_client = ssh_client
         self.params_set = self.load_params_set()
         self.chunk_size = chunk_size
         self.performance_analysis_report = performance_analysis_report
@@ -53,14 +55,21 @@ class ParamRecommender:
                 param_range = "、".join(list(map(str, item['info']['range'])))
             else:
                 param_range = f"从{item['info']['range'][0]}到{item['info']['range'][1]}"
-            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']}，参数的取值范围是：{param_range}")
+                    self.ssh_client = ssh_client
+            if self.ssh_client:
+                get_param_cmd = f'grep -E "^{item["name"]}\s*=" /etc/my.cnf | awk -F\'=\' \'{{print $2}}\' | xargs'
+                result = self.ssh_client.run_cmd(get_param_cmd)
+                param_env_value = result.output if result.status_code == 0 else "默认值"
+            else:
+                param_env_value = "默认值"
+            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}")
         return params
 
     def run(self, history_result):
         resultset = {}
 
-        #for i in range(0, len(self.params_set), self.chunk_size):
-        for i in range(0, 2, self.chunk_size):
+        for i in range(0, len(self.params_set), self.chunk_size):
+        # for i in range(0, 2, self.chunk_size):
             cur_params_set = self.params_set[i : i + self.chunk_size]
             recommend_prompt = f"""
 # CONTEXT # 

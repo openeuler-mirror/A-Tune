@@ -28,11 +28,15 @@ def apply_mysql_config(
     result = ssh_client.run_cmd("systemctl restart mysqld")
     exit_status = result.status_code
 
-    if exit_status == 0:
-        print("✅ mysqld 重启成功")
-    else:
-        error_msg = result.err_msg
-        print("❌ mysqld 重启失败")
-        print("错误信息：", error_msg)
+    for i in range(3):
+        if exit_status == 0:
+            print("✅ mysqld 重启成功")
+            break
+        else:
+            if i == 2:
+                error_msg = result.err_msg
+                print(f"❌ mysqld 重启失败，正在重试{i + 1}/3")
+                print("错误信息：", error_msg)
+                print("日志信息：", result.output)
 
 
