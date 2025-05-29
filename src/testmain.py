@@ -31,7 +31,7 @@ host_password = config["servers"][0]["password"]
 app = config["servers"][0]["app"]
 max_retries = config["servers"][0]["max_retries"]
 delay = config["servers"][0]["delay"]
-target_pid = config["servers"][0]["target_pid"]
+target_process_name = config["servers"][0]["target_process_name"]
 benchmark_cmd = config["benchmark_cmd"]
 
 ssh_client = SshClient(
@@ -58,7 +58,7 @@ collect_mode = COLLECTMODE.ATTACH_MODE
 microDepCollector = MicroDepCollector(
     host_info=host_info,
     iteration=10,
-    target_pid=target_pid,
+    target_process_name=target_process_name,
     benchmark_cmd=benchmark_cmd,
     mode=collect_mode,
 )
