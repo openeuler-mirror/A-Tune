@@ -1,0 +1,1935 @@
+[
+    {
+        "name": "kernel.sched_migration_cost_ns",
+        "info": {
+            "desc": "1. 在高负载多核系统中，若观察到频繁的进程迁移导致性能下降，可适当增加该值以减少不必要的迁移，典型调整范围为100000-500000纳秒\n\n2. 在低延迟敏感型应用中，若发现缓存局部性不佳导致性能下降，可适当降低该值以促进热进程迁移，典型调整范围为50000-200000纳秒",
+            "type": "continuous",
+            "range": [
+                100000,
+                5000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_cfs_bandwidth_slice_us",
+        "info": {
+            "desc": "1. 当需要更精细控制CFS带宽分配时（如高负载容器环境），可适当减小该值（默认5000微秒），但需注意过小会增加调度开销\n2. 在CPU资源充足且需要减少调度开销的场景下，可增大该值以减少全局时间池的分配频率",
+            "type": "continuous",
+            "range": [
+                1000,
+                50000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_wakeup_granularity_ns",
+        "info": {
+            "desc": "1. 对于延迟敏感型应用（如实时任务或高频交易系统），若观测到任务切换过于频繁导致性能下降，可适当增大该值（如5000000-10000000 ns），减少不必要的抢占  \n\n2. 在CPU密集型负载场景下，若调度器日志显示进程频繁被短时间抢占（如<1000000 ns），且存在吞吐量下降现象，可尝试降低该值（如1000000-2000000 ns）以提高响应速度",
+            "type": "continuous",
+            "range": [
+                1000000,
+                100000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_latency_ns",
+        "info": {
+            "desc": "1. 当系统运行高优先级实时任务时，若出现调度延迟过高的情况，可适当减小该值以提高调度响应速度\n\n2. 对于CPU密集型负载且任务数量较多(超过8个逻辑CPU)的系统，应增大该值以减少上下文切换开销",
+            "type": "continuous",
+            "range": [
+                1000000,
+                100000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_nr_migrate",
+        "info": {
+            "desc": "1. 当系统出现频繁的进程迁移导致性能下降时，可适当降低该值以减少迁移开销，建议从默认值32调整为16-24范围测试\n2. 对于NUMA架构服务器且进程具有较强CPU亲和性需求时，可适当提高该值至64以增强负载均衡能力",
+            "type": "continuous",
+            "range": [
+                1,
+                128
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_min_granularity_ns",
+        "info": {
+            "desc": "1. 当系统负载较高且存在大量短时间运行的进程时，可以适当增大该值以减少上下文切换开销，建议从默认值(通常为1,000,000 ns)逐步增加测试，观察性能变化\n\n2. 对于CPU密集型工作负载且进程运行时间普遍较长的情况，可以适当减小该值以提高系统响应能力，建议从默认值逐步减少测试",
+            "type": "continuous",
+            "range": [
+                1000000,
+                100000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sched_tunable_scaling",
+        "info": {
+            "desc": "1. 当系统CPU核心数较多（如32核以上）且存在调度延迟敏感型负载时，建议设置为2（线性比例调整），以优化多核环境下的调度粒度平衡\n\n2. 在低核心数服务器（如8核以下）或需要固定调度参数的实时任务场景中，建议设置为0（不调整），避免动态调整引入不可预测的延迟",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "transparent_hugepage.defrag",
+        "info": {
+            "desc": "1. 对于需要低延迟的应用（如数据库、实时系统），建议禁用该参数（设置为never），以避免因内存碎片整理导致的性能波动\n2. 对于内存密集型且对延迟不敏感的应用（如批处理作业），建议启用该参数（设置为always或defer+madvise），以提高大内存页使用率减少TLB缺失",
+            "range": [
+                "always",
+                "defer",
+                "defer+madvise",
+                "madvise",
+                "never"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "transparent_hugepage.enabled",
+        "info": {
+            "desc": "1. 对于延迟敏感型应用（如数据库、实时系统），建议禁用（设置为never或madvise），以避免因透明大页碎片整理导致的不可预测延迟\n\n2. 对于内存密集型批处理作业（如科学计算、大数据处理），建议启用（设置为always），以通过减少页表项提升内存访问效率",
+            "range": [
+                "always",
+                "madvise",
+                "never"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.netfilter.nf_conntrack_max",
+        "info": {
+            "desc": "1. 当服务器处理大量并发连接（如超过默认值65536）时，若出现\"table full\"相关内核日志或连接跟踪表频繁满导致丢包，应增加该值（通常设置为总内存MB数/16384，如8GB内存可设为524288）\n\n2. 在高并发短连接场景下，若nf_conntrack_count经常接近nf_conntrack_max值，应结合连接跟踪超时时间（nf_conntrack_tcp_timeout_*系列参数）一同调整，避免过早占满跟踪表",
+            "type": "continuous",
+            "range": [
+                0,
+                67108864
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.mtu",
+        "info": {
+            "desc": "1. 当网络传输中出现大量分片或性能下降时，建议测试并调整MTU值以匹配实际网络环境（通常1500是以太网默认值，但需考虑VPN/隧道开销）  \n\n2. 在高速网络（如10Gbps+）或特定拓扑（如RDMA）中，可尝试增大MTU（如9000）以提升吞吐量，但需确保全网设备支持Jumbo Frame",
+            "type": "continuous",
+            "range": [
+                500,
+                9000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.tx-frames",
+        "info": {
+            "desc": "在高吞吐量网络环境下（如10Gbps以上），若观察到tx_dropped或tx_errors计数器持续增长，可适当增加该值至64-256范围以提升批量发包效率  \n\n当CPU软中断（如NET_TX）占用率过高且网络延迟敏感时，应降低该值至32以下以减少单次中断处理的数据包数量",
+            "type": "continuous",
+            "range": [
+                0,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.rx-frames",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境中，当观察到`/proc/interrupts`显示单个CPU核心处理大量网络中断导致软中断(si)占用过高时，应适当增加该值以减少中断频率，典型调整范围为64-256  \n\n2. 在低延迟应用场景中，若网络延迟敏感型应用(如金融交易系统)出现延迟抖动，且`netstat -s`显示报文处理延迟增大，可尝试降低该值至32以下以加快中断响应",
+            "type": "continuous",
+            "range": [
+                0,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.tx-usecs",
+        "info": {
+            "desc": "1. 当网络传输延迟敏感型应用（如高频交易、实时视频流）出现延迟问题时，可尝试减小该值以减少中断延迟，建议从默认值100us逐步下调测试（如50us、25us），需配合性能监控避免过度降低导致CPU占用上升  \n2. 在CPU利用率过高且网络吞吐量未达瓶颈时，可适当增大该值（如200us）以减少中断频率，但需确保不会引入明显的延迟增加",
+            "type": "continuous",
+            "range": [
+                2,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.rx-usecs",
+        "info": {
+            "desc": "在高吞吐量网络环境下（如10Gbps以上），如果/proc/interrupts显示单个CPU核心处理过多RX中断，建议增加该值（如50-100微秒）以减少中断频率  \n\n当系统CPU利用率过高且/proc/net/softnet_stat显示drop计数增长时，可适当降低该值（如20-30微秒）以加快中断响应",
+            "type": "continuous",
+            "range": [
+                2,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.combined",
+        "info": {
+            "desc": "1. 当服务器处理高网络吞吐量（如10Gbps以上）且CPU出现软中断（softirq）不均时，应增加队列数量至与物理CPU核心数匹配，通常每个NUMA节点分配4-8个队列  \n\n2. 在虚拟化环境中当出现网络延迟波动时，需检查队列长度是否过短（默认256），建议结合网卡硬件能力调整为512-2048以缓冲突发流量",
+            "type": "continuous",
+            "range": [
+                1,
+                32
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.adaptive-rx",
+        "info": {
+            "desc": "1. 当网络接口接收高吞吐量小包时出现高CPU中断负载，应启用该参数以自动优化中断合并策略\n2. 在低延迟要求的场景(如高频交易)中若观察到网络延迟增加，应禁用该参数以避免自适应调整引入的延迟波动",
+            "range": [
+                "on",
+                "off"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.adaptive-tx",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境中（如10Gbps以上），当系统监控显示大量中断导致CPU使用率过高时，建议启用该参数以降低中断频率\n\n2. 在低延迟敏感型应用场景（如高频交易系统），若网络延迟指标出现异常波动，建议禁用该参数以确保中断响应及时性",
+            "range": [
+                "on",
+                "off"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.tx-ring buffer size",
+        "info": {
+            "desc": "1. 当网络吞吐量高且出现数据包丢失或延迟增加时，可以适当增大该值以减少发送队列溢出风险，建议从默认值(通常256-1024)逐步倍增测试，最大值不超过65535\n\n2. 在低吞吐量或低配置虚拟机环境中，若系统监控显示发送队列长期空闲(利用率<30%)，可适当减小该值以释放内存资源，建议不低于64",
+            "type": "continuous",
+            "range": [
+                256,
+                16384
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.rx-ring buffer size",
+        "info": {
+            "desc": "1. 当网络流量高峰期出现丢包或延迟增加时，可适当增大该值以提升吞吐量，但需注意内存消耗增加的风险\n2. 当系统内存资源紧张且网络负载较低时，可适当减小该值以释放内存资源，但需确保不会导致性能下降",
+            "type": "continuous",
+            "range": [
+                256,
+                16384
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.generic-receive-offload",
+        "info": {
+            "desc": "1. 当服务器处理大量小包且CPU利用率过高时，建议禁用该参数以降低CPU开销\n2. 当服务器主要处理大流量数据且网络吞吐量不足时，建议启用该参数以减少协议栈处理开销",
+            "range": [
+                "on",
+                "off"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.generic-segmentation-offload",
+        "info": {
+            "desc": "1. 当服务器主要处理大量小数据包（如DNS、VoIP等应用）且CPU利用率过高时，建议禁用该参数以降低CPU处理开销\n2. 当服务器主要传输大文件或视频流等大数据量应用时，建议启用该参数以提高网络吞吐量",
+            "range": [
+                "on",
+                "off"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.tcp-segmentation-offload",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境下（如10Gbps+），当CPU利用率因TCP分段处理过高时，建议启用该参数以减轻CPU负载\n2. 当遇到网络数据包校验错误或分片异常问题时，建议临时禁用该参数进行故障排查",
+            "range": [
+                "on",
+                "off"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.pid_max",
+        "info": {
+            "desc": "- 当系统频繁达到当前pid_max限制导致无法创建新进程时，应适当增大该值，通常可设置为默认值(32768)的2-4倍\n- 在容器化环境中若需支持大量短生命周期进程，建议将pid_max提升至262144(2^18)以匹配现代Linux内核支持的上限",
+            "type": "continuous",
+            "range": [
+                1048576,
+                4194304
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.shmmni",
+        "info": {
+            "desc": "- 当运行需要大量共享内存段的数据库（如Oracle）或科学计算应用时，若出现\"SHMMNI\"相关错误日志，应增加该值至超过应用实际需求的20%冗余量\n\n- 在容器化或虚拟化环境中，若单个物理节点需承载多个共享内存密集型实例，应按实例数乘以单个实例需求量的1.5倍进行设置",
+            "type": "continuous",
+            "range": [
+                1024,
+                16384
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.shmmax",
+        "info": {
+            "desc": "1. 当运行需要大量共享内存的应用（如Oracle数据库、SAP HANA等）时，如果应用报错提示共享内存不足，需要将kernel.shmmax设置为至少等于所有共享内存段总和的80%-90%，但不超过物理内存的90%\n\n2. 在容器化或虚拟化环境中，当多个实例需要共享内存通信且出现性能瓶颈时，应根据每个实例的实际共享内存需求总和来调整kernel.shmmax，确保其值大于所有实例需求之和",
+            "type": "continuous",
+            "range": [
+                17179869184,
+                68719476736
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.shmall",
+        "info": {
+            "desc": "1. 当系统运行需要大量共享内存的应用（如Oracle数据库）且出现\"SHMMAX too small\"错误时，需要增加该值至物理内存的80%左右\n\n2. 当系统频繁使用共享内存但未充分利用物理内存时，可适当降低该值以避免资源浪费，通常设置为(总物理内存 - 系统保留内存) / PAGE_SIZE",
+            "type": "continuous",
+            "range": [
+                1073741824,
+                8589934592
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.core_uses_pid",
+        "info": {
+            "desc": "1. 当需要快速定位崩溃进程时，建议启用该参数(设为1)，通过core文件名中的PID可以快速关联到具体进程信息\n\n2. 当系统频繁产生core文件且磁盘空间紧张时，建议禁用该参数(设为0)，避免文件名过长导致管理困难",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.msgmni",
+        "info": {
+            "desc": "1. 当系统日志频繁出现\"msgmni limit reached\"错误时，表明当前队列数量不足以支撑应用需求，需要增加该值\n\n2. 对于频繁使用System V消息队列的中间件应用(如Oracle数据库)，建议将该值设置为进程数量的4倍以上",
+            "type": "continuous",
+            "range": [
+                8000,
+                128000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.msgmax",
+        "info": {
+            "desc": "1. 当应用频繁发送超过当前 kernel.msgmax 限制的大消息导致消息队列操作失败时，应适当增大该值，但需确保不超过系统可用内存的合理比例\n\n2. 若系统存在大量小消息传输且 msgmax 设置过大导致内存碎片化，应降低该值以匹配实际消息大小，通常不低于 8KB",
+            "type": "continuous",
+            "range": [
+                4096,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.msgmnb",
+        "info": {
+            "desc": "增加该值当消息队列频繁达到默认上限(通常为16384字节)导致应用报错时  \n降低该值当系统存在大量闲置消息队列且需要减少内核内存占用时",
+            "type": "continuous",
+            "range": [
+                4096,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sem",
+        "info": {
+            "desc": "1. 当系统出现大量进程因信号量资源不足而阻塞时，需要增加semmni和semmsl值，建议将semmni设置为至少等于并发进程数，semmsl设置为每个进程可能需要的最大信号量数\n\n2. 当系统出现semop调用频繁失败或性能下降时，需要增大semopm值，建议将其设置为典型事务中所需的信号量操作数的2-3倍",
+            "range": [
+                "16000 512000000 256 16000",
+                "32000 1024000000 500 32000",
+                "64000 2048000000 1000 64000"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.hung_task_timeout_secs",
+        "info": {
+            "desc": "1. 当系统频繁出现hung_task警告但实际任务仍在正常执行时，可适当增大该值（如从默认120秒调整为300秒），避免误报\n\n2. 对于存储密集型应用（如数据库服务器），若观察到存储设备响应较慢导致任务频繁超时，应结合存储延迟指标调高该值至存储设备平均响应时间的2-3倍",
+            "type": "continuous",
+            "range": [
+                30,
+                1200
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.nmi_watchdog",
+        "info": {
+            "desc": "1. 在生产服务器上建议禁用该参数(设置为0)，因为NMI watchdog会周期性触发NMI中断，可能对系统性能产生轻微影响，尤其在高负载场景下\n\n2. 在调试内核死锁或硬件问题时可以临时启用(设置为1)，帮助捕获长时间关中断导致的挂起问题",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.sched_rt_runtime_us",
+        "info": {
+            "desc": "1. 当系统需要运行更多实时任务时，可以适当增加该值（但不超过sched_rt_period_us的95%），默认值950000微秒可提高到990000微秒\n\n2. 当非实时任务出现严重饥饿现象时，应减小该值（建议不低于800000微秒），为普通任务保留更多CPU时间",
+            "type": "continuous",
+            "range": [
+                950000,
+                1000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.timer_migration",
+        "info": {
+            "desc": "1. 在NUMA架构服务器上运行低延迟应用时，若出现跨节点时钟中断导致的性能抖动，应禁用该参数以保持本地CPU处理时钟中断\n\n2. 当系统负载主要集中运行在单个NUMA节点且出现时钟中断处理不均衡时，可启用该参数允许时钟中断在CPU间迁移",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.threads-max",
+        "info": {
+            "desc": "1. 当系统频繁出现\"fork: Cannot allocate memory\"错误或应用程序因无法创建新线程而崩溃时，需要增加该值。可通过计算系统内存容量和单个线程平均内存占用来确定合理上限，通常设置为物理内存(MB)/8。\n\n2. 在高并发容器环境或运行大量轻量级线程的应用(如Java微服务)时，若/proc/sys/kernel/pid_max已调高但仍有线程创建限制，应将该值提升至至少pid_max值的2倍。",
+            "type": "continuous",
+            "range": [
+                655360,
+                65536000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.sysrq",
+        "info": {
+            "desc": "1. 生产环境中建议设置为1（仅启用基本功能）或0（完全禁用），避免通过SysRq组合键意外触发系统操作，降低安全风险\n\n2. 调试崩溃或死机问题时临时设置为1或更大值（如176/128），启用更多调试功能后需立即恢复默认安全配置",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.sched_autogroup_enabled",
+        "info": {
+            "desc": "1. 在服务器环境下建议禁用该参数(设为0)，因为自动任务分组主要针对桌面交互程序优化，服务器工作负载通常不需要这种调度特性\n\n2. 当服务器运行大量短时交互式任务且出现调度延迟问题时，可尝试启用(设为1)观察效果，但需注意可能影响批处理任务的吞吐量",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.numa_balancing",
+        "info": {
+            "desc": "1. 当系统运行NUMA架构且应用存在跨节点内存访问时，应启用该参数(设置为1)以减少远程内存访问延迟\n2. 对于内存密集型且对延迟敏感的应用，若观察到较高比例的跨节点内存访问，建议禁用该参数(设置为0)以避免自动平衡带来的性能波动",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "kernel.randomize_va_space",
+        "info": {
+            "desc": "1. 当系统运行安全性要求较高的服务时，建议保持默认值2（完全随机化），以增强对抗内存攻击的能力\n\n2. 若应用程序出现因地址随机化导致的兼容性问题，且运行环境可信，可临时调整为1（仅对数据段随机化）或0（禁用）进行测试",
+            "type": "continuous",
+            "range": [
+                0,
+                2
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "kernel.dmesg_restrict",
+        "info": {
+            "desc": "1. 如果系统需要满足安全合规要求（如PCI-DSS、HIPAA等），建议设置为1以限制普通用户查看内核日志，防止敏感信息泄露\n2. 在需要开发调试或故障排查的环境中，建议设置为0以便非特权用户也能查看完整的系统日志信息",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "vm.swappiness",
+        "info": {
+            "desc": "1. 对于内存密集型应用（如数据库、缓存服务），建议将 vm.swappiness 设置为 10-30 以减少交换空间使用，优先利用物理内存\n2. 当系统频繁发生 OOM (Out of Memory) 时，可适当提高 vm.swappiness 至 60-80 以增加交换空间使用，避免进程被强制终止",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.vfs_cache_pressure",
+        "info": {
+            "desc": "1. 当系统频繁进行目录和inode缓存回收导致性能下降时，可适当降低该值（如设为50-100），减少内核回收缓存内存的频率\n\n2. 当系统内存充足但缓存利用率不足时，可适当提高该值（如设为150-200），促使内核更积极地回收缓存内存",
+            "type": "continuous",
+            "range": [
+                0,
+                500
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.dirty_background_ratio",
+        "info": {
+            "desc": "1. 对于写入密集型应用（如数据库服务器），建议将值从默认的10%提高到15-20%，以减少频繁的后台刷写对I/O性能的影响\n\n2. 对于内存较小的系统（如低于8GB），建议保持默认值或降至5-10%，以避免过多脏页堆积导致内存压力",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.dirty_ratio",
+        "info": {
+            "desc": "1. 当系统频繁因脏页刷盘导致I/O瓶颈时，可适当降低该值（如从默认20%降至10%），以减少单次刷盘的数据量，但会增加刷盘频率\n\n2. 若系统内存较大且主要处理顺序写入负载，可适当提高该值（如升至30%-40%），利用内存缓冲更多脏数据，减少磁盘I/O次数",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.stat_interval",
+        "info": {
+            "desc": "1. 当系统需要更频繁监控内存使用情况（如内存压力大或频繁交换时），可适当减小该值（如从默认10秒降至5秒），但需注意增加的系统开销  \n\n2. 在内存使用稳定且低负载环境中，可增大该值（如调至30秒）以减少/proc/vmstat的更新频率，降低内核开销",
+            "type": "continuous",
+            "range": [
+                1,
+                100
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.dirty_expire_centisecs",
+        "info": {
+            "desc": "1. 对于需要快速持久化数据的应用（如数据库），建议将值调低至100-300（1-3秒），以减少数据丢失风险  \n2. 对于写入密集型负载且对延迟敏感的应用，可适当提高至1000-3000（10-30秒），通过合并更多写操作来提升I/O吞吐量",
+            "type": "continuous",
+            "range": [
+                100,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.dirty_writeback_centisecs",
+        "info": {
+            "desc": "1. 当系统频繁出现I/O等待或磁盘写入延迟较高时，可适当降低该值（如从默认500调整为200-300），以加快脏页回写频率，减少突发写入导致的性能波动\n\n2. 对于写入密集型负载且使用电池供电的设备（如服务器UPS环境），可适当提高该值（如设置为1000-1500），通过减少磁盘写入次数来降低I/O开销和能耗",
+            "type": "continuous",
+            "range": [
+                100,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.overcommit_ratio",
+        "info": {
+            "desc": "1. 当物理服务器内存使用率长期低于50%且需要运行大量内存申请不确定的应用程序时，可适当提高该比例(如设置为80-90%)以提升内存利用率\n\n2. 在内存密集型应用场景下，若频繁触发OOM killer且监控显示实际内存使用接近物理内存总量，应降低该比例(如设置为50-70%)以避免过度承诺内存",
+            "type": "continuous",
+            "range": [
+                0,
+                100
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.overcommit_memory",
+        "info": {
+            "desc": "1. 当系统运行内存密集型应用且频繁触发OOM killer时，建议将值设为0（保守策略）或2（严格策略）以避免过度分配\n\n2. 当系统主要运行已知内存需求的批量任务且需要最大化内存利用率时，可设为1（总是允许过度分配）以提升吞吐量",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "vm.min_free_kbytes",
+        "info": {
+            "desc": "1. 当系统频繁触发直接内存回收(direct reclaim)导致性能下降时，需要增加该值以减少直接回收频率，建议设置为物理内存的1-3%\n\n2. 当系统存在大量不可移动页(unmovable pages)导致内存碎片化严重时，需适当提高该值以预留更多连续内存空间",
+            "type": "continuous",
+            "range": [
+                10240,
+                1024000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.page-cluster",
+        "info": {
+            "desc": "1. 当系统频繁进行大块连续内存交换时，可适当增大该值（默认3，建议范围3-10），减少交换操作的I/O开销\n\n2. 在SSD存储的交换分区环境中，由于随机访问性能较好，可降低该值（建议1-3）以减少单次交换延迟",
+            "type": "continuous",
+            "range": [
+                0,
+                8
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.max_map_count",
+        "info": {
+            "desc": "增加该值当运行内存密集型应用（如Elasticsearch或数据库）时出现\"max virtual memory areas vm.max_map_count [65530] is too low\"错误\n\n将该值设置为262144或更高当运行需要大量内存映射的Java应用（如Hadoop或Spark）时",
+            "type": "continuous",
+            "range": [
+                100000,
+                10000000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.zone_reclaim_mode",
+        "info": {
+            "desc": "1. 当系统运行在NUMA架构且存在跨节点内存访问延迟问题时，建议将vm.zone_reclaim_mode设置为1，优先尝试在本地节点回收内存以减少远程访问延迟\n\n2. 当系统内存压力较大且本地节点回收效果不佳时，建议将vm.zone_reclaim_mode设置为0，允许从其他节点回收内存以提高整体回收效率",
+            "range": [
+                "0",
+                "1",
+                "2",
+                "4"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "vm.watermark_scale_factor",
+        "info": {
+            "desc": "1. 当系统频繁触发直接内存回收(direct reclaim)且kswapd进程活跃度不足时，可适当降低该值(如从默认的10调整至5-8)，使kswapd更早介入内存回收\n\n2. 在内存压力较大且kswapd持续运行的场景下，若观察到系统响应延迟增加，可尝试增大该值(如调整至15-20)，延迟kswapd休眠时机以提升回收效率",
+            "type": "continuous",
+            "range": [
+                10,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "vm.numa_stat",
+        "info": {
+            "desc": "1. 当系统内存资源紧张且NUMA统计对当前业务场景不重要时，可将该参数设为0以降低统计精度，减少内存开销\n2. 在需要精确监控NUMA内存行为的高性能计算场景中，应保持该参数启用(默认值1)以获得完整统计信息",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "vm.drop_caches",
+        "info": {
+            "desc": "1. 当系统内存压力较大且缓存占用过高时，可临时设置为3释放pagecache、dentries和inodes缓存，但不宜频繁操作以免影响性能\n\n2. 在运行内存密集型应用前，可设置为1仅释放pagecache，避免缓存干扰应用性能测试结果",
+            "range": [
+                "1",
+                "2",
+                "3"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "fs.inotify.max_user_watches",
+        "info": {
+            "desc": "1. 当监控大量文件或目录时（如日志目录、代码仓库等），若出现\"Too many open files\"或\"User limit of inotify watches reached\"错误，需增加该值\n\n2. 对于高并发文件监控场景（如实时日志分析、文件同步服务），建议将该值调整为默认值（通常8192）的4-8倍，具体数值应根据实际监控文件数量确定",
+            "type": "continuous",
+            "range": [
+                4096,
+                819200
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "fs.nr_open",
+        "info": {
+            "desc": "1. 当应用（如数据库、Web服务器）频繁报告\"too many open files\"错误且ulimit -n已调高时，需增加该值至大于等于进程实际需要的最大文件描述符数\n\n2. 在内存资源紧张的系统中，若该值设置过高（如接近memlock限制），应适当降低以防止内存耗尽",
+            "type": "continuous",
+            "range": [
+                10240,
+                1024000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "fs.file-max",
+        "info": {
+            "desc": "1. 当系统频繁出现\"Too many open files\"错误或监控显示文件句柄使用率持续接近当前限制时，需要增加该值\n\n2. 对于高并发服务（如Web服务器、数据库等），建议将该值设置为物理内存大小（KB）的10%-20%（例如64GB内存可设置为6,400,000-12,800,000）",
+            "type": "continuous",
+            "range": [
+                102400,
+                10240000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "fs.aio-max-nr",
+        "info": {
+            "desc": "- 当系统日志频繁出现\"aio-max-nr reached\"警告或应用程序因异步I/O请求被拒绝而报错时，需要增加该值\n- 对于高并发数据库服务器(如MySQL/PostgreSQL)或大规模文件处理应用，建议将该值设置为(并发线程数×每个线程可能持有的未完成AIO请求数)×2",
+            "type": "continuous",
+            "range": [
+                102400,
+                10240000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "fs.inotify.max_user_instances",
+        "info": {
+            "desc": "1. 当系统日志频繁出现\"inotify instance limit reached\"或类似错误时，表明当前用户运行的监控进程（如文件同步工具、开发热加载工具等）数量超过限制，需要增加该值\n\n2. 对于运行大量容器或微服务的环境，每个容器实例可能需要独立的inotify实例监控文件变化，此时应根据实际容器数量合理调高该参数",
+            "type": "continuous",
+            "range": [
+                64,
+                65535
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "fs.suid_dumpable",
+        "info": {
+            "desc": "1. 当系统需要调试setuid程序崩溃问题时，建议将值设为1（debug模式），允许生成核心转储文件用于故障分析\n\n2. 在注重安全性的生产环境中，建议保持默认值0，避免潜在的安全风险，防止敏感信息通过核心转储泄露",
+            "type": "continuous",
+            "range": [
+                0,
+                2
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "blockdev",
+        "info": {
+            "desc": "增大预读值(如设置为8192)可提升顺序读性能，适用于频繁大文件顺序读场景\n\n降低预读值(如设置为128)可减少IO开销，适用于随机访问为主的场景",
+            "type": "continuous",
+            "range": [
+                0,
+                2147483648
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.fifo_batch",
+        "info": {
+            "desc": "1. 当系统需要更高吞吐量且能容忍更高延迟时（如批量数据处理场景），可适当增大该值（如32-64）  \n2. 当系统对延迟敏感（如实时数据库）且当前吞吐量足够时，可降低该值（如8-12）以减少单个批次的处理延迟",
+            "type": "continuous",
+            "range": [
+                1,
+                128
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.front_merges",
+        "info": {
+            "desc": "1. 在I/O负载主要来自顺序写入且存储设备性能良好时，建议保持默认值1以允许前向合并，这能减少请求数量提升吞吐量\n\n2. 当系统处理大量随机I/O或使用某些特定存储设备时出现性能下降，可尝试将该参数设为0禁用前向合并，减少不必要的合并操作开销",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.read_expire",
+        "info": {
+            "desc": "1. 当系统主要处理高优先级读操作（如数据库查询）且存在读延迟敏感型应用时，可适当降低该值（如从默认的125ms降至50-100ms），确保读请求能更快得到响应\n\n2. 若系统频繁出现读请求超时丢弃现象（可通过监控deadline调度器的统计信息发现），且存储设备实际响应能力优于当前设置，应适当调高该值（如增至150-200ms）以避免不必要的请求重试",
+            "type": "continuous",
+            "range": [
+                100,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.writes_starved",
+        "info": {
+            "desc": "1. 当系统主要处理随机读取密集型负载（如数据库服务）且需要低延迟响应时，可适当提高该值（默认2-5范围），优先处理读请求以减少读延迟\n\n2. 当系统存在大量顺序写操作（如日志写入、数据备份）且写性能成为瓶颈时，应降低该值（最小可设为1），防止读请求过度抢占I/O带宽影响写入吞吐量",
+            "type": "continuous",
+            "range": [
+                1,
+                10
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.max_sectors_kb",
+        "info": {
+            "desc": "1. 当使用高性能存储设备（如NVMe SSD）且存在大量大块I/O操作时，可适当增大该值（如1024-4096 KB）以提高吞吐量\n2. 当出现I/O错误或设备驱动不稳定时，应降低该值至默认值512 KB或更小以增强稳定性",
+            "type": "continuous",
+            "range": [
+                64,
+                1024
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.queue_depth",
+        "info": {
+            "desc": "1. 当使用高性能存储设备（如NVMe SSD）且系统负载较高时，若观察到存储设备利用率不足或IOPS未达预期，可适当增加该值（通常建议从默认32逐步上调至64-256范围），但需确保不超过设备硬件队列深度限制\n\n2. 对于虚拟机环境或低性能旋转磁盘（如HDD），若延迟显著增加或出现请求超时，应将值降低至16-32范围以减少IO堆积",
+            "type": "continuous",
+            "range": [
+                64,
+                1024
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.nr_requests",
+        "info": {
+            "desc": "1. 当系统有高性能存储设备（如NVMe SSD）且IOPS吞吐量不足时，可适当增加该值（默认128），建议范围256-1024，以充分发挥设备并行处理能力\n\n2. 当系统出现高延迟或请求堆积时，若存储设备为机械硬盘，应降低该值（建议64-128），避免单个设备队列过深导致寻道时间增加",
+            "type": "continuous",
+            "range": [
+                128,
+                2048
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.read_ahead_kb",
+        "info": {
+            "desc": "1. 当系统主要运行顺序读取大文件的应用（如数据库、视频流服务）且内存充足时，可适当增大该值（如从默认128KB调整为512KB-1MB），以减少I/O等待时间\n\n2. 当系统内存压力较大或主要处理随机访问负载时，应降低该值（如调整为64KB或更低），避免预读过多无用数据占用宝贵的内存资源",
+            "type": "continuous",
+            "range": [
+                0,
+                65536
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.rq_affinity",
+        "info": {
+            "desc": "1. 当系统在高I/O负载下出现CPU利用率不均衡时，建议调整该参数以提高本地CPU处理I/O请求的效率\n\n2. 在使用多队列存储设备时，若发现I/O性能未达到预期，建议调整此参数以充分利用多核CPU的并行处理能力",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.add_random",
+        "info": {
+            "desc": "1. 当系统对随机数质量要求极高且性能开销可接受时，建议启用该参数以增强熵池的随机性来源\n\n2. 在高性能计算或低延迟要求的场景下，若系统已有足够熵源，建议禁用该参数以避免I/O事件带来的额外开销",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.rotational",
+        "info": {
+            "desc": "1. 当存储设备为SSD时，必须将该参数设置为0，以避免系统错误地应用针对机械硬盘的I/O调度策略\n\n2. 当存储设备为机械硬盘时，该参数应保持默认值1，以确保系统能正确应用适合旋转介质的相关优化",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.scheduler",
+        "info": {
+            "desc": "1. 对于MySQL数据库场景，建议将block.scheduler设置为deadline，该调度算法能更好地处理数据库的随机I/O负载，减少I/O延迟\n\n2. 如果系统使用的是SSD存储设备，可以考虑设置为noop调度器，因为SSD没有机械磁盘的寻道时间，简单的FIFO队列调度即可发挥最佳性能",
+            "range": [
+                "mq-deadline",
+                "kyber",
+                "bfq",
+                "none"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.write_cache",
+        "info": {
+            "desc": "1. 当系统需要更高的写入性能且能容忍少量数据丢失风险时，建议设置为 write back 模式\n\n2. 当数据安全性要求极高且性能不是首要考虑时，建议设置为 write through 模式",
+            "range": [
+                "write back",
+                "write through"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.nomerges",
+        "info": {
+            "desc": "1. 仅在调试I/O请求合并相关问题时设置为0，生产环境应保持默认值1以获得合并带来的性能优势  \n2. 当使用blktrace等工具进行底层块设备分析时，可临时禁用合并(设为0)以获取更精确的请求跟踪数据",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "blockdev_multidisk",
+        "info": {
+            "desc": "- 当系统频繁进行大规模顺序读操作且磁盘I/O吞吐量未达预期时，可适当增大该值以提升多磁盘并行预取能力\n- 若系统主要处理随机I/O且内存压力较大时，应减小该值以避免无效预取占用过多内存带宽",
+            "type": "continuous",
+            "range": [
+                0,
+                2147483648
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.fifo_batch_multidisk",
+        "info": {
+            "desc": "1. 在需要提高多磁盘环境下批量I/O吞吐量的场景中（如存储服务器或数据库服务器），可适当增大该值至32-64，但需监控请求延迟是否在可接受范围内\n\n2. 当系统出现明显的I/O延迟敏感型应用性能下降时（如实时事务处理系统），应将该值降低至8-12以减少批量请求带来的延迟影响",
+            "type": "continuous",
+            "range": [
+                1,
+                128
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.front_merges_multidisk",
+        "info": {
+            "desc": "1. 在SSD或多磁盘阵列环境下，若观察到频繁的前向合并导致I/O延迟增加，建议禁用该参数(设为0)，因为SSD随机访问性能优异且多磁盘阵列本身具有并行处理能力，前向合并带来的优化效果有限\n\n2. 对于传统机械硬盘且主要处理顺序I/O负载的系统(如数据库日志写入)，保持默认值(启用前向合并)即可，因为顺序访问模式能从合并操作中获益",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.read_expire_multidisk",
+        "info": {
+            "desc": "1. 当系统主要处理高优先级读请求且存在多磁盘环境时，若读请求延迟超过预期，可适当降低该值至100-200ms范围以减少读请求等待时间\n\n2. 当系统主要处理顺序大文件读取且磁盘负载较高时，若观察到频繁的请求超时，可适当提高该值至500-1000ms范围以避免不必要的请求重新排队",
+            "type": "continuous",
+            "range": [
+                100,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.writes_starved_multidisk",
+        "info": {
+            "desc": "1. 当系统主要运行需要高读取性能的应用（如数据库服务）且磁盘I/O压力主要来自读取操作时，可以适当增大该值（例如从默认值2调整为3-5），以提高读取请求的优先级和吞吐量\n\n2. 当系统存在大量混合读写负载且写入延迟敏感型应用（如事务日志）时，应降低该值（例如调整为1），以避免写入请求因读取请求过多而长时间等待",
+            "type": "continuous",
+            "range": [
+                1,
+                10
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.max_sectors_kb_multidisk",
+        "info": {
+            "desc": "1. 当服务器使用高性能存储设备（如NVMe SSD或高端SAN）且存在大量顺序I/O负载时，建议增大该值至2048-4096 KB以提升吞吐量\n\n2. 当系统出现I/O请求合并不足或高延迟问题时，在确保存储设备支持较大传输单元的前提下，可逐步增加该值并监控性能变化",
+            "type": "continuous",
+            "range": [
+                64,
+                1024
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.queue_depth_multidisk",
+        "info": {
+            "desc": "- 当服务器使用多磁盘阵列且IOPS性能未达预期时，可适当增加该值以提高并行IO处理能力\n- 若系统出现高延迟或请求超时，且监控显示磁盘队列持续满载，应降低该值以避免请求堆积",
+            "type": "continuous",
+            "range": [
+                64,
+                1024
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.nr_requests_multidisk",
+        "info": {
+            "desc": "1. 当系统有多个磁盘且I/O吞吐量不足时，可以适当增加该值以提高并行处理能力，但需确保不超过设备队列深度总和\n2. 在高延迟存储设备场景下，若观察到请求排队时间过长导致性能下降，应考虑降低该值以避免请求积压",
+            "type": "continuous",
+            "range": [
+                128,
+                2048
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.read_ahead_kb_multidisk",
+        "info": {
+            "desc": "1. 当服务器主要运行顺序读取密集型应用（如数据库、日志分析）且内存充足时，可适当增大该值（如512-2048KB），以减少I/O等待时间\n\n2. 当系统内存压力较大或主要处理随机I/O负载时，应降低该值（如128-256KB）以避免缓存污染和内存浪费",
+            "type": "continuous",
+            "range": [
+                0,
+                65536
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "block.rq_affinity_multidisk",
+        "info": {
+            "desc": "1. 当服务器使用多磁盘阵列且CPU负载不均衡时，建议启用该参数以提高I/O并行性\n\n2. 在高并发低延迟要求的存储场景下，若出现CPU核心利用率不均导致I/O瓶颈，建议调整该参数值",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.add_random_multidisk",
+        "info": {
+            "desc": "1. 当系统依赖高强度加密操作（如SSL/TLS通信或加密文件系统）且/dev/random阻塞导致性能下降时，建议启用该参数以增加熵源多样性\n\n2. 在虚拟化环境中宿主机或容器的熵池补充不足时，应启用此参数以利用多磁盘I/O事件增强熵收集效率",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.rotational_multidisk",
+        "info": {
+            "desc": "1. 当存储设备为SSD时，必须将该参数设置为0以避免不必要的I/O调度开销\n2. 对于机械硬盘阵列环境，保持默认值1以优化旋转磁盘的I/O调度",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.scheduler_multidisk",
+        "info": {
+            "desc": "1. 对于MySQL数据库场景，建议将block.scheduler_multidisk设置为deadline调度器，该调度器能有效减少I/O延迟，特别适合需要稳定响应时间的数据库工作负载\n\n2. 若系统使用SSD存储设备，可考虑设置为noop调度器，因为SSD本身具有较低的访问延迟，不需要复杂的调度算法",
+            "range": [
+                "mq-deadline",
+                "kyber",
+                "bfq",
+                "none"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.write_cache_multidisk",
+        "info": {
+            "desc": "1. 当系统需要更高写入性能且能容忍少量数据丢失风险时，建议启用write back缓存策略\n\n2. 当系统要求数据强一致性且不能容忍任何数据丢失时，建议使用write through缓存策略",
+            "range": [
+                "write back",
+                "write through"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "block.nomerges_multidisk",
+        "info": {
+            "desc": "1. 当系统在多磁盘环境下出现I/O请求合并导致的性能下降或延迟问题时，建议保持默认值1以启用合并，除非有明确的性能分析表明禁用合并能带来提升\n\n2. 在进行存储子系统调试或性能基准测试需要隔离请求合并影响时，可临时设置为0禁用合并功能",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.core.netdev_budget",
+        "info": {
+            "desc": "1. 当网络接口频繁出现丢包（ifconfig显示RX dropped增加）且CPU软中断（softirq）占用过高时，建议适当增大该值（默认300可尝试调整为600-800）以提升单次软中断处理的包数量，减少中断次数\n\n2. 在低吞吐量但延迟敏感型场景（如高频交易系统）中，若网络延迟出现波动，可尝试降低该值（如调整为150-200）以减少单次软中断处理时间，降低处理延迟",
+            "type": "continuous",
+            "range": [
+                100,
+                1000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.optmem_max",
+        "info": {
+            "desc": "- 当应用程序（如高性能网络服务）需要处理大量并发连接或大容量数据时，若出现 socket 缓冲区不足导致的性能瓶颈，可适当增加该值\n- 在内存资源充足的服务器上，若默认值（通常为 20480）无法满足特定应用（如视频流、大数据传输）的需求，可按 2 的幂次方逐步调高至合理范围（如 65536 或 131072）",
+            "type": "continuous",
+            "range": [
+                20480,
+                204800
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.wmem_max",
+        "info": {
+            "desc": "1. 当服务器处理大量高吞吐量网络连接（如视频流、大文件传输等场景）时出现写缓冲区不足导致的性能瓶颈，建议将值从默认229376调整为16777216\n\n2. 在高并发TCP长连接场景（如WebSocket服务、消息队列等）中观察到因写缓冲区溢出导致的连接异常或数据丢失时，建议采用16777216值",
+            "type": "continuous",
+            "range": [
+                1048576,
+                67108864
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.wmem_default",
+        "info": {
+            "desc": "1. 当应用主要处理大量小数据包传输时，若网络吞吐量低于预期且系统监控显示发送缓冲区频繁填满，可适当增大该值至32768-65535字节范围，减少频繁缓冲区填满导致的延迟  \n\n2. 在高带宽高延迟网络环境下（如跨数据中心传输），若TCP窗口缩放功能已启用但实际窗口仍受限于默认值，应将该值提升至至少163840字节（160KB）以匹配BDP（带宽延迟积）需求",
+            "type": "continuous",
+            "range": [
+                8192,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.rmem_default",
+        "info": {
+            "desc": "1. 当应用需要处理大量网络数据流（如视频流、大数据传输）且观察到频繁的TCP窗口缩放或重传时，建议将值从默认的212992字节提升至1-4MB范围（1048576-4194304字节），需配合net.core.rmem_max同步调整\n\n2. 在高吞吐低延迟网络环境（如10Gbps以上）中，若netstat -s显示\"pruned\"或\"collapsed\"包统计持续增长，建议将值设置为BDP（带宽延迟积）的1/4至1/2，计算公式为：(带宽(bps) × 往返时延(s)) / 8 × 0.25",
+            "type": "continuous",
+            "range": [
+                8192,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.rmem_max",
+        "info": {
+            "desc": "1. 当应用需要处理高吞吐量网络数据流（如视频流、大数据传输）时，应将此值调整为16777216以提升接收性能  \n2. 在存在大量TCP长连接且频繁出现接收缓冲区不足警告（如内核日志报\"TCP: too much of memory\"）时，应增大该值",
+            "type": "continuous",
+            "range": [
+                1048576,
+                67108864
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.netdev_max_backlog",
+        "info": {
+            "desc": "1. 当服务器频繁出现网络丢包或高负载时，且通过监控发现 netdev_backlog 值持续接近或达到当前 netdev_max_backlog 设置值，应适当增大该参数值（例如从默认的1000调整为2000-3000）  \n\n2. 对于10Gbps及以上高速网络接口，若默认值导致数据包处理延迟增加，需根据实际网络吞吐量和CPU处理能力按比例提升该参数值",
+            "type": "continuous",
+            "range": [
+                1000,
+                100000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_thin_linear_timeouts",
+        "info": {
+            "desc": "1. 当服务器处理大量短生命周期TCP连接且频繁出现超时重传时，建议启用该参数(tcp_thin_linear_timeouts=1)以更精确检测瘦流并减少不必要的重传等待时间  \n\n2. 若服务器主要处理大文件传输或视频流等持续高吞吐连接，建议保持默认值(tcp_thin_linear_timeouts=0)以避免对正常数据流产生误判",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.unix.max_dgram_qlen",
+        "info": {
+            "desc": "1. 当系统频繁处理大量UDP数据报且出现丢包现象时，应考虑增加该值以提高队列容量\n2. 在高吞吐量UDP应用场景中，若观察到应用处理速度跟不上数据接收速度导致队列溢出，应适当调高此参数",
+            "type": "continuous",
+            "range": [
+                128,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.somaxconn",
+        "info": {
+            "desc": "1. 当服务器需要处理大量并发连接请求（如高负载Web服务器）且出现连接被丢弃或排队延迟时，应将此值从默认128增大到1024或更高\n\n2. 在运行需要频繁建立短连接的服务（如反向代理、负载均衡器）时，建议将该值调整为至少等于或大于服务的worker_processes与worker_connections乘积的1/4",
+            "type": "continuous",
+            "range": [
+                128,
+                65536
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.busy_poll",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境中（如10Gbps以上），若CPU利用率不足且存在延迟敏感型应用，可适当增加该值（如50-100微秒）以减少中断频率，但需监控CPU负载避免过度占用\n\n2. 在低延迟网络环境（如高频交易系统）中，若网络延迟指标不达标且CPU资源充足，可尝试设置为0禁用该功能，强制使用中断模式降低延迟",
+            "type": "continuous",
+            "range": [
+                0,
+                200
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.busy_read",
+        "info": {
+            "desc": "1. 当网络设备处理高吞吐量小包时出现频繁读超时或性能下降，可尝试增加该值至100-200微秒范围，需结合具体硬件性能测试确定最优值\n\n2. 在低延迟网络环境中若观察到CPU使用率异常升高且与网络中断处理相关，可测试降低该值至20-30微秒以减少等待时间",
+            "type": "continuous",
+            "range": [
+                0,
+                200
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.core.dev_weight",
+        "info": {
+            "desc": "1. 当网络中断处理成为性能瓶颈时（通过监控发现CPU软中断时间占比过高），可适当增加该值以提高单次中断处理的数据包数量，但需注意避免单个CPU过载\n\n2. 对于高吞吐量网卡（如10G/25G以上）或大量小包场景，建议将该值从默认的64提高到128-256范围，需结合具体硬件和负载测试确定最优值",
+            "type": "continuous",
+            "range": [
+                16,
+                1024
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_keepalive_intvl",
+        "info": {
+            "desc": "1. 当服务器需要检测长时间空闲连接的健康状态时，若默认值75秒导致故障检测延迟过高，可适当减小至30-60秒范围以加快故障发现，但需权衡网络负载增加的影响\n\n2. 在高延迟网络环境中，若频繁出现误判连接中断的情况，可考虑增大该值至90-120秒范围以减少不必要的探测流量，同时需配合调整tcp_keepalive_probes确保总体检测窗口合理",
+            "type": "continuous",
+            "range": [
+                30,
+                300
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_keepalive_probes",
+        "info": {
+            "desc": "1. 当服务器需要快速检测并释放失效连接（如负载均衡器后端健康检查场景）时，可适当减少该值（默认9），建议调整为3-5次以加快失效连接回收\n\n2. 在高延迟或不可靠网络环境中（如跨国VPN），为防止误判活跃连接为失效，应增大该值至12-15次，同时配合调整tcp_keepalive_time和tcp_keepalive_intvl参数",
+            "type": "continuous",
+            "range": [
+                3,
+                144
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_keepalive_time",
+        "info": {
+            "desc": "1. 当服务器需要检测长时间空闲连接的有效性时（如负载均衡器或反向代理场景），若默认值（7200秒）过长可能导致无效连接占用资源，可适当调低至300-600秒区间  \n\n2. 在高并发短连接业务场景下，若出现大量TIME_WAIT状态连接导致端口耗尽，可配合减小tcp_keepalive_probes和tcp_keepalive_intvl参数，将本参数值提升至10800秒以上以减少keepalive探测频率",
+            "type": "continuous",
+            "range": [
+                600,
+                36000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_tw_reuse",
+        "info": {
+            "desc": "1. 当服务器面临大量短连接请求且TIME-WAIT状态连接过多导致端口耗尽时，建议启用该参数(设置为1)以复用TIME-WAIT套接字\n2. 在NAT网络环境下或需要严格保证TCP连接可靠性的场景下，建议保持该参数为默认值0以避免潜在连接混乱风险",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_window_scaling",
+        "info": {
+            "desc": "1. 在高带宽或高延迟网络环境下（如长距离传输或高速网络），应确保该参数值为1以启用窗口缩放功能，提升大窗口TCP连接性能\n\n2. 当网络设备不支持RFC 1323或存在兼容性问题时，应将该参数设为0以禁用窗口缩放功能",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_fin_timeout",
+        "info": {
+            "desc": "1. 当服务器需要处理大量短连接请求时，如果观察到大量连接处于FIN_WAIT_2状态导致端口耗尽，建议将该值从默认的60秒降低到30秒或更低，以加快连接资源释放\n\n2. 对于高延迟网络环境或需要保持长时间连接的应用场景，如果发现连接异常终止问题，建议适当增加该值至120秒以上，确保连接正常关闭",
+            "type": "continuous",
+            "range": [
+                1,
+                120
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.udp_mem",
+        "info": {
+            "desc": "1. 当服务器频繁处理大量UDP流量（如DNS服务器、视频流服务器）且出现丢包或性能下降时，可适当增加high值（如默认值的2-3倍），确保有足够内存缓冲队列数据包\n\n2. 若系统空闲内存充足但UDP应用仍频繁触发压力模式（可通过监控/proc/net/sockstat观察），应按比例同步提高low和assure值（如low设为总内存的1%，assure设为2%）以避免不必要的内存回收抖动",
+            "range": [
+                "12582912 16777216 25165824",
+                "25165824 33554432 50331648",
+                "50331648 100663296"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_mem",
+        "info": {
+            "desc": "1. 当系统在高并发TCP连接场景下出现内存不足或频繁触发OOM killer时，应适当增加三个值（最小压力值/压力阈值/最大值），建议按总物理内存的1%-3%计算，并确保最大值不超过系统可用内存的50%\n\n2. 若系统出现TCP性能下降或连接被拒绝（尤其在高吞吐量场景），需检查当前值是否过小，建议将最小值设为当前活跃连接内存占用的1.5倍，最大值设为系统空闲内存的30%-40%",
+            "range": [
+                "6168306 8224411 12336612",
+                "12336612 16448822 24673224"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_rmem",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境中（如视频流服务器、大数据传输节点），当默认最大值6291456（6MB）导致TCP接收窗口成为瓶颈时，建议将第三个值调整为16777216（16MB）以提升吞吐量\n\n2. 对于内存资源受限的服务器（如云主机或容器环境），若默认值87380（85KB）的初始缓冲区导致内存压力，可将中间值降至65536（64KB）以平衡性能与资源消耗",
+            "range": [
+                "4096 16384 4194304",
+                "4096 32768 8388608",
+                "4096 65536 16777216"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_wmem",
+        "info": {
+            "desc": "1. 在高吞吐量网络环境中（如视频流服务器、文件传输服务器），建议将参数调整为 4096 65536 16777216，以提升大流量场景下的TCP写缓冲区性能\n\n2. 对于内存资源受限的服务器（如云主机或容器环境），若出现内存压力时应适当降低最大值（如调整为 4096 32768 8388608），避免TCP写缓冲区占用过多内存",
+            "range": [
+                "4096 16384 4194304",
+                "4096 32768 8388608",
+                "4096 65536 16777216"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_fastopen",
+        "info": {
+            "desc": "1. 当服务器主要处理大量短连接请求（如HTTP API服务）且需要降低TCP握手延迟时，建议启用该参数（值为3同时支持客户端和服务器端）\n\n2. 当服务器处于严格安全环境或处理敏感数据时，建议禁用该参数（值为0）以避免潜在的安全风险",
+            "range": [
+                "1",
+                "2",
+                "4"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_synack_retries",
+        "info": {
+            "desc": "1. 当服务器处于高并发连接场景且出现大量SYN_RECV状态连接时，若网络延迟较高，可适当增加该值（默认5）至7-10次，确保在拥塞环境下完成三次握手\n\n2. 若服务器遭受SYN Flood攻击或处于高负载状态，可降低该值至2-3次以快速释放半连接资源，减少SYN队列占用时间",
+            "type": "continuous",
+            "range": [
+                3,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_syn_retries",
+        "info": {
+            "desc": "1. 在延迟较高或不稳定的网络环境中（如跨国网络或移动网络），建议将默认值6适当增加到8-10，以应对可能出现的SYN丢包情况，但需注意这会延长连接建立失败时的等待时间\n\n2. 对于内网或低延迟高可靠网络环境，建议降低到3-4以减少连接建立超时等待时间，提高应用响应速度",
+            "type": "continuous",
+            "range": [
+                3,
+                64
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_moderate_rcvbuf",
+        "info": {
+            "desc": "1. 当应用需要处理大量突发流量时，建议启用该参数（设置为1），系统会自动调整接收缓冲区大小以适应流量变化\n2. 在内存资源受限的环境中，建议禁用该参数（设置为0），避免系统自动扩大接收缓冲区导致内存压力增加",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_timestamps",
+        "info": {
+            "desc": "1. 在存在NAT设备或负载均衡器的网络环境中，建议禁用该参数(设置为0)，以避免可能的时间戳冲突导致的连接问题\n2. 在高速低延迟的内网环境中，建议启用该参数(设置为1)，以获得更精确的RTT计算和更好的TCP性能",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_dsack",
+        "info": {
+            "desc": "1. 在延迟敏感型应用环境中(如高频交易系统)，建议设置为0(禁用)以减少不必要的ACK确认包带来的网络开销\n\n2. 在常规Web服务或文件传输场景下保持默认值1(启用)，可帮助处理网络丢包情况下的数据重传效率",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_fack",
+        "info": {
+            "desc": "1. 在存在高延迟或高丢包率的网络环境中，建议启用该参数以改善TCP重传性能，通过选择性确认减少不必要的重传\n\n2. 当服务器作为高性能网络应用（如视频流、大文件传输）的接收端时，建议保持启用状态以优化TCP拥塞控制机制",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_sack",
+        "info": {
+            "desc": "1. 在广域网(WAN)通信环境下应保持启用(1)，可显著改善高延迟或丢包网络中的TCP传输性能，即使会略微增加CPU负载\n2. 在低延迟、高带宽的局域网(LAN)环境中可考虑禁用(0)，特别是当系统CPU资源已高度饱和且网络质量极佳时",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_low_latency",
+        "info": {
+            "desc": "在高吞吐量且对延迟敏感的集群环境（如Beowulf集群）中应启用（设置为1）  \n在普通网络环境下保持禁用（设置为0）以避免不必要的开销",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_adv_win_scale",
+        "info": {
+            "desc": "1. 当应用需要处理大量小包网络流量时，若观察到TCP接收窗口利用率不足，可考虑增大该值（如设为2或3），以减少缓冲区开销比例，提升小包传输效率\n\n2. 在内存资源紧张的服务器环境中，若发现TCP内存消耗过高导致系统频繁OOM，可适当降低该值（如设为1或0），增加缓冲区开销比例以降低内存使用量",
+            "type": "continuous",
+            "range": [
+                0,
+                4
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.route.max_size",
+        "info": {
+            "desc": "1. 当服务器频繁处理大量网络连接或作为路由器转发大量数据包时，若观察到路由缓存频繁刷新导致性能下降，可适当增加该值（默认值4096可逐步倍增测试）\n\n2. 在高内存压力环境下，若路由表占用内存过高影响其他服务，且实际活跃路由条目远低于当前设置值，可适当降低该值以释放内存",
+            "type": "continuous",
+            "range": [
+                67108864,
+                2080374784
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_max_tw_buckets",
+        "info": {
+            "desc": "1. 当服务器出现大量TIME_WAIT状态的TCP连接导致端口耗尽或性能下降时，建议将net.ipv4.tcp_max_tw_buckets从默认值2048调整为360000。\n\n2. 在高并发短连接场景下，若监控发现TIME_WAIT连接数频繁达到上限，可适当增大该值至360000以提升连接处理能力。",
+            "type": "continuous",
+            "range": [
+                32768,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_max_syn_backlog",
+        "info": {
+            "desc": "1. 当服务器频繁处理大量新连接请求且出现 SYN 包丢弃时，应考虑增大该值至 8192 或更高\n\n2. 在高并发短连接场景下，若监控发现 SYN_RECV 状态连接数常接近默认值 2048，应调整该参数以避免连接建立延迟",
+            "type": "continuous",
+            "range": [
+                1024,
+                262144
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_max_orphans",
+        "info": {
+            "desc": "1. 当服务器频繁出现\"Out of socket memory\"错误或日志中出现大量orphaned sockets警告时，需要增加该值。建议根据当前系统内存容量调整，通常设置为内存容量的1/4对应的socket数量（每个orphan约占用64KB内存）\n\n2. 对于高并发短连接服务（如HTTP服务器、负载均衡器），若观察到tcp_max_orphans限制成为性能瓶颈（通过监控/proc/net/sockstat中orphan数量接近上限），应适当调高该值至并发连接数的1.2-1.5倍",
+            "type": "continuous",
+            "range": [
+                65536,
+                16777216
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_ecn",
+        "info": {
+            "desc": "1. 当网络中存在不支持ECN的老旧网络设备时，建议保持默认值0（禁用），以避免潜在的数据包丢弃问题\n\n2. 在确认网络设备完全支持ECN且需要降低TCP重传率的环境中，建议设置为1（启用）以获得更好的拥塞控制性能",
+            "range": [
+                "0",
+                "1",
+                "2"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.ip_forward",
+        "info": {
+            "desc": "- 当服务器需要作为路由器或VPN网关时，应设置为1以启用IPv4转发功能\n- 当服务器仅作为终端主机使用时，应保持默认值0以禁用转发功能，减少潜在安全风险",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.default.rp_filter",
+        "info": {
+            "desc": "1. 当服务器作为路由器或需要处理多路径网络流量时，建议将rp_filter设置为2（宽松模式），以避免严格的反向路径验证导致合法流量被丢弃\n2. 在单网卡服务器且网络环境可信的情况下，可以设置为0（关闭验证）以减少内核处理开销，但需确保网络环境无IP欺骗风险",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.ip_local_port_range",
+        "info": {
+            "desc": "1. 当服务器需要处理大量并发连接（如高负载代理服务器或Web服务器）时，默认的32768-60999端口范围可能导致端口耗尽，此时应扩大范围（如1024-65535），但需保留1024以下端口给特权服务\n\n2. 在容器化环境中运行多个实例时，为避免端口冲突，需要为每个实例分配不重叠的本地端口范围，同时确保总范围不超过系统上限",
+            "range": [
+                "32768 60999",
+                "1024 65535",
+                "8192 65535"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_no_metrics_save",
+        "info": {
+            "desc": "1. 在高并发短连接场景下，建议设置为1以禁用TCP连接参数保存，避免因大量无效参数缓存导致内存浪费和性能下降\n2. 在需要保持长连接稳定性的场景下，建议保持默认值0，允许重用之前连接的有效参数来优化新连接建立性能",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.ip_default_ttl",
+        "info": {
+            "desc": "1. 当网络中存在多层NAT或复杂路由环境时，若出现数据包提前被丢弃的情况，可考虑将TTL值提高到128，确保数据包能到达更远的网络节点\n\n2. 对于需要限制数据包传播范围的场景（如内部测试网络），可降低TTL值至32以下，防止数据包在网络中过度传播",
+            "type": "continuous",
+            "range": [
+                8,
+                128
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.ip_no_pmtu_disc",
+        "info": {
+            "desc": "1. 当网络中存在路径MTU发现(PMTUD)问题导致连接超时或性能下降时，建议将该参数设为1以禁用PMTUD，避免因ICMP黑洞或防火墙丢弃数据包导致的连接问题\n\n2. 在高速网络环境(如10Gbps以上)且网络设备可靠支持PMTUD时，建议保持默认值0以启用PMTUD，确保TCP能动态发现最优MTU值提升吞吐量",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_retries2",
+        "info": {
+            "desc": "1. 对于高延迟或不稳定网络环境中的服务器，可考虑将值降低到5-8，减少因网络临时故障导致的连接长时间挂起问题\n2. 对于需要快速检测连接失效的金融交易类服务器，建议设置为3-5，确保能更快释放失效连接资源",
+            "type": "continuous",
+            "range": [
+                3,
+                30
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_orphan_retries",
+        "info": {
+            "desc": "1. 当服务器面临大量半连接（orphaned sockets）导致资源占用过高时，可适当降低该值（如3-5），加速释放资源，但需注意过低可能导致正常长延迟网络下的连接被过早丢弃\n\n2. 若服务器主要处理本地或低延迟网络通信，且出现过多重试浪费资源的情况，可降至2-3次以减少不必要的等待时间",
+            "type": "continuous",
+            "range": [
+                0,
+                15
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_syncookies",
+        "info": {
+            "desc": "1. 当服务器频繁遭受SYN flood攻击时，应启用该参数(设置为1)，以保护系统资源不被耗尽\n2. 在正常网络环境下且未遭受攻击时，建议保持默认值(通常为1)，因为启用syncookies可能导致TCP连接性能略微下降",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_reordering",
+        "info": {
+            "desc": "1. 当网络路径存在较高丢包率或频繁重排序时，若观察到TCP重传率明显上升且吞吐量下降，应考虑适当增大该值（默认3可尝试调整为9-12），以容忍更多乱序数据包而非错误触发快速重传\n\n2. 在低延迟网络环境（如数据中心内部）且使用TSO/GRO等卸载技术时，若内核日志频繁出现\"TCP: too many of order packets\"警告，可将该值适度降低（如调整为6-8），减少乱序队列内存占用",
+            "type": "continuous",
+            "range": [
+                2,
+                10
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_retrans_collapse",
+        "info": {
+            "desc": "1. 在Linux服务器环境中，若确认无老旧打印机设备需要兼容，建议禁用此参数以优化TCP重传性能\n\n2. 当网络吞吐量出现异常下降且排查其他因素无果时，可尝试禁用此参数观察是否由打印机兼容性功能引起",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_congestion_control",
+        "info": {
+            "desc": "1. 在高带宽、高延迟网络环境下（如跨数据中心通信），建议将默认的\"cubic\"算法切换为\"bbr\"，可更充分利用带宽并减少排队延迟\n\n2. 在无线网络或移动网络环境中，若出现频繁丢包，建议使用\"vegas\"或\"westwood\"算法，这些算法对丢包区分更准确，能避免误判拥塞",
+            "range": [
+                "cubic",
+                "reno",
+                "bbr"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.default.promote_secondaries",
+        "info": {
+            "desc": "1. 当服务器需要保持高可用性且依赖多个IP地址时，建议设置为1，确保主IP被移除时次IP能自动提升为主IP，避免服务中断\n\n2. 在安全性要求严格的环境中建议设置为0，确保主IP被移除时所有关联IP都被清除，防止潜在的安全风险",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.all.promote_secondaries",
+        "info": {
+            "desc": "1. 当服务器需要保持高可用性且依赖多个IP地址时，建议设置为1，以确保主IP被移除时次IP能自动提升为主IP，避免服务中断\n\n2. 当服务器IP地址管理需要严格遵循变更控制流程时，建议保持默认值0，以确保任何IP地址变更都需要明确操作，防止意外配置变更",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.all.accept_redirects",
+        "info": {
+            "desc": "1. 对于作为网关或路由器的Linux服务器，建议设置为0以禁用ICMP重定向消息，防止潜在的网络拓扑欺骗攻击\n2. 对于普通主机服务器，若网络环境可信且需要ICMP重定向功能优化路由，可保持默认值1；否则建议设置为0增强安全性",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.default.accept_redirects",
+        "info": {
+            "desc": "1. 在作为路由器使用时，建议设置为0以禁用ICMP重定向消息，防止潜在的网络拓扑混淆和安全风险\n2. 在作为终端主机使用时，可保持默认值1以接受重定向消息，但若网络环境安全要求较高，建议同样设置为0",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.all.secure_redirects",
+        "info": {
+            "desc": "- 在安全要求较高的生产环境中，建议设置为0禁用，避免潜在的安全风险\n- 若网络环境需要接收特定ICMP重定向且信任网关，可设置为1但需配合其他安全措施",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.default.secure_redirects",
+        "info": {
+            "desc": "1. 在安全要求较高的生产环境中建议设置为0，防止潜在的网络重定向攻击\n2. 如果服务器需要接收来自可信网关的ICMP重定向消息以优化路由，可设置为1",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.ipv4.icmp_echo_ignore_broadcasts",
+        "info": {
+            "desc": "1. 如果服务器处于可能遭受ICMP广播风暴攻击的网络环境（如公开网络或DMZ区域），建议设置为1以避免资源耗尽\n\n2. 如果服务器位于受保护的内网且需要接收ICMP广播（如网络设备发现等场景），建议设置为0以保持功能正常",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.nf_conntrack_max",
+        "info": {
+            "desc": "1. 当服务器处理大量网络连接（如高并发代理、NAT网关或防火墙）且频繁出现\"nf_conntrack: table full\"日志时，需要增加该值以避免连接跟踪表溢出\n\n2. 当系统内存不足且连接跟踪表利用率持续低于50%时，可适当降低该值以释放内存资源",
+            "type": "continuous",
+            "range": [
+                65536,
+                1048576
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.netfilter.nf_conntrack_tcp_timeout_established",
+        "info": {
+            "desc": "1. 当服务器处理大量持久TCP连接(如长连接服务、代理服务器等)且观察到nf_conntrack表频繁满导致丢包时，可适当增大该值(默认43200秒/12小时)，但需确保不超过客户端实际连接保持时间，避免无效连接占用资源\n\n2. 对于短连接为主的Web服务器环境，若系统内存压力较大且连接跟踪表占用过高，可适当降低该值(但不应小于1800秒)，以加速连接表项回收",
+            "type": "continuous",
+            "range": [
+                108000,
+                1728000
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.netfilter.nf_conntrack_tcp_timeout_close_wait",
+        "info": {
+            "desc": "1. 当服务器处理大量短连接且频繁出现close_wait状态时，若该值过大(默认240秒)会导致连接资源长时间占用，可适当降低至60-120秒范围\n\n2. 对于长连接为主的服务器环境，若发现连接异常断开导致资源泄漏，可考虑增大该值至300-600秒范围",
+            "type": "continuous",
+            "range": [
+                15,
+                240
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.netfilter.nf_conntrack_tcp_timeout_fin_wait",
+        "info": {
+            "desc": "1. 当服务器处理大量短连接且频繁出现FIN_WAIT状态连接堆积时，若系统日志显示nf_conntrack表频繁满导致丢包，可适当减少该值至30-60秒范围以加速连接回收\n\n2. 若服务器主要处理长连接且并发连接数远低于nf_conntrack_max的80%，出现FIN_WAIT状态连接过早超时导致异常断开时，可增大该值至120-300秒范围确保正常连接终止流程完成",
+            "type": "continuous",
+            "range": [
+                30,
+                480
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.netfilter.nf_conntrack_tcp_timeout_time_wait",
+        "info": {
+            "desc": "1. 当服务器处理大量短连接且出现大量TIME_WAIT状态连接导致nf_conntrack表满时，可适当降低该值（默认120秒），建议调整为30-60秒以更快释放连接跟踪条目\n\n2. 若服务器作为反向代理或负载均衡器且出现端口耗尽问题，在确认无重传包风险后可考虑将该值降至15-30秒，但需确保大于TCP的2MSL时间",
+            "type": "continuous",
+            "range": [
+                30,
+                480
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.conf.default.forwarding",
+        "info": {
+            "desc": "1. 当服务器需要作为路由器或网关转发IPv4流量时，应将该参数设置为1，否则保持默认值0以关闭转发功能提升安全性\n2. 在容器或虚拟化环境中，若宿主机需要为虚拟机/容器提供网络转发功能，则需启用该参数",
+            "range": [
+                "0",
+                "1"
+            ],
+            "type": "discrete",
+            "dtype": "string"
+        }
+    },
+    {
+        "name": "net.core.rps_sock_flow_entries",
+        "info": {
+            "desc": "1. 当服务器处理大量网络连接且RPS/RFS功能开启时，若出现CPU缓存命中率下降或网络延迟增加，应考虑增加该值（通常建议设置为32768或65536）\n\n2. 在高吞吐量网络环境下（如10Gbps以上），若网络性能未达预期且/proc/net/softnet_stat显示drop计数增长，应将该值调整为至少等于或大于预期并发连接数",
+            "type": "continuous",
+            "range": [
+                0,
+                131072
+            ],
+            "dtype": "int"
+        }
+    },
+    {
+        "name": "net.ipv4.tcp_min_tso_segs",
+        "info": {
+            "desc": "1. 当服务器主要处理大量小数据包（如小于1460字节）且TSO利用率低时，可适当降低该值（默认2）以减少延迟，但需确保不低于1以避免性能下降\n\n2. 对于高速网络（10Gbps+）且处理大数据传输的场景，若观察到TSO分段不足导致CPU利用率过高，可适当增大该值（建议不超过8）以提升吞吐量",
+            "type": "continuous",
+            "range": [
+                1,
+                16
+            ],
+            "dtype": "int"
+        }
+    }
+]
