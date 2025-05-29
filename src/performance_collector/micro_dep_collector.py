@@ -1,5 +1,5 @@
 # from .base_collector import BaseCollector, CollectorArgs
-from .base_collector2 import BaseCollector, HostInfo, remote_execute_with_exit_code, run_nohup_cmd
+from .base_collector2 import BaseCollector, HostInfo, remote_execute_with_exit_code, run_nohup_cmd, get_process_pid
 import logging
 from typing import List
 cfg_fw = {
@@ -273,21 +273,22 @@ class TlbCollector(PerfCollector):
 
 
 class MicroDepCollector:
-    def __init__(self, host_info: HostInfo, target_pid=0, iteration=1000, duration=0.1, benchmark_cmd="", mode=COLLECTMODE.DIRECT_MODE):
+    def __init__(self, host_info: HostInfo, target_process_name="", iteration=1000, duration=0.1, benchmark_cmd="", mode=COLLECTMODE.DIRECT_MODE):
 
         self.collector_list: List[PerfCollector] = []
         self.host_info = host_info
-        self.target_pid = target_pid
+        self.target_process_name = target_process_name
         self.max_iteration = iteration
         self.iter = 0
         self.duration = duration
         self.mode = mode
 
+        self.target_pid = get_process_pid(target_process_name, host_info)
+
         if self.mode == COLLECTMODE.ATTACH_MODE and not benchmark_cmd:
             logging.error(f'benchmark cmd is required in attach mode')
 
         if self.mode == COLLECTMODE.ATTACH_MODE:
-            # self.benchmark_proc = subprocess.Popen(benchmark_cmd.split())
             self.benchmark_pid = run_nohup_cmd(
                 benchmark_cmd, 
                 host_info
