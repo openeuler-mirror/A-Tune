@@ -55,7 +55,6 @@ class ParamRecommender:
                 param_range = "、".join(list(map(str, item['info']['range'])))
             else:
                 param_range = f"从{item['info']['range'][0]}到{item['info']['range'][1]}"
-                    self.ssh_client = ssh_client
             if self.ssh_client:
                 get_param_cmd = f'grep -E "^{item["name"]}\s*=" /etc/my.cnf | awk -F\'=\' \'{{print $2}}\' | xargs'
                 result = self.ssh_client.run_cmd(get_param_cmd)
