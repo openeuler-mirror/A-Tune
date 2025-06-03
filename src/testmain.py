@@ -54,7 +54,7 @@ print("static_profile:", static_profile_info)
 
 
 host_info = HostInfo(host_ip=host_ip,host_port=host_port, host_password=host_password)
-collect_mode = COLLECTMODE.ATTACH_MODE
+collect_mode = COLLECTMODE.DIRECT_MODE
 microDepCollector = MicroDepCollector(
     host_info=host_info,
     iteration=10,
