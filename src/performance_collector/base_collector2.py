@@ -56,13 +56,13 @@ def remote_execute_with_exit_code(
         # 连接到远程主机
         client.connect(host_info.host_ip, host_info.host_port, host_info.host_user, host_info.host_password, timeout=5)
         # 执行指令
-        logging.debug(f"luckky test: remote_execute_with_exit_code execute cmd {cmd}")
+        logging.debug(f"remote_execute_with_exit_code execute cmd {cmd}")
         stdin, stdout, stderr = client.exec_command(cmd)
         # 获取执行结果
-        result = stdout.read().decode()
+        result = stdout.read().decode().strip()
         error = stderr.read().decode()
         status_code = stdout.channel.recv_exit_status()
-        logging.debug(f"luckky test: remote_execute_with_exit_code [{result}] [{error}] status_code {status_code}")
+        logging.debug(f"remote_execute_with_exit_code [{result}] [{error}] status_code {status_code}")
         return result, error, status_code
     except Exception as e:
         raise RuntimeError(f"Exception occurred while executing command '{cmd}': {e}")
