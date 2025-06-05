@@ -3,14 +3,18 @@ import json
 
 from src.utils.llm import get_llm_response
 from src.utils.json_repair import json_repair
-
+from src.utils.config.global_config import param_config
+from src.utils.config.app_config import AppInterface
 
 from src.utils.metrics import PerformanceMetric
 from src.utils.shell_execute import SshClient
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 
 from src.performance_collector.metric_collector import MetricCollector
-from src.performance_collector.static_metric_profile_collector import StaticMetricProfileCollector
+from src.performance_collector.static_metric_profile_collector import (
+    StaticMetricProfileCollector,
+)
+from src.performance_optimizer.param_knowledge import ParamKnowledge
 
 # 配置日志
 logging.basicConfig(
@@ -28,7 +32,8 @@ class ParamRecommender:
         static_profile: str,
         performance_analysis_report: str,
         chunk_size=20,
-        ssh_client=None
+        enable_system_params=True,
+        ssh_client=None,
     ):
         # 待调优app名称
         self.service_name = service_name
@@ -38,37 +43,20 @@ class ParamRecommender:
         self.performance_metric = performance_metric
         # 静态指标
         self.static_profile = "\n".join(f"{k}: {v}" for k, v in static_profile.items())
-        # 可调参数知识库
-        self.all_params = set()
+        # 可调参数知识库，用于给大模型描述应用参数背景知识
+        self.param_knowledge = ParamKnowledge(ssh_client)
+        self.all_params = self.param_knowledge.get_params(service_name)
         self.ssh_client = ssh_client
-        self.params_set = self.load_params_set()
+        self.params_set = self.param_knowledge.describe_param_background_knob(
+            service_name, self.all_params
+        )
         self.chunk_size = chunk_size
         self.performance_analysis_report = performance_analysis_report
-
-    def load_params_set(self):
-        params = []
-        with open("./src/knowledge_base/params/mysql_params.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-        for item in data:
-            self.all_params.add(item['name'])
-            if item['info']['type'] == "discrete":
-                param_range = "、".join(list(map(str, item['info']['range'])))
-            else:
-                param_range = f"从{item['info']['range'][0]}到{item['info']['range'][1]}"
-            if self.ssh_client:
-                get_param_cmd = f'grep -E "^{item["name"]}\s*=" /etc/my.cnf | awk -F\'=\' \'{{print $2}}\' | xargs'
-                result = self.ssh_client.run_cmd(get_param_cmd)
-                param_env_value = result.output if result.status_code == 0 else "默认值"
-            else:
-                param_env_value = "默认值"
-            params.append(f"{item['name']}:{item['info']['desc']},参数的默认值为：{item['info']['default_value']}，参数数据类型为：{item['info']['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}")
-        return params
 
     def run(self, history_result):
         resultset = {}
 
         for i in range(0, len(self.params_set), self.chunk_size):
-        # for i in range(0, 2, self.chunk_size):
             cur_params_set = self.params_set[i : i + self.chunk_size]
             recommend_prompt = f"""
 # CONTEXT # 
@@ -121,6 +109,7 @@ value是可调参数的推荐取值，请根据上面的环境配置信息给出
 
 if __name__ == "__main__":
     from src.config import config
+
     ssh_client = SshClient(
         host_ip=config["servers"][0]["ip"],
         host_port=22,
@@ -130,7 +119,9 @@ if __name__ == "__main__":
         delay=1.0,
     )
 
-    metric_collector = StaticMetricProfileCollector(ssh_client=ssh_client, max_workers=5)
+    metric_collector = StaticMetricProfileCollector(
+        ssh_client=ssh_client, max_workers=5
+    )
 
     static_profile = metric_collector.run()
 

@@ -1,3 +1,25 @@
-MySQL:
+mysql:
   user: "root"
   password: "123456"
+  config_file: "/etc/my.cnf"
+  port: 3306
+  set_param_template: 'grep -q "^$param_name\\s*=" "$config_file" && sed -i "s/^$param_name\\s*=.*/$param_name = $param_value/" "$config_file" || sed -i "/\\[mysqld\\]/a $param_name = $param_value" "$config_file"'
+  get_param_template: 'grep -E "^$param_name\s*=" $config_file | cut -d= -f2- | xargs'
+  stop_workload: "systemctl start mysqld"
+  start_workload: "systemctl stop mysqld"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
+
+postgresql:
+  user: "postgres"
+  password: "postgres"
+  config_file: "/data/pgsql/postgresql.conf"
+  port: 5432
+  set_param_template: 'grep -qE "^\s*$param_name\s*=" "$config_file" && sed -i "s/^[[:space:]]*$param_name[[:space:]]*=.*/$param_name = $param_value/" "$config_file" || echo "$param_name = $param_value" >> "$config_file"'
+  get_param_template: 'grep -oP "^\s*$param_name\s*=\s*\K.*" "$config_file"'
+  stop_workload: "/usr/local/pgsql/bin/pg_ctl stop -D /data/pgsql/ -m fast"
+  start_workload: "/usr/local/pgsql/bin/pg_ctl start -D /data/pgsql/ -l /var/log/postgresql/postgresql.log"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/postgresql/parse_benchmark.sh $host_ip $port $user $password"
+
+system:
+  set_param_template: 'sysctl -w $param_name=$param_value'
+  get_param_template: 'sysctl $param_name'

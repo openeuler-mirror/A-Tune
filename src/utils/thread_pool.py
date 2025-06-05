@@ -12,11 +12,13 @@ class TaskResult:
         uuid: str,
         func_name: str = "",
         result: Any = None,
+        status_code: int = 0,
         tag: str = "default_tag",
     ):
         self.uuid = uuid
         self.func_name = func_name
         self.result = result
+        self.status_code = status_code
         self.tag = tag
 
     def __dict__(self):
@@ -24,6 +26,7 @@ class TaskResult:
             "uuid": self.uuid,
             "func_name": self.func_name,
             "result": self.result,
+            "status_code": self.status_code,
             "tag": self.tag,
         }
 
@@ -128,10 +131,14 @@ class ThreadPoolManager:
             func_name = self.task_meta.get(task_id, "unknown")
             try:
                 result = future.result()
+                status_code = 0
             except Exception as e:
                 result = ExecuteResult(status_code=-1, output="", err_msg=str(e))
+                status_code = -1
             self.all_results.append(
-                TaskResult(task_id, func_name, result, self.tag_map[task_id])
+                TaskResult(
+                    task_id, func_name, result, status_code, self.tag_map[task_id]
+                )
             )
 
     def get_all_results(self) -> List[Dict[str, Any]]:
