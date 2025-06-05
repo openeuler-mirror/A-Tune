@@ -103,7 +103,7 @@ class ParamOptimizer:
         best_result = baseline
         ratio = self.calc_improve_rate(baseline, last_result)
         print(
-            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
+            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
         )
 
         for i in range(self.max_iterations):
@@ -137,12 +137,12 @@ class ParamOptimizer:
             # 达到预期效果，则退出循环
             if self.reached_goal(baseline, performance_result):
                 print(
-                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
+                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
                 )
                 break
 
             print(
-                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
+                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
             )
 
         print(
