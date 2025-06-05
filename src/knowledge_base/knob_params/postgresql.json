@@ -1,234 +1,459 @@
 {
-    "shared_buffers": {
-        "desc": "该参数设置共享内存区的大小，用于缓存数据页，减少磁盘 I/O。建议在系统物理内存充足时调整，通常设置为系统物理内存的 25% 左右，以提升缓存效率。",
-        "type": "continuous",
-        "range": [
-            128,
-            "系统物理内存的 25%"
-        ],
-        "dtype": "integer",
-        "default_value": "128MB"
-    },
-    "work_mem": {
-        "desc": "指定每个查询操作（如排序或哈希表）可以使用的内存量。对于复杂查询较多的系统，可适当增大，但过大会导致内存使用失控。建议根据系统内存和查询复杂度调整。",
-        "type": "continuous",
-        "range": [
-            64,
-            1024
-        ],
-        "dtype": "integer",
-        "default_value": "4MB"
-    },
-    "maintenance_work_mem": {
-        "desc": "设置维护操作（如 VACUUM、CREATE INDEX 等）使用的最大内存量。对于大型数据库，可设置为 256MB-1GB，以加快维护操作的速度。",
-        "type": "continuous",
-        "range": [
-            64,
-            1024
-        ],
-        "dtype": "integer",
-        "default_value": "64MB"
-    },
-    "effective_cache_size": {
-        "desc": "为查询规划器提供一个估算值，表示可用于缓存数据的内存量，包括操作系统和数据库缓存。建议设置为系统总内存的 75%，以帮助查询规划器更好地选择查询计划。",
-        "type": "continuous",
-        "range": [
-            4096,
-            "系统总内存的 75%"
-        ],
-        "dtype": "integer",
-        "default_value": "4GB"
-    },
-    "max_connections": {
-        "desc": "决定客户端的最大并发连接数。若出现连接数过多的错误，可适当增加，但需考虑对其他参数（如 work_mem）的影响。",
+    "archive_mode": {
+        "desc": "启用或禁用归档模式。当启用 archive_mode 时，已完成的 WAL 段将发送到归档存储。设置为 on 时，WAL 日志将被归档，适合需要数据恢复的场景。开启归档模式会增加磁盘 I/O，但能提高数据安全性。",
         "type": "discrete",
+        "dtype": "string",
         "range": [
-            100,
+            "off",
+            "on",
+            "always"
+        ]
+    },
+    "autovacuum_analyze_scale_factor": {
+        "desc": "该参数控制自动分析（autovacuum）在执行分析操作时，表中需要更新的行数与表的总行数的比例。增大该值可以减少自动分析的频率，降低CPU和IO的负担，但可能导致统计信息不准确。减小该值会增加自动分析的频率，有助于保持查询优化器的统计信息更新，缓解memory瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1
+        ]
+    },
+    "autovacuum_max_workers": {
+        "desc": "设置自动清理进程的最大工作线程数。增加此值可以提高数据库的自动清理能力，缓解由于死元组导致的磁盘IO瓶颈。取值范围为0到1024，0表示禁用自动清理。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1024
+        ]
+    },
+    "autovacuum_vacuum_scale_factor": {
+        "desc": "该参数控制自动清理（autovacuum）在执行清理操作时，表中需要删除的行数与表的总行数的比例。增大该值可以减少自动清理的频率，从而降低CPU和IO的负担，但可能导致表膨胀。减小该值会增加自动清理的频率，有助于及时释放空间，缓解disk IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1
+        ]
+    },
+    "autovacuum_work_mem": {
+        "desc": "指定每个自动清理工作进程可以使用的最大内存量。增大此值可以提高自动清理的效率，缓解内存瓶颈，尤其是在大表的自动清理时。建议根据表的大小和系统资源进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            64,
+            1073741823
+        ]
+    },
+    "bgwriter_delay": {
+        "desc": "设置后台写入器活动轮次之间的延迟时间。增大此值可以减少磁盘IO的频率，适合IO密集型的工作负载。默认值为200毫秒，单位为毫秒，取值范围为0到1000。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
             1000
-        ],
-        "dtype": "integer",
-        "default_value": "100"
+        ]
     },
-    "superuser_reserved_connections": {
-        "desc": "为超级用户保留的连接数。在系统连接数接近 max_connections 时，可适当调整，以确保超级用户能够连接。",
-        "type": "discrete",
-        "range": [
-            3,
-            10
-        ],
-        "dtype": "integer",
-        "default_value": "3"
-    },
-    "tcp_keepalives_idle": {
-        "desc": "空闲连接的 TCP keepalive 时间。在需要检测空闲连接是否仍然有效时调整，以避免无效连接占用资源。",
+    "bgwriter_flush_after": {
+        "desc": "bgwriter_flush_after参数设置后台写入器在写入数据后，尝试强制操作系统将这些写入操作发送到基础存储的阈值。增大此值可以减少磁盘IO的频率，适合IO密集型的工作负载。单位为字节，默认值为512kB，取值范围为0到1GB。",
         "type": "continuous",
+        "dtype": "int",
         "range": [
             0,
-            3600
-        ],
-        "dtype": "integer",
-        "default_value": "7200"
+            1073741824
+        ]
     },
-    "tcp_keepalives_interval": {
-        "desc": "TCP keepalive 发送间隔。在需要更频繁地检测连接状态时调整，以确保连接的可靠性。",
+    "bgwriter_lru_maxpages": {
+        "desc": "设置后台写入器每次写入的最大页面数。在每一轮中，后台写入器写入的缓冲区不超过这个数量。增大此值可以提高写入性能，适合内存充足的系统。取值范围为0到10000，0表示禁用此功能。",
         "type": "continuous",
+        "dtype": "int",
         "range": [
             0,
-            3600
-        ],
-        "dtype": "integer",
-        "default_value": "75"
+            10000
+        ]
     },
-    "tcp_keepalives_count": {
-        "desc": "TCP keepalive 重试次数。在需要调整连接检测的严格程度时调整，以避免误判。",
-        "type": "discrete",
-        "range": [
-            1,
-            10
-        ],
-        "dtype": "integer",
-        "default_value": "9"
-    },
-    "random_page_cost": {
-        "desc": "规划器对一次非顺序获取磁盘页面的代价估计。对于高端存储或 SSD 可适当调小，以反映更快的随机读取性能。",
+    "checkpoint_completion_target": {
+        "desc": "设置检查点完成的目标时间比例，作为检查点之间总时间的分数。增大此值可以使检查点过程更加平滑，缓解磁盘IO瓶颈，尤其是在高负载情况下。建议设置为0.5到0.9之间的值。",
         "type": "continuous",
-        "range": [
-            1.0,
-            10.0
-        ],
         "dtype": "float",
-        "default_value": "4.0"
+        "range": [
+            0.0,
+            1.0
+        ]
     },
-    "seq_page_cost": {
-        "desc": "规划器对一次顺序获取磁盘页面的代价估计。可根据实际存储性能调整，以反映顺序读取的性能。",
+    "checkpoint_timeout": {
+        "desc": "自动 WAL 检查点之间的最大时间间隔。增大此值可以减少检查点的频率，缓解磁盘 I/O 瓶颈，但可能会增加恢复时间。建议根据系统负载和性能需求进行调整。",
         "type": "continuous",
+        "dtype": "int",
         "range": [
-            1.0,
-            10.0
-        ],
-        "dtype": "float",
-        "default_value": "1.0"
+            30,
+            86400
+        ]
     },
-    "cpu_tuple_cost": {
-        "desc": "估算处理每行数据的 CPU 成本。可根据实际 CPU 性能调整，以反映 CPU 的处理能力。",
+    "commit_siblings": {
+        "desc": "在执行 commit_delay 延迟之前，必须有多少个并发打开事务。该参数影响VACUUM操作的触发频率，增大该值可以减少VACUUM的频率，从而降低CPU和磁盘IO的负担。",
         "type": "continuous",
+        "dtype": "int",
         "range": [
-            0.001,
-            0.1
-        ],
-        "dtype": "float",
-        "default_value": "0.01"
+            0,
+            100
+        ]
     },
     "cpu_index_tuple_cost": {
-        "desc": "估算处理索引中的每个元组的 CPU 成本。可根据实际 CPU 性能调整，以反映索引操作的 CPU 成本。",
+        "desc": "设置规划器对索引扫描期间处理每个索引条目的成本的估计。增大此值可以影响查询计划的选择，适合CPU密集型的工作负载。",
         "type": "continuous",
-        "range": [
-            0.001,
-            0.1
-        ],
         "dtype": "float",
-        "default_value": "0.005"
-    },
-    "cpu_operator_cost": {
-        "desc": "估算执行一个操作符的 CPU 成本。可根据实际 CPU 性能调整，以反映操作符的 CPU 成本。",
-        "type": "continuous",
         "range": [
-            0.001,
-            0.1
-        ],
+            0,
+            1000
+        ]
+    },
+    "cpu_tuple_cost": {
+        "desc": "设置规划器对查询期间处理每一行的成本的估计。增大此值可以影响查询计划的选择，适合CPU密集型的工作负载。",
+        "type": "continuous",
         "dtype": "float",
-        "default_value": "0.0025"
-    },
-    "log_min_duration_statement": {
-        "desc": "记录执行时间超过指定毫秒数的语句。可根据需要设置为合适的值，如 100ms，以记录慢查询。",
-        "type": "continuous",
         "range": [
-            -1,
-            3600000
-        ],
+            0,
+            1000
+        ]
+    },
+    "deadlock_timeout": {
+        "desc": "这是在检查是否存在死锁条件之前等待锁的时间。增大该值可能会导致死锁检测延迟，但可以减少CPU的消耗。减小该值可以更快地检测到死锁。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            10000
+        ]
+    },
+    "effective_cache_size": {
+        "desc": "设置PostgreSQL查询优化器假设的可用缓存内存量。增大此值可以提高查询优化器的决策质量，缓解内存瓶颈，尤其是在复杂查询中。通常建议设置为系统总内存的50%到75%。",
+        "type": "continuous",
         "dtype": "integer",
-        "default_value": "-1"
-    },
-    "log_statement": {
-        "desc": "控制记录哪些 SQL 语句。可根据需要设置为 ddl、mod 或 all，以记录不同类型的语句。",
-        "type": "discrete",
         "range": [
-            "none",
-            "ddl",
-            "mod",
-            "all"
-        ],
-        "dtype": "string",
-        "default_value": "none"
+            16,
+            1073741823
+        ]
     },
-    "logging_collector": {
-        "desc": "是否启用日志收集器。启用后可将日志输出到文件，便于后续分析和监控。",
+    "effective_io_concurrency": {
+        "desc": "设置预期的并发磁盘I/O操作数量。增大此值可以提高并发I/O操作的性能，缓解磁盘I/O瓶颈，尤其是在高并发的读写操作中。建议根据硬件能力进行调整，值越高，性能越好，但也要考虑系统负载。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            1000
+        ]
+    },
+    "enable_bitmapscan": {
+        "desc": "启用或禁用查询规划器对位图扫描计划类型的使用。启用此选项可以提高大数据集的查询性能。取值为ON或OFF。",
         "type": "discrete",
+        "dtype": "boolean",
         "range": [
             "off",
             "on"
-        ],
-        "dtype": "boolean",
-        "default_value": "off"
+        ]
     },
-    "checkpoint_timeout": {
-        "desc": "影响系统何时启动一个检查点操作。可根据系统写入负载调整，以平衡检查点频率和性能。",
-        "type": "continuous",
-        "range": [
-            30,
-            3600
-        ],
-        "dtype": "integer",
-        "default_value": "5min"
-    },
-    "checkpoint_completion_target": {
-        "desc": "检查点完成目标。可根据系统写入负载调整，以确保检查点操作在合理时间内完成。",
-        "type": "continuous",
-        "range": [
-            0.5,
-            0.9
-        ],
-        "dtype": "float",
-        "default_value": "0.9"
-    },
-    "max_wal_size": {
-        "desc": "控制 WAL 文件的最大总大小。对于高写入负载的系统，可增大此值以减少检查点频率。",
-        "type": "continuous",
-        "range": [
-            1024,
-            10240
-        ],
-        "dtype": "integer",
-        "default_value": "1GB"
-    },
-    "min_wal_size": {
-        "desc": "控制 WAL 文件的最小总大小。可根据系统写入负载调整，以确保 WAL 文件不会过小。",
-        "type": "continuous",
-        "range": [
-            80,
-            2048
-        ],
-        "dtype": "integer",
-        "default_value": "80MB"
-    },
-    "wal_buffers": {
-        "desc": "控制 WAL 缓冲区的大小。对于写入密集型工作负载，可设置为 shared_buffers 的 1/32 到 1/64，以提高写入性能。",
-        "type": "continuous",
-        "range": [
-            32,
-            "shared_buffers 的 1/32"
-        ],
-        "dtype": "integer",
-        "default_value": "4MB"
-    },
-    "autovacuum_max_workers": {
-        "desc": "指定能同时运行的 autovacuum 进程的最大数量。在表膨胀问题较为严重时，可适当调大，以加快清理速度。",
+    "enable_hashjoin": {
+        "desc": "启用或禁用查询规划器对哈希连接计划类型的使用。启用此选项可以提高连接查询的性能，特别适合大数据集的连接操作。",
         "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "off",
+            "on"
+        ]
+    },
+    "enable_indexscan": {
+        "desc": "启用或禁用查询规划器对索引扫描和仅索引扫描计划类型的使用。启用此选项可以提高查询性能，适合有索引的表。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "off",
+            "on"
+        ]
+    },
+    "enable_material": {
+        "desc": "启用或禁用查询规划器对物化（materialization）的使用。启用此选项可以提高复杂查询的性能，适合需要多次访问相同数据的查询。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "off",
+            "on"
+        ]
+    },
+    "enable_mergejoin": {
+        "desc": "启用或禁用查询规划器对归并连接计划类型的使用。启用此选项可以提高大数据集连接的性能。取值为ON或OFF。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "enable_nestloop": {
+        "desc": "启用或禁用查询规划器对嵌套循环连接计划的使用。启用此选项可以提高小数据集连接的性能。取值为ON或OFF。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "ON",
+            "OFF"
+        ]
+    },
+    "enable_partition_pruning": {
+        "desc": "启用或禁用查询规划器从查询计划中消除分区表的分区的功能。启用此选项可以提高分区表的查询性能。取值为ON或OFF。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "ON",
+            "OFF"
+        ]
+    },
+    "enable_seqscan": {
+        "desc": "启用或禁用查询规划器使用顺序扫描计划类型。启用此选项可以提高查询性能，适合小数据集的查询。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "enable_sort": {
+        "desc": "启用或禁用查询规划器使用显式排序步骤。启用此选项可以提高查询性能，适合需要排序的查询。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "fsync": {
+        "desc": "控制数据库在每次写入后是否强制将数据写入磁盘。设置为on时，确保数据的持久性，但会增加磁盘IO。关闭fsync可能会提高性能，但会增加数据丢失的风险。该参数影响检查点和批量数据写入期间的强制写入操作。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "full_page_writes": {
+        "desc": "当该参数开启时，PostgreSQL在修改每个磁盘页面时会将其完整内容写入WAL（Write-Ahead Logging）。这确保在发生崩溃时可以恢复完整页面，适合需要高数据安全性的场景。开启该选项会增加磁盘I/O。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "idle_in_transaction_session_timeout": {
+        "desc": "设置空闲事务会话的超时时间。增大该值可以减少因空闲会话导致的资源浪费，但可能会导致事务延迟。减小该值可以更快地释放资源。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "jit": {
+        "desc": "该参数控制是否启用JIT（Just-In-Time）编译。设置为ON可以提高复杂查询的性能，缓解CPU瓶颈。设置为OFF则会禁用JIT，适用于简单查询或对性能要求不高的场景。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "lock_timeout": {
+        "desc": "设置获取锁的超时时间。增大该值可以减少因锁竞争导致的错误，但可能会导致事务延迟。减小该值可以更快地释放锁。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            10000
+        ]
+    },
+    "log_min_duration_statement": {
+        "desc": "设置记录执行时间超过该值的SQL语句的日志。增大该值可以减少日志记录的数量，适合对性能要求较高的场景。减小该值可以更快地发现性能问题。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            10000
+        ]
+    },
+    "maintenance_work_mem": {
+        "desc": "指定维护操作（如VACUUM、CREATE INDEX等）可以使用的最大内存量。增大此值可以加速这些操作，缓解内存瓶颈，尤其是在大表的维护时。建议根据维护任务的复杂度进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            64,
+            1073741823
+        ]
+    },
+    "max_connections": {
+        "desc": "确定到数据库服务器的最大并发连接数。增大此值可以支持更多的并发用户，缓解内存瓶颈，但也会增加系统资源的消耗。建议根据系统资源和应用需求进行调整。默认值通常为 100 个连接。",
+        "type": "continuous",
+        "dtype": "int",
         "range": [
             1,
-            10
-        ],
-        "dtype": "integer",
-        "default_value": "3"
+            10000
+        ]
+    },
+    "max_locks_per_transaction": {
+        "desc": "该参数定义每个事务可以获得的最大锁数量。增大该值可以支持更多的并发事务，适用于高并发的应用场景，缓解内存瓶颈。减小该值可能导致事务因锁不足而失败。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            1024
+        ]
+    },
+    "max_parallel_workers": {
+        "desc": "设置系统可以使用的最大并行工作进程数。增大此值可以提高并行处理能力，缓解CPU瓶颈，尤其是在高并发查询中。建议根据系统资源进行调整。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            0,
+            1024
+        ]
+    },
+    "max_parallel_workers_per_gather": {
+        "desc": "设置每个 Gather 或 Gather Merge 节点可以启动的最大工作进程数。增大此值可以提高查询性能，缓解 CPU 瓶颈，尤其是在复杂查询中。建议根据查询复杂度和系统资源进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1024
+        ]
+    },
+    "max_prepared_transactions": {
+        "desc": "该参数设置可以同时处于 '已准备' 状态的最大事务数。增大该值可以支持更多的分布式事务，适用于需要高并发的应用场景，缓解内存瓶颈。减小该值可能导致预备事务因数量不足而失败。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1024
+        ]
+    },
+    "max_wal_size": {
+        "desc": "在自动检查点期间允许 WAL 增长的最大大小。增大此值可以减少检查点的频率，缓解磁盘 I/O 瓶颈，尤其是在高写入负载的情况下。这是一个软限制；在特殊情况下，WAL 大小可能会超过此值。建议根据系统的写入负载进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            1073741823
+        ]
+    },
+    "random_page_cost": {
+        "desc": "用于估算随机读取的真实成本，相对于顺序存取的成本。增大此值可以影响查询优化器的选择，缓解disk IO瓶颈，尤其是在SSD和HDD之间的选择时。通常SSD的值可以设置为1.1，HDD的值可以设置为4.0。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            1.1,
+            100
+        ]
+    },
+    "seq_page_cost": {
+        "desc": "设置规划器对作为一系列顺序获取的一部分的磁盘页面获取成本的估计。较低的值会使查询优化器更倾向于使用顺序扫描，从而可能缓解磁盘IO瓶颈。增大该值会使优化器更倾向于使用索引扫描。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1000
+        ]
+    },
+    "shared_buffers": {
+        "desc": "设置数据库服务器用于共享内存缓冲区的内存量。增加此值可以提高内存使用效率，缓解内存瓶颈，尤其是在高并发的读写操作中。通常建议设置为系统总内存的25%。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            128,
+            1073741823
+        ]
+    },
+    "statement_timeout": {
+        "desc": "设置SQL语句的超时时间，超过该时间将中止执行。增大该值可以减少因长时间运行的查询被中断的风险，但可能会导致资源占用过久。减小该值可以更快地释放资源。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "synchronous_commit": {
+        "desc": "指定在数据库服务器返回成功指示之前，必须完成多少WAL处理。设置为on可以确保数据安全，但会增加延迟；设置为off可以提高性能，但可能会丢失数据。建议根据数据安全性和性能需求进行调整。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "local",
+            "remote_write",
+            "remote_apply",
+            "on",
+            "off"
+        ]
+    },
+    "temp_buffers": {
+        "desc": "设置每个数据库会话中用于临时缓冲区的最大内存量。增大该值可以提高临时表的性能，适合需要大量临时表的场景。减小该值可能会导致临时表性能下降。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            2147483647
+        ]
+    },
+    "temp_file_limit": {
+        "desc": "指定一个进程可以用于临时文件的最大磁盘空间量。增大该值可以允许更大的临时文件，适合需要处理大数据集的场景。减小该值可以防止临时文件占用过多磁盘空间。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1073741823
+        ]
+    },
+    "vacuum_cost_limit": {
+        "desc": "这是VACUUM操作的成本限制。增大该值可以允许VACUUM操作使用更多的资源，适合需要频繁清理的场景。减小该值可以减少VACUUM对系统性能的影响。默认值为200。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            100000
+        ]
+    },
+    "wal_buffers": {
+        "desc": "WAL缓冲区的大小设置。增大此值可以提高WAL写入性能，缓解磁盘IO瓶颈，尤其是在高写入负载的情况下。建议根据系统的写入负载进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            64000,
+            16777216
+        ]
+    },
+    "wal_compression": {
+        "desc": "该参数控制是否对WAL（Write Ahead Log）进行压缩。启用WAL压缩可以减少磁盘IO和存储空间的使用，适用于IO瓶颈的场景。禁用WAL压缩则会提高写入性能，但会增加磁盘空间的使用。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "pglz",
+            "lz4",
+            "zstd",
+            "off"
+        ]
+    },
+    "wal_level": {
+        "desc": "确定写入WAL（Write Ahead Log）中的信息量，影响数据恢复和复制的能力。可选值为minimal、replica和logical。增大该值会增加磁盘IO的负担，但提供更强的数据保护和复制能力。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "minimal",
+            "replica",
+            "logical"
+        ]
+    },
+    "work_mem": {
+        "desc": "设置在写入临时磁盘文件之前，查询操作可以使用的内存量。增大此值可以提高复杂查询的性能，缓解内存瓶颈，尤其是在排序和哈希操作中。建议根据查询复杂度和并发量进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            64,
+            2147483647
+        ]
     }
 }
