@@ -1,0 +1,234 @@
+{
+    "shared_buffers": {
+        "desc": "该参数设置共享内存区的大小，用于缓存数据页，减少磁盘 I/O。建议在系统物理内存充足时调整，通常设置为系统物理内存的 25% 左右，以提升缓存效率。",
+        "type": "continuous",
+        "range": [
+            128,
+            "系统物理内存的 25%"
+        ],
+        "dtype": "integer",
+        "default_value": "128MB"
+    },
+    "work_mem": {
+        "desc": "指定每个查询操作（如排序或哈希表）可以使用的内存量。对于复杂查询较多的系统，可适当增大，但过大会导致内存使用失控。建议根据系统内存和查询复杂度调整。",
+        "type": "continuous",
+        "range": [
+            64,
+            1024
+        ],
+        "dtype": "integer",
+        "default_value": "4MB"
+    },
+    "maintenance_work_mem": {
+        "desc": "设置维护操作（如 VACUUM、CREATE INDEX 等）使用的最大内存量。对于大型数据库，可设置为 256MB-1GB，以加快维护操作的速度。",
+        "type": "continuous",
+        "range": [
+            64,
+            1024
+        ],
+        "dtype": "integer",
+        "default_value": "64MB"
+    },
+    "effective_cache_size": {
+        "desc": "为查询规划器提供一个估算值，表示可用于缓存数据的内存量，包括操作系统和数据库缓存。建议设置为系统总内存的 75%，以帮助查询规划器更好地选择查询计划。",
+        "type": "continuous",
+        "range": [
+            4096,
+            "系统总内存的 75%"
+        ],
+        "dtype": "integer",
+        "default_value": "4GB"
+    },
+    "max_connections": {
+        "desc": "决定客户端的最大并发连接数。若出现连接数过多的错误，可适当增加，但需考虑对其他参数（如 work_mem）的影响。",
+        "type": "discrete",
+        "range": [
+            100,
+            1000
+        ],
+        "dtype": "integer",
+        "default_value": "100"
+    },
+    "superuser_reserved_connections": {
+        "desc": "为超级用户保留的连接数。在系统连接数接近 max_connections 时，可适当调整，以确保超级用户能够连接。",
+        "type": "discrete",
+        "range": [
+            3,
+            10
+        ],
+        "dtype": "integer",
+        "default_value": "3"
+    },
+    "tcp_keepalives_idle": {
+        "desc": "空闲连接的 TCP keepalive 时间。在需要检测空闲连接是否仍然有效时调整，以避免无效连接占用资源。",
+        "type": "continuous",
+        "range": [
+            0,
+            3600
+        ],
+        "dtype": "integer",
+        "default_value": "7200"
+    },
+    "tcp_keepalives_interval": {
+        "desc": "TCP keepalive 发送间隔。在需要更频繁地检测连接状态时调整，以确保连接的可靠性。",
+        "type": "continuous",
+        "range": [
+            0,
+            3600
+        ],
+        "dtype": "integer",
+        "default_value": "75"
+    },
+    "tcp_keepalives_count": {
+        "desc": "TCP keepalive 重试次数。在需要调整连接检测的严格程度时调整，以避免误判。",
+        "type": "discrete",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "integer",
+        "default_value": "9"
+    },
+    "random_page_cost": {
+        "desc": "规划器对一次非顺序获取磁盘页面的代价估计。对于高端存储或 SSD 可适当调小，以反映更快的随机读取性能。",
+        "type": "continuous",
+        "range": [
+            1.0,
+            10.0
+        ],
+        "dtype": "float",
+        "default_value": "4.0"
+    },
+    "seq_page_cost": {
+        "desc": "规划器对一次顺序获取磁盘页面的代价估计。可根据实际存储性能调整，以反映顺序读取的性能。",
+        "type": "continuous",
+        "range": [
+            1.0,
+            10.0
+        ],
+        "dtype": "float",
+        "default_value": "1.0"
+    },
+    "cpu_tuple_cost": {
+        "desc": "估算处理每行数据的 CPU 成本。可根据实际 CPU 性能调整，以反映 CPU 的处理能力。",
+        "type": "continuous",
+        "range": [
+            0.001,
+            0.1
+        ],
+        "dtype": "float",
+        "default_value": "0.01"
+    },
+    "cpu_index_tuple_cost": {
+        "desc": "估算处理索引中的每个元组的 CPU 成本。可根据实际 CPU 性能调整，以反映索引操作的 CPU 成本。",
+        "type": "continuous",
+        "range": [
+            0.001,
+            0.1
+        ],
+        "dtype": "float",
+        "default_value": "0.005"
+    },
+    "cpu_operator_cost": {
+        "desc": "估算执行一个操作符的 CPU 成本。可根据实际 CPU 性能调整，以反映操作符的 CPU 成本。",
+        "type": "continuous",
+        "range": [
+            0.001,
+            0.1
+        ],
+        "dtype": "float",
+        "default_value": "0.0025"
+    },
+    "log_min_duration_statement": {
+        "desc": "记录执行时间超过指定毫秒数的语句。可根据需要设置为合适的值，如 100ms，以记录慢查询。",
+        "type": "continuous",
+        "range": [
+            -1,
+            3600000
+        ],
+        "dtype": "integer",
+        "default_value": "-1"
+    },
+    "log_statement": {
+        "desc": "控制记录哪些 SQL 语句。可根据需要设置为 ddl、mod 或 all，以记录不同类型的语句。",
+        "type": "discrete",
+        "range": [
+            "none",
+            "ddl",
+            "mod",
+            "all"
+        ],
+        "dtype": "string",
+        "default_value": "none"
+    },
+    "logging_collector": {
+        "desc": "是否启用日志收集器。启用后可将日志输出到文件，便于后续分析和监控。",
+        "type": "discrete",
+        "range": [
+            "off",
+            "on"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "checkpoint_timeout": {
+        "desc": "影响系统何时启动一个检查点操作。可根据系统写入负载调整，以平衡检查点频率和性能。",
+        "type": "continuous",
+        "range": [
+            30,
+            3600
+        ],
+        "dtype": "integer",
+        "default_value": "5min"
+    },
+    "checkpoint_completion_target": {
+        "desc": "检查点完成目标。可根据系统写入负载调整，以确保检查点操作在合理时间内完成。",
+        "type": "continuous",
+        "range": [
+            0.5,
+            0.9
+        ],
+        "dtype": "float",
+        "default_value": "0.9"
+    },
+    "max_wal_size": {
+        "desc": "控制 WAL 文件的最大总大小。对于高写入负载的系统，可增大此值以减少检查点频率。",
+        "type": "continuous",
+        "range": [
+            1024,
+            10240
+        ],
+        "dtype": "integer",
+        "default_value": "1GB"
+    },
+    "min_wal_size": {
+        "desc": "控制 WAL 文件的最小总大小。可根据系统写入负载调整，以确保 WAL 文件不会过小。",
+        "type": "continuous",
+        "range": [
+            80,
+            2048
+        ],
+        "dtype": "integer",
+        "default_value": "80MB"
+    },
+    "wal_buffers": {
+        "desc": "控制 WAL 缓冲区的大小。对于写入密集型工作负载，可设置为 shared_buffers 的 1/32 到 1/64，以提高写入性能。",
+        "type": "continuous",
+        "range": [
+            32,
+            "shared_buffers 的 1/32"
+        ],
+        "dtype": "integer",
+        "default_value": "4MB"
+    },
+    "autovacuum_max_workers": {
+        "desc": "指定能同时运行的 autovacuum 进程的最大数量。在表膨胀问题较为严重时，可适当调大，以加快清理速度。",
+        "type": "discrete",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "integer",
+        "default_value": "3"
+    }
+}

@@ -9,6 +9,8 @@ from abc import abstractmethod
 import traceback
 from types import ModuleType
 from src.utils.common import ExecuteResult
+import subprocess
+import shlex
 
 decorated_funcs = defaultdict(list)
 cmds_registry = defaultdict(list)
@@ -108,7 +110,56 @@ class SshClient:
                 self.host_ip, self.host_port, self.host_user, self.host_password
             )
             _, stdout, stderr = client.exec_command(cmd)
-            result.output = stdout.read().decode()
+            result.output = stdout.read().decode().strip()
+            result.err_msg = stderr.read().decode()
+            result.status_code = stdout.channel.recv_exit_status()
+        except Exception as e:
+            result.status_code = -1
+            result.output = ""
+            result.err_msg = traceback.format_exc()
+        finally:
+            client.close()
+        return result
+
+    @retryable()
+    def run_local_cmd(self, cmd):
+        try:
+            result = ExecuteResult()
+            # 使用 shlex.split 将命令字符串分割为参数列表
+            args = shlex.split(cmd)
+            shell_result = subprocess.run(
+                args,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            result.output = shell_result.stdout.strip()
+            result.err_msg = shell_result.stderr.strip()
+            result.status_code = shell_result.returncode
+        except subprocess.CalledProcessError as e:
+            result.output = ""
+            result.err_msg = e.stderr.strip()
+            result.status_code = e.returncode
+        except Exception as e:
+            result.output = ""
+            result.err_msg = str(e)
+            result.status_code = -1
+        return result
+
+    @retryable()
+    def run_shell(self, local_shell_path) -> ExecuteResult:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        result = ExecuteResult()
+        try:
+            with open(local_shell_path, "r") as f:
+                shell_content = f.read()
+            client.connect(
+                self.host_ip, self.host_port, self.host_user, self.host_password
+            )
+            _, stdout, stderr = client.exec_command(f"bash -s", stdin=shell_content)
+            result.output = stdout.read().decode().strip()
             result.err_msg = stderr.read().decode()
             result.status_code = stdout.channel.recv_exit_status()
         except Exception as e:

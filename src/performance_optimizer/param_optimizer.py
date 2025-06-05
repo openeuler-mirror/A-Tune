@@ -11,8 +11,11 @@ from src.utils.shell_execute import SshClient
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_collector.metric_collector import MetricCollector
-from src.performance_collector.static_metric_profile_collector import StaticMetricProfileCollector
+from src.performance_collector.static_metric_profile_collector import (
+    StaticMetricProfileCollector,
+)
 from src.utils.metrics import PerformanceMetric
+from src.utils.config.app_config import AppInterface
 
 # 配置日志
 logging.basicConfig(
@@ -31,10 +34,9 @@ class ParamOptimizer:
         static_profile: str,
         ssh_client: SshClient,
         slo_calc_callback: callable,
-        benchmark_callback: callable,
-        apply_params_callback: callable,
         max_iterations: int = 10,
     ):
+        self.service_name = service_name
         self.analysis_report = analysis_report
         self.static_profile = static_profile
         self.ssh_client = ssh_client
@@ -44,17 +46,16 @@ class ParamOptimizer:
             performance_metric=performance_metric,
             static_profile=static_profile,
             performance_analysis_report=analysis_report,
-            ssh_client = ssh_client
+            ssh_client=ssh_client,
         )
         self.max_iterations = max_iterations
         # 计算slo指标提升方式的回调函数，输入是benchmark返回的性能指标，输出是业务性能提升比例
         self.slo_calc_callback = slo_calc_callback
         # 业务预期指标提升的目标
         self.slo_goal = slo_goal
-        # 执行benchmark的回调函数
-        self.benchmark_callback = benchmark_callback
-        # 应用参数自动生效的回调函数
-        self.apply_params_callback = apply_params_callback
+        # 应用接口，包括应用参数下发、benchmark执行等操作
+        self.app_interface = AppInterface(ssh_client).get(service_name)
+        self.system_interface = AppInterface(ssh_client).system
 
     def calc_improve_rate(self, baseline, benchmark_result):
         return self.slo_calc_callback(baseline, benchmark_result)
@@ -65,10 +66,23 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        return self.benchmark_callback(self.ssh_client)
+        print("🔄 正在验证benchmark性能...")
+        result = self.app_interface.benchmark()
+        if result.status_code == 0:
+            try:
+                return float(result.output)
+            except ValueError:
+                return 0.0
+        else:
+            return 0.0
 
     def apply_params(self, recommend_params):
-        self.apply_params_callback(self.ssh_client, recommend_params)
+        for param_name, param_value in recommend_params.items():
+            apply_result = self.app_interface.set_param(param_name, param_value)
+            if apply_result.status_code == 0:
+                print(f"设置参数{param_name}为{param_value}")
+            else:
+                print(f"设置参数{param_name}失败，原因是：{apply_result.err_msg}")
 
     def run(self):
         # 运行benchmark，摸底参数性能指标
@@ -79,7 +93,7 @@ class ParamOptimizer:
         best_result = baseline
         ratio = self.calc_improve_rate(baseline, last_result)
         print(
-            f"[{1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
+            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
         )
 
         for i in range(self.max_iterations):
@@ -88,10 +102,13 @@ class ParamOptimizer:
 
             # 设置参数生效
             self.apply_params(recommend_params)
+            print("🔄 正在重启应用 ...")
+            self.app_interface.stop_workload()
+            self.app_interface.start_workload()
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
-            
+
             last_result = performance_result
 
             history.append(
@@ -106,12 +123,14 @@ class ParamOptimizer:
                 best_result = max(baseline, performance_result)
             else:
                 best_result = max(best_result, performance_result)
-            
+
             ratio = self.calc_improve_rate(baseline, last_result)
 
             # 达到预期效果，则退出循环
             if self.reached_goal(baseline, performance_result):
-                print(f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}")
+                print(
+                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
+                )
                 break
 
             print(
@@ -125,6 +144,7 @@ class ParamOptimizer:
 
 if __name__ == "__main__":
     from src.config import config
+
     ssh_client = SshClient(
         host_ip=config["servers"][0]["ip"],
         host_port=22,
@@ -134,7 +154,9 @@ if __name__ == "__main__":
         delay=1.0,
     )
 
-    metric_collector = StaticMetricProfileCollector(ssh_client=ssh_client, max_workers=5)
+    metric_collector = StaticMetricProfileCollector(
+        ssh_client=ssh_client, max_workers=5
+    )
 
     static_profile = metric_collector.run()
     print("static_profile:", static_profile)
