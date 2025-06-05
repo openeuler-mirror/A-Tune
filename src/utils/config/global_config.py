@@ -1,3 +1,4 @@
+import os
 import json
 import yaml
 from typing import Any, Optional, Dict, List
@@ -73,6 +74,11 @@ class EnvironConfig:
                 result.append(filename)
         return result
 
-
-env_config = EnvironConfig("./config")
-param_config = EnvironConfig("./src/knowledge_base/knob_params")
+CONFIG_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config")
+)
+PARAMS_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "knowledge_base", "knob_params")
+)
+env_config = EnvironConfig(CONFIG_PATH)
+param_config = EnvironConfig(PARAMS_PATH)
