@@ -21,7 +21,10 @@ EXECUTE_MODE_PATTERN = re.compile(rf"^\$EXECUTE_MODE:\s*({ALL_EXECUTE_MODES})?\s
 
 
 def default_scripts_dir():
-    return os.path.join(os.getcwd(), "scripts")
+    scripts_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", "scripts")
+    )
+    return scripts_dir
 
 
 def app_template(key):

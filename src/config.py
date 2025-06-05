@@ -9,7 +9,9 @@ class Config:
         if os.getenv("CONFIG"):
             config_file = os.getenv("CONFIG")
         else:
-            config_file = "./config/.env.yaml"
+            config_file = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "config", ".env.yaml")
+            )
         with open(config_file, 'r', encoding='utf-8') as file:
             self.config = yaml.safe_load(file)
         if os.getenv("PROD"):

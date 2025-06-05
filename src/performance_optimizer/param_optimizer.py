@@ -69,12 +69,9 @@ class ParamOptimizer:
         print("🔄 正在验证benchmark性能...")
         result = self.app_interface.benchmark()
         if result.status_code == 0:
-            try:
-                return float(result.output)
-            except ValueError:
-                return 0.0
+            return float(result.output)
         else:
-            return 0.0
+            raise RuntimeError(f"failed to execute benchmark because {result.err_msg}")
 
     def apply_params(self, recommend_params):
         for param_name, param_value in recommend_params.items():
@@ -83,6 +80,19 @@ class ParamOptimizer:
                 print(f"设置参数{param_name}为{param_value}")
             else:
                 print(f"设置参数{param_name}失败，原因是：{apply_result.err_msg}")
+
+    def restart_application(self):
+        print("🔄 正在重启应用 ...")
+        stop_result = self.app_interface.stop_workload()
+        if stop_result.status_code != 0:
+            raise RuntimeError(
+                f"failed to stop application because {stop_result.err_msg}"
+            )
+        start_result = self.app_interface.start_workload()
+        if start_result.status_code != 0:
+            raise RuntimeError(
+                f"failed to start application because {start_result.err_msg}"
+            )
 
     def run(self):
         # 运行benchmark，摸底参数性能指标
@@ -93,7 +103,7 @@ class ParamOptimizer:
         best_result = baseline
         ratio = self.calc_improve_rate(baseline, last_result)
         print(
-            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
+            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
         )
 
         for i in range(self.max_iterations):
@@ -102,9 +112,7 @@ class ParamOptimizer:
 
             # 设置参数生效
             self.apply_params(recommend_params)
-            print("🔄 正在重启应用 ...")
-            self.app_interface.stop_workload()
-            self.app_interface.start_workload()
+            self.restart_application()
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
@@ -129,12 +137,12 @@ class ParamOptimizer:
             # 达到预期效果，则退出循环
             if self.reached_goal(baseline, performance_result):
                 print(
-                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
+                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
                 )
                 break
 
             print(
-                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result else baseline}, 性能提升：{ratio:.2%}"
+                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else "-"}, 性能提升：{ratio:.2%}"
             )
 
         print(

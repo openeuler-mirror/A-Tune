@@ -8,6 +8,7 @@ from .base_analyzer import BaseAnalyzer
 from typing import Tuple
 from src.utils.thread_pool import ThreadPoolManager
 
+
 class PerformanceAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -18,11 +19,8 @@ class PerformanceAnalyzer(BaseAnalyzer):
         self.micro_analyer = MicroDepAnalyzer(data=self.data.get("micro_dep", {}))
         self.mysql_analyzer = MysqlAnalyzer(data=self.data.get("Mysql", {}))
         self.thread_pool = ThreadPoolManager(max_workers=5)
-    
-    def analyze(
-        self,
-        report: str
-    ) -> str:
+
+    def analyze(self, report: str) -> str:
         bottle_neck_prompt = f"""
         # CONTEXT # 
         当前linux系统的性能分析报告如下,报告中所涉及到的数据准确无误,真实可信:
@@ -55,16 +53,16 @@ class PerformanceAnalyzer(BaseAnalyzer):
             "disk": "DISK",
             "network": "NETWORK",
             "memory": "MEMORY",
-            "none": "NONE"
+            "none": "NONE",
         }
-        
+
         # 转换为小写并查找瓶颈
         for key, value in bottlenecks.items():
             if key in result.lower():
                 return value
-        
+
         # 如果没有找到明确的瓶颈，返回UNKNOWN BOTTLENECKS
-        return "UNKNOWN BOTTLENECKS" 
+        return "UNKNOWN BOTTLENECKS"
 
     def generate_report(self) -> Tuple[str, str]:
         cpu_analyzer_task = self.thread_pool.add_task(self.cpu_analyzer.run)
@@ -79,6 +77,10 @@ class PerformanceAnalyzer(BaseAnalyzer):
 
         report_results = {}
         for task_result in task_results:
+            if task_result.status_code != 0:
+                raise RuntimeError(
+                    f"failed to execute task {task_result.func_name}, exception is {task_result.result}"
+                )
             report_results[task_result.uuid] = task_result.result
 
         os_performance_report = ""
@@ -90,7 +92,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         app_performance_report = ""
         app_performance_report += report_results[mysql_analyzer_task]
         return os_performance_report, app_performance_report
-    
+
     def run(self) -> Tuple[str, str]:
         os_performance_report, app_performance_report = self.generate_report()
         bottleneck = self.analyze(os_performance_report)
