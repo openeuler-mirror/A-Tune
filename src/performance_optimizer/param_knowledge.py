@@ -36,10 +36,13 @@ class ParamKnowledge:
         for param_name in params:
             item = app_params.get(param_name)
             # 1.描述参数范围
-            if item["type"] == "discrete":
-                param_range = "、".join(list(map(str, item["range"])))
+            if item["range"]:
+                if item["type"] == "discrete":
+                    param_range = "、".join(list(map(str, item["range"])))
+                else:
+                    param_range = f"从{item['range'][0]}到{item['range'][1]}"
             else:
-                param_range = f"从{item['range'][0]}到{item['range'][1]}"
+                param_range = None
             # 2.当前环境取值
             param_result = app.get_param(param_name=param_name)
             param_env_value = (

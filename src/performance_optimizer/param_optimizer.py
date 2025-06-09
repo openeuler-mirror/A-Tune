@@ -35,6 +35,7 @@ class ParamOptimizer:
         ssh_client: SshClient,
         slo_calc_callback: callable,
         max_iterations: int = 10,
+        need_restart_application: bool=False,
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
@@ -56,6 +57,7 @@ class ParamOptimizer:
         # 应用接口，包括应用参数下发、benchmark执行等操作
         self.app_interface = AppInterface(ssh_client).get(service_name)
         self.system_interface = AppInterface(ssh_client).system
+        self.need_restart_application = need_restart_application
 
     def calc_improve_rate(self, baseline, benchmark_result):
         return self.slo_calc_callback(baseline, benchmark_result)
@@ -112,7 +114,8 @@ class ParamOptimizer:
 
             # 设置参数生效
             self.apply_params(recommend_params)
-            self.restart_application()
+            if self.need_restart_application:
+                self.restart_application()
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()

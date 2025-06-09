@@ -1,0 +1,199 @@
+{
+    "spark.default.parallelism": {
+        "desc": "RDD 中的默认分区数，由 `join`、`reduceByKey` 和 `parallelize` 等转换返回，当用户未设置时。对于分布式 shuffle 操作（如 reduceByKey 和 join），它取决于父 RDD 中的最大分区数。对于没有父 RDD 的 parallelize 操作，默认值依赖于集群管理器。例如，在本地模式下，默认值为本地机器上的核心数。通常建议将此值设置为集群总核心数的 2 到 4 倍，以提高 CPU 利用率，缓解 CPU 瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ]
+    },
+    "spark.driver.memory": {
+        "desc": "用于驱动程序进程的内存量，影响驱动程序的性能和稳定性。增大此值可以缓解内存瓶颈，尤其是在驱动程序需要处理大量数据时。取值通常为如1g、2g等，具体取值应根据集群资源和任务需求进行调整。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": null
+    },
+    "spark.driver.memoryOverhead": {
+        "desc": "在集群模式下，每个驱动程序进程要分配的非堆内存量，用于存储非JVM内存的开销，如网络和文件系统的缓冲区。适当增加此值可以缓解由于内存不足导致的性能问题，尤其是在处理大数据集时。单位为MiB，默认值为driverMemory * spark.driver.memoryOverheadFactor。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            384,
+            null
+        ]
+    },
+    "spark.dynamicAllocation.initialExecutors": {
+        "desc": "如果启用了动态分配，则要运行的初始执行器数量。此参数影响任务启动时的资源分配，增大此值可以提高任务启动速度，缓解CPU瓶颈。取值应根据集群资源和任务需求进行调整，通常为1到数个executor。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "spark.dynamicAllocation.maxExecutors": {
+        "desc": "如果启用了动态分配，则执行器数量的上限。该参数限制了在负载高峰时可用的资源，增大此值可以提高并行度，缓解CPU瓶颈。取值应根据集群资源和任务需求进行调整，通常为数十到数百个executor。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "spark.dynamicAllocation.minExecutors": {
+        "desc": "如果启用了动态分配，则执行器数量的下限。该参数确保在负载较低时仍有一定的资源可用。增大此值可以缓解CPU和内存瓶颈。取值应根据集群资源和任务需求进行调整，通常为1到数个executor。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "spark.executor.cores": {
+        "desc": "每个执行器上要使用的核心数量，影响并行度和任务执行速度。增大此值可以缓解CPU瓶颈，但需确保集群资源足够。通常取值为1到数个核心，具体取值应根据任务并行需求和集群资源进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ]
+    },
+    "spark.executor.memory": {
+        "desc": "每个执行器进程使用的内存量，通常以字节为单位（如1g、2g等）进行指定。增大此值可以缓解内存瓶颈，尤其是在处理大数据集时。具体取值应根据集群资源和任务需求进行调整。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            null,
+            null
+        ]
+    },
+    "spark.executor.memoryOverhead": {
+        "desc": "每个执行器进程要分配的额外内存量，以 MiB 为单位，主要用于存储非JVM内存的开销，包括 VM 开销、内部字符串和其他本机开销等。通常建议的取值为执行器内存的 6-10%。增大此值可以缓解内存瓶颈，尤其是在使用外部库时。具体取值应根据任务需求进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            384,
+            null
+        ]
+    },
+    "spark.io.compression.codec": {
+        "desc": "用于压缩内部数据的编解码器，例如 RDD 分区、事件日志、广播变量和混洗输出。支持的编码格式包括 LZ4、LZF、Snappy 和 ZSTD。使用压缩可以减少磁盘 IO 和网络带宽的消耗，提升数据传输效率。不同的编码格式在压缩比和压缩速度上有所不同，例如 Snappy 压缩速度快但压缩比相对较低，而 Gzip 压缩比高但速度较慢。默认情况下，Spark 提供四种编解码器：lz4、lzf、snappy 和 zstd。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "lz4",
+            "lzf",
+            "snappy",
+            "zstd"
+        ]
+    },
+    "spark.kryo.referenceTracking": {
+        "desc": "启用或禁用Kryo序列化的引用跟踪。启用引用跟踪可以减少内存使用和序列化时间，特别是在处理大量重复对象时。这在对象图具有循环时是必需的，并且如果它们包含同一对象的多个副本，则对效率很有用。如果知道情况并非如此，可以禁用它以提高性能。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "true",
+            "false"
+        ]
+    },
+    "spark.locality.wait": {
+        "desc": "在调度任务时，Spark会等待数据本地性（locality）的时间，以提高任务的执行效率。该参数定义了在放弃并将任务调度到不太本地化的节点之前，Spark等待的时间。等待时间会逐步遍历多个本地化级别（进程本地、节点本地、机架本地等）。如果任务执行时间较长且本地化效果不佳，可以考虑增加此设置，但默认值通常能够满足大多数场景的需求。适当调整此参数可以在CPU和网络瓶颈之间取得平衡。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            null,
+            null
+        ]
+    },
+    "spark.memory.fraction": {
+        "desc": "spark.memory.fraction参数用于指定执行和存储所使用的内存比例，计算方式为(堆空间 - 300MB)的部分。此值越低，溢出和缓存数据驱逐的频率越高。增大此值可以提高内存利用率，缓解内存瓶颈。建议根据具体任务特性进行调整，默认值为0.6。",
+        "type": "continuous",
+        "dtype": "double",
+        "range": [
+            0.0,
+            1.0
+        ]
+    },
+    "spark.memory.offHeap.enabled": {
+        "desc": "启用off-heap内存管理，允许Spark使用JVM外的内存。启用后可以缓解内存瓶颈，尤其是在处理大数据集时。若启用堆外内存使用，则必须设置spark.memory.offHeap.size为正值。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "true",
+            "false"
+        ]
+    },
+    "spark.memory.offHeap.size": {
+        "desc": "用于堆外分配的内存绝对量，以字节为单位。此设置不会影响堆内存使用情况，因此，如果您的执行器总内存消耗必须符合某个硬性限制，请务必相应地缩小 JVM 堆大小。当 spark.memory.offHeap.enabled=true 时，此值必须设置为正值。增大此值可以提高内存利用率，缓解内存瓶颈。取值通常为如512m、1g等，具体取值应根据集群资源和任务需求进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ]
+    },
+    "spark.reducer.maxSizeInFlight": {
+        "desc": "每个 reduce 任务同时获取的映射输出的最大大小（以 MiB 为单位）。此参数影响 shuffle 性能，增大此值可以提高网络利用率，缓解网络瓶颈。建议根据网络带宽和任务特性进行调整，通常取值为 48m、64m 等。为了避免每个 reduce 任务的固定内存开销，建议将此值设置得较小。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            1,
+            null
+        ]
+    },
+    "spark.shuffle.compress": {
+        "desc": "启用shuffle数据压缩以减少网络传输和磁盘IO的开销。通常建议启用此功能，以缓解disk IO和network瓶颈。启用时需注意CPU的额外开销。取值为true或false。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "true",
+            "false"
+        ]
+    },
+    "spark.shuffle.file.buffer": {
+        "desc": "每个混洗文件输出流的内存缓冲区的大小（以 KiB 为单位）。这些缓冲区可以减少在创建中间混洗文件时的磁盘寻址和系统调用次数，从而提高性能。增大此值可以提高磁盘IO性能，缓解disk IO瓶颈。取值通常为如32k、64k等，具体取值应根据任务特性进行调整。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            1,
+            1048576
+        ]
+    },
+    "spark.speculation": {
+        "desc": "启用或禁用任务推测执行。推测执行可以在某些任务运行缓慢时启动额外的副本，以减少整体作业的执行时间。此参数可以缓解由于某些任务的CPU或内存瓶颈导致的性能问题。取值为true时启用推测执行，false时禁用。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "true",
+            "false"
+        ]
+    },
+    "spark.sql.adaptive.maxNumPostShufflePartitions": {
+        "desc": "设置Spark SQL自适应查询执行中，Shuffle后最大分区数。此参数可以帮助优化Shuffle后的数据分布，适当调整可以缓解内存和CPU瓶颈。增大此值可以提高并行度，减小此值可以减少分区数量。建议根据具体的作业需求进行调整，以达到最佳性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ]
+    },
+    "spark.sql.files.maxPartitionBytes": {
+        "desc": "设置Spark SQL读取文件时每个分区的最大字节数。此配置仅在使用基于文件的源（如Parquet、JSON和ORC）时有效。增大此值可以减少分区数量，但可能导致内存瓶颈；减小此值可以增加分区数量，提高并行度，从而影响任务的并行性和内存使用。该参数的默认值为128MB。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            1,
+            null
+        ]
+    },
+    "spark.task.maxFailures": {
+        "desc": "在放弃作业之前，任何特定任务连续失败的次数。此参数可以帮助在任务失败时进行重试，从而提高作业的成功率。适当增加此值可以缓解由于临时故障导致的任务失败，但过高的值可能会导致资源浪费。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ]
+    }
+}

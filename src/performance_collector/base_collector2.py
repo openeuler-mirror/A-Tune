@@ -89,6 +89,8 @@ def get_process_pid(
 ):
     cmd = f"pgrep -f {process_name}"
     pid, _, _ = remote_execute_with_exit_code(cmd, host_info)
+    if isinstance(pid, list):
+        pid = pid[-1]
     if not pid.isdigit():
         raise RuntimeError(f"Failed to get PID of process [{process_name}]")
     return pid

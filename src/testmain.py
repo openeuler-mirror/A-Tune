@@ -39,6 +39,8 @@ max_retries = config["servers"][0]["max_retries"]
 delay = config["servers"][0]["delay"]
 target_process_name = config["servers"][0]["target_process_name"]
 benchmark_cmd = config["benchmark_cmd"]
+need_restart_application = config["feature"][0]["need_restart_application"]
+need_microDep_collector = config["feature"][0]["microDep_collector"]
 
 ssh_client = SshClient(
     host_ip=host_ip,
@@ -57,19 +59,6 @@ static_metric_collector = StaticMetricProfileCollector(
 static_profile_info = static_metric_collector.run()
 print("static_profile:", static_profile_info)
 
-
-host_info = HostInfo(host_ip=host_ip, host_port=host_port, host_password=host_password)
-collect_mode = COLLECTMODE.DIRECT_MODE
-microDepCollector = MicroDepCollector(
-    host_info=host_info,
-    iteration=10,
-    target_process_name=target_process_name,
-    benchmark_cmd=benchmark_cmd,
-    mode=collect_mode,
-)
-micro_dep_dollector_data = microDepCollector.run()
-print("microDepCollector data", micro_dep_dollector_data)
-
 print(">>> 运行MetricCollector：")
 metric_collector = MetricCollector(
     host_ip=host_ip,
@@ -79,8 +68,21 @@ metric_collector = MetricCollector(
     app=app,
 )
 data = metric_collector.run()
-data["micro_dep"] = micro_dep_dollector_data
 print("metric_collector data:", data)
+
+host_info = HostInfo(host_ip=host_ip, host_port=host_port, host_password=host_password)
+collect_mode = COLLECTMODE.DIRECT_MODE
+if need_microDep_collector:
+    microDepCollector = MicroDepCollector(
+        host_info=host_info,
+        iteration=10,
+        target_process_name=target_process_name,
+        benchmark_cmd=benchmark_cmd,
+        mode=collect_mode,
+    )
+    micro_dep_dollector_data = microDepCollector.run()
+    print("microDepCollector data", micro_dep_dollector_data)
+    data["micro_dep"] = micro_dep_dollector_data
 
 print(">>> 运行PerformanceAnalyzer：")
 testAnalyzer = PerformanceAnalyzer(data=data)
@@ -103,6 +105,7 @@ param_optimizer = ParamOptimizer(
     ssh_client=ssh_client,
     slo_calc_callback=slo_calc_callback,
     max_iterations=1,
+    need_restart_application = need_restart_application,
 )
 param_optimizer.run()
 
