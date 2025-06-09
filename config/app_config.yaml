@@ -5,8 +5,8 @@ mysql:
   port: 3306
   set_param_template: 'grep -q "^$param_name\\s*=" "$config_file" && sed -i "s/^$param_name\\s*=.*/$param_name = $param_value/" "$config_file" || sed -i "/\\[mysqld\\]/a $param_name = $param_value" "$config_file"'
   get_param_template: 'grep -E "^$param_name\s*=" $config_file | cut -d= -f2- | xargs'
-  stop_workload: "systemctl start mysqld"
-  start_workload: "systemctl stop mysqld"
+  stop_workload: "systemctl stop mysqld"
+  start_workload: "systemctl start mysqld"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
 
 postgresql:
@@ -19,6 +19,11 @@ postgresql:
   stop_workload: "/usr/local/pgsql/bin/pg_ctl stop -D /data/pgsql/ -m fast"
   start_workload: "/usr/local/pgsql/bin/pg_ctl start -D /data/pgsql/ -l /var/log/postgresql/postgresql.log"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/postgresql/parse_benchmark.sh $host_ip $port $user $password"
+
+spark:
+  set_param_template: 'sh /home/cxm/set_param.sh $param_name $param_value'
+  get_param_template: 'sh /home/cxm/get_param.sh $param_name'
+  benchmark: "$EXECUTE_MODE:remote sh /home/cxm/spark_benchmark.sh"
 
 system:
   set_param_template: 'sysctl -w $param_name=$param_value'

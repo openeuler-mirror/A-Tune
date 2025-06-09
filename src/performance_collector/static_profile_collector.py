@@ -178,7 +178,7 @@ def df_parser(output: str) -> dict:
     返回每个挂载点的文件系统类型
     """
     metrics = {}
-    lines = output.splitlines()
+    lines = output.strip().splitlines()
     if len(lines) < 2:
         return metrics
     header = re.split(r"\s+", lines[0].strip())
