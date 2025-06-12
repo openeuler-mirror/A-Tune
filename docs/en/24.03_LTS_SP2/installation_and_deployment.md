@@ -14,7 +14,7 @@ This chapter describes how to install and deploy A-Tune.
 
 ## Environment Preparation
 
-For details about installing an openEuler OS, see the [_openEuler Installation Guide_](../../../installation_upgrade/installation/installation_on_servers.md).
+For details about installing an openEuler OS, see the [_openEuler Installation Guide_](https://docs.openeuler.openatom.cn/en/docs/24.03_LTS_SP1/server/installation_upgrade/installation/installation_on_servers.html).
 
 ## A-Tune Installation
 
