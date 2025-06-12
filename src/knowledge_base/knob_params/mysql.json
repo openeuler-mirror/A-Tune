@@ -465,16 +465,6 @@
         "dtype": "Integer",
         "default_value": 0
     },
-    "innodb_numa_interleave": {
-        "desc": "启用NUMA内存交错。启用后可以提高多核系统的内存访问性能，缓解内存瓶颈。取值为ON/OFF，默认值为OFF。",
-        "type": "discrete",
-        "range": [
-            "OFF",
-            "ON"
-        ],
-        "dtype": "Boolean",
-        "default_value": "OFF"
-    },
     "innodb_old_blocks_pct": {
         "desc": "指定InnoDB缓冲池中用于旧块子列表的近似百分比。增大此值可以增加旧块的使用，可能会提高查询性能，并缓解内存瓶颈。默认值为37，最大值为95，最小值为5。",
         "type": "continuous",

@@ -133,7 +133,9 @@ class ThreadPoolManager:
                 result = future.result()
                 status_code = 0
             except Exception as e:
-                result = ExecuteResult(status_code=-1, output="", err_msg=str(e))
+                result = ExecuteResult(
+                    status_code=-1, output="", err_msg=traceback.format_exc()
+                )
                 status_code = -1
             self.all_results.append(
                 TaskResult(

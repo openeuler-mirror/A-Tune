@@ -16,8 +16,8 @@ postgresql:
   port: 5432
   set_param_template: 'grep -qE "^\s*$param_name\s*=" "$config_file" && sed -i "s/^[[:space:]]*$param_name[[:space:]]*=.*/$param_name = $param_value/" "$config_file" || echo "$param_name = $param_value" >> "$config_file"'
   get_param_template: 'grep -oP "^\s*$param_name\s*=\s*\K.*" "$config_file"'
-  stop_workload: "/usr/local/pgsql/bin/pg_ctl stop -D /data/pgsql/ -m fast"
-  start_workload: "/usr/local/pgsql/bin/pg_ctl start -D /data/pgsql/ -l /var/log/postgresql/postgresql.log"
+  stop_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl stop -D /data/pgsql/ -m fast'"
+  start_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl start -D /data/pgsql/ -l /var/log/postgresql/postgresql.log'"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/postgresql/parse_benchmark.sh $host_ip $port $user $password"
 
 spark:
