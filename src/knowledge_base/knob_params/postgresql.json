@@ -422,18 +422,16 @@
         "type": "continuous",
         "dtype": "int",
         "range": [
-            64000,
-            16777216
+            1,
+            262143
         ]
     },
     "wal_compression": {
         "desc": "该参数控制是否对WAL（Write Ahead Log）进行压缩。启用WAL压缩可以减少磁盘IO和存储空间的使用，适用于IO瓶颈的场景。禁用WAL压缩则会提高写入性能，但会增加磁盘空间的使用。",
         "type": "discrete",
-        "dtype": "string",
+        "dtype": "bool",
         "range": [
-            "pglz",
-            "lz4",
-            "zstd",
+            "on",
             "off"
         ]
     },

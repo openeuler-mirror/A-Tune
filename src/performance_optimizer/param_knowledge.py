@@ -27,14 +27,32 @@ class ParamKnowledge:
             self.ssh_client = ssh_client
 
     def get_params(self, app_name):
-        return self.param_config.get(app_name).keys()
+        # check 应用和系统参数是否有重名的
+        system_params = self.param_config.get("system").keys()
+        app_params = self.param_config.get(app_name).keys()
+        union_params = set(system_params) & set(app_params)
+        if union_params:
+            raise RuntimeError(
+                f"Duplicate keys ({union_params}) detected between application parameters and system parameters."
+            )
+        return list(self.param_config.get("system").keys()) + list(
+            self.param_config.get(app_name).keys()
+        )
 
     def describe_param_background_knob(self, app_name: str, params: Iterable):
         params_describe_list = []
         app_params = self.param_config.get(app_name.lower())
+        system_params = self.param_config.get("system")
         app = AppInterface(self.ssh_client).get(app_name)
         for param_name in params:
-            item = app_params.get(param_name)
+            item = (
+                app_params.get(param_name)
+                if param_name in app_params
+                else system_params.get(param_name)
+            )
+            if not item:
+                print(f"param {param_name} not in app param or system param")
+                continue
             # 1.描述参数范围
             if item["range"]:
                 if item["type"] == "discrete":

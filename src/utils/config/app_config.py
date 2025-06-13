@@ -4,7 +4,7 @@ from enum import Enum
 from string import Template
 from dataclasses import dataclass, asdict, field
 from src.utils.shell_execute import SshClient
-from src.utils.config.global_config import env_config
+from src.utils.config.global_config import env_config, param_config
 
 
 # 某个app需要注册私有的模板方法，可存在这里
@@ -52,8 +52,11 @@ def app_template(key):
 
 # 根据kwargs填充shell命令模板，生成可用的shell命令
 def shell_template(template_str, **kwargs):
-    template = Template(template_str)
-    return template.substitute(**kwargs)
+    processed_str = re.sub(r"\$(\d+)", r"$$\1", template_str)
+    template = Template(processed_str)
+    processed_template = template.substitute(**kwargs)
+    postprocessed_str = re.sub(r"\$\$(\d+)", r"$\1", processed_template)
+    return postprocessed_str
 
 
 @dataclass
@@ -95,6 +98,8 @@ class AppTemplate:
                 host_port=ssh_client.host_port,
             )
         )
+        self.app_params = param_config.get(app_name)
+        self.system_params = param_config.get("system")
         self.ssh_client = ssh_client
         self.get_param_template = get_param_template
         self.set_param_template = set_param_template
@@ -117,9 +122,13 @@ class AppTemplate:
             return self.mode_map[ExecuteMode.REMOTE], cmd
 
     def get_param(self, param_name):
-        if not self.get_param:
+        if param_name in self.system_params:
+            get_param_template = self.system_params[param_name]["get"]
+        else:
+            get_param_template = self.get_param_template
+        if not self.get_param_template:
             return None
-        run_cmd_func, cmd = self.extract_mode(self.get_param_template)
+        run_cmd_func, cmd = self.extract_mode(get_param_template)
         cmd = shell_template(
             cmd,
             param_name=param_name,
@@ -128,9 +137,13 @@ class AppTemplate:
         return run_cmd_func(cmd)
 
     def set_param(self, param_name, param_value):
-        if not self.set_param:
+        if param_name in self.system_params:
+            set_param_template = self.system_params[param_name]["set"]
+        else:
+            set_param_template = self.set_param_template
+        if not self.set_param_template:
             return None
-        run_cmd_func, cmd = self.extract_mode(self.set_param_template)
+        run_cmd_func, cmd = self.extract_mode(set_param_template)
         cmd = shell_template(
             cmd,
             param_name=param_name,
