@@ -10,7 +10,7 @@
 
 ## 环境准备
 
-- 安装openEuler系统，安装方法参考 《[安装指南](https://docs.openeuler.org/zh/docs/24.03_LTS_SP2/server/installation_upgrade/installation/installation-on-servers.html)》。
+- 安装openEuler系统，安装方法参考 《[安装指南](https://docs.openeuler.openatom.cn/zh/docs/24.03_LTS_SP2/server/installation_upgrade/installation/installation_on_servers.html)》。
 
 - 安装A-Tune需要使用root权限。
 

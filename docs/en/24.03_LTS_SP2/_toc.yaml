@@ -1,0 +1,19 @@
+label: A-Tune User Guide
+isManual: true
+description: Optimized openEuler performance through AI-powered, automated tuning
+sections:
+  - label: A-Tune User Guide
+    href: ./a_tune.md
+    sections:
+      - label: Getting to Know A-Tune
+        href: ./getting_to_know_a_tune.md
+      - label: Installation and Deployment
+        href: ./installation_and_deployment.md
+      - label: Usage Instructions
+        href: ./usage_instructions.md
+      - label: Native-Turbo
+        href: ./native_turbo.md
+      - label: Appendix
+        href: ./appendix.md
+      - label: Common Issues and Solutions
+        href: ./faqs_and_solutions.md
