@@ -44,7 +44,7 @@ class BaseMetricCollector:
         logging.info("Collecting app profile data ...")
         parsed_results = {}
 
-        self.thread_pool.run_all_task()
+        self.thread_pool.run_all_tasks()
 
         task_results = self.thread_pool.get_all_results()
 

@@ -1,4 +1,4 @@
-from .base_collector import BaseCollector
+from ..base_collector import BaseCollector
 from typing import Dict, Any, List, Tuple
 import logging
 import json
@@ -57,7 +57,7 @@ def check_mysql_state(
 def get_mysql_config() -> Tuple[str, str]:
     current_file_path = os.path.abspath(__file__)
     current_dir_path = os.path.dirname(current_file_path)
-    app_config = os.path.join(current_dir_path, "..", "..", "config", "app_config.yaml")
+    app_config = os.path.join(current_dir_path, "..", "..", "..", "config", "app_config.yaml")
     try:
         with open(app_config, "r") as f:
             app_config = yaml.safe_load(f)

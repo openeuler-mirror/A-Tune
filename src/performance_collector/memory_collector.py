@@ -101,7 +101,7 @@ class MemoryCollector(BaseCollector):
     def __init__(self, cmd: List[str], **kwargs):
         kwargs['cmds'] = cmd
         super().__init__(**kwargs)
-    
+
     def parse_cmd_stdout(
         self,
         memory_info_stdout: Dict[str, Any],
@@ -129,26 +129,23 @@ class MemoryCollector(BaseCollector):
         self,
         memory_parse_result: Dict,
     ) -> Dict:
+        logging.info(f"[MemoryCollector] collecting memory workload metrics")
         memory_process_result = {}
-        
+
         # 计算交换空间使用率
         memory_process_result["交换空间使用率"] = self.calculate_swap_usage(
             memory_parse_result["可用的交换空间总量"],
             memory_parse_result["总的交换空间总量"]
         )
-        
+
         # 内存使用率
         memory_process_result["内存使用率"] = memory_parse_result["内存使用率"] / 100
-        
+
         # # Swapout 判断
         # SWAPOUT_THRESHOLD = 5  # 定义阈值常量
         # memory_process_result["swapout"] = int(memory_parse_result["每秒从主内存交换到交换空间的页面数"] > SWAPOUT_THRESHOLD)
-        
+
         # OOM Killer 判断
         memory_process_result["omm_kill"] = int(memory_parse_result["omm_kill"] > 0)
-        
+
         return memory_process_result
-
-
-
-    

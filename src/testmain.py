@@ -2,17 +2,17 @@ import logging
 
 from src.performance_collector.metric_collector import MetricCollector
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
-from src.performance_optimizer.knob_optimizer import KnobOptimizer
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.performance_collector.static_metric_profile_collector import (
     StaticMetricProfileCollector,
 )
 
+from src.utils.collector.collector_trigger import TriggerEventListener
 from src.utils.shell_execute import SshClient
 from src.config import config
-from src.performance_benchmark.apply_mysql_params import apply_mysql_config
+from src.utils.common import display_metrics
 
-
+from src.performance_test.pressure_test import PressureTest
 from performance_collector.micro_dep_collector import (
     MicroDepCollector,
     HostInfo,
@@ -20,15 +20,13 @@ from performance_collector.micro_dep_collector import (
 )
 from src.performance_optimizer.param_optimizer import ParamOptimizer
 from src.utils.metrics import PerformanceMetric
-from src.performance_benchmark.mysql_benchmark import parse_mysql_sysbench
 
-
-# logging.basicConfig(
-#     level=logging.INFO,  # 设置日志级别
-#     format='%(asctime)s - %(levelname)s - %(message)s',  # 设置日志格式
-#     datefmt='%Y-%m-%d %H:%M:%S'  # 设置时间格式
-# )
-logging.disable(logging.CRITICAL)
+logging.basicConfig(
+    level=logging.INFO,  # 设置日志级别
+    format="%(asctime)s - %(levelname)s - %(message)s",  # 设置日志格式
+    datefmt="%Y-%m-%d %H:%M:%S",  # 设置时间格式
+)
+# logging.disable(logging.CRITICAL)
 
 host_ip = config["servers"][0]["ip"]
 host_port = config["servers"][0]["port"]
@@ -41,6 +39,7 @@ target_process_name = config["servers"][0]["target_process_name"]
 benchmark_cmd = config["benchmark_cmd"]
 need_restart_application = config["feature"][0]["need_restart_application"]
 need_microDep_collector = config["feature"][0]["microDep_collector"]
+pressure_test_mode = config["feature"][0]["pressure_test_mode"]
 
 ssh_client = SshClient(
     host_ip=host_ip,
@@ -51,24 +50,32 @@ ssh_client = SshClient(
     delay=delay,
 )
 
-# logging.info(">>> 运行MetricProfileCollector：")
-print(">>> 运行MetricProfileCollector：")
 static_metric_collector = StaticMetricProfileCollector(
     ssh_client=ssh_client, max_workers=5
 )
 static_profile_info = static_metric_collector.run()
-print("static_profile:", static_profile_info)
+display_metrics(static_profile_info["static"], headers=["指标名称", "指标值"])
 
-print(">>> 运行MetricCollector：")
+if pressure_test_mode:
+    logging.info(f"[Main] start pressure test ...")
+    # 压测模式若开启，则采集前通过压测模拟负载环境，压测期间采集负载数据
+    # 压测模式若关闭，则按照流程执行benchmark作为基线
+    pressure_test = PressureTest(app, ssh_client)
+    trigger_event_listener = TriggerEventListener().configure(timeout=300)
+    trigger_event_listener.run()
+    pressure_test.start()
+
 metric_collector = MetricCollector(
+    ssh_client=ssh_client,
     host_ip=host_ip,
     host_port=host_port,
     host_user=host_user,
     host_password=host_password,
     app=app,
+    pressure_test_mode=pressure_test_mode,
 )
 data = metric_collector.run()
-print("metric_collector data:", data)
+display_metrics(data, headers=["负载类型", "指标名", "指标值"])
 
 host_info = HostInfo(host_ip=host_ip, host_port=host_port, host_password=host_password)
 collect_mode = COLLECTMODE.DIRECT_MODE
@@ -84,8 +91,8 @@ if need_microDep_collector:
     print("microDepCollector data", micro_dep_dollector_data)
     data["micro_dep"] = micro_dep_dollector_data
 
-print(">>> 运行PerformanceAnalyzer：")
-testAnalyzer = PerformanceAnalyzer(data=data)
+logging.info("[Main] analyzing performance ...")
+testAnalyzer = PerformanceAnalyzer(data=data, app=app)
 report, bottleneck = testAnalyzer.run()
 print(">>> PerformanceAnalyzer运行结果：", report, bottleneck)
 
@@ -105,7 +112,8 @@ param_optimizer = ParamOptimizer(
     ssh_client=ssh_client,
     slo_calc_callback=slo_calc_callback,
     max_iterations=1,
-    need_restart_application = need_restart_application,
+    need_restart_application=need_restart_application,
+    pressure_test_mode=pressure_test_mode,
 )
 param_optimizer.run()
 

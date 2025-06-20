@@ -4,8 +4,9 @@ from abc import ABC, abstractmethod
 
 
 class BaseAnalyzer(ABC):
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, app: str, data: Dict[str, Any]):
         self.data = data
+        self.app = app
 
     @abstractmethod
     def analyze(self, **kwargs) -> str:
