@@ -1,8 +1,8 @@
 # 知识库加载一次即可
-import json
 import threading
-import os
+import logging
 from typing import Iterable
+from tqdm import tqdm
 from src.utils.config.global_config import param_config
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
@@ -22,12 +22,14 @@ class ParamKnowledge:
         return cls._instance
 
     def __init__(self, ssh_client: SshClient):
+        logging.info(f"[ParamKnowledge] initializing param knowledge base ...")
         # 防止重复初始化
         if not hasattr(self, "ssh_client"):
             self.ssh_client = ssh_client
 
     def get_params(self, app_name):
         # check 应用和系统参数是否有重名的
+        logging.info(f"[ParamKnowledge] checking params ...")
         system_params = self.param_config.get("system").keys()
         app_params = self.param_config.get(app_name).keys()
         union_params = set(system_params) & set(app_params)
@@ -40,11 +42,12 @@ class ParamKnowledge:
         )
 
     def describe_param_background_knob(self, app_name: str, params: Iterable):
+        logging.info(f"[ParamKnowledge] building param knowledge base ...")
         params_describe_list = []
         app_params = self.param_config.get(app_name.lower())
         system_params = self.param_config.get("system")
         app = AppInterface(self.ssh_client).get(app_name)
-        for param_name in params:
+        for param_name in tqdm(params):
             item = (
                 app_params.get(param_name)
                 if param_name in app_params
@@ -69,6 +72,7 @@ class ParamKnowledge:
             params_describe_list.append(
                 f"{param_name}:{item['desc']},参数数据类型为：{item['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}"
             )
+        logging.info(f"[ParamKnowledge] initialize param knowledge base finished!")
         return params_describe_list
 
 

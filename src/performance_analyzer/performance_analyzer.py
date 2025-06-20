@@ -2,7 +2,7 @@ from .cpu_analyzer import CpuAnalyzer
 from .disk_analyzer import DiskAnalyzer
 from .memory_analyzer import MemoryAnalyzer
 from .network_analyzer import NetworkAnalyzer
-from .mysql_analyzer import MysqlAnalyzer
+from .app_analyzer import AppAnalyzer
 from .micro_dep_analyzer import MicroDepAnalyzer
 from .base_analyzer import BaseAnalyzer
 from typing import Tuple
@@ -12,12 +12,24 @@ from src.utils.thread_pool import ThreadPoolManager
 class PerformanceAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.cpu_analyzer = CpuAnalyzer(data=self.data.get("Cpu", {}))
-        self.disk_analyzer = DiskAnalyzer(data=self.data.get("Disk", {}))
-        self.memory_analyzer = MemoryAnalyzer(data=self.data.get("Memory", {}))
-        self.network_analyzer = NetworkAnalyzer(data=self.data.get("Network", {}))
-        self.micro_analyer = MicroDepAnalyzer(data=self.data.get("micro_dep", {}))
-        self.mysql_analyzer = MysqlAnalyzer(data=self.data.get("Mysql", {}))
+        self.cpu_analyzer = CpuAnalyzer(
+            app=kwargs["app"], data=self.data.get("Cpu", {})
+        )
+        self.disk_analyzer = DiskAnalyzer(
+            app=kwargs["app"], data=self.data.get("Disk", {})
+        )
+        self.memory_analyzer = MemoryAnalyzer(
+            app=kwargs["app"], data=self.data.get("Memory", {})
+        )
+        self.network_analyzer = NetworkAnalyzer(
+            app=kwargs["app"], data=self.data.get("Network", {})
+        )
+        self.micro_analyer = MicroDepAnalyzer(
+            app=kwargs["app"], data=self.data.get("micro_dep", {})
+        )
+        self.app_analyzer = AppAnalyzer(
+            app=kwargs["app"], data=self.data.get("Application", {})
+        )
         self.thread_pool = ThreadPoolManager(max_workers=5)
 
     def analyze(self, report: str) -> str:
@@ -70,9 +82,9 @@ class PerformanceAnalyzer(BaseAnalyzer):
         memory_analyzer_task = self.thread_pool.add_task(self.memory_analyzer.run)
         network_analyzer_task = self.thread_pool.add_task(self.network_analyzer.run)
         micro_analyzer_task = self.thread_pool.add_task(self.micro_analyer.run)
-        mysql_analyzer_task = self.thread_pool.add_task(self.mysql_analyzer.run)
+        app_analyzer_task = self.thread_pool.add_task(self.app_analyzer.run)
 
-        self.thread_pool.run_all_task()
+        self.thread_pool.run_all_tasks()
         task_results = self.thread_pool.get_all_results()
 
         report_results = {}
@@ -90,7 +102,7 @@ class PerformanceAnalyzer(BaseAnalyzer):
         os_performance_report += report_results[network_analyzer_task]
         os_performance_report += report_results[micro_analyzer_task]
         app_performance_report = ""
-        app_performance_report += report_results[mysql_analyzer_task]
+        app_performance_report += report_results[app_analyzer_task]
         return os_performance_report, app_performance_report
 
     def run(self) -> Tuple[str, str]:

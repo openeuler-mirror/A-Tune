@@ -1,6 +1,7 @@
-import concurrent.futures
 import uuid
 import traceback
+import threading
+import concurrent.futures
 from typing import Any, Callable, Dict, Tuple, List, Union, Iterable
 
 from src.utils.common import ExecuteResult
@@ -21,7 +22,7 @@ class TaskResult:
         self.status_code = status_code
         self.tag = tag
 
-    def __dict__(self):
+    def as_dict(self):
         return {
             "uuid": self.uuid,
             "func_name": self.func_name,
@@ -31,7 +32,7 @@ class TaskResult:
         }
 
     def __repr__(self):
-        return str(self.__dict__())
+        return str(self.as_dict())
 
 
 """
@@ -54,10 +55,7 @@ class ThreadPoolManager:
         task_id = str(uuid.uuid4())
         self.pending.append((task_id, func, args, kwargs))
         self.task_meta[task_id] = func.__name__
-        if "tag" in kwargs:
-            self.tag_map[task_id] = kwargs["tag"]
-        else:
-            self.tag_map[task_id] = "default_tag"
+        self.tag_map[task_id] = kwargs.pop("tag", "default_tag")
         return task_id
 
     """
@@ -103,7 +101,7 @@ class ThreadPoolManager:
             uuids_all.extend(uuids_batch)
         return uuids_all
 
-    def run_all_task(self) -> None:
+    def run_all_tasks(self) -> None:
         for task_id, func, args, kwargs in self.pending:
             future = self.executor.submit(func, *args, **kwargs)
             self.tasks[task_id] = future
@@ -145,4 +143,94 @@ class ThreadPoolManager:
 
     def get_all_results(self) -> List[Dict[str, Any]]:
         self.wait_all()
+        self.tasks.clear()
         return self.all_results
+
+
+class SerialTaskManager:
+    def __init__(self):
+        self.tasks: List[Tuple[str, Callable, Tuple, Dict]] = []
+        self.all_results: List[Dict[str, Any]] = []
+        self.tag_map: dict = {}
+        self.task_meta: Dict[str, str] = {}
+
+    def add_task(self, func: Callable, *args, **kwargs) -> str:
+        task_id = str(uuid.uuid4())
+        self.tasks.append((task_id, func, args, kwargs))
+        self.task_meta[task_id] = func.__name__
+        if "tag" in kwargs:
+            self.tag_map[task_id] = kwargs["tag"]
+        else:
+            self.tag_map[task_id] = "default_tag"
+        return task_id
+
+    def add_batch(
+        self, tasks: Iterable[Union[Callable, Tuple[Callable, Tuple, Dict]]]
+    ) -> List[str]:
+        uuids = []
+        for task in tasks:
+            if callable(task):
+                task_id = self.add_task(task, tag="default")
+            elif isinstance(task, tuple):
+                # (func, args, kwargs)
+                func = task[0]
+                args = task[1] if len(task) > 1 else ()
+                kwargs = task[2] if len(task) > 2 else {}
+                task_id = self.add_task(func, *args, **kwargs)
+            else:
+                raise ValueError(f"Unsupported task format: {task}")
+            uuids.append(task_id)
+        return uuids
+
+    def add_multi_batch(self, *args) -> List[str]:
+        uuids_all = []
+        for task in args:
+            if isinstance(task, list):
+                uuids_batch = self.add_batch(task)
+            else:
+                raise ValueError(f"Unsupported task format: {task}")
+            uuids_all.extend(uuids_batch)
+        return uuids_all
+
+    def run_task_with_timeout(
+        self, task_id: str, func: Callable, args: Tuple, kwargs: Dict
+    ) -> TaskResult:
+        func_name = self.task_meta[task_id]
+        tag = self.tag_map[task_id]
+        result = None
+        status_code = 0
+
+        def target():
+            nonlocal result, status_code
+            try:
+                result = func(*args, **kwargs)
+                status_code = 0
+            except Exception as e:
+                result = ExecuteResult(
+                    status_code=-1, output="", err_msg=traceback.format_exc()
+                )
+                status_code = -1
+
+        thread = threading.Thread(target=target)
+        thread.start()
+        thread.join(timeout=30)  # 设置超时时间为30秒
+        if thread.is_alive():
+            result = ExecuteResult(
+                status_code=-1, output="", err_msg="Task timed out after 30 seconds"
+            )
+            status_code = -1
+        return TaskResult(task_id, func_name, result, status_code, tag)
+
+    def run_all_tasks(self) -> None:
+        self.all_results.clear()
+        for task_id, func, args, kwargs in self.tasks:
+            task_result = self.run_task_with_timeout(task_id, func, args, kwargs)
+            self.all_results.append(task_result)
+
+    def get_all_results(self) -> List[Dict[str, Any]]:
+        self.tasks.clear()
+        return self.all_results
+
+
+thread_pool_manager = ThreadPoolManager(max_workers=8)
+serial_task_manager = SerialTaskManager()
