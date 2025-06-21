@@ -1,4 +1,3 @@
-import re
 import logging
 import pandas as pd
 from io import StringIO
@@ -14,14 +13,31 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+BIG_WRITER_COLLECT_INTERVAL = 180
 
-@snapshot_task(
+
+# 采集5分钟内数据
+@period_task(
     cmd="su - postgres -c \"/usr/local/pgsql/bin/psql --csv -c 'SELECT * FROM pg_stat_bgwriter;'\"",
     collect_mode=CollectMode.ASYNC,
     tag="pgsql缓存指标",
+    delay=0,
+    sample_count=2,
+    interval=BIG_WRITER_COLLECT_INTERVAL
 )
-def pg_stat_bgwriter_parser(output: str) -> dict:
-    df = pd.read_csv(StringIO(output))
+def pg_stat_bgwriter_parser(output: list[str]) -> dict:
+    if len(output) < 2:
+        return {}  # 需要两次采样才能计算差值
+
+    df1 = pd.read_csv(StringIO(output[0]))
+    df2 = pd.read_csv(StringIO(output[1]))
+
+    if df1.empty or df2.empty:
+        return {}
+
+    row1 = df1.iloc[0].to_dict()
+    row2 = df2.iloc[0].to_dict()
+
     mapping = {
         "checkpoints_timed": "定时检查点次数",
         "checkpoints_req": "请求检查点次数",
@@ -34,10 +50,22 @@ def pg_stat_bgwriter_parser(output: str) -> dict:
         "buffers_backend_fsync": "后端 fsync 次数",
         "buffers_alloc": "分配新缓冲区页数",
     }
-    if not df.empty:
-        raw = dict(zip(df.columns, df.iloc[0]))
-        return {mapping.get(k, k): v for k, v in raw.items()}
-    return {}
+
+    result = {}
+    for key, label in mapping.items():
+        new_label = f"{BIG_WRITER_COLLECT_INTERVAL // 60}分钟内{label}"
+        
+        old_val = row1.get(key, 0)
+        new_val = row2.get(key, 0)
+
+        try:
+            delta = int(new_val) - int(old_val)
+        except (ValueError, TypeError):
+            delta = 0  # 如果解析失败就默认 0
+
+        result[new_label] = max(delta, 0)  # 防止 PostgreSQL 重启导致出现负值
+
+    return result
 
 
 @snapshot_task(

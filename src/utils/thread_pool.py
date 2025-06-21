@@ -55,10 +55,7 @@ class ThreadPoolManager:
         task_id = str(uuid.uuid4())
         self.pending.append((task_id, func, args, kwargs))
         self.task_meta[task_id] = func.__name__
-        if "tag" in kwargs:
-            self.tag_map[task_id] = kwargs["tag"]
-        else:
-            self.tag_map[task_id] = "default_tag"
+        self.tag_map[task_id] = kwargs.pop("tag", "default_tag")
         return task_id
 
     """

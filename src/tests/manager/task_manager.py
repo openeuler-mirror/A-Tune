@@ -39,10 +39,9 @@ task_manager = TaskManager(
     modules=[pgsql_collector],
     global_trigger_mode=False,
     timeout=60,
+    debug=True
 )
 
 result = task_manager.run()
 
 print(result)
-
-PgsqlAnalyzer()

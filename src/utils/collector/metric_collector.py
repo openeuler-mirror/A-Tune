@@ -12,7 +12,7 @@ from src.utils.common import ExecuteResult
 from src.utils.collector.collector_trigger import TriggerStatus, TriggerEventListener
 
 MAX_SAMPLE_COUNT = 100
-MAX_SAMPLE_INTERVAL = 60
+MAX_SAMPLE_INTERVAL = 600
 MAX_TASK_TIMEOUT = 300
 
 trigger_event_listener = TriggerEventListener()
@@ -116,10 +116,12 @@ def period_task(
                     )
                     return result
 
-            logging.info(f"task {func.__name__} running ...")
+            logging.info(
+                f"period task {func.__name__} running, it will take {(sample_count - 1) * interval}s ..."
+            )
             all_result = []
 
-            for _ in range(sample_count):
+            for _ in range(sample_count - 1):
                 cmd_result = ssh_client.run_cmd(cmd)
                 if cmd_result.status_code == 0:
                     all_result.append(cmd_result.output)
@@ -137,6 +139,7 @@ def period_task(
                 processed_result = process_decorated_func(all_result, func)
                 result.status_code = 0
                 result.output = processed_result
+                logging.info(f"task {func.__name__} finished!")
 
             return result
 
@@ -158,7 +161,7 @@ def snapshot_task(
         file = inspect.getfile(func)
 
         @wraps(func)
-        def wrapper(ssh_client, *args, **kwargs):
+        def wrapper(ssh_client):
             result = ExecuteResult()
             if (
                 collect_mode == CollectMode.ASYNC
@@ -185,6 +188,7 @@ def snapshot_task(
                 processed_result = process_decorated_func(cmd_result.output, func)
                 result.status_code = cmd_result.status_code
                 result.output = processed_result
+                logging.info(f"task {func.__name__} finished!")
             else:
                 result = cmd_result
 

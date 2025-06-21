@@ -181,4 +181,5 @@ class TaskManager:
                 collect_result[task_result.tag] = task_result.result.output.output
             else:
                 logging.warning(f"failed to collect {task_result.tag}")
+                print(task_result.result.err_msg)
         return collect_result
