@@ -14,6 +14,7 @@ from src.performance_collector.metric_collector import MetricCollector
 from src.performance_collector.static_metric_profile_collector import (
     StaticMetricProfileCollector,
 )
+from src.utils.thread_pool import thread_pool_manager
 from src.performance_optimizer.param_knowledge import ParamKnowledge
 
 # 配置日志
@@ -53,12 +54,8 @@ class ParamRecommender:
         self.chunk_size = chunk_size
         self.performance_analysis_report = performance_analysis_report
 
-    def run(self, history_result):
-        resultset = {}
-
-        for i in range(0, len(self.params_set), self.chunk_size):
-            cur_params_set = self.params_set[i : i + self.chunk_size]
-            recommend_prompt = f"""
+    def _process_chunk(self, history_result, cur_params_set):
+        recommend_prompt = f"""
 # CONTEXT # 
 本次性能优化的目标为：
 性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
@@ -73,14 +70,37 @@ class ParamRecommender:
 # AUDIENCE #
 你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
 """
-            optimized_idea = get_llm_response(recommend_prompt)
-            recommended_params = self.recommend(
-                history_result, optimized_idea, cur_params_set
+        optimized_idea = get_llm_response(recommend_prompt)
+        recommended_params = self.recommend(
+            history_result, optimized_idea, cur_params_set
+        )
+        recommended_params_set = json_repair(recommended_params)
+
+        result = {}
+        for param_name, param_value in recommended_params_set.items():
+            if param_name in self.all_params:
+                result[param_name] = param_value
+        return result
+
+    def run(self, history_result):
+        resultset = {}
+
+        for i in range(0, len(self.params_set), self.chunk_size):
+            cur_params_set = self.params_set[i : i + self.chunk_size]
+            # 提交任务给线程池，返回 future-like 对象（你线程池需要支持这个）
+            thread_pool_manager.add_task(
+                self._process_chunk, history_result, cur_params_set
             )
-            recommended_params_set = json_repair(recommended_params)
-            for param_name, param_value in recommended_params_set.items():
-                if param_name in self.all_params:
-                    resultset[param_name] = param_value
+
+        thread_pool_manager.run_all_tasks()
+        task_results = thread_pool_manager.get_all_results()
+
+        for task_result in task_results:
+            if task_result.status_code != 0:
+                raise RuntimeError(
+                    f"failed to execute task {task_result.func_name}, exception is {task_result.result}"
+                )
+            resultset.update(task_result.result)
 
         return resultset
 

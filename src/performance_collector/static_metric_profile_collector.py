@@ -34,12 +34,14 @@ class StaticMetricProfileCollector:
 
     def sequential_tasks(self):
         pass
-    
+
     def run(self):
-        logging.info("Collecting static profile data ...")
+        logging.info(
+            "[StaticMetricProfileCollector] collecting static profile data ..."
+        )
         parsed_results = {}
 
-        self.thread_pool.run_all_task()
+        self.thread_pool.run_all_tasks()
         task_results = self.thread_pool.get_all_results()
 
         for task_result in task_results:
@@ -51,24 +53,3 @@ class StaticMetricProfileCollector:
                 logging.error(f"error while execute task {task_result.func_name}, err_msg is {task_result.result}")
 
         return parsed_results
-
-
-if __name__ == "__main__":
-    from src.utils.shell_execute import SshClient
-    ssh_client = SshClient(
-        host_ip="YOUR_IP",
-        host_port=22,
-        host_user="root",
-        host_password="YOUR_PWD",
-        max_retries=3,
-        delay=1.0    
-    )
-
-    metric_collector = MetricProfileCollector(
-        ssh_client=ssh_client,
-        max_workers=5 
-    )
-
-    static_profile_info = metric_collector.run()
-
-    print(static_profile_info)

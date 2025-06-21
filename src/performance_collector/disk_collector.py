@@ -68,7 +68,7 @@ class DiskCollector(BaseCollector):
     def __init__(self, cmd: List[str], **kwargs):
         kwargs['cmds'] = cmd
         super().__init__(**kwargs)
-    
+
     def parse_cmd_stdout(
         self,
         disk_info_stdout: Dict[str, Any],
@@ -85,6 +85,7 @@ class DiskCollector(BaseCollector):
         self,
         disk_parse_result: Dict,
     ) -> Dict:
+        logging.info(f"[DiskCollector] collecting disk workload metrics")
         disk_process_result = {
             # "iowait": disk_parse_result["系统有未完成的磁盘I/O请求时，等待IO占用CPU的百分比"] / 100,
             "磁盘信息": disk_parse_result["磁盘利用"],
@@ -92,10 +93,5 @@ class DiskCollector(BaseCollector):
         for i in range(len(disk_process_result["磁盘信息"])):
             for key in disk_process_result["磁盘信息"][i]:
                 disk_process_result["磁盘信息"][i][key].update(disk_parse_result["磁盘读写性能"][i][key])
-        
+
         return disk_process_result
-
-
-
-
-    

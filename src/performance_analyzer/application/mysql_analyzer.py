@@ -1,4 +1,4 @@
-from .base_analyzer import BaseAnalyzer
+from ..base_analyzer import BaseAnalyzer
 
 class MysqlAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):

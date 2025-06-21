@@ -97,7 +97,7 @@ class NetworkCollector(BaseCollector):
     def __init__(self, cmd: List[str], **kwargs):
         kwargs['cmds'] = cmd
         super().__init__(**kwargs)
-    
+
     def parse_cmd_stdout(
         self,
         network_info_stdout: Dict[str, Any],
@@ -109,19 +109,15 @@ class NetworkCollector(BaseCollector):
             cmd_parse_result = parse_function(k, v)
             parse_result = {**parse_result, **cmd_parse_result}
         return parse_result
-    
+
     def data_process(
         self,
         network_parse_result: Dict,
     ) -> Dict:
+        logging.info(f"[NetworkCollector] collecting network workload metrics")
         network_process_result = {}
         network_process_result["listenOverflows"] = int(network_parse_result["listenOverflows"] > 0)
         network_process_result["fulldocookies"] = int(network_parse_result["fulldocookies"] > 0)
         network_process_result["fulldrop"] = int(network_parse_result["fulldrop"] > 0)
         network_process_result["网卡指标"] = network_parse_result["网卡指标"]
         return network_process_result
-
-
-
-
-    

@@ -15,7 +15,7 @@ perf = "perf stat -e 'syscalls:*' -a sleep 1 2>&1 | grep syscalls| awk '{sum += 
 
 def get_cpu_cmd()-> List[str]:
     return list(CPU_PARSE_FUNCTIONS.keys())
-    
+
 def nproc_parse(
     cmd: str,
     stdout: Any,
@@ -201,7 +201,7 @@ class CpuCollector(BaseCollector):
         # 将cmd添加到kwargs中
         kwargs['cmds'] = cmd
         super().__init__(**kwargs)
-    
+
     def parse_cmd_stdout(
         self,
         cpu_info_stdout: Dict[str, Any],
@@ -231,15 +231,16 @@ class CpuCollector(BaseCollector):
         self, 
         cpu_parse_result: Dict,
     ) -> Dict:
+        logging.info(f"[CpuCollector] collecting cpu workload metrics")
         cpu_process_result = {}
-        
+
         # 计算平均负载
         for metric in [CpuMetric.ONE_MINUTE_AVG_LOAD, CpuMetric.FIVE_MINUTE_AVG_LOAD, CpuMetric.TEN_MINUTE_AVG_LOAD]:
             cpu_process_result[metric.value] = self.normalize_percentage(
                 cpu_parse_result[f"过去{metric.value}平均负载"], 
                 cpu_parse_result["cpu核数"]
             )
-        
+
         # 计算CPU利用率
         cpu_utilizations = [
             "用户态中的cpu利用率",
@@ -250,7 +251,7 @@ class CpuCollector(BaseCollector):
             cpu_process_result[utilization] = self.normalize_percentage(
                 cpu_parse_result[utilization], 100
             )
-        
+
         # 其他百分比计算
         for key in [
             "硬中断占用CPU时间的百分比",
@@ -262,7 +263,7 @@ class CpuCollector(BaseCollector):
             cpu_process_result[key] = self.normalize_percentage(
                 cpu_parse_result[key], 100
             )
-        
+
         # 计算CPU利用率和上下文切换次数
         cpu_process_result["CPU利用率"] = 1 - self.normalize_percentage(
             cpu_parse_result["CPU处在空闲状态的时间百分比"], 100
@@ -270,39 +271,34 @@ class CpuCollector(BaseCollector):
         cpu_process_result["系统每秒进行上下文切换的次数"] = cpu_parse_result.get(
             "系统每秒进行上下文切换的次数", 0
         )
-        
+
         # 阻塞进程率
         cpu_process_result["阻塞进程率"] = self.normalize_percentage(
             cpu_parse_result["被阻塞的进程数"], cpu_parse_result["总进程数"]
         )
-        
+
         # 确保内核态执行时的CPU利用率不为0
         cpu_process_result["kernel内核态执行时的CPU利用率"] = max(
             0.01, cpu_process_result["kernel内核态执行时的CPU利用率"]
         )
-        
+
         # 判断计算密集型或IO密集型
         user_mode_ratio = cpu_process_result["用户态中的cpu利用率"] / cpu_process_result["kernel内核态执行时的CPU利用率"]
         is_heavy_io = self.is_heavy_load(cpu_process_result["用户态中的cpu利用率"]) or self.is_heavy_load(cpu_process_result["kernel内核态执行时的CPU利用率"])
-        
+
         if user_mode_ratio > 2:
             cpu_process_result["计算密集型"] = 1 if is_heavy_io else 0
         else:
             cpu_process_result["计算密集型"] = 0
-        
+
         if user_mode_ratio < 2:
             cpu_process_result["IO密集型"] = 1 if is_heavy_io else 0
         else:
             cpu_process_result["IO密集型"] = 0
-        
+
         # 复制其他信息
         cpu_process_result["进程信息"] = cpu_parse_result.get("进程信息", [])
         cpu_process_result["系统单位时间调用次数"] = cpu_parse_result.get("系统单位时间调用次数", 0)
         cpu_process_result["cpu核数"] = cpu_parse_result.get("cpu核数", 0)
-        
+
         return cpu_process_result
-
-
-
-
-    

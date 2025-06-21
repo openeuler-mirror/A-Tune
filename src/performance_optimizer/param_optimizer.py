@@ -1,21 +1,9 @@
-from pydantic import BaseModel
-from abc import abstractmethod
-from typing import Dict, List, Any, Tuple
-from src.utils.shell_execute import remote_execute
-from src.utils.llm import get_llm_response
-from src.utils.json_repair import json_repair
-from src.performance_benchmark.mysql_benchmark import parse_mysql_sysbench
-from src.performance_benchmark.apply_mysql_params import apply_mysql_config
 import logging
 from src.utils.shell_execute import SshClient
-from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_optimizer.param_recommender import ParamRecommender
-from src.performance_collector.metric_collector import MetricCollector
-from src.performance_collector.static_metric_profile_collector import (
-    StaticMetricProfileCollector,
-)
 from src.utils.metrics import PerformanceMetric
 from src.utils.config.app_config import AppInterface
+from src.performance_test.pressure_test import wait_for_pressure_test
 
 # 配置日志
 logging.basicConfig(
@@ -35,12 +23,14 @@ class ParamOptimizer:
         ssh_client: SshClient,
         slo_calc_callback: callable,
         max_iterations: int = 10,
-        need_restart_application: bool=False,
+        need_restart_application: bool = False,
+        pressure_test_mode: bool = False,
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
         self.static_profile = static_profile
         self.ssh_client = ssh_client
+        self.pressure_test_mode = pressure_test_mode
         self.param_recommender = ParamRecommender(
             service_name=service_name,
             slo_goal=slo_goal,
@@ -98,7 +88,21 @@ class ParamOptimizer:
 
     def run(self):
         # 运行benchmark，摸底参数性能指标
-        baseline = self.benchmark()
+        if self.pressure_test_mode:
+            logging.info(f"[ParamOptimizer] waiting for pressure test finished ...")
+            pressure_test_result = wait_for_pressure_test()
+
+            if pressure_test_result.status_code != 0:
+                raise RuntimeError(
+                    f"[ParamOptimizer] failed to run pressure test, err msg is {pressure_test_result.err_msg}"
+                )
+
+            baseline = float(pressure_test_result.output.output)
+            logging.info(
+                f"[ParamOptimizer] pressure test finished, baseline is {baseline}"
+            )
+        else:
+            baseline = self.benchmark()
         # 保存每轮调优的结果，反思调优目标是否达到
         history = []
         last_result = baseline
@@ -151,67 +155,3 @@ class ParamOptimizer:
         print(
             f"调优完毕，{'达到' if self.reached_goal(baseline, best_result) else '未达到'} 预期目标"
         )
-
-
-if __name__ == "__main__":
-    from src.config import config
-
-    ssh_client = SshClient(
-        host_ip=config["servers"][0]["ip"],
-        host_port=22,
-        host_user="root",
-        host_password=config["servers"][0]["password"],
-        max_retries=3,
-        delay=1.0,
-    )
-
-    metric_collector = StaticMetricProfileCollector(
-        ssh_client=ssh_client, max_workers=5
-    )
-
-    static_profile = metric_collector.run()
-    print("static_profile:", static_profile)
-
-    print("正在采集负载信息...")
-    app = "mysql"
-    testCollector = MetricCollector(
-        host_ip=config["servers"][0]["ip"],
-        host_port=22,
-        host_user="root",
-        host_password=config["servers"][0]["password"],
-        app=app,
-    )
-    data = testCollector.run()
-    print("data:", data)
-    print("正在分析负载信息...")
-    testAnalyzer = PerformanceAnalyzer(data=data)
-    performance_analysis_report, bottleneck = testAnalyzer.run()
-    print("performance_analysis_report:", performance_analysis_report)
-    print("bottleneck:", bottleneck)
-
-    def slo_calc_callback(baseline, benchmark_result):
-        if baseline is None or abs(baseline) < 1e-9:
-            return 0.0
-        return (benchmark_result - baseline) / baseline
-
-    def benchmark_callback(ssh_client):
-        print("🔄 正在验证mysql benchmark性能...")
-        result = parse_mysql_sysbench(ssh_client)
-        try:
-            return float(result.output["qps"])
-        except ValueError:
-            return 0.0
-
-    param_optimizer = ParamOptimizer(
-        service_name="mysql",
-        performance_metric=PerformanceMetric.QPS,
-        slo_goal=0.1,
-        analysis_report=performance_analysis_report,
-        static_profile=static_profile,
-        ssh_client=ssh_client,
-        slo_calc_callback=slo_calc_callback,
-        benchmark_callback=benchmark_callback,
-        apply_params_callback=apply_mysql_config,
-    )
-
-    param_optimizer.run()
