@@ -1,3 +1,4 @@
+import logging
 import importlib
 
 from typing import Any
@@ -17,7 +18,11 @@ def load_analyzer_class(app: str):
         collector_class = getattr(module, class_name)
         return collector_class
     except (ImportError, AttributeError) as e:
-        raise ImportError(f"无法加载 {module_path}.{class_name}: {e}")
+        logging.error(
+            f"no module named {module_path}.{class_name} can be found, will skip analyze application workload."
+        )
+
+    return None
 
 
 class AppAnalyzer:
@@ -26,7 +31,12 @@ class AppAnalyzer:
         if app.lower() == "mysql":
             self.app_analyzer = MysqlAnalyzer(data=data, app=app)
         else:
-            self.app_analyzer = self.app_class(data=data, app=app)
+            if self.app_class:
+                self.app_analyzer = self.app_class(data=data, app=app)
+            else:
+                self.app_analyzer = None
 
     def run(self):
+        if not self.app_analyzer:
+            return ""
         return self.app_analyzer.run()

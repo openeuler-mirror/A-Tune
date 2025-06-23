@@ -93,7 +93,7 @@ class TriggerEventListener:
             try:
                 if os.path.exists(self.fifo_path):
                     os.remove(self.fifo_path)
-                
+
                 os.mkfifo(self.fifo_path, 0o666)
 
                 fifo_fd = os.open(self.fifo_path, os.O_RDONLY | os.O_NONBLOCK)
@@ -131,7 +131,9 @@ class TriggerEventListener:
         self._set_status(TriggerStatus.WAITING)
         self._thread = threading.Thread(target=_listener, daemon=True)
         self._thread.start()
-        logging.info(f"[TriggerEventListener] Start listening at {self.fifo_path}")
+        logging.info(
+            f"[TriggerEventListener] start listening at {self.fifo_path}, it will block euler-copilot until recieved signal from pressure test ..."
+        )
 
 
 @contextmanager

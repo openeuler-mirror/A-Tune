@@ -1,3 +1,4 @@
+import logging
 import importlib
 
 from src.utils.shell_execute import SshClient
@@ -18,7 +19,11 @@ def load_app_collector(app: str):
 
         return module
     except (ImportError, AttributeError) as e:
-        raise ImportError(f"无法加载 {module_path}: {e}")
+        logging.error(
+            f"no module named {module_path} can be found, will skip collect application workload data."
+        )
+
+    return None
 
 
 class AppCollector:
@@ -29,7 +34,7 @@ class AppCollector:
         host_user: str,
         host_password: str,
         ssh_client: SshClient,
-        app: str = None
+        app: str = None,
     ):
         self.app = app
         if self.app.lower() == "mysql":
@@ -47,11 +52,17 @@ class AppCollector:
             )
         else:
             app_collector_module = load_app_collector(self.app)
-            self.collector = TaskManager(
-                ssh_client=ssh_client,
-                modules=[app_collector_module],
-                timeout=60,
-            )
+
+            if not app_collector_module:
+                self.collector = None
+            else:
+                self.collector = TaskManager(
+                    ssh_client=ssh_client,
+                    modules=[app_collector_module],
+                    timeout=60,
+                )
 
     def run(self):
+        if not self.collector:
+            return {}
         return self.collector.run()
