@@ -25,6 +25,15 @@ spark:
   get_param_template: 'sh /home/cxm/get_param.sh $param_name'
   benchmark: "$EXECUTE_MODE:remote sh /home/cxm/spark_benchmark.sh"
 
+nginx:
+  port: 10000
+  config_file: "/usr/local/nginx/conf/nginx.conf"
+  set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s|^\\s*$param_name\\s\\+.*|    $param_name $param_value;|" "$config_file" || sed -i "/http\\s*{/a\    $param_name $param_value;" "$config_file"'
+  get_param_template: 'grep -E "^\\s*$param_name\\s+" $config_file | head -1 | sed -E "s/^\\s*$param_name\\s+(.*);/\\1/"'
+  stop_workload: "/usr/local/nginx/sbin/nginx -s reload"
+  start_workload: "/usr/local/nginx/sbin/nginx -s reload"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
+
 system:
   set_param_template: 'sysctl -w $param_name=$param_value'
   get_param_template: 'sysctl $param_name'
