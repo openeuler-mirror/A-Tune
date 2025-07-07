@@ -121,7 +121,7 @@ def period_task(
             )
             all_result = []
 
-            for _ in range(sample_count - 1):
+            for cnt in range(sample_count):
                 cmd_result = ssh_client.run_cmd(cmd)
                 if cmd_result.status_code == 0:
                     all_result.append(cmd_result.output)
@@ -130,7 +130,8 @@ def period_task(
                     logging.warning(
                         f"failed to execute peroid task {func.__name__}, reason is {cmd_result.err_msg}"
                     )
-                sleep(interval)
+                if cnt != sample_count - 1:
+                    sleep(interval)
 
             if len(all_result) <= 0:
                 result.status_code = -1
