@@ -8,6 +8,7 @@ mysql:
   stop_workload: "systemctl stop mysqld"
   start_workload: "systemctl start mysqld"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
+  performance_metric: "QPS"
 
 pgsql:
   user: "postgres"
@@ -19,11 +20,13 @@ pgsql:
   stop_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl stop -D /data/data1/pgsql/ -m fast'"
   start_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl start -D /data/data1/pgsql/ -l /var/log/postgresql/postgresql.log'"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/postgresql/parse_benchmark.sh $host_ip $port $user $password"
+  performance_metric: "QPS"
 
 spark:
-  set_param_template: 'sh /home/cxm/set_param.sh $param_name $param_value'
-  get_param_template: 'sh /home/cxm/get_param.sh $param_name'
-  benchmark: "$EXECUTE_MODE:remote sh /home/cxm/spark_benchmark.sh"
+  set_param_template: 'sh /path/of/set_param.sh $param_name $param_value'
+  get_param_template: 'sh /path/of/get_param.sh $param_name'
+  benchmark: "sh /path/of/spark_benchmark.sh"
+  performance_metric: "DURATION"
 
 nginx:
   port: 10000
@@ -33,6 +36,7 @@ nginx:
   stop_workload: "/usr/local/nginx/sbin/nginx -s reload"
   start_workload: "/usr/local/nginx/sbin/nginx -s reload"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
+  performance_metric: "QPS"
 
 system:
   set_param_template: 'sysctl -w $param_name=$param_value'

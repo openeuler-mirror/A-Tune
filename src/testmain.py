@@ -40,6 +40,7 @@ benchmark_cmd = config["benchmark_cmd"]
 need_restart_application = config["feature"][0]["need_restart_application"]
 need_microDep_collector = config["feature"][0]["microDep_collector"]
 pressure_test_mode = config["feature"][0]["pressure_test_mode"]
+business_context = config["servers"][0]["business_context"]
 
 ssh_client = SshClient(
     host_ip=host_ip,
@@ -97,15 +98,14 @@ report, bottleneck = testAnalyzer.run()
 print(">>> PerformanceAnalyzer运行结果：", report, bottleneck)
 
 
-def slo_calc_callback(baseline, benchmark_result):
+def slo_calc_callback(baseline, benchmark_result, symbol):
     if baseline is None or abs(baseline) < 1e-9:
         return 0.0
-    return (benchmark_result - baseline) / baseline
+    return symbol * (benchmark_result - baseline) / baseline
 
 
 param_optimizer = ParamOptimizer(
     service_name=app,
-    performance_metric=PerformanceMetric.QPS,
     slo_goal=0.1,
     analysis_report=report,
     static_profile=static_profile_info,
@@ -128,6 +128,6 @@ strategy_optimizer = StrategyOptimizer(
     target_config_path="",
 )
 recommendations = strategy_optimizer.get_recommendations_json(
-    bottleneck, top_k=1, business_context="高并发Web服务，CPU负载主要集中在用户态处理"
+    bottleneck, top_k=1, business_context=business_context
 )
 print("推荐策略:", recommendations)
