@@ -1,15 +1,4 @@
 {
-  "kernel.sched_migration_cost_ns": {
-    "desc": "1. 在高负载多核系统中，若观察到频繁的进程迁移导致性能下降，可适当增加该值以减少不必要的迁移，典型调整范围为100000-500000纳秒\n\n2. 在低延迟敏感型应用中，若发现缓存局部性不佳导致性能下降，可适当降低该值以促进热进程迁移，典型调整范围为50000-200000纳秒",
-    "type": "continuous",
-    "range": [
-      100000,
-      5000000
-    ],
-    "dtype": "int",
-    "set": "sysctl -w kernel.sched_migration_cost_ns=$param_value",
-    "get": "sysctl -n kernel.sched_migration_cost_ns"
-  },
   "kernel.sched_cfs_bandwidth_slice_us": {
     "desc": "1. 当需要更精细控制CFS带宽分配时（如高负载容器环境），可适当减小该值（默认5000微秒），但需注意过小会增加调度开销\n2. 在CPU资源充足且需要减少调度开销的场景下，可增大该值以减少全局时间池的分配频率",
     "type": "continuous",
@@ -20,17 +9,6 @@
     "dtype": "int",
     "set": "sysctl -w kernel.sched_cfs_bandwidth_slice_us=$param_value",
     "get": "sysctl -n kernel.sched_cfs_bandwidth_slice_us"
-  },
-  "kernel.sched_wakeup_granularity_ns": {
-    "desc": "1. 对于延迟敏感型应用（如实时任务或高频交易系统），若观测到任务切换过于频繁导致性能下降，可适当增大该值（如5000000-10000000 ns），减少不必要的抢占  \n\n2. 在CPU密集型负载场景下，若调度器日志显示进程频繁被短时间抢占（如<1000000 ns），且存在吞吐量下降现象，可尝试降低该值（如1000000-2000000 ns）以提高响应速度",
-    "type": "continuous",
-    "range": [
-      1000000,
-      100000000
-    ],
-    "dtype": "int",
-    "set": "sysctl -w kernel.sched_wakeup_granularity_ns=$param_value",
-    "get": "sysctl -n kernel.sched_wakeup_granularity_ns"
   },
   "kernel.sched_latency_ns": {
     "desc": "1. 当系统运行高优先级实时任务时，若出现调度延迟过高的情况，可适当减小该值以提高调度响应速度\n\n2. 对于CPU密集型负载且任务数量较多(超过8个逻辑CPU)的系统，应增大该值以减少上下文切换开销",
@@ -43,17 +21,6 @@
     "set": "sysctl -w kernel.sched_latency_ns=$param_value",
     "get": "sysctl -n kernel.sched_latency_ns"
   },
-  "kernel.sched_nr_migrate": {
-    "desc": "1. 当系统出现频繁的进程迁移导致性能下降时，可适当降低该值以减少迁移开销，建议从默认值32调整为16-24范围测试\n2. 对于NUMA架构服务器且进程具有较强CPU亲和性需求时，可适当提高该值至64以增强负载均衡能力",
-    "type": "continuous",
-    "range": [
-      1,
-      128
-    ],
-    "dtype": "int",
-    "set": "sysctl -w kernel.sched_nr_migrate=$param_value",
-    "get": "sysctl -n kernel.sched_nr_migrate"
-  },
   "kernel.sched_min_granularity_ns": {
     "desc": "1. 当系统负载较高且存在大量短时间运行的进程时，可以适当增大该值以减少上下文切换开销，建议从默认值(通常为1,000,000 ns)逐步增加测试，观察性能变化\n\n2. 对于CPU密集型工作负载且进程运行时间普遍较长的情况，可以适当减小该值以提高系统响应能力，建议从默认值逐步减少测试",
     "type": "continuous",
@@ -64,18 +31,6 @@
     "dtype": "int",
     "set": "sysctl -w kernel.sched_min_granularity_ns=$param_value",
     "get": "sysctl -n kernel.sched_min_granularity_ns"
-  },
-  "kernel.sched_tunable_scaling": {
-    "desc": "1. 当系统CPU核心数较多（如32核以上）且存在调度延迟敏感型负载时，建议设置为2（线性比例调整），以优化多核环境下的调度粒度平衡\n\n2. 在低核心数服务器（如8核以下）或需要固定调度参数的实时任务场景中，建议设置为0（不调整），避免动态调整引入不可预测的延迟",
-    "range": [
-      "0",
-      "1",
-      "2"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "sysctl -w kernel.sched_tunable_scaling=$param_value",
-    "get": "sysctl -n kernel.sched_tunable_scaling"
   },
   "transparent_hugepage.defrag": {
     "desc": "1. 对于需要低延迟的应用（如数据库、实时系统），建议禁用该参数（设置为never），以避免因内存碎片整理导致的性能波动\n2. 对于内存密集型且对延迟不敏感的应用（如批处理作业），建议启用该参数（设置为always或defer+madvise），以提高大内存页使用率减少TLB缺失",
@@ -113,149 +68,6 @@
     "dtype": "int",
     "set": "sysctl -w net.netfilter.nf_conntrack_max=$param_value",
     "get": "sysctl -n net.netfilter.nf_conntrack_max"
-  },
-  "net.mtu": {
-    "desc": "1. 当网络传输中出现大量分片或性能下降时，建议测试并调整MTU值以匹配实际网络环境（通常1500是以太网默认值，但需考虑VPN/隧道开销）  \n\n2. 在高速网络（如10Gbps+）或特定拓扑（如RDMA）中，可尝试增大MTU（如9000）以提升吞吐量，但需确保全网设备支持Jumbo Frame",
-    "type": "continuous",
-    "range": [
-      500,
-      9000
-    ],
-    "dtype": "int",
-    "set": "ifconfig enp189s0f0 mtu $param_value",
-    "get": "ifconfig enp189s0f0 | grep mtu | awk '{print $4}'"
-  },
-  "net.tx-frames": {
-    "desc": "在高吞吐量网络环境下（如10Gbps以上），若观察到tx_dropped或tx_errors计数器持续增长，可适当增加该值至64-256范围以提升批量发包效率  \n\n当CPU软中断（如NET_TX）占用率过高且网络延迟敏感时，应降低该值至32以下以减少单次中断处理的数据包数量",
-    "type": "continuous",
-    "range": [
-      0,
-      64
-    ],
-    "dtype": "int",
-    "set": "ethtool -C enp189s0f0 tx-frames $param_value",
-    "get": "ethtool -c enp189s0f0 | grep tx-frames: | awk '{print $2}'"
-  },
-  "net.rx-frames": {
-    "desc": "1. 在高吞吐量网络环境中，当观察到`/proc/interrupts`显示单个CPU核心处理大量网络中断导致软中断(si)占用过高时，应适当增加该值以减少中断频率，典型调整范围为64-256  \n\n2. 在低延迟应用场景中，若网络延迟敏感型应用(如金融交易系统)出现延迟抖动，且`netstat -s`显示报文处理延迟增大，可尝试降低该值至32以下以加快中断响应",
-    "type": "continuous",
-    "range": [
-      0,
-      64
-    ],
-    "dtype": "int",
-    "set": "ethtool -C enp189s0f0 rx-frames $param_value",
-    "get": "ethtool -c enp189s0f0 | grep rx-frames: | awk '{print $2}'"
-  },
-  "net.tx-usecs": {
-    "desc": "1. 当网络传输延迟敏感型应用（如高频交易、实时视频流）出现延迟问题时，可尝试减小该值以减少中断延迟，建议从默认值100us逐步下调测试（如50us、25us），需配合性能监控避免过度降低导致CPU占用上升  \n2. 在CPU利用率过高且网络吞吐量未达瓶颈时，可适当增大该值（如200us）以减少中断频率，但需确保不会引入明显的延迟增加",
-    "type": "continuous",
-    "range": [
-      2,
-      64
-    ],
-    "dtype": "int",
-    "set": "ethtool -C enp189s0f0 tx-usecs $param_value",
-    "get": "ethtool -c enp189s0f0 | grep tx-usecs: | awk '{print $2}'"
-  },
-  "net.rx-usecs": {
-    "desc": "在高吞吐量网络环境下（如10Gbps以上），如果/proc/interrupts显示单个CPU核心处理过多RX中断，建议增加该值（如50-100微秒）以减少中断频率  \n\n当系统CPU利用率过高且/proc/net/softnet_stat显示drop计数增长时，可适当降低该值（如20-30微秒）以加快中断响应",
-    "type": "continuous",
-    "range": [
-      2,
-      64
-    ],
-    "dtype": "int",
-    "set": "ethtool -C enp189s0f0 rx-usecs $param_value",
-    "get": "ethtool -c enp189s0f0 | grep rx-usecs: | awk '{print $2}'"
-  },
-  "net.combined": {
-    "desc": "1. 当服务器处理高网络吞吐量（如10Gbps以上）且CPU出现软中断（softirq）不均时，应增加队列数量至与物理CPU核心数匹配，通常每个NUMA节点分配4-8个队列  \n\n2. 在虚拟化环境中当出现网络延迟波动时，需检查队列长度是否过短（默认256），建议结合网卡硬件能力调整为512-2048以缓冲突发流量",
-    "type": "continuous",
-    "range": [
-      1,
-      32
-    ],
-    "dtype": "int",
-    "set": "ethtool -L enp189s0f0 combined $param_value",
-    "get": "ethtool -l enp189s0f0 | grep Combined | awk '{print $2}' | tail -n 1"
-  },
-  "net.adaptive-rx": {
-    "desc": "1. 当网络接口接收高吞吐量小包时出现高CPU中断负载，应启用该参数以自动优化中断合并策略\n2. 在低延迟要求的场景(如高频交易)中若观察到网络延迟增加，应禁用该参数以避免自适应调整引入的延迟波动",
-    "range": [
-      "on",
-      "off"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "ethtool -C enp189s0f0 adaptive-rx $param_value",
-    "get": "ethtool -c enp189s0f0 | grep Adaptive | awk '{print $3}'"
-  },
-  "net.adaptive-tx": {
-    "desc": "1. 在高吞吐量网络环境中（如10Gbps以上），当系统监控显示大量中断导致CPU使用率过高时，建议启用该参数以降低中断频率\n\n2. 在低延迟敏感型应用场景（如高频交易系统），若网络延迟指标出现异常波动，建议禁用该参数以确保中断响应及时性",
-    "range": [
-      "on",
-      "off"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "ethtool -C enp189s0f0 adaptive-tx $param_value",
-    "get": "ethtool -c enp189s0f0 | grep Adaptive | awk '{print $5}'"
-  },
-  "net.tx-ring buffer size": {
-    "desc": "1. 当网络吞吐量高且出现数据包丢失或延迟增加时，可以适当增大该值以减少发送队列溢出风险，建议从默认值(通常256-1024)逐步倍增测试，最大值不超过65535\n\n2. 在低吞吐量或低配置虚拟机环境中，若系统监控显示发送队列长期空闲(利用率<30%)，可适当减小该值以释放内存资源，建议不低于64",
-    "type": "continuous",
-    "range": [
-      256,
-      16384
-    ],
-    "dtype": "int",
-    "set": "ethtool -G enp189s0f0 tx $param_value",
-    "get": "ethtool -g enp189s0f0 | tail -n 2 | head -n 1 | awk '{print $2}'"
-  },
-  "net.rx-ring buffer size": {
-    "desc": "1. 当网络流量高峰期出现丢包或延迟增加时，可适当增大该值以提升吞吐量，但需注意内存消耗增加的风险\n2. 当系统内存资源紧张且网络负载较低时，可适当减小该值以释放内存资源，但需确保不会导致性能下降",
-    "type": "continuous",
-    "range": [
-      256,
-      16384
-    ],
-    "dtype": "int",
-    "set": "ethtool -G enp189s0f0 rx $param_value",
-    "get": "ethtool -g enp189s0f0 | tail -n 5 | head -n 1 | awk '{print $2}'"
-  },
-  "net.generic-receive-offload": {
-    "desc": "1. 当服务器处理大量小包且CPU利用率过高时，建议禁用该参数以降低CPU开销\n2. 当服务器主要处理大流量数据且网络吞吐量不足时，建议启用该参数以减少协议栈处理开销",
-    "range": [
-      "on",
-      "off"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "ethtool -K enp189s0f0 gro $param_value",
-    "get": "ethtool -k enp189s0f0 | grep \"generic-receive-offload\" | awk '{print $2}'"
-  },
-  "net.generic-segmentation-offload": {
-    "desc": "1. 当服务器主要处理大量小数据包（如DNS、VoIP等应用）且CPU利用率过高时，建议禁用该参数以降低CPU处理开销\n2. 当服务器主要传输大文件或视频流等大数据量应用时，建议启用该参数以提高网络吞吐量",
-    "range": [
-      "on",
-      "off"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "ethtool -K enp189s0f0 gso $param_value",
-    "get": "ethtool -k enp189s0f0 | grep \"generic-segmentation-offload\" | awk '{print $2}'"
-  },
-  "net.tcp-segmentation-offload": {
-    "desc": "1. 在高吞吐量网络环境下（如10Gbps+），当CPU利用率因TCP分段处理过高时，建议启用该参数以减轻CPU负载\n2. 当遇到网络数据包校验错误或分片异常问题时，建议临时禁用该参数进行故障排查",
-    "range": [
-      "on",
-      "off"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "ethtool -K enp189s0f0 tso $param_value",
-    "get": "ethtool -k enp189s0f0 | grep \"tcp-segmentation-offload\" | awk '{print $2}'"
   },
   "kernel.pid_max": {
     "desc": "- 当系统频繁达到当前pid_max限制导致无法创建新进程时，应适当增大该值，通常可设置为默认值(32768)的2-4倍\n- 在容器化环境中若需支持大量短生命周期进程，建议将pid_max提升至262144(2^18)以匹配现代Linux内核支持的上限",
@@ -344,18 +156,6 @@
     "dtype": "int",
     "set": "sysctl -w kernel.msgmnb=$param_value",
     "get": "sysctl -n kernel.msgmnb"
-  },
-  "kernel.sem": {
-    "desc": "1. 当系统出现大量进程因信号量资源不足而阻塞时，需要增加semmni和semmsl值，建议将semmni设置为至少等于并发进程数，semmsl设置为每个进程可能需要的最大信号量数\n\n2. 当系统出现semop调用频繁失败或性能下降时，需要增大semopm值，建议将其设置为典型事务中所需的信号量操作数的2-3倍",
-    "range": [
-      "16000 512000000 256 16000",
-      "32000 1024000000 500 32000",
-      "64000 2048000000 1000 64000"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "sysctl -w kernel.sem=$param_value",
-    "get": "sysctl -n kernel.sem"
   },
   "kernel.hung_task_timeout_secs": {
     "desc": "1. 当系统频繁出现hung_task警告但实际任务仍在正常执行时，可适当增大该值（如从默认120秒调整为300秒），避免误报\n\n2. 对于存储密集型应用（如数据库服务器），若观察到存储设备响应较慢导致任务频繁超时，应结合存储延迟指标调高该值至存储设备平均响应时间的2-3倍",
@@ -881,175 +681,6 @@
     "set": "echo $param_value > /sys/block/sda/queue/nomerges",
     "get": "cat /sys/block/sda/queue/nomerges"
   },
-  "blockdev_multidisk": {
-    "desc": "- 当系统频繁进行大规模顺序读操作且磁盘I/O吞吐量未达预期时，可适当增大该值以提升多磁盘并行预取能力\n- 若系统主要处理随机I/O且内存压力较大时，应减小该值以避免无效预取占用过多内存带宽",
-    "type": "continuous",
-    "range": [
-      0,
-      2147483648
-    ],
-    "dtype": "int",
-    "set": "bash set_blockdev.sh $param_value",
-    "get": "/sbin/blockdev --getra /dev/sda"
-  },
-  "block.fifo_batch_multidisk": {
-    "desc": "1. 在需要提高多磁盘环境下批量I/O吞吐量的场景中（如存储服务器或数据库服务器），可适当增大该值至32-64，但需监控请求延迟是否在可接受范围内\n\n2. 当系统出现明显的I/O延迟敏感型应用性能下降时（如实时事务处理系统），应将该值降低至8-12以减少批量请求带来的延迟影响",
-    "type": "continuous",
-    "range": [
-      1,
-      128
-    ],
-    "dtype": "int",
-    "set": "bash set_fifo_batch.sh $param_value",
-    "get": "cat /sys/block/sda/queue/iosched/fifo_batch"
-  },
-  "block.front_merges_multidisk": {
-    "desc": "1. 在SSD或多磁盘阵列环境下，若观察到频繁的前向合并导致I/O延迟增加，建议禁用该参数(设为0)，因为SSD随机访问性能优异且多磁盘阵列本身具有并行处理能力，前向合并带来的优化效果有限\n\n2. 对于传统机械硬盘且主要处理顺序I/O负载的系统(如数据库日志写入)，保持默认值(启用前向合并)即可，因为顺序访问模式能从合并操作中获益",
-    "range": [
-      "0",
-      "1"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_front_merges.sh $param_value",
-    "get": "cat /sys/block/sda/queue/iosched/front_merges"
-  },
-  "block.read_expire_multidisk": {
-    "desc": "1. 当系统主要处理高优先级读请求且存在多磁盘环境时，若读请求延迟超过预期，可适当降低该值至100-200ms范围以减少读请求等待时间\n\n2. 当系统主要处理顺序大文件读取且磁盘负载较高时，若观察到频繁的请求超时，可适当提高该值至500-1000ms范围以避免不必要的请求重新排队",
-    "type": "continuous",
-    "range": [
-      100,
-      1000
-    ],
-    "dtype": "int",
-    "set": "bash set_read_expire.sh $param_value",
-    "get": "cat /sys/block/sda/queue/iosched/read_expire"
-  },
-  "block.writes_starved_multidisk": {
-    "desc": "1. 当系统主要运行需要高读取性能的应用（如数据库服务）且磁盘I/O压力主要来自读取操作时，可以适当增大该值（例如从默认值2调整为3-5），以提高读取请求的优先级和吞吐量\n\n2. 当系统存在大量混合读写负载且写入延迟敏感型应用（如事务日志）时，应降低该值（例如调整为1），以避免写入请求因读取请求过多而长时间等待",
-    "type": "continuous",
-    "range": [
-      1,
-      10
-    ],
-    "dtype": "int",
-    "set": "bash set_writes_starved.sh $param_value",
-    "get": "cat /sys/block/sda/queue/iosched/writes_starved"
-  },
-  "block.max_sectors_kb_multidisk": {
-    "desc": "1. 当服务器使用高性能存储设备（如NVMe SSD或高端SAN）且存在大量顺序I/O负载时，建议增大该值至2048-4096 KB以提升吞吐量\n\n2. 当系统出现I/O请求合并不足或高延迟问题时，在确保存储设备支持较大传输单元的前提下，可逐步增加该值并监控性能变化",
-    "type": "continuous",
-    "range": [
-      64,
-      1024
-    ],
-    "dtype": "int",
-    "set": "bash set_max_sectors_kb.sh $param_value",
-    "get": "cat /sys/block/sda/queue/max_sectors_kb"
-  },
-  "block.queue_depth_multidisk": {
-    "desc": "- 当服务器使用多磁盘阵列且IOPS性能未达预期时，可适当增加该值以提高并行IO处理能力\n- 若系统出现高延迟或请求超时，且监控显示磁盘队列持续满载，应降低该值以避免请求堆积",
-    "type": "continuous",
-    "range": [
-      64,
-      1024
-    ],
-    "dtype": "int",
-    "set": "bash set_queue_depth.sh $param_value",
-    "get": "cat /sys/block/sda/device/queue_depth"
-  },
-  "block.nr_requests_multidisk": {
-    "desc": "1. 当系统有多个磁盘且I/O吞吐量不足时，可以适当增加该值以提高并行处理能力，但需确保不超过设备队列深度总和\n2. 在高延迟存储设备场景下，若观察到请求排队时间过长导致性能下降，应考虑降低该值以避免请求积压",
-    "type": "continuous",
-    "range": [
-      128,
-      2048
-    ],
-    "dtype": "int",
-    "set": "bash set_nr_requests.sh $param_value",
-    "get": "cat /sys/block/sda/queue/nr_requests"
-  },
-  "block.read_ahead_kb_multidisk": {
-    "desc": "1. 当服务器主要运行顺序读取密集型应用（如数据库、日志分析）且内存充足时，可适当增大该值（如512-2048KB），以减少I/O等待时间\n\n2. 当系统内存压力较大或主要处理随机I/O负载时，应降低该值（如128-256KB）以避免缓存污染和内存浪费",
-    "type": "continuous",
-    "range": [
-      0,
-      65536
-    ],
-    "dtype": "int",
-    "set": "bash set_read_ahead_kb.sh $param_value",
-    "get": "cat /sys/block/sda/queue/read_ahead_kb"
-  },
-  "block.rq_affinity_multidisk": {
-    "desc": "1. 当服务器使用多磁盘阵列且CPU负载不均衡时，建议启用该参数以提高I/O并行性\n\n2. 在高并发低延迟要求的存储场景下，若出现CPU核心利用率不均导致I/O瓶颈，建议调整该参数值",
-    "range": [
-      "0",
-      "1",
-      "2"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_rq_affinity.sh $param_value",
-    "get": "cat /sys/block/sda/queue/rq_affinity"
-  },
-  "block.add_random_multidisk": {
-    "desc": "1. 当系统依赖高强度加密操作（如SSL/TLS通信或加密文件系统）且/dev/random阻塞导致性能下降时，建议启用该参数以增加熵源多样性\n\n2. 在虚拟化环境中宿主机或容器的熵池补充不足时，应启用此参数以利用多磁盘I/O事件增强熵收集效率",
-    "range": [
-      "0",
-      "1"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_add_random.sh $param_value",
-    "get": "cat /sys/block/sda/queue/add_random"
-  },
-  "block.rotational_multidisk": {
-    "desc": "1. 当存储设备为SSD时，必须将该参数设置为0以避免不必要的I/O调度开销\n2. 对于机械硬盘阵列环境，保持默认值1以优化旋转磁盘的I/O调度",
-    "range": [
-      "0",
-      "1"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_rotational.sh $param_value",
-    "get": "cat /sys/block/sda/queue/rotational"
-  },
-  "block.scheduler_multidisk": {
-    "desc": "1. 对于MySQL数据库场景，建议将block.scheduler_multidisk设置为deadline调度器，该调度器能有效减少I/O延迟，特别适合需要稳定响应时间的数据库工作负载\n\n2. 若系统使用SSD存储设备，可考虑设置为noop调度器，因为SSD本身具有较低的访问延迟，不需要复杂的调度算法",
-    "range": [
-      "mq-deadline",
-      "kyber",
-      "bfq",
-      "none"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_scheduler.sh $param_value",
-    "get": "cat /sys/block/sda/queue/scheduler | sed -n 's/.*\\[\\(.*\\)\\].*/\\1/p'"
-  },
-  "block.write_cache_multidisk": {
-    "desc": "1. 当系统需要更高写入性能且能容忍少量数据丢失风险时，建议启用write back缓存策略\n\n2. 当系统要求数据强一致性且不能容忍任何数据丢失时，建议使用write through缓存策略",
-    "range": [
-      "write back",
-      "write through"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_write_cache.sh $param_value",
-    "get": "cat /sys/block/sda/queue/write_cache"
-  },
-  "block.nomerges_multidisk": {
-    "desc": "1. 当系统在多磁盘环境下出现I/O请求合并导致的性能下降或延迟问题时，建议保持默认值1以启用合并，除非有明确的性能分析表明禁用合并能带来提升\n\n2. 在进行存储子系统调试或性能基准测试需要隔离请求合并影响时，可临时设置为0禁用合并功能",
-    "range": [
-      "0",
-      "1",
-      "2"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "bash set_nomerges.sh $param_value",
-    "get": "cat /sys/block/sda/queue/nomerges"
-  },
   "net.core.netdev_budget": {
     "desc": "1. 当网络接口频繁出现丢包（ifconfig显示RX dropped增加）且CPU软中断（softirq）占用过高时，建议适当增大该值（默认300可尝试调整为600-800）以提升单次软中断处理的包数量，减少中断次数\n\n2. 在低吞吐量但延迟敏感型场景（如高频交易系统）中，若网络延迟出现波动，可尝试降低该值（如调整为150-200）以减少单次软中断处理时间，降低处理延迟",
     "type": "continuous",
@@ -1495,18 +1126,6 @@
     "dtype": "string",
     "set": "sysctl -w net.ipv4.conf.default.rp_filter=$param_value",
     "get": "sysctl -n net.ipv4.conf.default.rp_filter"
-  },
-  "net.ipv4.ip_local_port_range": {
-    "desc": "1. 当服务器需要处理大量并发连接（如高负载代理服务器或Web服务器）时，默认的32768-60999端口范围可能导致端口耗尽，此时应扩大范围（如1024-65535），但需保留1024以下端口给特权服务\n\n2. 在容器化环境中运行多个实例时，为避免端口冲突，需要为每个实例分配不重叠的本地端口范围，同时确保总范围不超过系统上限",
-    "range": [
-      "32768 60999",
-      "1024 65535",
-      "8192 65535"
-    ],
-    "type": "discrete",
-    "dtype": "string",
-    "set": "sysctl -w net.ipv4.ip_local_port_range=$param_value",
-    "get": "sysctl -n net.ipv4.ip_local_port_range"
   },
   "net.ipv4.tcp_no_metrics_save": {
     "desc": "1. 在高并发短连接场景下，建议设置为1以禁用TCP连接参数保存，避免因大量无效参数缓存导致内存浪费和性能下降\n2. 在需要保持长连接稳定性的场景下，建议保持默认值0，允许重用之前连接的有效参数来优化新连接建立性能",
