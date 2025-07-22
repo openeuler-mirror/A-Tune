@@ -1,6 +1,7 @@
 [
     {
         "策略名称": "CPU调频策略设置为 performance",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo performance | tee  /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor",
         "优化前默认值": "performance",
         "策略是否可直接配置": "Y",
@@ -10,6 +11,7 @@
     },
     {
         "策略名称": "优化 CPU 空闲状态下的性能",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\n或启动参数配置 haltpoll.enable=Y cpuidle-haltpoll.force=Y",
         "优化前默认值": "N",
         "策略是否可直接配置": "Y",
@@ -19,6 +21,7 @@
     },
     {
         "策略名称": "tuned低时延配置",
+        "对应瓶颈点": "NETWORK",
         "优化步骤": "tuned-adm profile latency-performance\ntuned-adm profile network-latency\ntuned-adm profile realtime\ntuned-adm profile cpu-partitioning",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -28,6 +31,7 @@
     },
     {
         "策略名称": "haltpoll",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\n 或启动参数配置\nhaltpoll.enable=Y \ncpuidle-haltpoll.force=Y",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -37,6 +41,7 @@
     },
     {
         "策略名称": "禁用控制自动组调度特性",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo 0 > /proc/sys/kernel/sched_autogroup_enabled",
         "优化前默认值": 0,
         "策略是否可直接配置": "Y",
@@ -46,6 +51,7 @@
     },
     {
         "策略名称": "降低内核vm数据统计频率",
+        "对应瓶颈点": "MEMORY",
         "优化步骤": "echo 10 > /proc/sys/vm/stat_interval",
         "优化前默认值": 1,
         "策略是否可直接配置": "Y",
@@ -55,6 +61,7 @@
     },
     {
         "策略名称": "程序进程绑核到同一个片上",
+        "对应瓶颈点": "MEMORY",
         "优化步骤": "1. 运行程序前设置绑核：taskset -c 0-7 ./test_program\n2. 运行中进程设置绑核：taskset -c 0-7 <pid>",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -64,6 +71,7 @@
     },
     {
         "策略名称": "控制OpenMP程序中线程的 CPU 亲和性",
+        "对应瓶颈点": "CPU",
         "优化步骤": "export GOMP_CPU_AFFINITY=0-$(($(nproc) - 1));\nexport OMP_DYNAMIC=\"false\";\nexport OMP_THREAD_LIMIT=\"192\";\nexport OMP_SCHEDULE=\"static\"",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -73,6 +81,7 @@
     },
     {
         "策略名称": "网卡中断绑核",
+        "对应瓶颈点": "CPU",
         "优化步骤": "systemctl stop irqbalance.service;\ncat /proc/interrupts | grep 网卡;\ncat /proc/irq/<中断号>/smp_affinity_list;\necho \"2-3\" > /proc/irq/<中断号>/smp_affinity_list;（2-3是绑定的cpu）",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -82,6 +91,7 @@
     },
     {
         "策略名称": "用户态percpu缓存",
+        "对应瓶颈点": "CPU",
         "优化步骤": "1.绑定进程到特定 CPU 核心\ntaskset -c 0,1 ./application\n2.绑定内存到本地 NUMA 节点\nnumactl --cpunodebind=0 --membind=0 ./application\nnumactl --localalloc ./application(如果希望避免跨 NUMA 节点访问，可以使用 --localalloc)\n3.使用高性能内存分配器\nexport LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so或者\nexport LD_PRELOAD=/usr/lib/libtcmalloc.so\n./application\n4.禁用透明大页（THP），启用大页内存\necho never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag\necho 1024 > /proc/sys/vm/nr_hugepages",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -91,6 +101,7 @@
     },
     {
         "策略名称": "hbase关键进程绑核",
+        "对应瓶颈点": "CPU",
         "优化步骤": "taskset -c 0,1 <HMaster进程ID>",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -100,6 +111,7 @@
     },
     {
         "策略名称": "用户态低时延调度",
+        "对应瓶颈点": "CPU",
         "优化步骤": "taskset -c 0,1 ./your_program\necho 1024 > /proc/sys/vm/nr_hugepages",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -109,6 +121,7 @@
     },
     {
         "策略名称": "smt(调度时尽量使用本核，不用超线程的核)",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo KEEP_ON_CORE > /sys/kernel/debug/sched/features\necho 200 > /proc/sys/kernel/sched_util_ratio",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -118,6 +131,7 @@
     },
     {
         "策略名称": "geust_idle_poll特性 （hbase随机读）",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\necho 400000 > /sys/module/haltpoll/parameters/guest_halt_poll_ns\n",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -127,6 +141,7 @@
     },
     {
         "策略名称": "clusteraware特性",
+        "对应瓶颈点": "CPU",
         "优化步骤": "1. 宏依赖：CONFIG_SCHED_CLUSTER\n2. 使能：echo 1 > /proc/sys/kernel/sched_cluster\n3. 去使能：echo 0 > /proc/sys/kernel/sched_cluster",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -136,6 +151,7 @@
     },
     {
         "策略名称": "网卡中断绑核",
+        "对应瓶颈点": "MEMORY",
         "优化步骤": "systemctl stop irqbalance.service\ncat /proc/interrupts | grep 网卡\ncat /proc/irq/<中断号>/smp_affinity_list\necho \"2-3\" > /proc/irq/<中断号>/smp_affinity_list（2-3是绑定的cpu）",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -145,6 +161,7 @@
     },
     {
         "策略名称": "geust_idle_poll特性 ",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo Y > /sys/module/cpuidle_haltpoll/parameters/force\necho 400000 > /sys/module/haltpoll/parameters/guest_halt_poll_ns\n",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -154,6 +171,7 @@
     },
     {
         "策略名称": "arm：预取关闭，X86：预取开启",
+        "对应瓶颈点": "CPU",
         "优化步骤": "预取关闭：echo 0 > /sys/block/<device>/queue/read_ahead_kb\n预取开启：echo value > /sys/block/<device>/queue/read_ahead_kb（value是非零值）",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -163,6 +181,7 @@
     },
     {
         "策略名称": "异步IO",
+        "对应瓶颈点": "DISK",
         "优化步骤": "修改mysql配置文件：\n[mysqld]\ninnodb_use_native_aio = 1",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -172,6 +191,7 @@
     },
     {
         "策略名称": "使用numad服务优化NUMA内存访问",
+        "对应瓶颈点": "MEMROY",
         "优化步骤": "1. 安装numad包\n2. numad服务开启：systemctl start numad\n3. 配置 numad：根据需要修改 /etc/numad.conf 配置文件，以调整其行为。可以设置 NUMA 节点、内存使用阈值和其它参数。\n4. 绑定应用至 numad：在启动应用时，使用 numad 提供的 Mbind 特性，使应用程序能利用它的优化。可以通过以下命令行选项来实现：numad <your_application>  ",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -181,6 +201,7 @@
     },
     {
         "策略名称": "numa绑核",
+        "对应瓶颈点": "CPU",
         "优化步骤": "taskset -c 0,1 mysqld",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -190,6 +211,7 @@
     },
     {
         "策略名称": "任务调度",
+        "对应瓶颈点": "CPU",
         "优化步骤": "echo STEAL > /sys/kernel/debug/sched_features\necho NO_SIS_UTIL > /sys/kernel/debug/sched_features\necho SIS_PROP > /sys/kernel/debug/sched_features",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -199,6 +221,7 @@
     },
     {
         "策略名称": "代码段、malloc大页调优(仅针对4K页内核)",
+        "对应瓶颈点": "MEMROY",
         "优化步骤": "# 禁用透明大页\necho never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag\n# 临时设置大页(重启后失效)\necho $huge_pages > /proc/sys/vm/nr_hugepages\n# 永久设置大页\necho \"vm.nr_hugepages = $huge_pages\" >> /etc/sysctl.conf\nsysctl -p",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -208,6 +231,7 @@
     },
     {
         "策略名称": "tcmalloc大页",
+        "对应瓶颈点": "MEMROY",
         "优化步骤": "# 预留大页（例如预留1024个2MB大页）\necho 1024 > /proc/sys/vm/nr_hugepages\n# 通过环境变量启用大页支持\nexport TCMALLOC_USE_HUGE_PAGES=1\n# 指定大页阈值（默认2MB，可调整为1GB页）\nexport TCMALLOC_HUGE_PAGE_THRESHOLD=2097152  # 2MB\nLD_PRELOAD=\"/usr/lib/libtcmalloc.so\" ./your_program",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -217,6 +241,7 @@
     },
     {
         "策略名称": "6.6内核以上\n动态复合页代码段/so大页等等",
+        "对应瓶颈点": "MEMORY",
         "优化步骤": "程序复合页：\necho always > /sys/kernel/mm/transparent_hugepage/hugepages-<size>/enabled\necho 0x{xxx} > /sys/kernel/mm/transparent_hugepage/thp_exec_enabled\necho 4 > /sys/kernel/mm/transparent_hugepage/pcp_allow_high_order\necho 1 > /sys/kernel/mm/transparent_hugepage/thp_mapping_align\n文件复合页：\nmount -t ext4 -o buffered_iomap /dev/sda1 /mnt\nmount -t ext4 -o nobuffered_iomap /dev/sda1 /mnt\nUUID=xxx /         ext4   buffered_iomap        0 0\nUUID=xxx /         ext4   nobuffered_iomap        0 0\nmount -o remount,nobuffered_iomap /mnt\nmount -o remount,buffered_iomap /mnt",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -226,6 +251,7 @@
     },
     {
         "策略名称": "透明大页关闭",
+        "对应瓶颈点": "MEMORY",
         "优化步骤": "echo never > /sys/kernel/mm/transparent_hugepage/enabled\necho never > /sys/kernel/mm/transparent_hugepage/defrag",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -235,6 +261,7 @@
     },
     {
         "策略名称": "设置堆栈空间上限和用户进程内存上限",
+        "对应瓶颈点": "CPU",
         "优化步骤": "ulimit -s unlimited\nulimit -l 2097152",
         "优化前默认值": "1. 8192\n2. 65536",
         "策略是否可直接配置": "Y",
@@ -244,6 +271,7 @@
     },
     {
         "策略名称": "卸载内核网络数据包过滤模块",
+        "对应瓶颈点": "CPU",
         "优化步骤": "客户端卸载内核模块iptable_security,iptable_raw,iptable_nat,iptable_mangle",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -253,6 +281,7 @@
     },
     {
         "策略名称": "网络参数",
+        "对应瓶颈点": "NETWORK",
         "优化步骤": "sysctl -w net.ipv4.tcp_autocorking=0\nsysctl -w net.core.gro_normal_batch=1",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
@@ -262,6 +291,7 @@
     },
     {
         "策略名称": "网络参数，Netfilter 相关表的优化\n",
+        "对应瓶颈点": "NETWORK",
         "优化步骤": "echo 0 > /proc/sys/net/bridge/bridge-nf-call-arptables\necho 0 > /proc/sys/net/bridge/bridge-nf-call-iptables\necho 0 > /proc/sys/net/bridge/bridge-nf-call-ip6tables",
         "优化前默认值": "",
         "策略是否可直接配置": "Y",
