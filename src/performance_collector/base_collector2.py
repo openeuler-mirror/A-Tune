@@ -50,7 +50,7 @@ def remote_execute_with_exit_code(
 ) -> Tuple[str, str, int]:
     # 创建SSH对象
     client = paramiko.SSHClient()
-    # 允许连接不在known_hosts文件中的主机 
+    # 允许连接不在known_hosts文件中的主机
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
         # 连接到远程主机
@@ -91,6 +91,7 @@ def get_process_pid(
     pid, _, _ = remote_execute_with_exit_code(cmd, host_info)
     if isinstance(pid, list):
         pid = pid[-1]
+    pid = sorted(pid.split('\n'))[0]
     if not pid.isdigit():
         raise RuntimeError(f"Failed to get PID of process [{process_name}]")
     return pid

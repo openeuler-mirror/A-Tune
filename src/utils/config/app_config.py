@@ -5,7 +5,7 @@ from string import Template
 from dataclasses import dataclass, asdict, field
 from src.utils.shell_execute import SshClient
 from src.utils.config.global_config import env_config, param_config
-
+from src.utils.metrics import PerformanceMetric
 
 # 某个app需要注册私有的模板方法，可存在这里
 REGISTERED_TEMPLATE = {}
@@ -73,18 +73,19 @@ class AppMetaConfig:
 
 class AppTemplate:
     def __init__(
-        self,
-        ssh_client: SshClient,
-        app_name: str = "",
-        user: str = "",
-        port: str = "",
-        password: str = "",
-        config_file: str = "",
-        get_param_template: str = "",
-        set_param_template: str = "",
-        start_workload: str = "",
-        stop_workload: str = "",
-        benchmark: str = "",
+            self,
+            ssh_client: SshClient,
+            app_name: str = "",
+            user: str = "",
+            port: str = "",
+            password: str = "",
+            config_file: str = "",
+            get_param_template: str = "",
+            set_param_template: str = "",
+            start_workload: str = "",
+            stop_workload: str = "",
+            benchmark: str = "",
+            performance_metric: str = ""
     ):
         # 应用的基本配置，填充模板可能会用到
         self.meta_data = asdict(
@@ -106,6 +107,17 @@ class AppTemplate:
         self.start_workload_cmd = start_workload
         self.stop_workload_cmd = stop_workload
         self.benchmark_cmd = benchmark
+        if app_name != "system":
+            try:
+                self.performance_metric = PerformanceMetric[performance_metric]
+            except KeyError:
+                supported_metrics = list(PerformanceMetric.__members__.keys())
+                raise KeyError(
+                    f"Performance metric '{performance_metric}' is not supported. "
+                    f"Supported metrics are: {supported_metrics}"
+                )
+        else:
+            self.performance_metric = PerformanceMetric["QPS"]
         self.mode_map = {
             ExecuteMode.REMOTE: ssh_client.run_cmd,
             ExecuteMode.LOCAL: ssh_client.run_local_cmd,
@@ -182,6 +194,14 @@ class AppTemplate:
         )
         return run_cmd_func(cmd)
 
+    def get_calculate_type(self):
+        if self.performance_metric == PerformanceMetric.DURATION or self.performance_metric == PerformanceMetric.RT:
+            # 耗时和响应时间越小越好，使用 min
+            return min, -1
+        else:
+            # QPS 和吞吐量越大越好，使用 max
+            return max, 1
+
 
 # 将配置文件反序列化成可执行的函数，例如：
 # 下面就是一个实例化mysql应用
@@ -226,13 +246,13 @@ class AppInterface:
 
 
 if __name__ == "__main__":
-
     class SshClient:
         def __init__(self):
             pass
 
         def run_cmd(self, cmd):
             print(cmd)
+
 
     ssh_client = SshClient()
     app_interface = AppInterface(ssh_client)

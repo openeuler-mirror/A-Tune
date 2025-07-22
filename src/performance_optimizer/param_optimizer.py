@@ -16,8 +16,7 @@ class ParamOptimizer:
     def __init__(
         self,
         service_name: str,
-        performance_metric: PerformanceMetric,
-        slo_goal: str,
+        slo_goal: float,
         analysis_report: str,
         static_profile: str,
         ssh_client: SshClient,
@@ -31,14 +30,6 @@ class ParamOptimizer:
         self.static_profile = static_profile
         self.ssh_client = ssh_client
         self.pressure_test_mode = pressure_test_mode
-        self.param_recommender = ParamRecommender(
-            service_name=service_name,
-            slo_goal=slo_goal,
-            performance_metric=performance_metric,
-            static_profile=static_profile,
-            performance_analysis_report=analysis_report,
-            ssh_client=ssh_client,
-        )
         self.max_iterations = max_iterations
         # 计算slo指标提升方式的回调函数，输入是benchmark返回的性能指标，输出是业务性能提升比例
         self.slo_calc_callback = slo_calc_callback
@@ -48,12 +39,19 @@ class ParamOptimizer:
         self.app_interface = AppInterface(ssh_client).get(service_name)
         self.system_interface = AppInterface(ssh_client).system
         self.need_restart_application = need_restart_application
+        self.param_recommender = ParamRecommender(
+            service_name=service_name,
+            slo_goal=slo_goal,
+            performance_metric=self.app_interface.performance_metric,
+            static_profile=static_profile,
+            performance_analysis_report=analysis_report,
+            ssh_client=ssh_client,
+        )
+    def calc_improve_rate(self, baseline, benchmark_result, symbol):
+        return self.slo_calc_callback(baseline, benchmark_result, symbol)
 
-    def calc_improve_rate(self, baseline, benchmark_result):
-        return self.slo_calc_callback(baseline, benchmark_result)
-
-    def reached_goal(self, baseline, benchmark_result):
-        if self.calc_improve_rate(baseline, benchmark_result) >= self.slo_goal:
+    def reached_goal(self, baseline, benchmark_result, symbol):
+        if self.calc_improve_rate(baseline, benchmark_result, symbol) >= self.slo_goal:
             return True
         return False
 
@@ -107,7 +105,8 @@ class ParamOptimizer:
         history = []
         last_result = baseline
         best_result = baseline
-        ratio = self.calc_improve_rate(baseline, last_result)
+        compare_func, symbol = self.app_interface.get_calculate_type()
+        ratio = self.calc_improve_rate(baseline, last_result, symbol)
         print(
             f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
         )
@@ -129,20 +128,20 @@ class ParamOptimizer:
             history.append(
                 (
                     "提升{:.2%}".format(
-                        self.calc_improve_rate(baseline, performance_result)
+                        self.calc_improve_rate(baseline, performance_result, symbol)
                     ),
                     recommend_params,
                 )
             )
             if best_result is None:
-                best_result = max(baseline, performance_result)
+                best_result = compare_func(baseline, performance_result)
             else:
-                best_result = max(best_result, performance_result)
+                best_result = compare_func(best_result, performance_result)
 
-            ratio = self.calc_improve_rate(baseline, last_result)
+            ratio = self.calc_improve_rate(baseline, last_result, symbol)
 
             # 达到预期效果，则退出循环
-            if self.reached_goal(baseline, performance_result):
+            if self.reached_goal(baseline, performance_result, symbol):
                 print(
                     f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
                 )
@@ -153,5 +152,5 @@ class ParamOptimizer:
             )
 
         print(
-            f"调优完毕，{'达到' if self.reached_goal(baseline, best_result) else '未达到'} 预期目标"
+            f"调优完毕，{'达到' if self.reached_goal(baseline, best_result, symbol) else '未达到'} 预期目标"
         )

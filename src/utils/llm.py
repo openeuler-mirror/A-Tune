@@ -1,8 +1,11 @@
+import re
 from typing import List
 import requests
 from src.config import config
 from langchain_openai import ChatOpenAI
 
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+requests.Session.verify = False
 
 def get_llm_response(prompt: str) -> str:
     client = ChatOpenAI(
