@@ -66,7 +66,7 @@ def run_collector(ssh: SSHInput):
         host_user=ssh.user,
         host_password=ssh.password,
         app=config["servers"][0]["app"],
-        pressure_test_mode=config["feature"][0]["pressure_test_mode"],
+        pressure_test_mode=False,
     )
     metrics = metric_collector.run()
 
@@ -180,3 +180,4 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
         "param_optimization": param_opt_result,
         "strategy_recommendation": recommendations,
     }
+
