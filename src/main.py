@@ -18,6 +18,8 @@ from src.performance_optimizer.param_optimizer import ParamOptimizer
 from src.utils.shell_execute import SshClient
 from src.utils.metrics import PerformanceMetric
 from src.config import config
+from src.performance_optimizer.param_recommender import ParamRecommender
+from src.utils.config.app_config import AppInterface
 
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
@@ -88,9 +90,7 @@ def run_collector(ssh: SSHInput):
         metrics["micro_dep"] = micro_dep
 
     # 缓存
-    cache[ssh.ip] = {
-        "metrics": metrics,
-    }
+    cache[ssh.ip] = {"metrics": metrics, "static_profile": static_profile}
 
     return {
         "data": {
@@ -111,10 +111,11 @@ def run_analyzer(ip: str = Query(..., description="目标服务器 IP")):
     analyzer = PerformanceAnalyzer(
         data=cache[ip]["metrics"], app=config["servers"][0]["app"]
     )
-    report, _ = analyzer.run()
+    report, bottleneck = analyzer.run()
     cache[ip]["report"] = report
+    cache[ip]["bottleneck"] = bottleneck
 
-    return {"report": report}
+    return {"report": report, "bottleneck": bottleneck}
 
 
 # ================= Optimizer（参数+策略）接口 ===================
@@ -140,29 +141,22 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
         delay=1,
     )
 
-    def slo_calc_callback(baseline, benchmark_result):
-        if baseline is None or abs(baseline) < 1e-9:
-            return 0.0
-        return (benchmark_result - baseline) / baseline
-
-    param_opt = ParamOptimizer(
+    param_recommender = ParamRecommender(
         service_name=config["servers"][0]["app"],
-        performance_metric=PerformanceMetric.QPS,
         slo_goal=0.1,
-        analysis_report=cache[ip]["report"],
+        performance_metric=AppInterface(ssh_client)
+        .get(config["servers"][0]["app"])
+        .performance_metric,
         static_profile=cache[ip]["static_profile"],
+        performance_analysis_report=cache[ip]["report"],
         ssh_client=ssh_client,
-        slo_calc_callback=slo_calc_callback,
-        max_iterations=1,
-        need_restart_application=config["feature"][0]["need_restart_application"],
-        pressure_test_mode=config["feature"][0]["pressure_test_mode"],
     )
-    param_opt_result = param_opt.run()
+    param_opt_result = param_recommender.run(history_result=None)
 
     # --- 策略优化 ---
     strategy_opt = StrategyOptimizer(
         application=config["servers"][0]["app"],
-        bottle_neck=param_opt.analysis_report.get("瓶颈信息", {}),  # fallback
+        bottle_neck=cache[ip]["bottleneck"],  # fallback
         host_ip=ip,
         host_port=config["servers"][0]["port"],
         host_user=config["servers"][0]["host_user"],
@@ -171,7 +165,7 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
         target_config_path="",
     )
     recommendations = strategy_opt.get_recommendations_json(
-        bottleneck=param_opt.analysis_report.get("瓶颈信息", {}),
+        bottleneck=cache[ip]["bottleneck"],
         top_k=1,
         business_context="高并发Web服务，CPU负载主要集中在用户态处理",
     )
@@ -181,3 +175,8 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
         "strategy_recommendation": recommendations,
     }
 
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app=app, host="0.0.0.0", port=8092)
