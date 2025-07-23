@@ -17,7 +17,7 @@ def get_llm_response(prompt: str) -> str:
         streaming=True
     )
     result = client.invoke(input=prompt)
-    return result.content
+    return re.sub(r"<think>.*?</think>", "", result.content, flags=re.DOTALL)
 
 
 def get_embedding(text: str) -> List[float]:

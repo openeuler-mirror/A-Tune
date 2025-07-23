@@ -63,7 +63,6 @@ class StrategyOptimizer(BaseOptimizer):
             f"瓶颈点: {s['对应瓶颈点']}\n"
             f"功能说明: {s['功能说明']}\n"
             f"使用风险: {s['使用风险']}\n"
-            f"是否可配置: {s['策略是否可配置']}"
             for idx, s in enumerate(strategies)
         )
 
