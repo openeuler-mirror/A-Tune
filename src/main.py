@@ -1,9 +1,13 @@
-from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel
-from typing import Dict, Any
 import logging
+from typing import Dict, Any
 
+from fastapi import FastAPI, HTTPException, Query
+
+from src.config import config
+from src.utils.shell_execute import SshClient
+from src.utils.config.app_config import AppInterface
 from src.performance_collector.metric_collector import MetricCollector
+from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.performance_collector.static_metric_profile_collector import (
@@ -14,12 +18,7 @@ from src.performance_collector.micro_dep_collector import (
     HostInfo,
     COLLECTMODE,
 )
-from src.performance_optimizer.param_optimizer import ParamOptimizer
-from src.utils.shell_execute import SshClient
-from src.utils.metrics import PerformanceMetric
-from src.config import config
-from src.performance_optimizer.param_recommender import ParamRecommender
-from src.utils.config.app_config import AppInterface
+
 
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
@@ -35,23 +34,28 @@ logging.basicConfig(
 cache: Dict[str, Dict[str, Any]] = {}
 
 
-class SSHInput(BaseModel):
-    ip: str
-    port: int
-    user: str
-    password: str
+host_port = config["servers"][0]["port"]
+host_user = config["servers"][0]["host_user"]
+host_password = config["servers"][0]["password"]
+app = config["servers"][0]["app"]
+max_retries = config["servers"][0]["max_retries"]
+delay = config["servers"][0]["delay"]
 
 
 # ================= Collector 接口 ===================
-@app.post("/collector")
-def run_collector(ssh: SSHInput):
+@app.get("/collector")
+def run_collector(ip: str = Query(..., description="目标服务器 IP")):
+    if not ip:
+        raise HTTPException(
+            status_code=400, detail=f"需要输入待调优机器IP，否则无法采集数据"
+        )
     ssh_client = SshClient(
-        host_ip=ssh.ip,
-        host_port=ssh.port,
-        host_user=ssh.user,
-        host_password=ssh.password,
-        max_retries=3,
-        delay=1,
+        host_ip=ip,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        max_retries=max_retries,
+        delay=delay,
     )
 
     # 1. 静态指标
@@ -63,11 +67,11 @@ def run_collector(ssh: SSHInput):
     # 2. 动态指标
     metric_collector = MetricCollector(
         ssh_client=ssh_client,
-        host_ip=ssh.ip,
-        host_port=ssh.port,
-        host_user=ssh.user,
-        host_password=ssh.password,
-        app=config["servers"][0]["app"],
+        host_ip=ip,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        app=app,
         pressure_test_mode=False,
     )
     metrics = metric_collector.run()
@@ -75,9 +79,9 @@ def run_collector(ssh: SSHInput):
     # 3. 微依赖分析（可选）
     if config["feature"][0]["microDep_collector"]:
         host_info = HostInfo(
-            host_ip=ssh.ip,
-            host_port=ssh.port,
-            host_password=ssh.password,
+            host_ip=ip,
+            host_port=host_port,
+            host_password=host_password,
         )
         micro_collector = MicroDepCollector(
             host_info=host_info,
@@ -90,7 +94,7 @@ def run_collector(ssh: SSHInput):
         metrics["micro_dep"] = micro_dep
 
     # 缓存
-    cache[ssh.ip] = {"metrics": metrics, "static_profile": static_profile}
+    cache[ip] = {"metrics": metrics, "static_profile": static_profile}
 
     return {
         "data": {
@@ -103,7 +107,7 @@ def run_collector(ssh: SSHInput):
 # ================= Analyzer 接口 ===================
 @app.get("/analyzer")
 def run_analyzer(ip: str = Query(..., description="目标服务器 IP")):
-    if ip not in cache or "metrics" not in cache[ip]:
+    if not ip or ip not in cache or "metrics" not in cache[ip]:
         raise HTTPException(
             status_code=400, detail=f"{ip} 缺少 metrics，请先执行 /collector"
         )
@@ -122,7 +126,8 @@ def run_analyzer(ip: str = Query(..., description="目标服务器 IP")):
 @app.get("/optimizer")
 def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
     if (
-        ip not in cache
+        not ip
+        or ip not in cache
         or "report" not in cache[ip]
         or "static_profile" not in cache[ip]
     ):
@@ -134,11 +139,11 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
     # --- 参数优化 ---
     ssh_client = SshClient(
         host_ip=ip,
-        host_port=config["servers"][0]["port"],
-        host_user=config["servers"][0]["host_user"],
-        host_password=config["servers"][0]["password"],
-        max_retries=3,
-        delay=1,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        max_retries=max_retries,
+        delay=delay,
     )
 
     param_recommender = ParamRecommender(
