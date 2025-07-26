@@ -38,6 +38,18 @@ nginx:
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
   performance_metric: "QPS"
 
+gaussdb:
+  user: ""
+  password: ""
+  config_file: "/path/of/tpchnode"
+  port: 5432
+  set_param_template: 'gs_guc reload -Z datanode -D /data2/zjh/gitcode/data/tpchnode -c "$param_name=$param_value"'
+  get_param_template: 'grep -oP "^\s*$param_name\s*=\s*\K.*" "$config_file"'
+  stop_workload: "gs_ctl stop -D /data2/zjh/gitcode/data/tpchnode"
+  start_workload: "gs_ctl start -D /data2/zjh/gitcode/data/tpchnode -l logfile"
+  benchmark: "$EXECUTE_MODE:local sh /home/wsy/gaussdb_benchmark.sh"
+  performance_metric: "DURATION"
+
 system:
   set_param_template: 'sysctl -w $param_name=$param_value'
   get_param_template: 'sysctl $param_name'

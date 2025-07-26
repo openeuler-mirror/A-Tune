@@ -1,0 +1,239 @@
+{
+    "shared_buffers": {
+        "desc": "设置GaussDB KernelGaussDB使用的共享内存大小。增加此参数的值会使GaussDB KernelGaussDB比系统默认设置需要更多的System V共享内存。",
+        "type": "continuous",
+        "range": [
+            16,
+            1073741823
+        ],
+        "dtype": "Integer",
+        "default_value": 32768
+    },
+    "max_process_memory": {
+        "desc": "设置一个数据库节点可用的最大物理内存。",
+        "type": "continuous",
+        "range": [
+            2097152,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 12582912
+    },
+    "work_mem": {
+        "desc": "设置内部排序操作和Hash表在开始写入临时磁盘文件之前使用的内存大小。ORDER BY，DISTINCT和merge joins都要用到排序操作。Hash表在散列连接、散列为基础的聚集、散列为基础的IN子查询处理中都要用到。",
+        "type": "continuous",
+        "range": [
+            64,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 65536
+    },
+    "enable_bloom_filter": {
+        "desc": "标识是否允许使用BloomFilter优化。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "scan_wait_for_bloom_filter": {
+        "desc": "扫描算子是否等待BloomFilter创建完成。多租场景下，该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "bloom_filter_build_max_rows": {
+        "desc": "启用BloomFilter优化时，Hashjoin的Build侧可以创建BloomFilter的最大数据量。如果build侧的数据量高于这个值，则不会建立BloomFilter。多租场景下，该参数可在PDB级别设置。",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 2000000
+    },
+    "bloom_filter_apply_threshold": {
+        "desc": "启用BloomFilter优化时，Hashjoin的Apply侧可以创建BloomFilter的最小数据量。如果apply侧的数据量低于这个值，则不会建立BloomFilter。多租场景下，该参数可在PDB级别设置。",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 10000
+    },
+    "enable_smp_partitionwise": {
+        "desc": "控制是否在SMP场景下，开启Partition-wise Join的能力。多租场景下，该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "force_smp_partitionwise_scan": {
+        "desc": "在SMP场景下，打开Partition-wise Join开关enable_smp_partitionwise后，是否在全局范围内开启Partition-wise Scan的并行扫描方式。多租场景下，该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "enable_htap": {
+        "desc": "是否开启HTAP特性，开启HTAP特性后，会加载COLVIEW关键字指定列的存量行存数据到内存IMCV（In-memory Column View，列式内存引擎）中，用于提高AP（Analytical Processing，分析处理）查询效率。使用多租数据库特性时需要关闭该参数。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "enable_parallel_populate": {
+        "desc": "依赖HTAP特性开启状态，设置是否开启存量行存转内存列IMCV的并行加载特性，以加速IMCV表创建流程。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "enable_imcvscan": {
+        "desc": "依赖HTAP特性开启状态，设置是否打开HTAP内存列扫描算子IMCVScan。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "htap_max_mem_size": {
+        "desc": "依赖HTAP特性开启状态，设置HTAP特性可用的内存上限。当GaussDB动态内存使用达到上限后，即使HTAP内存使用未达到上限，也无法继续分配内存。",
+        "type": "continuous",
+        "range": [
+            102400,
+            1073741824
+        ],
+        "dtype": "Integer",
+        "default_value": 1048576
+    },
+    "htap_router_mode": {
+        "desc": "依赖HTAP特性开启状态，设置HTAP透明路由的模式。",
+        "type": "discrete",
+        "range": [
+            "row",
+            "column",
+            "auto"
+        ],
+        "dtype": "string",
+        "default_value": "row"
+    },
+    "query_dop": {
+        "desc": "用户自定义的查询并行度。开启SMP功能后，系统会使用设定的并行度执行。该参数可在PDB级别设置。",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "Integer",
+        "default_value": 1
+    },
+    "enable_force_smp": {
+        "desc": "控制是否强制开启SMP计划。参数开启后，代价模型默认拉起stream线程的代价为空，当设置并行度并且算子支持并行时强制选择并行路径。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "enable_nestloop": {
+        "desc": "控制优化器对内表全表扫描嵌套循环连接规划类型的使用。完全消除嵌套循环连接是不可能的，但是，若关闭这个参数，当存在其他方法时，优化器会优先选择其他方法。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_numeric_optimization": {
+        "desc": "设置是否开启Numeric类型数据运算优化。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_sonic_hashagg": {
+        "desc": "标识是否依据规则约束使用基于面向列的hash表设计的Hash Agg算子。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_sonic_hashjoin": {
+        "desc": "标识是否依据规则约束使用基于面向列的hash表设计的Hash Join算子。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_thread_pool": {
+        "desc": "控制是否使用线程池功能。多租数据库特性（enable_mtd）需要开启该参数。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "enable_early_free": {
+        "desc": "控制是否可以进行算子内存的提前释放。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "vector_engine_features": {
+        "desc": "标识向量化引擎可选特性的开关。开启这些特性不一定对执行性能有提升效果，在特定的业务场景中，通过此GUC参数对向量化引擎相关特性进行设置，使得执行性能最优。该参数可在PDB级别设置。",
+        "type": "discrete",
+        "range": [
+            "",
+            "enable_ca_hashagg",
+            "enable_ca_hashjoin",
+            "enable_late_materialization",
+            "enable_ca_hashagg, enable_ca_hashjoin",
+            "enable_ca_hashjoin, enable_late_materialization",
+            "enable_ca_hashagg, enable_late_materialization",
+            "enable_ca_hashagg, enable_ca_hashjoin, enable_late_materialization"
+        ],
+        "dtype": "string",
+        "default_value": "enable_ca_hashagg, enable_ca_hashjoin, enable_late_materialization"
+    }
+}
