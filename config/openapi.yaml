@@ -23,8 +23,7 @@ paths:
           description: 成功采集数据
           content:
             application/json:
-              schema:
-                : '#/components/schemas/ApiResponse'
+              schema: '#/components/schemas/ApiResponse'
   /analyzer:
     get:
       summary: 瓶颈分析接口
@@ -42,8 +41,7 @@ paths:
           description: 成功采集数据
           content:
             application/json:
-              schema:
-                : '#/components/schemas/ApiResponse'
+              schema: '#/components/schemas/ApiResponse'
   /optimizer:
     get:
       summary: 参数推荐接口
@@ -61,8 +59,7 @@ paths:
           description: 成功采集数据
           content:
             application/json:
-              schema:
-                : '#/components/schemas/ApiResponse'
+              schema: '#/components/schemas/ApiResponse'
 components:
   schemas:
     ApiResponse:

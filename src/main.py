@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 
 from src.config import config
 from src.utils.shell_execute import SshClient
@@ -33,24 +33,24 @@ logging.basicConfig(
 )
 cache: Dict[str, Dict[str, Any]] = {}
 
-
+host_ip = config["servers"][0]["ip"]
 host_port = config["servers"][0]["port"]
 host_user = config["servers"][0]["host_user"]
 host_password = config["servers"][0]["password"]
-app = config["servers"][0]["app"]
+app_name = config["servers"][0]["app"]
 max_retries = config["servers"][0]["max_retries"]
 delay = config["servers"][0]["delay"]
 
 
 # ================= Collector 接口 ===================
 @app.get("/collector")
-def run_collector(ip: str = Query(..., description="目标服务器 IP")):
-    if not ip:
+def run_collector():
+    if not host_ip:
         raise HTTPException(
             status_code=400, detail=f"需要输入待调优机器IP，否则无法采集数据"
         )
     ssh_client = SshClient(
-        host_ip=ip,
+        host_ip=host_ip,
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
@@ -67,11 +67,11 @@ def run_collector(ip: str = Query(..., description="目标服务器 IP")):
     # 2. 动态指标
     metric_collector = MetricCollector(
         ssh_client=ssh_client,
-        host_ip=ip,
+        host_ip=host_ip,
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
-        app=app,
+        app=app_name,
         pressure_test_mode=False,
     )
     metrics = metric_collector.run()
@@ -79,7 +79,7 @@ def run_collector(ip: str = Query(..., description="目标服务器 IP")):
     # 3. 微依赖分析（可选）
     if config["feature"][0]["microDep_collector"]:
         host_info = HostInfo(
-            host_ip=ip,
+            host_ip=host_ip,
             host_port=host_port,
             host_password=host_password,
         )
@@ -94,7 +94,7 @@ def run_collector(ip: str = Query(..., description="目标服务器 IP")):
         metrics["micro_dep"] = micro_dep
 
     # 缓存
-    cache[ip] = {"metrics": metrics, "static_profile": static_profile}
+    cache[host_ip] = {"metrics": metrics, "static_profile": static_profile}
 
     return {
         "data": {
@@ -106,39 +106,39 @@ def run_collector(ip: str = Query(..., description="目标服务器 IP")):
 
 # ================= Analyzer 接口 ===================
 @app.get("/analyzer")
-def run_analyzer(ip: str = Query(..., description="目标服务器 IP")):
-    if not ip or ip not in cache or "metrics" not in cache[ip]:
+def run_analyzer():
+    if not host_ip or host_ip not in cache or "metrics" not in cache[host_ip]:
         raise HTTPException(
-            status_code=400, detail=f"{ip} 缺少 metrics，请先执行 /collector"
+            status_code=400, detail=f"{host_ip} 缺少 metrics，请先采集数据，再进行分析"
         )
 
     analyzer = PerformanceAnalyzer(
-        data=cache[ip]["metrics"], app=config["servers"][0]["app"]
+        data=cache[host_ip]["metrics"], app=app_name
     )
     report, bottleneck = analyzer.run()
-    cache[ip]["report"] = report
-    cache[ip]["bottleneck"] = bottleneck
+    cache[host_ip]["report"] = report
+    cache[host_ip]["bottleneck"] = bottleneck
 
     return {"report": report, "bottleneck": bottleneck}
 
 
 # ================= Optimizer（参数+策略）接口 ===================
 @app.get("/optimizer")
-def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
+def run_optimizer():
     if (
-        not ip
-        or ip not in cache
-        or "report" not in cache[ip]
-        or "static_profile" not in cache[ip]
+        not host_ip
+        or host_ip not in cache
+        or "report" not in cache[host_ip]
+        or "static_profile" not in cache[host_ip]
     ):
         raise HTTPException(
             status_code=400,
-            detail=f"{ip} 缺少 report 或 static_profile，请先执行 /collector 和 /analyzer",
+            detail=f"{host_ip} 缺少 report 或 static_profile，请先执行 /collector 和 /analyzer",
         )
 
     # --- 参数优化 ---
     ssh_client = SshClient(
-        host_ip=ip,
+        host_ip=host_ip,
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
@@ -147,30 +147,30 @@ def run_optimizer(ip: str = Query(..., description="目标服务器 IP")):
     )
 
     param_recommender = ParamRecommender(
-        service_name=config["servers"][0]["app"],
+        service_name=app_name,
         slo_goal=0.1,
         performance_metric=AppInterface(ssh_client)
-        .get(config["servers"][0]["app"])
+        .get(app_name)
         .performance_metric,
-        static_profile=cache[ip]["static_profile"],
-        performance_analysis_report=cache[ip]["report"],
+        static_profile=cache[host_ip]["static_profile"],
+        performance_analysis_report=cache[host_ip]["report"],
         ssh_client=ssh_client,
     )
     param_opt_result = param_recommender.run(history_result=None)
 
     # --- 策略优化 ---
     strategy_opt = StrategyOptimizer(
-        application=config["servers"][0]["app"],
-        bottle_neck=cache[ip]["bottleneck"],  # fallback
-        host_ip=ip,
-        host_port=config["servers"][0]["port"],
-        host_user=config["servers"][0]["host_user"],
-        host_password=config["servers"][0]["password"],
-        system_report=cache[ip]["report"],
+        application=app_name,
+        bottle_neck=cache[host_ip]["bottleneck"],  # fallback
+        host_ip=host_ip,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        system_report=cache[host_ip]["report"],
         target_config_path="",
     )
     recommendations = strategy_opt.get_recommendations_json(
-        bottleneck=cache[ip]["bottleneck"],
+        bottleneck=cache[host_ip]["bottleneck"],
         top_k=1,
         business_context="高并发Web服务，CPU负载主要集中在用户态处理",
     )
