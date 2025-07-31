@@ -1,0 +1,641 @@
+{
+    "bluestore_throttle_bytes": {
+        "desc": "该参数控制Bluestore的写入速率限制，以字节为单位。可以缓解disk IO瓶颈。增大该值可以提高写入性能，减小则可以降低写入速率以保护其他操作。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1073741824
+        ],
+        "default_value": 0,
+        "related_param": []
+    },
+    "bluestore_throttle_deferred_bytes": {
+        "desc": "该参数控制Bluestore在写入时的延迟字节数限制。可以缓解disk IO瓶颈。增大该值可以允许更多的延迟写入，减小则可以减少延迟写入的数量。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1073741824
+        ],
+        "default_value": 0,
+        "related_param": []
+    },
+    "journal_max_write_bytes": {
+        "desc": "该参数定义了日志一次性写入的最大字节数（Bytes）。增大该值可以提高日志写入性能，缓解磁盘IO瓶颈，减小则可能导致日志写入延迟。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            1073741824
+        ],
+        "default_value": "10485760",
+        "related_param": []
+    },
+    "journal_max_write_entries": {
+        "desc": "该参数定义了日志最大写入条目数。增大该值可以提高日志写入性能，减小则可能导致日志写入延迟。该参数可以缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            1000000
+        ],
+        "default_value": "100",
+        "related_param": []
+    },
+    "osd_client_message_size_cap": {
+        "desc": "OSD客户端消息的最大大小，单位为字节。该参数控制允许在内存中处理的最大客户端数据消息大小，设置此参数可以防止过大的消息导致网络瓶颈，适当的值可以提高网络性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            4096,
+            1048576
+        ],
+        "default_value": "500Mi",
+        "related_param": []
+    },
+    "osd_map_cache_size": {
+        "desc": "设置OSD映射缓存的大小，单位为字节。增大该值可以提高OSD映射的访问速度，但会增加内存使用。该参数的默认值为50，建议根据实际需求进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "50",
+        "related_param": []
+    },
+    "osd_max_backfills": {
+        "desc": "osd_max_backfills参数用于设置单个OSD允许的最大并发回填操作数。增大此值可以提高数据恢复速度，但可能会导致磁盘IO瓶颈。该参数分别适用于读和写操作。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            1,
+            100
+        ],
+        "default_value": "1",
+        "related_param": [
+            "osd_mclock_override_recovery_settings"
+        ]
+    },
+    "osd_max_pgls": {
+        "desc": "设置每个OSD允许的最大PG日志数量。增大该值可以提高日志的处理能力，但可能会导致内存使用增加。该参数的合理配置对于Ceph集群的性能至关重要。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "1Ki",
+        "related_param": []
+    },
+    "osd_max_pg_log_entries": {
+        "desc": "该参数设置每个Placement Group（PG）日志的最大条目数。增大该值可以提高日志的处理能力，但可能会导致内存使用增加。修建PGLog时保留的最大PGLog数为该值。该参数的合理配置对于Ceph集群的性能和稳定性至关重要。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "10000",
+        "related_param": [
+            "osd_min_pg_log_entries",
+            "osd_pg_log_dups_tracked",
+            "osd_target_pg_log_entries_per_osd"
+        ]
+    },
+    "osd_max_pg_per_osd_hard_ratio": {
+        "desc": "该参数设置每个OSD允许的最大PG数量与OSD数量的比率。增大该值可以提高存储的扩展性，但可能会导致内存和CPU的使用增加。该比率在达到设定值后，OSD将拒绝创建新的PG。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "3.0",
+        "related_param": [
+            "mon_max_pg_per_osd"
+        ]
+    },
+    "osd_max_scrubs": {
+        "desc": "设置每个OSD同时进行的最大scrubbing操作数量。增大该值可以提高scrubbing的并发性，但可能会导致CPU和disk IO瓶颈。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "3",
+        "related_param": []
+    },
+    "osd_max_write_size": {
+        "desc": "OSD允许的最大写入大小，单位为字节。增大此值可以提高写入性能，但可能会导致内存使用增加，从而影响CPU和内存瓶颈。该参数的最大写入大小为4096字节到1048576字节之间，默认值为4194304字节。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            4096,
+            1048576
+        ],
+        "default_value": "4194304",
+        "related_param": []
+    },
+    "osd_mclock_iops_capacity_low_threshold_hdd": {
+        "desc": "该参数用于设置HDD的IOPS容量低阈值（以4KiB块大小为单位），当IOPS容量低于该阈值时，将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_hdd定义的最后有效或默认IOPS容量。减小该值可以避免HDD过载，从而缓解disk IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "50.0",
+        "related_param": [
+            "osd_mclock_max_capacity_iops_hdd"
+        ]
+    },
+    "osd_mclock_iops_capacity_low_threshold_ssd": {
+        "desc": "该参数定义了SSD的IOPS容量低阈值（以4KiB块大小为单位），当OSD的IOPS性能低于此阈值时，将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_ssd定义的最后有效或默认IOPS容量。减小该值可以避免SSD过载，从而缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "1000.0",
+        "related_param": [
+            "osd_mclock_max_capacity_iops_ssd"
+        ]
+    },
+    "osd_mclock_iops_capacity_threshold_hdd": {
+        "desc": "该参数定义了HDD的IOPS容量阈值（以4KiB块大小为单位），超过该阈值后将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_hdd定义的最后有效或默认IOPS容量。增大该值可以提高HDD的使用效率，从而缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "500.0",
+        "related_param": [
+            "osd_mclock_max_capacity_iops_hdd"
+        ]
+    },
+    "osd_mclock_iops_capacity_threshold_ssd": {
+        "desc": "该参数定义了SSD的IOPS容量阈值（以4KiB块大小为单位），超过该阈值后将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_ssd定义的最后有效或默认IOPS容量。增大该值可以提高SSD的使用效率，从而缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "80000.0",
+        "related_param": [
+            "osd_mclock_max_capacity_iops_ssd"
+        ]
+    },
+    "osd_mclock_max_capacity_iops_hdd": {
+        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for rotational media)。设置此参数可以帮助优化HDD的使用，缓解disk IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "315.0",
+        "related_param": []
+    },
+    "osd_mclock_max_capacity_iops_ssd": {
+        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for solid state media)。设置此参数可以帮助优化SSD的使用，缓解disk IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "21500.0",
+        "related_param": []
+    },
+    "osd_mclock_max_sequential_bandwidth_hdd": {
+        "desc": "该参数定义了OSD在使用旋转介质时考虑的最大顺序带宽（以字节/秒为单位）。设置此参数可以帮助优化HDD的顺序IO性能，缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "size",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "150Mi",
+        "related_param": []
+    },
+    "osd_mclock_max_sequential_bandwidth_ssd": {
+        "desc": "该参数用于设置OSD在固态媒体上的最大顺序带宽（以字节/秒为单位），可以帮助优化SSD的顺序IO性能，缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "size",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "1200Mi",
+        "related_param": []
+    },
+    "osd_mclock_profile": {
+        "desc": "控制OSD的多时钟配置文件。选择合适的配置文件可以优化IO性能，缓解disk IO瓶颈。可选的配置文件包括高恢复操作、低延迟操作和高客户端操作。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "balanced", "high_recovery_ops", "high_client_ops", "custom"
+        ],
+        "default_value": "high_recovery_ops",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_best_effort_lim": {
+        "desc": "该参数用于控制后台最佳努力调度器的IO限制，影响并发最佳努力恢复操作的数量。增大该值可以允许更多的并发最佳努力恢复请求，从而缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_best_effort_res": {
+        "desc": "该参数用于控制后台最佳努力调度器的资源分配，影响最佳努力恢复操作的资源使用。增大该值可以提高资源分配，从而缓解磁盘IO瓶颈。默认值为0.0，范围在0到1.0之间。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_best_effort_wgt": {
+        "desc": "该参数用于控制每个后台最佳努力调度的IO共享权重，影响最佳努力恢复操作的优先级。增大该值可以提高最佳努力恢复操作的优先级，从而缓解磁盘IO瓶颈。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "1",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_recovery_lim": {
+        "desc": "该参数用于控制后台恢复调度器的IO限制，限制并发恢复操作的数量。增大该值可以允许更多的并发恢复请求，从而缓解磁盘IO瓶颈。具体来说，它定义了背景恢复的IO限制，适用于需要优化恢复性能的场景。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_recovery_res": {
+        "desc": "IO比例保留用于后台恢复（默认）。该参数控制后台恢复调度器的资源分配，增大该值可以提高资源分配，从而缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_background_recovery_wgt": {
+        "desc": "IO share for each background recovery over reservation. 该参数用于控制后台恢复操作的优先级，增大该值可以提高恢复操作的优先级，从而缓解磁盘IO瓶颈。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "1",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_client_lim": {
+        "desc": "IO限制用于每个客户端（默认）在预留之上。该参数控制并发客户端请求的数量，增大该值可以允许更多的并发请求，从而缓解CPU瓶颈。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": []
+    },
+    "osd_mclock_scheduler_client_res": {
+        "desc": "IO比例为每个客户端保留的资源。增大该值可以提高资源分配，从而缓解CPU瓶颈。默认值为0.0。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            1.0
+        ],
+        "default_value": "0.0",
+        "related_param": [
+            "osd_op_queue"
+        ]
+    },
+    "osd_mclock_scheduler_client_wgt": {
+        "desc": "IO share for each client (default) over reservation. 客户端调度器的权重，用于控制客户端请求的调度优先级。增大该值可以提高客户端请求的处理优先级，从而缓解CPU瓶颈。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "1",
+        "related_param": []
+    },
+    "osd_memory_target": {
+        "desc": "该选项设置了每个OSD进程能申请到的内存大小，单位为字节。适当设置此参数可以帮助缓解内存瓶颈，确保OSD进程在高负载情况下仍能保持性能。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "4294967296",
+        "related_param": []
+    },
+    "osd_min_pg_log_entries": {
+        "desc": "该参数设置每个Placement Group（PG）日志的最小条目数。增大该值可以提高日志的可靠性，但可能会增加内存使用。修建PGLog时，保留的最小PGLog数。该参数的合理配置有助于优化Ceph集群的性能和稳定性。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "250",
+        "related_param": [
+            "osd_max_pg_log_entries",
+            "osd_pg_log_dups_tracked",
+            "osd_target_pg_log_entries_per_osd"
+        ]
+    },
+    "osd_op_num_shards": {
+        "desc": "该参数定义了为特定OSD分配的操作分片数。增大此值可以提高并发处理能力，缓解CPU瓶颈，但可能会增加内存使用。建议在性能需求较高的环境中进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            64
+        ],
+        "default_value": "1",
+        "related_param": []
+    },
+    "osd_op_num_shards_ssd": {
+        "desc": "该参数定义了为特定的OSD（针对固态存储介质）分配的分片数量。增大此值可以提高SSD的并发处理能力，缓解CPU瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            2,
+            64
+        ],
+        "default_value": "8",
+        "related_param": [
+            "osd_op_num_shards"
+        ]
+    },
+    "osd_op_num_threads_per_shard": {
+        "desc": "每个OSD分片的工作线程数。增大此值可以提高并发处理能力，缓解CPU瓶颈，但可能会导致内存使用增加。建议根据实际负载情况进行调整。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            16
+        ],
+        "default_value": "1",
+        "related_param": []
+    },
+    "osd_op_num_threads_per_shard_ssd": {
+        "desc": "每个OSD分片为给定的OSD（针对固态媒体）生成的工作线程数量。增大此值可以提高SSD的并发处理能力，缓解CPU瓶颈，但可能会导致内存使用增加。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            2,
+            16
+        ],
+        "default_value": "2",
+        "related_param": [
+            "osd_op_num_threads_per_shard"
+        ]
+    },
+    "osd_pool_default_crush_rule": {
+        "desc": "设置新创建池的默认CRUSH规则。该参数决定了在创建复制池时使用的CRUSH规则。默认值为，表示选择ID最低的规则。不同的CRUSH规则会影响数据的分布和冗余策略。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "-1",
+        "related_param": []
+    },
+    "osd_pool_default_min_size": {
+        "desc": "设置新创建池的默认最小副本数量。增大该值可以提高数据的可用性，但会增加存储的开销。该参数确保在操作处于降级模式时，满足最小副本数量以避免数据丢失。默认值为0，表示没有特定的最小值。如果设置为0，则最小值为size - (size / 2)。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            0,
+            255
+        ],
+        "default_value": "0",
+        "related_param": [
+            "osd_pool_default_size"
+        ]
+    },
+    "osd_pool_default_pgp_num": {
+        "desc": "该参数设置新创建池的默认PG副本数量。增大该值可以提高数据的冗余性，但会增加存储的开销。默认值为64，最小值为1。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "64",
+        "related_param": [
+            "osd_pool_default_pg_num",
+            "osd_pool_default_pg_autoscale_mode"
+        ]
+    },
+    "osd_pool_default_pg_num": {
+        "desc": "设置新创建池的默认PG数量。增大该值可以提高数据的并行性，但可能会导致内存和CPU的使用增加。建议根据实际负载和硬件资源进行调整。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "32",
+        "related_param": [
+            "osd_pool_default_pg_autoscale_mode"
+        ]
+    },
+    "osd_pool_default_size": {
+        "desc": "默认情况下，Ceph会对RADOS对象创建三个副本。如果希望维护四个副本（一个主副本和三个备份副本），可以通过设置'osd_pool_default_size'参数来实现。增大该值可以提高数据的冗余性，但会增加存储的开销。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            1,
+            null
+        ],
+        "default_value": "3",
+        "related_param": []
+    },
+    "osd_recovery_max_active": {
+        "desc": "OSD在恢复过程中允许的最大并发操作数。增大此值可以加快恢复速度，但可能会导致磁盘IO和网络瓶颈。建议根据集群负载情况进行调整。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            1,
+            100
+        ],
+        "default_value": "3",
+        "related_param": [
+            "osd_recovery_max_active_hdd",
+            "osd_recovery_max_active_ssd",
+            "osd_mclock_override_recovery_settings"
+        ]
+    },
+    "osd_recovery_op_priority": {
+        "desc": "osd_recovery_op_priority参数用于设置恢复操作相对于客户端操作的优先级。较高的优先级可以加快恢复速度，但可能会影响正常操作的性能，导致CPU和磁盘IO瓶颈。该参数的取值范围为1-63，值越高占用的资源越多。",
+        "type": "discrete",
+        "dtype": "integer",
+        "range": [
+            1,
+            63
+        ],
+        "default_value": "3",
+        "related_param": []
+    },
+    "osd_scrub_auto_repair": {
+        "desc": "启用该参数将自动修复在scrubbing或deep-scrubbing过程中发现的错误，从而减少手动干预，提高系统的可靠性。该功能有助于确保数据的完整性和可用性。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "false",
+        "related_param": [
+            "osd_scrub_auto_repair_num_errors"
+        ]
+    },
+    "osd_scrub_auto_repair_num_errors": {
+        "desc": "在scrubbing过程中，OSD允许自动修复的最大错误数量。若发现的错误数量超过该值，则不会进行自动修复。增大该值可以提高修复能力，但可能会增加CPU和磁盘IO的负担。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "5",
+        "related_param": [
+            "osd_scrub_auto_repair"
+        ]
+    },
+    "osd_scrub_load_threshold": {
+        "desc": "设置OSD在进行scrubbing时允许的最大负载阈值。增大该值可以使OSD在高负载情况下仍然进行scrubbing，可能会导致CPU和disk IO瓶颈加重。",
+        "type": "continuous",
+        "dtype": "float",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "0.5",
+        "related_param": []
+    },
+    "osd_scrub_max_interval": {
+        "desc": "该参数定义了每个PG进行数据清理操作的最大间隔时间，单位为秒。增大该值可以减少清理操作的频率，从而缓解CPU和磁盘IO的瓶颈。默认值为7天（即86400秒）。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "7 days",
+        "related_param": [
+            "osd_scrub_min_interval"
+        ]
+    },
+    "osd_scrub_min_interval": {
+        "desc": "设置OSD进行scrubbing操作的最小时间间隔，单位为秒。增大该值可以减少scrubbing对系统性能的影响，特别是在高负载情况下，缓解CPU和disk IO瓶颈。默认值为1天（86400秒）。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "86400",
+        "related_param": [
+            "osd_scrub_max_interval"
+        ]
+    },
+    "osd_scrub_priority": {
+        "desc": "osd_scrub_priority参数用于控制Ceph集群中数据清理操作的默认优先级。当池未指定scrub_priority值时，使用该参数的值。增大该值可以提高清理操作的优先级，从而缓解磁盘IO瓶颈，确保在清理操作阻塞客户端操作时，可以提升到osd_client_op_priority的值。",
+        "type": "discrete",
+        "dtype": "uint",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "5",
+        "related_param": []
+    },
+    "rbd_cache": {
+        "desc": "该参数控制RBD的缓存功能。启用缓存可以缓解磁盘IO和网络瓶颈，提高性能。取值为'false'时禁用缓存，'true'时启用缓存。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "false",
+        "related_param": []
+    },
+    "rbd_cache_max_dirty": {
+        "desc": "该参数定义了RBD缓存中允许的最大脏数据字节数（Bytes）。当缓存模式为write-back时，增大该值可以允许更多的脏数据，从而缓解内存瓶颈；而设置为0则会使用write-through模式，可能会影响性能。需要注意的是，增大该值可能会增加数据丢失的风险。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            null
+        ],
+        "default_value": "25165824",
+        "related_param": []
+    },
+    "rbd_cache_max_dirty_age": {
+        "desc": "该参数定义了RBD缓存中脏数据的最大存在时间，以秒为单位。在被刷新到存储盘前，脏数据可以在缓存中存在的时间。增大该值可以允许脏数据存在更长时间，从而缓解内存瓶颈，但可能导致数据更新不及时。默认值为60秒，最大值为86400秒。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            86400
+        ],
+        "default_value": "60",
+        "related_param": []
+    },
+    "rbd_cache_size": {
+        "desc": "该参数定义了RBD缓存的大小，以字节为单位。增大该值可以提高缓存命中率，减小则可能导致缓存不足，进而缓解内存瓶颈。",
+        "type": "continuous",
+        "dtype": "integer",
+        "range": [
+            0,
+            1073741824
+        ],
+        "default_value": "33554432",
+        "related_param": []
+    },
+    "rbd_cache_writethrough_until_flush": {
+        "desc": "该参数控制在写入期间是否使用直写缓存，直到数据被刷新。该选项是为了兼容linux-2.6.32之前的virtio驱动，避免因为不发送flush请求而导致数据不回写。启用该参数可以缓解磁盘IO瓶颈。取值为'true'时启用，'false'时禁用。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            null,
+            null
+        ],
+        "default_value": "true",
+        "related_param": []
+    }
+}
+
