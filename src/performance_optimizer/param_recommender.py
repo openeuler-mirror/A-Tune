@@ -33,7 +33,7 @@ class ParamRecommender:
         static_profile: str,
         performance_analysis_report: str,
         chunk_size=20,
-        enable_system_params=True,
+        enable_system_tuning=True,
         ssh_client=None,
     ):
         # 待调优app名称
@@ -46,7 +46,7 @@ class ParamRecommender:
         self.static_profile = "\n".join(f"{k}: {v}" for k, v in static_profile.items())
         # 可调参数知识库，用于给大模型描述应用参数背景知识
         self.param_knowledge = ParamKnowledge(ssh_client)
-        self.all_params = self.param_knowledge.get_params(service_name)
+        self.all_params = self.param_knowledge.get_params(service_name, enable_system_tuning)
         self.ssh_client = ssh_client
         self.params_set = self.param_knowledge.describe_param_background_knob(
             service_name, self.all_params

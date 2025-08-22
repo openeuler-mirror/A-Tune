@@ -24,6 +24,7 @@ class ParamOptimizer:
         max_iterations: int = 10,
         need_restart_application: bool = False,
         pressure_test_mode: bool = False,
+        enable_system_tuning: bool = False,
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
@@ -46,6 +47,7 @@ class ParamOptimizer:
             static_profile=static_profile,
             performance_analysis_report=analysis_report,
             ssh_client=ssh_client,
+            enable_system_tuning=enable_system_tuning
         )
     def calc_improve_rate(self, baseline, benchmark_result, symbol):
         return self.slo_calc_callback(baseline, benchmark_result, symbol)

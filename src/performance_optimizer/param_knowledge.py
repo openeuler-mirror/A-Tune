@@ -27,19 +27,22 @@ class ParamKnowledge:
         if not hasattr(self, "ssh_client"):
             self.ssh_client = ssh_client
 
-    def get_params(self, app_name):
-        # check 应用和系统参数是否有重名的
-        logging.info(f"[ParamKnowledge] checking params ...")
-        system_params = self.param_config.get("system").keys()
-        app_params = self.param_config.get(app_name).keys()
-        union_params = set(system_params) & set(app_params)
-        if union_params:
-            raise RuntimeError(
-                f"Duplicate keys ({union_params}) detected between application parameters and system parameters."
-            )
-        return list(self.param_config.get("system").keys()) + list(
-            self.param_config.get(app_name).keys()
-        )
+    def get_params(self, app_name, enable_system_tuning):
+        app_params = self.param_config.get(app_name, {})
+        if not app_params:
+            raise ValueError(f"App '{app_name}' not found in param_config.")
+
+        # 只有在启用系统调优时才加载并检查系统参数
+        if enable_system_tuning:
+            system_params = self.param_config.get("system", {})
+            duplicate_keys = set(system_params) & set(app_params)
+            if duplicate_keys:
+                raise RuntimeError(
+                    f"Duplicate keys ({duplicate_keys}) detected between system and app '{app_name}'."
+                )
+            return list(system_params.keys()) + list(app_params.keys())
+        else:
+            return list(app_params.keys())
 
     def describe_param_background_knob(self, app_name: str, params: Iterable):
         logging.info(f"[ParamKnowledge] building param knowledge base ...")
