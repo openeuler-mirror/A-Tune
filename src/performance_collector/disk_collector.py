@@ -19,16 +19,36 @@ def parse_disk_data(
     r, rkb, w, wkb = float(data["r/s"]), float(data["rkB/s"]), float(data["w/s"]), float(data["wkB/s"])
     return {device_name: {"单位时间读速率": r, "单位时间读大小": rkb, "单位时间写速率": w, "单位时间写大小": wkb}}
 
-def parse_disk_util_data(
-    a_data: Any,
-    b_data: Any,
-) -> Dict:
+def parse_disk_util_data(a_data: dict, b_data: dict) -> dict:
     device_name = b_data["disk_device"]
-    wait = (float(b_data["r_await"]) + float(b_data["w_await"]) + float(b_data["d_await"])
-            - float(a_data["r_await"]) - float(a_data["w_await"]) - float(a_data["d_await"]))
-    aqu_sz = float(b_data["aqu-sz"]) - float(a_data["aqu-sz"])
-    util = float(b_data["util"])
-    return {device_name: {"磁盘平均等待时间变化趋势": wait, "磁盘平均请求队列长度变化趋势": aqu_sz, "磁盘利用率": util}}
+
+    try:
+        await_a = float(a_data.get("await"))
+        await_b = float(b_data.get("await"))
+        await_change = await_b - await_a  # 正数表示变慢，负数表示变快
+    except (TypeError, ValueError, KeyError):
+        # 如果 'await' 不存在或无效，回退到 r_await + w_await 的简单相加
+        logging.warning(f"Device {device_name}: 'await' not available, falling back to r_await + w_await")
+        r_await_a = float(a_data.get("r_await", 0.0))
+        w_await_a = float(a_data.get("w_await", 0.0))
+        r_await_b = float(b_data.get("r_await", 0.0))
+        w_await_b = float(b_data.get("w_await", 0.0))
+        await_change = (r_await_b + w_await_b) - (r_await_a + w_await_a)
+
+    # 磁盘队列长度变化趋势
+    try:
+        aqu_sz_change = float(b_data["aqu-sz"]) - float(a_data["aqu-sz"])
+    except (TypeError, ValueError, KeyError):
+        aqu_sz_change = 0.0
+
+    # 磁盘利用率（直接取最新值）
+    try:
+        util = float(b_data["util"])
+    except (TypeError, ValueError, KeyError):
+        util = 0.0
+
+    return {device_name: {"磁盘平均等待时间变化趋势": await_change, "磁盘平均请求队列长度变化趋势": aqu_sz_change, "磁盘利用率": util}}
+
 
 def iostat_parse(cmd, stdout):
     if cmd == "iostat -o JSON -dx 1 2":
