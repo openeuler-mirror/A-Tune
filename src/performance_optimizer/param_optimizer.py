@@ -23,8 +23,9 @@ class ParamOptimizer:
         slo_calc_callback: callable,
         max_iterations: int = 10,
         need_restart_application: bool = False,
+        need_recover_cluster: bool = False,
         pressure_test_mode: bool = False,
-        enable_system_tuning: bool = False,
+        enable_system_tuning: bool = False
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
@@ -40,6 +41,7 @@ class ParamOptimizer:
         self.app_interface = AppInterface(ssh_client).get(service_name)
         self.system_interface = AppInterface(ssh_client).system
         self.need_restart_application = need_restart_application
+        self.need_recover_cluster = need_recover_cluster
         self.param_recommender = ParamRecommender(
             service_name=service_name,
             slo_goal=slo_goal,
@@ -49,6 +51,7 @@ class ParamOptimizer:
             ssh_client=ssh_client,
             enable_system_tuning=enable_system_tuning
         )
+        self.first_restart_save = True
     def calc_improve_rate(self, baseline, benchmark_result, symbol):
         return self.slo_calc_callback(baseline, benchmark_result, symbol)
 
@@ -86,6 +89,45 @@ class ParamOptimizer:
                 f"failed to start application because {start_result.err_msg}"
             )
 
+    def recover_cluster(self):
+        print("🔄 正在恢复集群 ...")
+        recover_result = self.app_interface.recover_workload()
+        if recover_result.status_code != 0:
+            raise RuntimeError(
+                f"failed to recover cluster because {recover_result.err_msg}"
+            )
+
+    def save_restart_params_to_script(self, recommend_params, script_path, batch_id):
+        """
+        将推荐参数保存到脚本中（仅在调优过程中需要重置参数的情况使用）
+        """
+
+        commands = []
+        for param_name, param_value in recommend_params.items():
+            cmd = self.app_interface.generate_set_command(param_name, param_value)
+            if cmd:
+                commands.append(cmd)
+
+        if not commands:
+            print(f"第 {batch_id} 轮无需要重启生效的参数，跳过写入脚本。")
+            return
+
+        # 构建要追加的内容
+        batch_header = f"\n# 批次 {batch_id} - 重启后生效参数\n"
+        content = batch_header + '\n'.join(commands)
+
+        if self.first_restart_save:
+            init_cmd = f"echo '#!/bin/bash' > {script_path}"
+            self.ssh_client.run_cmd(init_cmd)
+            self.first_restart_save = False
+            print(f"首次创建重启参数脚本: {script_path}")
+
+        append_cmd = f"cat << 'EOF' >> {script_path}\n{content}\nEOF"
+        self.ssh_client.run_cmd(append_cmd)
+        
+        print(f"已将 {len(commands)} 个参数写入重启脚本: {script_path}")
+
+
     def run(self):
         # 运行benchmark，摸底参数性能指标
         if self.pressure_test_mode:
@@ -103,6 +145,9 @@ class ParamOptimizer:
             )
         else:
             baseline = self.benchmark()
+            if self.need_recover_cluster:
+                self.recover_cluster()
+
         # 保存每轮调优的结果，反思调优目标是否达到
         history = []
         last_result = baseline
@@ -124,6 +169,11 @@ class ParamOptimizer:
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
+            if self.need_recover_cluster:
+                # 保存在一个/tmp目录下的脚本中
+                script_path = '/tmp/euler-copilot-params.sh'
+                self.save_restart_params_to_script(recommend_params, script_path, i + 1)
+                self.recover_cluster()
 
             last_result = performance_result
 

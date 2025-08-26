@@ -48,13 +48,14 @@ ceph:
 gaussdb:
   user: ""
   password: ""
-  config_file: "/path/of/tpchnode"
+  config_file: "/path/of/config_file"
   port: 5432
-  set_param_template: 'gs_guc reload -Z datanode -D /data2/zjh/gitcode/data/tpchnode -c "$param_name=$param_value"'
-  get_param_template: 'grep -oP "^\s*$param_name\s*=\s*\K.*" "$config_file"'
-  stop_workload: "gs_ctl stop -D /data2/zjh/gitcode/data/tpchnode"
-  start_workload: "gs_ctl start -D /data2/zjh/gitcode/data/tpchnode -l logfile"
-  benchmark: "$EXECUTE_MODE:local sh /home/wsy/gaussdb_benchmark.sh"
+  set_param_template: 'gs_guc set -Z datanode  -N all -I all -c "${param_name}=${param_value}"'
+  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}"'
+  stop_workload: "cm_ctl stop -m i"
+  start_workload: "cm_ctl start"
+  recover_workload: "$EXECUTE_MODE:local sh /path/of/gaussdb_cluster_recover.sh"
+  benchmark: "$EXECUTE_MODE:local sh/path/of/gaussdb_benchmark.sh"
   performance_metric: "DURATION"
 
 system:
