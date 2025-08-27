@@ -84,6 +84,7 @@ class AppTemplate:
             set_param_template: str = "",
             start_workload: str = "",
             stop_workload: str = "",
+            recover_workload: str = "",
             benchmark: str = "",
             performance_metric: str = ""
     ):
@@ -106,6 +107,7 @@ class AppTemplate:
         self.set_param_template = set_param_template
         self.start_workload_cmd = start_workload
         self.stop_workload_cmd = stop_workload
+        self.recover_workload_cmd = recover_workload
         self.benchmark_cmd = benchmark
         if app_name != "system":
             try:
@@ -183,6 +185,33 @@ class AppTemplate:
             **self.meta_data,
         )
         return run_cmd_func(cmd)
+
+    def recover_workload(self):
+        if not self.recover_workload_cmd:
+            return None
+        run_cmd_func, cmd = self.extract_mode(self.recover_workload_cmd)
+        cmd = shell_template(
+            cmd,
+            **self.meta_data,
+        )
+        return run_cmd_func(cmd)
+
+    def generate_set_command(self, param_name, param_value):
+        if param_name in self.system_params:
+            set_param_template = self.system_params[param_name]["set"]
+        else:
+            set_param_template = self.set_param_template
+        if not self.set_param_template:
+            return None
+        _, cmd = self.extract_mode(set_param_template)
+
+        formatted_cmd = shell_template(
+            cmd,
+            param_name=param_name,
+            param_value=param_value,
+            **self.meta_data,
+        )
+        return formatted_cmd
 
     def benchmark(self):
         if not self.benchmark_cmd:

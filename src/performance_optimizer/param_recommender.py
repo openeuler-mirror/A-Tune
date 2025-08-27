@@ -54,26 +54,36 @@ class ParamRecommender:
         self.chunk_size = chunk_size
         self.performance_analysis_report = performance_analysis_report
 
-    def _process_chunk(self, history_result, cur_params_set):
+    def _process_chunk(self, history_result, cur_params_set, prompt_pos):
+        """
+        Args:
+            history_result: 历史调优结果
+            cur_params_set: 当前可调参数集合
+            prompt_pos: 是否为首次调优（True 表示正向提示，False 表示需反思前次失败）
+        """
+
         recommend_prompt = f"""
-# CONTEXT # 
-本次性能优化的目标为：
-性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
-性能分析报告：
-{self.performance_analysis_report}
-你可以分析的参数有：
-{",".join(cur_params_set)}
-# OBJECTIVE #
-你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以上性能分析报告分析有哪些调优思路。
-# Tone #
-你应该尽可能秉承严肃、认真、严谨的态度
-# AUDIENCE #
-你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
-"""
+        # CONTEXT # 
+        本次性能优化的目标为：
+        性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
+        性能分析报告：
+        {self.performance_analysis_report}
+        你可以分析的参数有：
+        {",".join(cur_params_set)}
+        # OBJECTIVE #
+        你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以上性能分析报告分析有哪些调优思路。
+        # Tone #
+        你应该尽可能秉承严肃、认真、严谨的态度
+        # AUDIENCE #
+        你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
+        """
         optimized_idea = get_llm_response(recommend_prompt)
-        recommended_params = self.recommend(
-            history_result, optimized_idea, cur_params_set
+        optimization_feedback_tip = (
+            "前一轮的参数推荐不但没有作用，反而导致性能的劣化，请总结前一轮参数推荐的经验，重新分析并给出对性能优化有帮助的参数推荐。"
+            if not prompt_pos else ""
         )
+
+        recommended_params = self.recommend(history_result, optimized_idea, cur_params_set, optimization_feedback_tip)
         recommended_params_set = json_repair(recommended_params)
 
         result = {}
@@ -82,15 +92,14 @@ class ParamRecommender:
                 result[param_name] = param_value
         return result
 
-    def run(self, history_result):
+    def run(self, history_result, prompt_pos):
         resultset = {}
 
         for i in range(0, len(self.params_set), self.chunk_size):
             cur_params_set = self.params_set[i : i + self.chunk_size]
             # 提交任务给线程池，返回 future-like 对象（你线程池需要支持这个）
             thread_pool_manager.add_task(
-                self._process_chunk, history_result, cur_params_set
-            )
+                self._process_chunk, history_result, cur_params_set, prompt_pos)
 
         thread_pool_manager.run_all_tasks()
         task_results = thread_pool_manager.get_all_results()
@@ -104,25 +113,26 @@ class ParamRecommender:
 
         return resultset
 
-    def recommend(self, history_result, optimization_idea, cur_params_set):
+    def recommend(self, history_result, optimization_idea, cur_params_set, optimization_feedback_tip):
         history_result = str(history_result[-1]) if history_result else "无"
         params_set_str = "\n".join(cur_params_set)
         prompt = f"""
-你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以下调优思路、当前环境的配置信息、可调整参数，选出可调整参数值。
-请尽量精简描述，将终点需要调整的方向输出出来，不需要总结观点，对性能无影响的也不要输出。
-当前环境的配置信息有：
-{self.static_profile}
-以下是历史调优的信息，历史调优修改了如下参数，你可以参考如下历史调优信息来反思可以可以改进的点: 
-{history_result}
-调优思路是：
-{optimization_idea}
-你可以调整的参数是：
-{params_set_str}
-请以json格式回答问题，key为可调参数名称，请根据上述的环境配置信息给出可调整的参数，若参数不相关则不要给出
-value是可调参数的推荐取值，请根据上面的环境配置信息给出合理的具体取值，请仔细确认各个值是否可以被使用，避免设置后应用无法启动。
-请注意若参数取值为数字类型，默认的单位为字节，请注意单位换算；若数字后面跟了单位，请使用字符串表示。
-请勿给出除了json以外其他的回复,切勿增加注释。
-"""
+        你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以下调优思路、当前环境的配置信息、可调整参数，选出可调整参数值。
+        {optimization_feedback_tip}
+        请尽量精简描述，将终点需要调整的方向输出出来，不需要总结观点，对性能无影响的也不要输出。
+        当前环境的配置信息有：
+        {self.static_profile}
+        以下是历史调优的信息，历史调优修改了如下参数，你可以参考如下历史调优信息来反思可以可以改进的点: 
+        {history_result}
+        调优思路是：
+        {optimization_idea}
+        你可以调整的参数是：
+        {params_set_str}
+        请以json格式回答问题，key为可调参数名称，请根据上述的环境配置信息给出可调整的参数，若参数不相关则不要给出
+        value是可调参数的推荐取值，请根据上面的环境配置信息给出合理的具体取值，请仔细确认各个值是否可以被使用，避免设置后应用无法启动。
+        请注意若参数取值为数字类型，默认的单位为字节，请注意单位换算；若数字后面跟了单位，请使用字符串表示。
+        请勿给出除了json以外其他的回复,切勿增加注释。
+        """
         response = get_llm_response(prompt)
         return response
 

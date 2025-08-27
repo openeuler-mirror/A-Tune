@@ -124,7 +124,7 @@ class ParamOptimizer:
 
         append_cmd = f"cat << 'EOF' >> {script_path}\n{content}\nEOF"
         self.ssh_client.run_cmd(append_cmd)
-        
+
         print(f"已将 {len(commands)} 个参数写入重启脚本: {script_path}")
 
 
@@ -160,7 +160,12 @@ class ParamOptimizer:
 
         for i in range(self.max_iterations):
             # 未达成目标的情况下，根据调优结果与历史最优的参数，执行参数调优推荐，给出参数名和参数值
-            recommend_params = self.param_recommender.run(history_result=history)
+            if last_result * symbol > best_result * symbol:
+                prompt_pos = True
+            else:
+                prompt_pos = False
+
+            recommend_params = self.param_recommender.run(history_result=history, prompt_pos=prompt_pos)
 
             # 设置参数生效
             self.apply_params(recommend_params)
