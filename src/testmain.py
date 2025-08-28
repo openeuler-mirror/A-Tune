@@ -38,9 +38,12 @@ delay = config["servers"][0]["delay"]
 target_process_name = config["servers"][0]["target_process_name"]
 benchmark_cmd = config["benchmark_cmd"]
 need_restart_application = config["feature"][0]["need_restart_application"]
+need_recover_cluster = config["feature"][0]["need_recover_cluster"]
 need_microDep_collector = config["feature"][0]["microDep_collector"]
 pressure_test_mode = config["feature"][0]["pressure_test_mode"]
 business_context = config["servers"][0]["business_context"]
+enable_system_tuning = config["feature"][0]["enable_system_tuning"]
+
 
 ssh_client = SshClient(
     host_ip=host_ip,
@@ -113,7 +116,9 @@ param_optimizer = ParamOptimizer(
     slo_calc_callback=slo_calc_callback,
     max_iterations=1,
     need_restart_application=need_restart_application,
+    need_recover_cluster=need_recover_cluster,
     pressure_test_mode=pressure_test_mode,
+    enable_system_tuning=enable_system_tuning
 )
 param_optimizer.run()
 
