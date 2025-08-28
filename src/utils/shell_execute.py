@@ -1,58 +1,25 @@
-import paramiko
-import time
-from typing import Dict, Any, Callable
-import logging
-from functools import wraps, partial
 import inspect
-from collections import defaultdict
-from abc import abstractmethod
-import traceback
-from types import ModuleType
-from src.utils.common import ExecuteResult
-import subprocess
+import logging
 import shlex
+import subprocess
+import time
+import traceback
+from collections import defaultdict
+from functools import wraps
+from types import ModuleType
+from typing import Callable
+
+import paramiko
+
+from src.utils.common import ExecuteResult
 
 decorated_funcs = defaultdict(list)
 cmds_registry = defaultdict(list)
-
 
 # 配置日志
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
-
-
-def remote_execute(
-    cmd: str = "",
-    host_ip: str = "",
-    host_port: int = 22,
-    host_user: str = "root",
-    host_password: str = "",
-) -> Dict[str, Any]:
-    # 创建SSH对象
-    client = paramiko.SSHClient()
-    # 允许连接不在known_hosts文件中的主机
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-        # 连接到远程主机
-        client.connect(host_ip, host_port, host_user, host_password)
-        # 执行指令
-        stdin, stdout, stderr = client.exec_command(cmd)
-        # 获取执行结果
-        result = stdout.read().decode()
-        error = stderr.read().decode()
-        status_code = stdout.channel.recv_exit_status()
-        if status_code:
-            logging.error("Error executing command '%s': %s", cmd, error)
-            return {cmd: result}
-        else:
-            #logging.info("Command '%s' executed successfully.", cmd)
-            return {cmd: result}
-    except Exception as e:
-        logging.error("Exception occurred while executing command '%s': %s", cmd, e)
-        return None
-    finally:
-        client.close()
 
 
 def retryable(max_retries: int = 3, delay: int = 1):
@@ -84,13 +51,13 @@ def retryable(max_retries: int = 3, delay: int = 1):
 
 class SshClient:
     def __init__(
-        self,
-        host_ip: str = "",
-        host_port: int = 22,
-        host_user: str = "root",
-        host_password: str = "",
-        max_retries: int = 0,
-        delay: float = 1.0,
+            self,
+            host_ip: str = "",
+            host_port: int = 22,
+            host_user: str = "root",
+            host_password: str = "",
+            max_retries: int = 0,
+            delay: float = 1.0,
     ):
         self.host_ip = host_ip
         self.host_port = host_port
@@ -123,8 +90,8 @@ class SshClient:
 
     @retryable()
     def run_local_cmd(self, cmd):
+        result = ExecuteResult()
         try:
-            result = ExecuteResult()
             # 使用 shlex.split 将命令字符串分割为参数列表
             args = shlex.split(cmd)
             shell_result = subprocess.run(
@@ -148,31 +115,19 @@ class SshClient:
         return result
 
     @retryable()
-    def run_shell(self, local_shell_path) -> ExecuteResult:
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        result = ExecuteResult()
-        try:
-            with open(local_shell_path, "r") as f:
-                shell_content = f.read()
-            client.connect(
-                self.host_ip, self.host_port, self.host_user, self.host_password
-            )
-            _, stdout, stderr = client.exec_command(f"bash -s", stdin=shell_content)
-            result.output = stdout.read().decode().strip()
-            result.err_msg = stderr.read().decode()
-            result.status_code = stdout.channel.recv_exit_status()
-        except Exception as e:
-            result.status_code = -1
-            result.output = ""
-            result.err_msg = traceback.format_exc()
-        finally:
-            client.close()
-        return result
+    def run_background_command(self, cmd) -> str:
+        """在后台运行命令并返回PID"""
+        full_cmd = f"nohup {cmd} > /dev/null 2>&1 & echo $!"
+        result = self.run_cmd(full_cmd)
+        pid = result.output
+        pid = pid.strip()
+        if not pid.isdigit():
+            raise RuntimeError("Failed to get PID")
+        return pid
 
 
 def process_decorated_func(
-    result: ExecuteResult, func: Callable, ssh_client: SshClient, *args, **kwargs
+        result: ExecuteResult, func: Callable, *args, **kwargs
 ):
     try:
         processed_result = func(result.output, *args, **kwargs)
@@ -184,9 +139,9 @@ def process_decorated_func(
 
 
 def cmd_pipeline(
-    cmd: str = "",
-    tag: str = "default_tag",
-    parallel: bool = False,
+        cmd: str = "",
+        tag: str = "default_tag",
+        parallel: bool = False,
 ):
     def decorator(func):
         file = inspect.getfile(func)
@@ -195,7 +150,7 @@ def cmd_pipeline(
         def wrapper(ssh_client, *args, **kwargs):
             result = ssh_client.run_cmd(cmd)
             if result.status_code == 0:
-                return process_decorated_func(result, func, ssh_client)
+                return process_decorated_func(result, func)
             return result
 
         decorated_funcs[file].append(
@@ -207,27 +162,7 @@ def cmd_pipeline(
 
 
 def get_registered_cmd_funcs(
-    ssh_client: SshClient, tag: str = "default_tag", parallel: bool = False
-):
-    stack = inspect.stack()
-    if len(stack) < 2:
-        return []
-    frame = stack[1]
-    caller_file = frame.filename
-
-    registered_funcs = decorated_funcs.get(caller_file, [])
-
-    func_list = []
-    for func_info in registered_funcs:
-        if func_info["parallel"]:
-            func_list.append(
-                (func_info["func"], (ssh_client,), {"tag": func_info["tag"]})
-            )
-    return func_list
-
-
-def get_registered_cmd_funcs(
-    module: ModuleType, tag: str = "default_tag", parallel: bool = True
+        module: ModuleType, parallel: bool = True
 ):
     if not isinstance(module, ModuleType) or not hasattr(module, "__file__"):
         raise RuntimeError(

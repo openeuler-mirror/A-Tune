@@ -4,21 +4,19 @@ from typing import Dict, Any
 from fastapi import FastAPI, HTTPException
 
 from src.config import config
-from src.utils.shell_execute import SshClient
-from src.utils.config.app_config import AppInterface
-from src.performance_collector.metric_collector import MetricCollector
-from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
-from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
+from src.performance_collector.metric_collector import MetricCollector
+from src.performance_collector.micro_dep_collector import (
+    MicroDepCollector,
+    COLLECTMODE,
+)
 from src.performance_collector.static_metric_profile_collector import (
     StaticMetricProfileCollector,
 )
-from src.performance_collector.micro_dep_collector import (
-    MicroDepCollector,
-    HostInfo,
-    COLLECTMODE,
-)
-
+from src.performance_optimizer.param_recommender import ParamRecommender
+from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
+from src.utils.config.app_config import AppInterface
+from src.utils.shell_execute import SshClient
 
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
@@ -78,13 +76,8 @@ def run_collector():
 
     # 3. 微依赖分析（可选）
     if config["feature"][0]["microDep_collector"]:
-        host_info = HostInfo(
-            host_ip=host_ip,
-            host_port=host_port,
-            host_password=host_password,
-        )
         micro_collector = MicroDepCollector(
-            host_info=host_info,
+            ssh_client=ssh_client,
             iteration=10,
             target_process_name=config["servers"][0]["target_process_name"],
             benchmark_cmd=config["benchmark_cmd"],
@@ -126,10 +119,10 @@ def run_analyzer():
 @app.get("/optimizer")
 def run_optimizer():
     if (
-        not host_ip
-        or host_ip not in cache
-        or "report" not in cache[host_ip]
-        or "static_profile" not in cache[host_ip]
+            not host_ip
+            or host_ip not in cache
+            or "report" not in cache[host_ip]
+            or "static_profile" not in cache[host_ip]
     ):
         raise HTTPException(
             status_code=400,

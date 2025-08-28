@@ -1,14 +1,20 @@
-from pydantic import BaseModel
 from abc import abstractmethod
-from typing import Dict, List, Any
-from src.utils.shell_execute import remote_execute
+from typing import Dict, Any
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from src.utils.shell_execute import SshClient  # 假设这个是你的类
+
 
 class CollectorArgs(BaseModel):
-    cmds: List[str] = []
-    host_ip: str = ""
-    host_port: int = 22
-    host_user: str = "root"
-    host_password: str = ""
+    cmds: List[str] = Field(default_factory=list)
+    ssh_client: Optional[SshClient] = None
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
+
 
 class BaseCollector:
     def __init__(self, **kwargs):
@@ -16,19 +22,16 @@ class BaseCollector:
         self.args = CollectorArgs(**kwargs)
 
     def get_cmd_stdout(
-        self,
+            self,
     ) -> Dict:
         # 执行远程命令
         result = {}
         for cmd in self.args.cmds:
-            cmd_res = remote_execute(
-                cmd=cmd,
-                host_ip=self.args.host_ip,
-                host_port=self.args.host_port,
-                host_user=self.args.host_user,
-                host_password=self.args.host_password,
+            cmd_res = self.args.ssh_client.run_cmd(
+                cmd=cmd
             )
-            result = {**result, **cmd_res}
+            res = {cmd: cmd_res.output}
+            result = {**result, **res}
         return result
 
     @abstractmethod
@@ -36,12 +39,12 @@ class BaseCollector:
         pass
 
     def default_parse(
-        self,
-        cmd: str,
-        stdout: Any,
+            self,
+            cmd: str,
+            stdout: Any,
     ) -> Dict:
         return {cmd: stdout}
-    
+
     @abstractmethod
     def data_process(self, **kwargs) -> Dict:
         pass

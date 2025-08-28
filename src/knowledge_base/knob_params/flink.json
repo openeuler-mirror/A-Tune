@@ -1,0 +1,300 @@
+{
+  "execution.checkpointing.interval": {
+    "desc": "设置执行检查点的时间间隔，单位为毫秒。该参数用于启用和控制状态快照的频率，能够缓解系统在状态恢复时的磁盘IO瓶颈。增大该值可以减少检查点的频率，从而降低系统负载，但可能导致恢复时间增加；减小该值可以提高数据一致性，但会增加系统负载。要启用检查点，必须将此值设置为大于0的正整数。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 10000
+  },
+  "execution.checkpointing.max-concurrent-checkpoints": {
+    "desc": "设置最大并发检查点的数量，用于控制同时进行的检查点数量。增大该值可以提高系统的并发能力，但可能导致资源竞争；减小该值可以降低系统负载，但可能影响数据一致性。该参数能够缓解系统在 checkpoint 过程中可能出现的 disk IO 瓶颈。",
+    "type": "discrete",
+    "range": [
+      1,
+      10
+    ],
+    "dtype": "int",
+    "default_value": 1
+  },
+  "execution.checkpointing.min-pause": {
+    "desc": "设置两个连续检查点之间的最小暂停时间，单位为毫秒。该参数用于控制检查点之间的间隔，能够缓解系统在 checkpoint 过程中可能出现的 CPU 瓶颈。增大该值可以减少检查点的频率，降低系统负载；减小该值可以提高检查点的频率，但可能导致系统资源竞争。",
+    "type": "continuous",
+    "range": [
+      0,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "0 ms"
+  },
+  "execution.checkpointing.timeout": {
+    "desc": "设置检查点的超时时间，单位为毫秒；用于控制检查点的最大执行时间，能够缓解系统在 checkpoint 过程中可能出现的 memory 瓶颈。增大该值可以容忍更长的检查点时间，但可能导致系统资源占用增加；减小该值可以加快失败检测，但可能导致频繁的检查点失败。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 60000
+  },
+  "jobmanager.memory.flink.size": {
+    "desc": "JobManager的总内存大小，包括JVM堆内存和非堆内存，但不包括JVM Metaspace和JVM Overhead。增加此值可以缓解内存瓶颈，提升JobManager的性能，主要用于Flink的内部数据结构和状态管理。",
+    "type": "discrete",
+    "range": [
+      null,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "(none)"
+  },
+  "jobmanager.memory.jvm-overhead.max": {
+    "desc": "设置 JobManager JVM 的最大开销内存，确保 JVM 在高负载下有足够的内存。增加此值可以缓解内存瓶颈，提升系统的稳定性。此参数用于指定为 JVM 开销保留的非堆内存，例如线程栈空间、编译缓存等。",
+    "type": "discrete",
+    "range": [
+      null,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "1 gb"
+  },
+  "jobmanager.memory.jvm-overhead.min": {
+    "desc": "设置 JobManager JVM 的最小开销内存，确保 JVM 有足够的内存用于运行。此参数用于预留 JVM 的非堆内存开销，包括线程栈空间、编译缓存等。增加此值可以缓解内存瓶颈，避免 JVM 频繁进行垃圾回收。",
+    "type": "discrete",
+    "range": [
+      null,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "192 mb"
+  },
+  "jobmanager.memory.process.size": {
+    "desc": "设置 JobManager 进程的总内存大小，包括 JVM heap、off-heap、网络缓冲等。此参数影响 JobManager 的内存使用情况，适当增加此值可以缓解内存瓶颈，确保 JobManager 能够处理更多的任务和状态信息。该值包括所有 JobManager JVM 进程消耗的内存，包括总 Flink 内存、JVM Metaspace 和 JVM Overhead。",
+    "type": "continuous",
+    "range": [
+      1024,
+      65536
+    ],
+    "dtype": "int",
+    "default_value": "(none)"
+  },
+  "parallelism.default": {
+    "desc": "设置 Flink 作业的默认并行度，若未指定并行度则使用该值。增加此值可以缓解 CPU 瓶颈，提升作业的执行效率。默认值为1，最大值为128。",
+    "type": "discrete",
+    "range": [
+      null,
+      null
+    ],
+    "dtype": "int",
+    "default_value": "1"
+  },
+  "restart-strategy.fixed-delay.attempts": {
+    "desc": "设置固定延迟重启策略的重启尝试次数；用于控制在任务失败时的重启次数，能够缓解系统在故障恢复时的 CPU 瓶颈。增大该值可以提高任务的恢复能力，但可能导致资源占用增加；减小该值可以加快失败检测，但可能导致任务丢失。",
+    "type": "discrete",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 1
+  },
+  "restart-strategy.fixed-delay.delay": {
+    "desc": "该参数设置固定延迟重启策略的重启延迟时间，单位为毫秒。它用于控制在任务失败后的重启等待时间，能够缓解系统在故障恢复时的网络瓶颈。增大该值可以减少重启频率，降低系统负载；减小该值可以加快重启速度，但可能导致资源竞争。",
+    "type": "continuous",
+    "range": [
+      0,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 10000
+  },
+  "restart-strategy": {
+    "desc": "定义在任务失败时的重启策略，以缓解系统在故障恢复时的内存瓶颈。可选值包括：'none'（不重启）、'fixed-delay'（固定延迟重启）、'failure-rate'（基于失败率的重启）、'exponential-delay'（指数延迟重启）。",
+    "type": "discrete",
+    "range": null,
+    "dtype": "string",
+    "default_value": "none"
+  },
+  "state.backend.incremental": {
+    "desc": "该参数用于设置是否启用增量快照，控制状态快照的存储方式。启用增量快照可以减少存储空间的使用，并缓解系统在状态管理时的磁盘IO瓶颈，但可能会增加恢复时间。",
+    "type": "discrete",
+    "range": null,
+    "dtype": "boolean",
+    "default_value": "false"
+  },
+  "state.backend": {
+    "desc": "设置状态后端类型；用于定义 Flink 如何存储状态，能够缓解系统在状态管理时的 disk IO 瓶颈。可选值包括 'memory'、'filesystem' 和 'rocksdb'。",
+    "type": "discrete",
+    "range": null,
+    "dtype": "string",
+    "default_value": "memory"
+  },
+  "state.backend.rocksdb.block.cache-size": {
+    "desc": "设置 RocksDB 的块缓存大小，单位为字节。该参数用于控制 RocksDB 在内存中缓存的数据块数量，从而提高读取性能。",
+    "type": "continuous",
+    "range": [
+      0,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "8 mb"
+  },
+  "state.backend.rocksdb.checkpoint.transfer.thread.num": {
+    "desc": "该参数设置每个有状态操作符用于传输（下载和上传）RocksDBStateBackend文件的线程数量。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 4
+  },
+  "state.backend.rocksdb.compaction.level.max-size-level-base": {
+    "desc": "设置 RocksDB 的最大压缩级别基础大小，单位为字节。该参数用于优化存储性能，能够缓解系统在状态管理时的磁盘 I/O 瓶颈。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "256 mb"
+  },
+  "state.backend.rocksdb.thread.num": {
+    "desc": "该参数设置 RocksDB 的最大并发后台刷新和压缩作业数量（每个有状态操作符）。",
+    "type": "discrete",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 2
+  },
+  "state.backend.rocksdb.use-bloom-filter": {
+    "desc": "该参数用于设置是否启用 Bloom Filter，以优化 RocksDB 的查询性能。",
+    "type": "discrete",
+    "range": null,
+    "dtype": "boolean",
+    "default_value": "false"
+  },
+  "state.backend.rocksdb.write-batch-size": {
+    "desc": "设置 RocksDB 的写批处理大小，单位为字节。该参数用于优化写入性能。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "2 mb"
+  },
+  "state.backend.rocksdb.writebuffer.count": {
+    "desc": "设置 RocksDB 的写缓冲区数量，用于优化写入性能。",
+    "type": "continuous",
+    "range": [
+      1,
+      null
+    ],
+    "dtype": "int",
+    "default_value": 2
+  },
+  "taskmanager.memory.flink.size": {
+    "desc": "设置 TaskManager 用于 Flink 的内存大小，主要用于 Flink 的内部数据结构和状态管理。",
+    "type": "continuous",
+    "range": [
+      0,
+      65536
+    ],
+    "dtype": "int",
+    "default_value": 1024
+  },
+  "taskmanager.memory.managed.fraction": {
+    "desc": "该参数设置 TaskManager 管理的内存占总内存的比例，控制 Flink 的内存使用。",
+    "type": "continuous",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "dtype": "float",
+    "default_value": 0.4
+  },
+  "taskmanager.memory.managed.size": {
+    "desc": "设置 TaskManager 管理的内存大小，主要用于 Flink 的状态管理和数据处理。",
+    "type": "continuous",
+    "range": [
+      0,
+      65536
+    ],
+    "dtype": "int",
+    "default_value": 0
+  },
+  "taskmanager.memory.network.fraction": {
+    "desc": "设置 TaskManager 网络缓冲区占总内存的比例，控制网络缓冲区的大小。",
+    "type": "continuous",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "dtype": "float",
+    "default_value": 0.1
+  },
+  "taskmanager.memory.network.max": {
+    "desc": "最大网络内存大小，用于TaskExecutors。",
+    "type": "continuous",
+    "range": [
+      0,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "1 gb"
+  },
+  "taskmanager.memory.network.min": {
+    "desc": "设置 TaskManager 网络缓冲区的最小大小，确保在低负载情况下网络缓冲区不会过小。",
+    "type": "continuous",
+    "range": [
+      0,
+      65536
+    ],
+    "dtype": "string",
+    "default_value": "64 mb"
+  },
+  "taskmanager.memory.process.size": {
+    "desc": "设置 TaskManager 进程的总内存大小，包括 JVM heap、off-heap、网络缓冲等。",
+    "type": "continuous",
+    "range": [
+      1024,
+      65536
+    ],
+    "dtype": "int",
+    "default_value": 1024
+  },
+  "taskmanager.memory.task.heap.size": {
+    "desc": "设置 TaskManager 任务的堆内存大小，主要用于任务的计算和状态管理。",
+    "type": "continuous",
+    "range": [
+      0,
+      65536
+    ],
+    "dtype": "int",
+    "default_value": 1024
+  },
+  "taskmanager.memory.task.off-heap.size": {
+    "desc": "设置 TaskManager 任务的 off-heap 内存大小，主要用于存储大对象和避免 JVM 的垃圾回收。",
+    "type": "discrete",
+    "range": [
+      null,
+      null
+    ],
+    "dtype": "string",
+    "default_value": "0 bytes"
+  },
+  "taskmanager.numberOfTaskSlots": {
+    "desc": "该参数设置 TaskManager 的任务槽数量，决定了单个 TaskManager 可以并行处理的任务数量。",
+    "type": "discrete",
+    "range": [
+      1,
+      128
+    ],
+    "dtype": "int",
+    "default_value": 1
+  }
+}

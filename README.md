@@ -14,14 +14,13 @@ https://gitee.com/openeuler/A-Tune/tree/euler-copilot-tune/
 （注意：分支指定为euler-copilot-tune）
 2. 安装其他依赖
 ```bash
-#1.python venv依赖
+#1.调优程序运行机器安装python venv依赖
 yum install python3-devel krb5-devel
-#2.调优依赖
+#2.目标应用所在机器安装调优依赖并重启sysstat
 yum install sysstat perf
-#3.重启sysstat
 systemctl start sysstat
 ```
-3. 安装python依赖:
+3. 调优程序运行机器安装python依赖:
 ```BASH
 #1.创建并加载python venv
 python3 -m venv venv
@@ -50,14 +49,19 @@ servers:
     port:                                                               #应用所在ip的具体port
     app: "mysql"                                                        #当前支持mysql、nginx、pgsql、spark
     target_process_name: "mysqld"                                       #调优应用的name
-    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"       #调优应用的描述（用于策略生成）
+    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"           #调优应用的描述（用于策略生成）
     max_retries: 3
     delay: 1.0
     
 feature:
   - need_restart_application: False                                     #修改参数之后是否需要重启应用使参数生效
+    need_recover_cluster: False                                         #调优过程中是否需要恢复集群
     microDep_collector: True                                            #是否开启微架构指标踩采集
     pressure_test_mode: True                                            #是否通过压测模拟负载环境
+    tune_system_param: False                                            #是否调整系统参数
+    tune_app_param: True                                                #是否调整应用参数
+    strategy_optimization: False                                        #是否需要策略推荐
+    benchmark_timeout: 3600                                             #benchmark执行超时限制
 ```
 
 2.  完善app_config.yaml，放入项目的config/app_config.yaml中（重点是补充set_param_template、get_param_template、benchmark脚本），具体内容如下：
@@ -73,6 +77,14 @@ mysql:
   start_workload: "systemctl start mysqld"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
   performance_metric: "QPS"
+
+flink:
+  set_param_template: 'sh /home/wsy/set_param.sh $param_name $param_value'
+  get_param_template: 'sh /home/wsy/get_param.sh $param_name'
+  benchmark: "sh /home/wsy/nexmark_test.sh"
+  stop_workload: 'docker exec -i flink_jm_8c32g bash -c "source /etc/profile && /usr/local/flink-1.16.3/bin/stop-cluster.sh && /usr/local/nexmark/bin/shutdown_cluster.sh"'
+  start_workload: 'docker exec -i flink_jm_8c32g bash -c "source /etc/profile && /usr/local/flink-1.16.3/bin/start-cluster.sh"'
+  performance_metric: "THROUGHPUT"
 
 pgsql:
   user: "postgres"
@@ -102,14 +114,46 @@ nginx:
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
   performance_metric: "QPS"
 
+ceph:
+  set_param_template: 'ceph config set osd "$param_name" "$param_value"'
+  get_param_template: 'sh /path/of/get_params.sh'
+  start_workload: "sh /path/of/restart_ceph.sh"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/parse_benchmark.sh"
+  performance_metric: "BANDWIDTH"
+
+gaussdb:
+  user: ""
+  password: ""
+  config_file: "/path/of/config_file"
+  port: 5432
+  set_param_template: 'gs_guc set -Z datanode  -N all -I all -c "${param_name}=${param_value}"'
+  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}"'
+  stop_workload: "cm_ctl stop -m i"
+  start_workload: "cm_ctl start"
+  recover_workload: "$EXECUTE_MODE:local sh /path/of/gaussdb_cluster_recover.sh"
+  benchmark: "$EXECUTE_MODE:local sh/path/of/gaussdb_benchmark.sh"
+  performance_metric: "DURATION"
+
 system:
   set_param_template: 'sysctl -w $param_name=$param_value'
   get_param_template: 'sysctl $param_name'
+
+redis:
+  port: 6379
+  config_file: "/etc/redis.conf"
+  set_param_template: "sed -i 's/^$param_name/$param_name $param_value/g' $config_file"
+  get_param_template: "grep -P '$param_name' $config_file | awk '{print $2}"
+  start_workload: "systemctl start redis"
+  stop_workload: "systemctl stop redis"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/redis/parse_benchmark.sh $host_ip $port "
+  performance_metric: "QPS"
+
 
 ```
 其中：
 set_param_template:根据调优结果修改应用参数，用于后续测试效果
 get_param_template:获取应用参数
+recover_workload: 恢复集群
 benchmark:benchmark脚本，格式如下：
 
 ```bash
@@ -128,7 +172,7 @@ echo $time_taken
 3. 运行EulerCopilot
 ```bash
 export PYTHONPATH="`pwd`:$PYTHONPATH"
-python3 src/testmain.py
+python3 src/start_tune.py
 ```
 ### 常见问题解决
 

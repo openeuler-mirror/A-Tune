@@ -11,10 +11,10 @@ _pressure_test_result = ExecuteResult(
 )  # 注意除了PressureTest线程能修改外，其他线程不应修改该结果
 
 
-def wait_for_pressure_test(timeout=300):
+def wait_for_pressure_test(timeout=3600):
     """
     等待压测线程完成或超时。
-    :param timeout: 超时时间（秒，默认300秒）
+    :param timeout: 超时时间（秒，默认3600秒）
     :return: 压测结果或超时提示
     """
     start_time = time.time()

@@ -51,6 +51,7 @@ def lscpu_parser(output: str) -> dict:
 def free_parser(output: str) -> dict:
     """解析 `free -b` 输出，并将内存大小转换为 GB"""
     metrics = {}
+
     parts = output.split()
     if len(parts) >= 2 and parts[0].startswith("Mem"):
         total_bytes = int(parts[1])

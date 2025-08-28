@@ -1,10 +1,11 @@
-# 知识库加载一次即可
-import threading
 import logging
+import threading
 from typing import Iterable
+
 from tqdm import tqdm
-from src.utils.config.global_config import param_config
+
 from src.utils.config.app_config import AppInterface
+from src.utils.config.global_config import param_config
 from src.utils.shell_execute import SshClient
 
 
@@ -12,37 +13,51 @@ class ParamKnowledge:
     _instance = None
     _lock = threading.Lock()
 
-    def __new__(cls, ssh_client: SshClient):
+    def __new__(cls,
+                ssh_client: SshClient,
+                tune_system_param: bool = False,
+                tune_app_param: bool = True):
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
                     cls._instance = super(ParamKnowledge, cls).__new__(cls)
                     cls._instance.param_config = param_config
                     cls._instance.ssh_client = ssh_client  # 保存 ssh_client
+                    cls._instance.tune_system_param = tune_system_param
+                    cls._instance.tune_app_param = tune_app_param
         return cls._instance
 
-    def __init__(self, ssh_client: SshClient):
+    def __init__(self,
+                 ssh_client: SshClient,
+                 tune_system_param: bool = False,
+                 tune_app_param: bool = True):
         logging.info(f"[ParamKnowledge] initializing param knowledge base ...")
         # 防止重复初始化
+        if not hasattr(self, "tune_system_param"):
+            self.tune_system_param = tune_system_param
+        if not hasattr(self, "tune_app_param"):
+            self.tune_app_param = tune_app_param
         if not hasattr(self, "ssh_client"):
             self.ssh_client = ssh_client
 
-    def get_params(self, app_name, enable_system_tuning):
-        app_params = self.param_config.get(app_name, {})
-        if not app_params:
-            raise ValueError(f"App '{app_name}' not found in param_config.")
-
-        # 只有在启用系统调优时才加载并检查系统参数
-        if enable_system_tuning:
-            system_params = self.param_config.get("system", {})
-            duplicate_keys = set(system_params) & set(app_params)
-            if duplicate_keys:
-                raise RuntimeError(
-                    f"Duplicate keys ({duplicate_keys}) detected between system and app '{app_name}'."
-                )
-            return list(system_params.keys()) + list(app_params.keys())
-        else:
-            return list(app_params.keys())
+    def get_params(self, app_name):
+        # check 应用和系统参数是否有重名的
+        logging.info(f"[ParamKnowledge] checking params ...")
+        system_params = set()
+        app_params = set()
+        all_params = []
+        if self.tune_system_param:
+            system_params = set(self.param_config.get("system", {}).keys())
+            all_params += list(self.param_config.get("system").keys())
+        if self.tune_app_param:
+            app_params = set(self.param_config.get(app_name, {}).keys())
+            all_params += list(self.param_config.get(app_name).keys())
+        union_params = system_params & app_params
+        if union_params:
+            raise RuntimeError(
+                f"Duplicate keys ({union_params}) detected between application parameters and system parameters."
+            )
+        return all_params
 
     def describe_param_background_knob(self, app_name: str, params: Iterable):
         logging.info(f"[ParamKnowledge] building param knowledge base ...")
@@ -80,11 +95,11 @@ class ParamKnowledge:
 
 
 if __name__ == "__main__":
-
     class Result:
         def __init__(self, status_code, output):
             self.status_code = status_code
             self.output = output
+
 
     class SshClient:
         def __init__(self):
@@ -92,6 +107,7 @@ if __name__ == "__main__":
 
         def run_cmd(self, cmd):
             return Result(0, "12")
+
 
     ssh_client = SshClient()
     param_knowledge = ParamKnowledge(ssh_client)
