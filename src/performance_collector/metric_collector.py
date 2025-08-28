@@ -19,54 +19,31 @@ class MetricCollector:
     def __init__(
         self,
         ssh_client: SshClient,
-        host_ip: str,
-        host_port: int,
-        host_user: str,
-        host_password: str,
         app: str = None,
         pressure_test_mode: bool = False,
     ):
         self.args = CollectorArgs(
-            host_ip=host_ip,
-            host_port=host_port,
-            host_user=host_user,
-            host_password=host_password,
+            ssh_client=ssh_client
         )
         self.app = app  # 新增app属性
         self.pressure_test_mode = pressure_test_mode
         self.cpu_collector = CpuCollector(
             cmd=get_cpu_cmd(),
-            host_ip=self.args.host_ip,
-            host_port=self.args.host_port,
-            host_user=self.args.host_user,
-            host_password=self.args.host_password,
+            ssh_client=self.args.ssh_client,
         )
         self.disk_collector = DiskCollector(
             cmd=get_disk_cmd(),
-            host_ip=self.args.host_ip,
-            host_port=self.args.host_port,
-            host_user=self.args.host_user,
-            host_password=self.args.host_password,
+            ssh_client=self.args.ssh_client,
         )
         self.memory_collector = MemoryCollector(
             cmd=get_memory_cmd(),
-            host_ip=self.args.host_ip,
-            host_port=self.args.host_port,
-            host_user=self.args.host_user,
-            host_password=self.args.host_password,
+            ssh_client=self.args.ssh_client,
         )
         self.network_collector = NetworkCollector(
             cmd=get_network_cmd(),
-            host_ip=self.args.host_ip,
-            host_port=self.args.host_port,
-            host_user=self.args.host_user,
-            host_password=self.args.host_password,
+            ssh_client=self.args.ssh_client,
         )
         self.app_collector = AppCollector(
-            host_ip=self.args.host_ip,
-            host_port=self.args.host_port,
-            host_user=self.args.host_user,
-            host_password=self.args.host_password,
             ssh_client=ssh_client,
             app=app,
         )

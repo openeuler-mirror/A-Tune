@@ -67,7 +67,7 @@ class AppMetaConfig:
     password: str
     config_file: str
     host_ip: str
-    host_port: str
+    host_port: int
     SCRIPTS_DIR: str = field(default_factory=default_scripts_dir)
 
 
@@ -225,11 +225,11 @@ class AppTemplate:
 
     def get_calculate_type(self):
         if self.performance_metric == PerformanceMetric.DURATION or self.performance_metric == PerformanceMetric.RT:
-            # 耗时和响应时间越小越好，使用 min
-            return min, -1
+            # 耗时和响应时间等越小越好
+            return -1
         else:
-            # QPS 和吞吐量越大越好，使用 max
-            return max, 1
+            # QPS 和吞吐量等越大越好
+            return 1
 
 
 # 将配置文件反序列化成可执行的函数，例如：

@@ -49,7 +49,9 @@ def parse_redis_info(info_output: str) -> dict:
                 ),
             }
         )
-    return {k: v for k, v in info.items() if v is not None}
+    cmd = "redis-cli INFO"
+    result = {k: v for k, v in info.items() if v is not None}
+    return {cmd: result}
 
 
 @snapshot_task(
@@ -59,19 +61,20 @@ def parse_redis_info(info_output: str) -> dict:
 )
 def parse_commandstats(commandstats_output: str) -> dict:
     """解析 commandstats 为每个命令调用次数和平均耗时"""
-    stats = {}
+    result = {}
     for line in commandstats_output.strip().splitlines():
         if not line.startswith("cmdstat_"):
             continue
         parts = line.split(":")
         cmd = parts[0].replace("cmdstat_", "")
         values = dict(item.split("=") for item in parts[1].split(","))
-        stats[cmd] = {
+        result[cmd] = {
             "调用次数": int(values.get("calls", 0)),
             "总耗时（微秒）": int(values.get("usec", 0)),
             "平均耗时（微秒）": float(values.get("usec_per_call", 0)),
         }
-    return stats
+    cmd = "redis-cli INFO commandstats"
+    return {cmd: result}
 
 
 @snapshot_task(
@@ -99,5 +102,6 @@ def parse_hit_rate_from_info_stats(info_stats_output: str) -> dict:
 
     total = hits + misses
     hit_rate = round(hits / total * 100, 2) if total else 0.0
-
-    return {"命中次数": hits, "未命中次数": misses, "命中率(%)": hit_rate}
+    cmd = "redis-cli INFO commandstats"
+    result = {"命中次数": hits, "未命中次数": misses, "命中率(%)": hit_rate}
+    return {cmd: result}

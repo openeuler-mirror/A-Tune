@@ -1,7 +1,7 @@
-import re
 import json
+import re
+
 from src.utils.collector.metric_collector import (
-    period_task,
     snapshot_task,
     CollectMode,
 )
@@ -23,15 +23,14 @@ def parse_ceph_s(output: str) -> dict:
     # recovery speed
     recovery_match = re.search(r"recovery io.*?([\d\.]+)\s*([KMGT]?B)/s", output)
     if recovery_match:
-        result["恢复速度"] = recovery_match.group(1)+recovery_match.group(2)
+        result["恢复速度"] = recovery_match.group(1) + recovery_match.group(2)
 
     # slow ops
     slow_ops_match = re.search(r"(\d+)\s+slow ops", output)
     if slow_ops_match:
         result["慢请求数"] = int(slow_ops_match.group(1))
 
-    return result
-
+    return {"ceph -s": result}
 
 
 @snapshot_task(
@@ -64,7 +63,7 @@ def parse_ceph_df_output(text: str) -> dict:
             continue
 
         parts = re.split(r'\s{2,}|\t', line)
-        
+
         if section == 'raw' and len(parts) >= 6:
             storage = {
                 "类型": parts[0],
@@ -95,7 +94,7 @@ def parse_ceph_df_output(text: str) -> dict:
             }
             result["存储池"].append(pool)
 
-    return result
+    return {"ceph df": result}
 
 
 @snapshot_task(
@@ -108,63 +107,7 @@ def parse_ceph_pg_stat(output: str) -> dict:
     pg_match = re.search(r"(\d+)\s+active.+", output)
     if pg_match:
         result["PG 总数"] = int(pg_match.group(1))
-    return result
-
-
-def parse_raw_to_dict(raw_str):
-    """
-    解析原始多OSD字符串成字典
-    输入示例：
-    osd.0: { ...json... }
-    osd.1: { ...json... }
-    返回：
-    { "osd.0": {...}, "osd.1": {...} }
-    """
-    pattern = re.compile(r'(osd\.\d+):\s*({.*?})(?=(?:\nosd\.\d+:)|\Z)', re.S)
-    parsed = {}
-    for m in pattern.finditer(raw_str):
-        osd_name = m.group(1)
-        json_str = m.group(2)
-        try:
-            parsed[osd_name] = json.loads(json_str)
-        except json.JSONDecodeError:
-            parsed[osd_name] = {}
-    return parsed
-
-def get_value_by_path(d, path):
-    """
-    递归访问嵌套字典d，path为"key1.key2.key3"形式
-    找不到返回None
-    """
-    keys = path.split('.')
-    cur = d
-    for k in keys:
-        if not isinstance(cur, dict):
-            return None
-        cur = cur.get(k)
-        if cur is None:
-            return None
-    return cur
-
-def extract_metrics_with_path_map(parsed_dict, path_map):
-    """
-    遍历每个osd的数据，根据path_map提取对应字段，转换成中文key
-    path_map = {"osd.op_r": "读请求数", ...}
-    返回：
-    {
-      "osd.0": {"读请求数": 1000, ...},
-      "osd.1": {...}
-    }
-    """
-    result = {}
-    for osd_name, data in parsed_dict.items():
-        metrics = {}
-        for eng_path, cn_name in path_map.items():
-            val = get_value_by_path(data, eng_path)
-            if val is not None:
-                metrics[cn_name] = val
-        result[osd_name] = metrics
-    return result
+    return {"ceph pg stat": result}
 
 
 @snapshot_task(
@@ -219,4 +162,4 @@ def parse_perf_dump_str(raw_str: str) -> dict:
 
         result[osd_name] = metrics
 
-    return result
+    return {"ceph tell osd.* perf dump": result}

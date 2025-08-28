@@ -1,13 +1,13 @@
 import logging
-import pandas as pd
 from io import StringIO
+
+import pandas as pd
+
 from src.utils.collector.metric_collector import (
     period_task,
     snapshot_task,
     CollectMode,
-    CollectType,
 )
-
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -54,7 +54,7 @@ def pg_stat_bgwriter_parser(output: list[str]) -> dict:
     result = {}
     for key, label in mapping.items():
         new_label = f"{BIG_WRITER_COLLECT_INTERVAL // 60}分钟内{label}"
-        
+
         old_val = row1.get(key, 0)
         new_val = row2.get(key, 0)
 
@@ -64,8 +64,8 @@ def pg_stat_bgwriter_parser(output: list[str]) -> dict:
             delta = 0  # 如果解析失败就默认 0
 
         result[new_label] = max(delta, 0)  # 防止 PostgreSQL 重启导致出现负值
-
-    return result
+    cmd = "su - postgres -c \"/usr/local/pgsql/bin/psql --csv -c 'SELECT * FROM pg_stat_bgwriter;'\""
+    return {cmd: result}
 
 
 @snapshot_task(
@@ -85,7 +85,8 @@ def pg_stat_activity_parser(output: str) -> dict:
     for _, row in df.iterrows():
         raw = dict(row)
         result.append({mapping.get(k, k): v for k, v in raw.items()})
-    return {"连接信息": result}
+    cmd = "su - postgres -c \"/usr/local/pgsql/bin/psql --csv -c 'SELECT datname, state, wait_event_type, wait_event FROM pg_stat_activity;'\""
+    return {cmd: result}
 
 
 @snapshot_task(
@@ -107,7 +108,8 @@ def pg_stat_database_parser(output: str) -> dict:
     for _, row in df.iterrows():
         raw = dict(row)
         result.append({mapping.get(k, k): v for k, v in raw.items()})
-    return {"数据库统计": result}
+    cmd = "su - postgres -c \"/usr/local/pgsql/bin/psql --csv -c 'SELECT datname, numbackends, xact_commit, xact_rollback, blks_read, blks_hit FROM pg_stat_database;'\""
+    return {cmd: result}
 
 
 @snapshot_task(
@@ -122,4 +124,5 @@ def pg_locks_parser(output: str) -> dict:
     for _, row in df.iterrows():
         raw = dict(row)
         result.append({mapping.get(k, k): v for k, v in raw.items()})
-    return {"锁信息": result}
+    cmd = "su - postgres -c \"/usr/local/pgsql/bin/psql --csv -c 'SELECT mode, granted, COUNT(*) as count FROM pg_locks GROUP BY mode, granted;'\""
+    return {cmd: result}

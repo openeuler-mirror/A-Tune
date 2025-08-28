@@ -1,9 +1,9 @@
 import logging
-from src.utils.shell_execute import SshClient
+
 from src.performance_optimizer.param_recommender import ParamRecommender
-from src.utils.metrics import PerformanceMetric
-from src.utils.config.app_config import AppInterface
 from src.performance_test.pressure_test import wait_for_pressure_test
+from src.utils.config.app_config import AppInterface
+from src.utils.shell_execute import SshClient
 
 # 配置日志
 logging.basicConfig(
@@ -14,18 +14,20 @@ logging.basicConfig(
 class ParamOptimizer:
 
     def __init__(
-        self,
-        service_name: str,
-        slo_goal: float,
-        analysis_report: str,
-        static_profile: str,
-        ssh_client: SshClient,
-        slo_calc_callback: callable,
-        max_iterations: int = 10,
-        need_restart_application: bool = False,
-        need_recover_cluster: bool = False,
-        pressure_test_mode: bool = False,
-        enable_system_tuning: bool = False
+            self,
+            service_name: str,
+            slo_goal: float,
+            analysis_report: str,
+            static_profile: str,
+            ssh_client: SshClient,
+            slo_calc_callback: callable,
+            max_iterations: int = 10,
+            need_restart_application: bool = False,
+            pressure_test_mode: bool = False,
+            tune_system_param: bool = False,
+            tune_app_param: bool = True,
+            need_recover_cluster: bool = False,
+            benchmark_timeout: int = 3600
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
@@ -49,9 +51,12 @@ class ParamOptimizer:
             static_profile=static_profile,
             performance_analysis_report=analysis_report,
             ssh_client=ssh_client,
-            enable_system_tuning=enable_system_tuning
+            tune_system_param=tune_system_param,
+            tune_app_param=tune_app_param
         )
         self.first_restart_save = True
+        self.benchmark_timeout=benchmark_timeout
+
     def calc_improve_rate(self, baseline, benchmark_result, symbol):
         return self.slo_calc_callback(baseline, benchmark_result, symbol)
 
@@ -61,9 +66,9 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        print("🔄 正在验证benchmark性能...")
+        logging.info("🔄 正在验证benchmark性能...")
         result = self.app_interface.benchmark()
-        if result.status_code == 0:
+        if result.status_code == 0 and result.output:
             return float(result.output)
         else:
             raise RuntimeError(f"failed to execute benchmark because {result.err_msg}")
@@ -72,12 +77,12 @@ class ParamOptimizer:
         for param_name, param_value in recommend_params.items():
             apply_result = self.app_interface.set_param(param_name, param_value)
             if apply_result.status_code == 0:
-                print(f"设置参数{param_name}为{param_value}")
+                logging.info(f"设置参数{param_name}为{param_value}")
             else:
-                print(f"设置参数{param_name}失败，原因是：{apply_result.err_msg}")
+                logging.info(f"设置参数{param_name}失败，原因是：{apply_result.err_msg}")
 
     def restart_application(self):
-        print("🔄 正在重启应用 ...")
+        logging.info("🔄 正在重启应用 ...")
         stop_result = self.app_interface.stop_workload()
         if stop_result.status_code != 0:
             raise RuntimeError(
@@ -127,12 +132,11 @@ class ParamOptimizer:
 
         print(f"已将 {len(commands)} 个参数写入重启脚本: {script_path}")
 
-
     def run(self):
         # 运行benchmark，摸底参数性能指标
         if self.pressure_test_mode:
             logging.info(f"[ParamOptimizer] waiting for pressure test finished ...")
-            pressure_test_result = wait_for_pressure_test()
+            pressure_test_result = wait_for_pressure_test(timeout=self.benchmark_timeout)
 
             if pressure_test_result.status_code != 0:
                 raise RuntimeError(
@@ -145,27 +149,23 @@ class ParamOptimizer:
             )
         else:
             baseline = self.benchmark()
-            if self.need_recover_cluster:
-                self.recover_cluster()
-
         # 保存每轮调优的结果，反思调优目标是否达到
-        history = []
-        last_result = baseline
+        historys = {
+            "历史最佳结果": {},
+            "历史最差结果": {},
+            "上一轮调优结果": {}
+        }
         best_result = baseline
-        compare_func, symbol = self.app_interface.get_calculate_type()
-        ratio = self.calc_improve_rate(baseline, last_result, symbol)
-        print(
-            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
+        worst_result = baseline
+        is_positive = True
+        symbol = self.app_interface.get_calculate_type()
+        logging.info(
+            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}"
         )
 
         for i in range(self.max_iterations):
             # 未达成目标的情况下，根据调优结果与历史最优的参数，执行参数调优推荐，给出参数名和参数值
-            if last_result * symbol > best_result * symbol:
-                prompt_pos = True
-            else:
-                prompt_pos = False
-
-            recommend_params = self.param_recommender.run(history_result=history, prompt_pos=prompt_pos)
+            recommend_params = self.param_recommender.run(history_result=historys, is_positive=is_positive)
 
             # 设置参数生效
             self.apply_params(recommend_params)
@@ -180,34 +180,36 @@ class ParamOptimizer:
                 self.save_restart_params_to_script(recommend_params, script_path, i + 1)
                 self.recover_cluster()
 
-            last_result = performance_result
-
-            history.append(
-                (
-                    "提升{:.2%}".format(
-                        self.calc_improve_rate(baseline, performance_result, symbol)
-                    ),
-                    recommend_params,
-                )
-            )
-            if best_result is None:
-                best_result = compare_func(baseline, performance_result)
+            if performance_result * symbol < baseline:
+                is_positive = False
             else:
-                best_result = compare_func(best_result, performance_result)
+                is_positive = True
 
-            ratio = self.calc_improve_rate(baseline, last_result, symbol)
+            if performance_result * symbol > best_result * symbol:
+                best_result = performance_result
+                best_history = {"最佳性能": performance_result, "参数推荐": recommend_params}
+                historys["历史最佳结果"] = best_history
+
+            if performance_result * symbol < worst_result * symbol:
+                worst_result = performance_result
+                worst_history = {"最差性能": performance_result, "参数推荐": recommend_params}
+                historys["历史最差结果"] = worst_history
+
+            historys["上一轮调优结果"] = {"上一轮性能": performance_result, "参数推荐": recommend_params}
+
+            ratio = self.calc_improve_rate(baseline, performance_result, symbol)
 
             # 达到预期效果，则退出循环
             if self.reached_goal(baseline, performance_result, symbol):
-                print(
-                    f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
+                logging.info(
+                    f"[{i + 1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 本轮结果:{performance_result if performance_result is not None else '-'}, 性能提升：{ratio:.2%}"
                 )
                 break
 
-            print(
-                f"[{i+1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 上一轮结果:{last_result if last_result is not None else '-'}, 性能提升：{ratio:.2%}"
+            logging.info(
+                f"[{i + 1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 本轮结果:{performance_result if performance_result is not None else '-'}, 性能提升：{ratio:.2%}"
             )
 
-        print(
+        logging.info(
             f"调优完毕，{'达到' if self.reached_goal(baseline, best_result, symbol) else '未达到'} 预期目标"
         )

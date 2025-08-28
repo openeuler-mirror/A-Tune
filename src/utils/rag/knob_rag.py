@@ -1,17 +1,19 @@
 import json
-import os
-import re
-import faiss
-import pickle
-import numpy as np
-from tqdm import tqdm
-from typing import Any, Dict, Tuple, List
 import logging
+import os
+import pickle
+import re
+from typing import Any, Dict, Tuple
+
+import faiss
+import numpy as np
 from sklearn.preprocessing import normalize
-from pathlib import Path
+from tqdm import tqdm
+
 from src.utils.llm import get_llm_response, get_embedding
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 class KnobRag:
     def __init__(self, config_path: str, bottle_neck: str, application: str, system_report: str):
@@ -19,12 +21,12 @@ class KnobRag:
         self.application = application
         self.system_report = system_report
         self.config = self.load_config(config_path)
-        self.topk: int = self.config.get("topk", 10)  
+        self.topk: int = self.config.get("topk", 10)
         self.threshold: float = self.config.get("threshold", 0.5)
 
     def load_config(
-        self,
-        config_path: str
+            self,
+            config_path: str
     ) -> Dict[str, Any]:
         try:
             with open(config_path, "r", encoding="utf-8") as f:
@@ -36,19 +38,19 @@ class KnobRag:
         except json.JSONDecodeError:
             logging.error(f"配置文件 {config_path} 格式错误。")
             raise Exception(f"配置文件 {config_path} 格式错误。")
-    
+
     def get_query_list(
-        self,
+            self,
     ) -> list:
-#         prompt = f"""
-# 你是一个经验丰富的linux故障分析专家，你的任务是根据给定的系统分析报告，分析出当前系统存在的问题。
-# 根据系统分析报告给出的结果，你需要做如下两件事情：
-# 1.分析系统报告，根据系统报告判断哪些方面有问题，描述该问题可能产生的原因
-# 2.输出有问题的情况，针对没有潜在问题和性能瓶颈的方面请不要输出，包括对系统的建议也不要输出
-# 分析的结果用list格式输出，严格按照一行一个结果的格式，以数字开头，不要添加额外的输入语句，不要换行，一条问题写一行，每条结果前面加上数字编号后面跟上输出结果。
-# 请注意仅仅只输出系统中有问题的指标，如果该场景没有问题也没有明显瓶颈，就不要输出在结果中，另外针对系统的建议也不需要输出。
-# 系统分析报告是：{self.system_report}
-#         """
+        #         prompt = f"""
+        # 你是一个经验丰富的linux故障分析专家，你的任务是根据给定的系统分析报告，分析出当前系统存在的问题。
+        # 根据系统分析报告给出的结果，你需要做如下两件事情：
+        # 1.分析系统报告，根据系统报告判断哪些方面有问题，描述该问题可能产生的原因
+        # 2.输出有问题的情况，针对没有潜在问题和性能瓶颈的方面请不要输出，包括对系统的建议也不要输出
+        # 分析的结果用list格式输出，严格按照一行一个结果的格式，以数字开头，不要添加额外的输入语句，不要换行，一条问题写一行，每条结果前面加上数字编号后面跟上输出结果。
+        # 请注意仅仅只输出系统中有问题的指标，如果该场景没有问题也没有明显瓶颈，就不要输出在结果中，另外针对系统的建议也不需要输出。
+        # 系统分析报告是：{self.system_report}
+        #         """
         prompt = f"""
         # CONTEXT # 
         当前linux系统性能分析报告是:
@@ -81,8 +83,8 @@ class KnobRag:
 
     # 构建索引
     def build_index(
-        self, 
-        file_name: str,
+            self,
+            file_name: str,
     ) -> Tuple[faiss.IndexFlatIP, list]:
         docs = []
         # with open(f"{file_name}.jsonl", "r", encoding="utf-8") as f:
@@ -121,14 +123,14 @@ class KnobRag:
     # 召回top5且阈值大于0.6的样本
     # 返回值类型？
     def retrieve(
-        self, 
-        index: faiss.Index, 
-        docs: list, 
-        query_list: list,
+            self,
+            index: faiss.Index,
+            docs: list,
+            query_list: list,
     ) -> list:
         result = {}
         unique = set()
-        
+
         for query_data in query_list:
             query_embedding = get_embedding(query_data)
             D, I = index.search(normalize(np.array(query_embedding).astype('float32').reshape(1, -1)), self.topk)
@@ -161,7 +163,6 @@ class KnobRag:
             application_result = []
         final_result = system_result + application_result
         return [x["param_name"] for x in final_result]
-
 
 # if __name__ == "__main__":
 #     system_report = """一、CPU性能分析
@@ -203,5 +204,5 @@ class KnobRag:
 #     config_path = r"D:\github\tuning\src\utils\rag\rag_config.json"
 #     rag = KnobRag(config_path=config_path, bottle_neck="CPU", application="mysql", system_report=system_report)
 #     ret = rag.run()
-    # print(ret)
-    # ret=['vm.swappiness', 'vm.min_free_kbytes', 'vm.dirty_expire_centisecs', 'vm.overcommit_ratio', 'vm.dirty_background_ratio', 'vm.dirty_bytes', 'vm.dirty_background_bytes', 'kernel.shmmax', 'kernel.shmall', 'vm.drop_caches']
+# print(ret)
+# ret=['vm.swappiness', 'vm.min_free_kbytes', 'vm.dirty_expire_centisecs', 'vm.overcommit_ratio', 'vm.dirty_background_ratio', 'vm.dirty_bytes', 'vm.dirty_background_bytes', 'kernel.shmmax', 'kernel.shmall', 'vm.drop_caches']

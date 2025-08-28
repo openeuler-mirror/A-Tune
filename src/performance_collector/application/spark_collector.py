@@ -27,7 +27,8 @@ def spark_job_info(app_id: str) -> dict:
     if not app_id:
         return {}
     try:
-        resp = requests.get(f"{SPARK_HISTORY_SERVER}/api/v1/applications/{app_id}/jobs", timeout=10)
+        cmd = f"{SPARK_HISTORY_SERVER}/api/v1/applications/{app_id}/jobs"
+        resp = requests.get(cmd, timeout=10)
         jobs = resp.json()
         total_jobs = len(jobs)
         running_jobs = sum(1 for job in jobs if job["status"] == "RUNNING")
@@ -47,7 +48,7 @@ def spark_job_info(app_id: str) -> dict:
             "跳过Task总数": total_skipped_tasks,
             "已完成Stage总数": total_completed_stages,
         }
-        return {"spark作业信息": result}
+        return {cmd: result}
 
     except Exception as e:
         logging.warning(f"获取 job 信息失败: {e}")
@@ -65,7 +66,8 @@ def spark_stage_info(app_id: str) -> dict:
         return {}
 
     try:
-        resp = requests.get(f"{SPARK_HISTORY_SERVER}/api/v1/applications/{app_id}/stages", timeout=10)
+        cmd = f"{SPARK_HISTORY_SERVER}/api/v1/applications/{app_id}/stages"
+        resp = requests.get(cmd, timeout=10)
         stages = resp.json()
         total_stages = len(stages)
         total_tasks = sum(s.get("numTasks", 0) for s in stages)
@@ -84,7 +86,7 @@ def spark_stage_info(app_id: str) -> dict:
             "总Memory Spill": total_mem_spill,
             "总Disk Spill": total_disk_spill,
         }
-        return {"spark阶段信息": result}
+        return {cmd: result}
     except Exception as e:
         logging.warning(f"获取 stage 信息失败: {e}")
         return {}
@@ -104,6 +106,9 @@ def spark_executor_info(output: list[str]) -> dict:
     if len(output) < 2:
         return {}
     try:
+        cmd = "curl -s {}/api/v1/applications/$(curl -s {}/api/v1/applications | jq -r '.[0].id')/executors".format(
+            SPARK_HISTORY_SERVER, SPARK_HISTORY_SERVER
+        )
         data1 = json.loads(output[0])
         data2 = json.loads(output[1])
 
@@ -135,7 +140,7 @@ def spark_executor_info(output: list[str]) -> dict:
             "失败任务数": metrics2["failed_tasks"],
             f"{DURATION}s内平均每Executor任务增长数": avg_tasks_per_executor
         }
-        return {"spark执行器信息": result}
+        return {cmd: result}
     except Exception as e:
         logging.error(f"解析 executor 指标失败: {e}")
         return {}

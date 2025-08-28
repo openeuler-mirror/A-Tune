@@ -1,4 +1,4 @@
-# main.py
+# start_workflow.py
 from src.performance_test.pressure_test import PressureTest, wait_for_pressure_test
 import time
 

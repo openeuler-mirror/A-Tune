@@ -1,10 +1,7 @@
-from typing import Dict, Any, List
 import logging
-import json
-import re
 
 from src.performance_collector import static_profile_collector
-from src.utils.shell_execute import cmd_pipeline, get_registered_cmd_funcs, SshClient
+from src.utils.shell_execute import get_registered_cmd_funcs
 from src.utils.thread_pool import ThreadPoolManager
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,7 +18,7 @@ class StaticMetricProfileCollector:
         self.thread_pool = ThreadPoolManager(max_workers=max_workers)
         self.sequential_pool = []
         self._add_tasks(
-            # 获取这些模块所以注册的cmd parser接口，提交到线程池执行
+            # 获取这些模块所有注册的cmd parser接口，提交到线程池执行
             static_profile_collector
         )
 
@@ -50,6 +47,6 @@ class StaticMetricProfileCollector:
             if task_result.result.status_code == 0:
                 parsed_results[task_result.tag].update(task_result.result.output)
             else:
-                logging.error(f"error while execute task {task_result.func_name}, err_msg is {task_result.result}")
+                logging.warning(f"error while execute task {task_result.func_name}, err_msg is {task_result.result}")
 
         return parsed_results

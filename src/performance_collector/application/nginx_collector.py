@@ -1,12 +1,8 @@
 import logging
-import pandas as pd
 import re
-from io import StringIO
 from src.utils.collector.metric_collector import (
     period_task,
-    snapshot_task,
     CollectMode,
-    CollectType,
 )
 
 logging.basicConfig(
@@ -88,5 +84,5 @@ def parse_nginx_status(output: list[str]) -> dict:
         f"{DURATION}s内平均QPS": avg_qps,
     }
     result.update(avg_conns)
-    return result
+    return {"curl -s http://127.0.0.1:10000/status": result}
 

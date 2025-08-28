@@ -44,7 +44,7 @@ class ThreadPoolManager:
     def __init__(self, max_workers: int = 5):
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
         self.tasks: Dict[str, concurrent.futures.Future] = {}
-        self.all_results: List[Dict[str, Any]] = []
+        self.all_results: List[TaskResult] = []
         self.pending: list[tuple[str, Callable, tuple, dict]] = []
         self.tag_map: dict = {}
         self.task_meta: Dict[str, str] = {}
@@ -141,7 +141,7 @@ class ThreadPoolManager:
                 )
             )
 
-    def get_all_results(self) -> List[Dict[str, Any]]:
+    def get_all_results(self) -> List[TaskResult]:
         self.wait_all()
         self.tasks.clear()
         return self.all_results
@@ -150,7 +150,7 @@ class ThreadPoolManager:
 class SerialTaskManager:
     def __init__(self):
         self.tasks: List[Tuple[str, Callable, Tuple, Dict]] = []
-        self.all_results: List[Dict[str, Any]] = []
+        self.all_results: List[TaskResult] = []
         self.tag_map: dict = {}
         self.task_meta: Dict[str, str] = {}
 
@@ -227,7 +227,7 @@ class SerialTaskManager:
             task_result = self.run_task_with_timeout(task_id, func, args, kwargs)
             self.all_results.append(task_result)
 
-    def get_all_results(self) -> List[Dict[str, Any]]:
+    def get_all_results(self) -> List[TaskResult]:
         self.tasks.clear()
         return self.all_results
 
