@@ -75,7 +75,6 @@ class ParamRecommender:
             history_result, optimized_idea, cur_params_set, is_positive
         )
 
-        recommended_params = self.recommend(history_result, optimized_idea, cur_params_set, optimization_feedback_tip)
         recommended_params_set = json_repair(recommended_params)
 
         result = {}
@@ -84,7 +83,7 @@ class ParamRecommender:
                 result[param_name] = param_value
         return result
 
-    def run(self, history_result, is_positive):
+    def run(self, history_result, is_positive=True):
         resultset = {}
 
         for i in range(0, len(self.params_set), self.chunk_size):
@@ -176,49 +175,3 @@ class ParamRecommender:
         response = get_llm_response(prompt)
         return response
 
-
-if __name__ == "__main__":
-    from src.config import config
-
-    ssh_client = SshClient(
-        host_ip=config["servers"][0]["ip"],
-        host_port=22,
-        host_user="root",
-        host_password=config["servers"][0]["password"],
-        max_retries=3,
-        delay=1.0,
-    )
-
-    metric_collector = StaticMetricProfileCollector(
-        ssh_client=ssh_client, max_workers=5
-    )
-
-    static_profile = metric_collector.run()
-
-    app = "mysql"
-    testCollector = MetricCollector(
-        host_ip=config["servers"][0]["ip"],
-        host_port=22,
-        host_user="root",
-        host_password=config["servers"][0]["password"],
-        app=app,
-    )
-    data = testCollector.run()
-
-    testAnalyzer = PerformanceAnalyzer(data=data)
-    performance_analysis_report, bottleneck = testAnalyzer.run()
-    param_recommender = ParamRecommender(
-        service_name="mysql",
-        metric_objective="QPS",
-        service_objective="10%",
-        static_profile=static_profile,
-        performance_analysis_report=performance_analysis_report,
-    )
-
-    response = param_recommender.run(history_result=None, baseline_result=43219.43)
-    print(">>>>>>>>>>>>>>>>>>>>>>性能调优思路如下：")
-    print(response)
-
-    response = param_recommender.recommend(response)
-    print(">>>>>>>>>>>>>>>>>>>>>>推荐参数如下：")
-    print(response)

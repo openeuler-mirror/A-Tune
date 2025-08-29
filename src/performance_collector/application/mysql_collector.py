@@ -4,10 +4,15 @@ from src.utils.collector.metric_collector import (
     snapshot_task,
     CollectMode,
 )
+from src.utils.config.global_config import env_config
+
+mysql_config = env_config.get("app_config").get("mysql")
+mysql_user = mysql_config["user"]
+mysql_password = mysql_config["password"]
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Connections';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Connections';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL服务器连接次数",
 )
@@ -18,7 +23,7 @@ def parse_mysql_connections(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Uptime';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Uptime';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL启动时间（秒）",
 )
@@ -29,7 +34,7 @@ def parse_mysql_uptime(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Innodb_rows_%';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Innodb_rows_%';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL Innodb 行操作数",
 )
@@ -40,7 +45,7 @@ def parse_mysql_innodb_rows(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_select';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_select';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL SELECT 执行次数",
 )
@@ -51,7 +56,7 @@ def parse_mysql_com_select(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_insert';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_insert';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL INSERT 执行次数",
 )
@@ -62,7 +67,7 @@ def parse_mysql_com_insert(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_update';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_update';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL UPDATE 执行次数",
 )
@@ -73,7 +78,7 @@ def parse_mysql_com_update(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_delete';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Com_delete';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL DELETE 执行次数",
 )
@@ -84,7 +89,7 @@ def parse_mysql_com_delete(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW STATUS LIKE '%THREAD%'\"",
+    cmd=f"mysql -s -N -e \"SHOW STATUS LIKE '%THREAD%';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL 线程信息",
 )
@@ -95,7 +100,7 @@ def parse_mysql_threads(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Slow_queries';\"",
+    cmd=f"mysql -s -N -e \"SHOW GLOBAL STATUS LIKE 'Slow_queries';\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL 慢查询次数",
 )
@@ -106,7 +111,7 @@ def parse_mysql_slow_queries(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW PROFILES\"",
+    cmd=f"mysql -s -N -e \"SHOW PROFILES;\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL Profiling 信息",
 )
@@ -116,7 +121,7 @@ def parse_mysql_profiles(output: str) -> Dict:
 
 
 @snapshot_task(
-    cmd="mysql -s -N -e \"SHOW PROCESSLIST\"",
+    cmd=f"mysql -s -N -e \"SHOW PROCESSLIST;\" -u{mysql_user} -p{mysql_password}",
     collect_mode=CollectMode.ASYNC,
     tag="MySQL ProcessList 信息",
 )

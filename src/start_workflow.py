@@ -65,10 +65,6 @@ def run_collector():
     # 2. 动态指标
     metric_collector = MetricCollector(
         ssh_client=ssh_client,
-        host_ip=host_ip,
-        host_port=host_port,
-        host_user=host_user,
-        host_password=host_password,
         app=app_name,
         pressure_test_mode=False,
     )
