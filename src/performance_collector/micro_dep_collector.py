@@ -185,60 +185,64 @@ class TopDownCollector(PerfCollector):
     def process(self):
         """处理TopDown性能数据"""
         # 提取微架构参数
-        dispatch_size = self.FW_CONFIG["dispatch_size"]
+        if self.raw_data["cycle"] != 0 and self.raw_data["execstall_cycle"] != 0:
+            dispatch_size = self.FW_CONFIG["dispatch_size"]
 
-        # 计算各级指标
-        cycle = self.raw_data["cycle"]
-        inst_retired = self.raw_data["inst_retired"]
-        execstall_cycle = self.raw_data["execstall_cycle"]
+            # 计算各级指标
+            cycle = self.raw_data["cycle"]
+            inst_retired = self.raw_data["inst_retired"]
+            execstall_cycle = self.raw_data["execstall_cycle"]
 
-        # L1 指标
-        self.processed_data['frontend_bound'] = self.raw_data['fetch_bubble'] / (dispatch_size * cycle) * 100
-        self.processed_data['bad_spec'] = (self.raw_data['inst_spec'] - inst_retired) / (dispatch_size * cycle) * 100
-        self.processed_data['retiring'] = inst_retired / (dispatch_size * cycle) * 100
-        self.processed_data['backend_bound'] = 100 - sum([
-            self.processed_data['frontend_bound'],
-            self.processed_data['bad_spec'],
-            self.processed_data['retiring']
-        ])
+            # L1 指标
+            self.processed_data['frontend_bound'] = self.raw_data['fetch_bubble'] / (dispatch_size * cycle) * 100
+            self.processed_data['bad_spec'] = (self.raw_data['inst_spec'] - inst_retired) / (
+                    dispatch_size * cycle) * 100
+            self.processed_data['retiring'] = inst_retired / (dispatch_size * cycle) * 100
+            self.processed_data['backend_bound'] = 100 - sum([
+                self.processed_data['frontend_bound'],
+                self.processed_data['bad_spec'],
+                self.processed_data['retiring']
+            ])
 
-        # L2 指标
-        self.processed_data['frontend_latency_bound'] = self.raw_data['fetch_bubble_max'] / cycle * 100
-        self.processed_data['frontend_bandwidth_bound'] = self.processed_data['frontend_bound'] - self.processed_data[
-            'frontend_latency_bound']
+            # L2 指标
+            self.processed_data['frontend_latency_bound'] = self.raw_data['fetch_bubble_max'] / cycle * 100
+            self.processed_data['frontend_bandwidth_bound'] = self.processed_data['frontend_bound'] - \
+                                                              self.processed_data[
+                                                                  'frontend_latency_bound']
 
-        mispred = self.raw_data['brmisspred']
-        o3flush = self.raw_data['o3flush']
-        self.processed_data['bs_mispred'] = self.processed_data['bad_spec'] * mispred / (mispred + o3flush)
-        self.processed_data['bs_mclear'] = self.processed_data['bad_spec'] - self.processed_data['bs_mispred']
+            mispred = self.raw_data['brmisspred']
+            o3flush = self.raw_data['o3flush']
+            self.processed_data['bs_mispred'] = self.processed_data['bad_spec'] * mispred / (mispred + o3flush)
+            self.processed_data['bs_mclear'] = self.processed_data['bad_spec'] - self.processed_data['bs_mispred']
 
-        memstall_anyload = self.raw_data['memstall_anyload']
-        memstall_anystore = self.raw_data['memstall_anystore']
-        self.processed_data['core_bound'] = (execstall_cycle - memstall_anyload - memstall_anystore) / execstall_cycle * \
-                                            self.processed_data['backend_bound']
-        self.processed_data['mem_bound'] = (memstall_anyload + memstall_anystore) / execstall_cycle * \
-                                           self.processed_data['backend_bound']
+            memstall_anyload = self.raw_data['memstall_anyload']
+            memstall_anystore = self.raw_data['memstall_anystore']
+            self.processed_data['core_bound'] = (
+                                                        execstall_cycle - memstall_anyload - memstall_anystore) / execstall_cycle * \
+                                                self.processed_data['backend_bound']
+            self.processed_data['mem_bound'] = (memstall_anyload + memstall_anystore) / execstall_cycle * \
+                                               self.processed_data['backend_bound']
 
-        # L3 指标
-        self.processed_data['core_fsu_bound'] = self.raw_data['fsustall'] / cycle * 100
-        self.processed_data['core_other_bound'] = self.processed_data['core_bound'] - self.processed_data[
-            'core_fsu_bound']
+            # L3 指标
+            self.processed_data['core_fsu_bound'] = self.raw_data['fsustall'] / cycle * 100
+            self.processed_data['core_other_bound'] = self.processed_data['core_bound'] - self.processed_data[
+                'core_fsu_bound']
 
-        memstall_l1miss = self.raw_data['memstall_l1miss']
-        memstall_l2miss = self.raw_data['memstall_l2miss']
-        self.processed_data['mem_l1_bound'] = (memstall_anyload - memstall_l1miss) / execstall_cycle * \
-                                              self.processed_data['backend_bound']
-        self.processed_data['mem_l2_bound'] = (memstall_anyload - memstall_l2miss) / execstall_cycle * \
-                                              self.processed_data['backend_bound']
-        self.processed_data['mem_l3_dram_bound'] = memstall_l2miss / execstall_cycle * self.processed_data[
-            'backend_bound']
-        self.processed_data['mem_store_bound'] = memstall_anystore / execstall_cycle * self.processed_data[
-            'backend_bound']
+            memstall_l1miss = self.raw_data['memstall_l1miss']
+            memstall_l2miss = self.raw_data['memstall_l2miss']
+            self.processed_data['mem_l1_bound'] = (memstall_anyload - memstall_l1miss) / execstall_cycle * \
+                                                  self.processed_data['backend_bound']
+            self.processed_data['mem_l2_bound'] = (memstall_anyload - memstall_l2miss) / execstall_cycle * \
+                                                  self.processed_data['backend_bound']
+            self.processed_data['mem_l3_dram_bound'] = memstall_l2miss / execstall_cycle * self.processed_data[
+                'backend_bound']
+            self.processed_data['mem_store_bound'] = memstall_anystore / execstall_cycle * self.processed_data[
+                'backend_bound']
 
-        # 系统指标
-        self.processed_data['context_switches'] = self.raw_data['context_switches']
-        self.processed_data['cpu_migrations'] = self.raw_data['cpu_migrations']
-        self.processed_data['page_faults'] = self.raw_data['page_faults']
+            # 系统指标
+            self.processed_data['context_switches'] = self.raw_data['context_switches']
+            self.processed_data['cpu_migrations'] = self.raw_data['cpu_migrations']
+            self.processed_data['page_faults'] = self.raw_data['page_faults']
 
 
 class CacheCollector(PerfCollector):
@@ -254,20 +258,21 @@ class CacheCollector(PerfCollector):
 
     def process(self):
         """处理缓存性能数据"""
-        inst_retired = self.raw_data['inst_retired']
+        if self.raw_data['l1i_access'] != 0:
+            inst_retired = self.raw_data['inst_retired']
 
-        # 计算各级缓存指标
-        self.processed_data['l1i_missrate'] = self.raw_data['l1i_refill'] / self.raw_data['l1i_access'] * 100
-        self.processed_data['l1d_missrate'] = self.raw_data['l1d_refill'] / self.raw_data['l1d_access'] * 100
+            # 计算各级缓存指标
+            self.processed_data['l1i_missrate'] = self.raw_data['l1i_refill'] / self.raw_data['l1i_access'] * 100
+            self.processed_data['l1d_missrate'] = self.raw_data['l1d_refill'] / self.raw_data['l1d_access'] * 100
 
-        self.processed_data['l2i_missrate'] = self.raw_data['l2i_refill'] / self.raw_data['l2i_access'] * 100
-        self.processed_data['l2d_missrate'] = self.raw_data['l2d_refill'] / self.raw_data['l2d_access'] * 100
+            self.processed_data['l2i_missrate'] = self.raw_data['l2i_refill'] / self.raw_data['l2i_access'] * 100
+            self.processed_data['l2d_missrate'] = self.raw_data['l2d_refill'] / self.raw_data['l2d_access'] * 100
 
-        self.processed_data['l1i_mpki'] = self.raw_data['l1i_refill'] / inst_retired * 1000
-        self.processed_data['l1d_mpki'] = self.raw_data['l1d_refill'] / inst_retired * 1000
+            self.processed_data['l1i_mpki'] = self.raw_data['l1i_refill'] / inst_retired * 1000
+            self.processed_data['l1d_mpki'] = self.raw_data['l1d_refill'] / inst_retired * 1000
 
-        self.processed_data['l2i_mpki'] = self.raw_data['l2i_refill'] / inst_retired * 1000
-        self.processed_data['l2d_mpki'] = self.raw_data['l2d_refill'] / inst_retired * 1000
+            self.processed_data['l2i_mpki'] = self.raw_data['l2i_refill'] / inst_retired * 1000
+            self.processed_data['l2d_mpki'] = self.raw_data['l2d_refill'] / inst_retired * 1000
 
 
 class BranchCollector(PerfCollector):
@@ -283,15 +288,16 @@ class BranchCollector(PerfCollector):
 
     def process(self):
         """处理分支预测性能数据"""
-        cycle = self.raw_data['cycle']
-        brmisspred = self.raw_data['brmisspred']
-        brpred = self.raw_data['brpred']
+        if self.raw_data['cycle'] != 0 and self.raw_data['brmisspred'] != 0 and self.raw_data['brpred'] != 0:
+            cycle = self.raw_data['cycle']
+            brmisspred = self.raw_data['brmisspred']
+            brpred = self.raw_data['brpred']
 
-        # 分支预测相关指标
-        self.processed_data['branch_missrate'] = brmisspred / (brmisspred + brpred) * 100
-        self.processed_data['alu_isq_stall'] = self.raw_data['alu_isq_stall'] / cycle * 100
-        self.processed_data['lsu_isq_stall'] = self.raw_data['lsu_isq_stall'] / cycle * 100
-        self.processed_data['fsu_isq_stall'] = self.raw_data['fsu_isq_stall'] / cycle * 100
+            # 分支预测相关指标
+            self.processed_data['branch_missrate'] = brmisspred / (brmisspred + brpred) * 100
+            self.processed_data['alu_isq_stall'] = self.raw_data['alu_isq_stall'] / cycle * 100
+            self.processed_data['lsu_isq_stall'] = self.raw_data['lsu_isq_stall'] / cycle * 100
+            self.processed_data['fsu_isq_stall'] = self.raw_data['fsu_isq_stall'] / cycle * 100
 
 
 class TlbCollector(PerfCollector):
@@ -307,29 +313,30 @@ class TlbCollector(PerfCollector):
 
     def process(self):
         """处理TLB性能数据"""
-        inst_retired = self.raw_data['inst_retired']
-        cycle = self.raw_data['cycle']
+        if self.raw_data['inst_retired'] != 0 and self.raw_data['cycle'] != 0:
+            inst_retired = self.raw_data['inst_retired']
+            cycle = self.raw_data['cycle']
 
-        # TLB相关指标
-        self.processed_data['l1i_tlb_missrate'] = self.raw_data['l1i_tlb_refill'] / self.raw_data['l1i_tlb'] * 100
-        self.processed_data['l1d_tlb_missrate'] = self.raw_data['l1d_tlb_refill'] / self.raw_data['l1d_tlb'] * 100
+            # TLB相关指标
+            self.processed_data['l1i_tlb_missrate'] = self.raw_data['l1i_tlb_refill'] / self.raw_data['l1i_tlb'] * 100
+            self.processed_data['l1d_tlb_missrate'] = self.raw_data['l1d_tlb_refill'] / self.raw_data['l1d_tlb'] * 100
 
-        self.processed_data['l2i_tlb_missrate'] = self.raw_data['l2i_tlb_refill'] / self.raw_data['l2i_tlb'] * 100
-        self.processed_data['l2d_tlb_missrate'] = self.raw_data['l2d_tlb_refill'] / self.raw_data['l2d_tlb'] * 100
+            self.processed_data['l2i_tlb_missrate'] = self.raw_data['l2i_tlb_refill'] / self.raw_data['l2i_tlb'] * 100
+            self.processed_data['l2d_tlb_missrate'] = self.raw_data['l2d_tlb_refill'] / self.raw_data['l2d_tlb'] * 100
 
-        self.processed_data['itlb_walk_rate'] = self.raw_data['itlb_walk'] / self.raw_data['l1i_tlb'] * 100
-        self.processed_data['dtlb_walk_rate'] = self.raw_data['dtlb_walk'] / self.raw_data['l1d_tlb'] * 100
+            self.processed_data['itlb_walk_rate'] = self.raw_data['itlb_walk'] / self.raw_data['l1i_tlb'] * 100
+            self.processed_data['dtlb_walk_rate'] = self.raw_data['dtlb_walk'] / self.raw_data['l1d_tlb'] * 100
 
-        self.processed_data['l1i_tlb_mpki'] = self.raw_data['l1i_tlb_refill'] / inst_retired * 1000
-        self.processed_data['l1d_tlb_mpki'] = self.raw_data['l1d_tlb_refill'] / inst_retired * 1000
+            self.processed_data['l1i_tlb_mpki'] = self.raw_data['l1i_tlb_refill'] / inst_retired * 1000
+            self.processed_data['l1d_tlb_mpki'] = self.raw_data['l1d_tlb_refill'] / inst_retired * 1000
 
-        self.processed_data['l2i_tlb_mpki'] = self.raw_data['l2i_tlb_refill'] / inst_retired * 1000
-        self.processed_data['l2d_tlb_mpki'] = self.raw_data['l2d_tlb_refill'] / inst_retired * 1000
+            self.processed_data['l2i_tlb_mpki'] = self.raw_data['l2i_tlb_refill'] / inst_retired * 1000
+            self.processed_data['l2d_tlb_mpki'] = self.raw_data['l2d_tlb_refill'] / inst_retired * 1000
 
-        self.processed_data['itlb_walk_mpki'] = self.raw_data['itlb_walk'] / inst_retired * 1000
-        self.processed_data['dtlb_walk_mpki'] = self.raw_data['dtlb_walk'] / inst_retired * 1000
+            self.processed_data['itlb_walk_mpki'] = self.raw_data['itlb_walk'] / inst_retired * 1000
+            self.processed_data['dtlb_walk_mpki'] = self.raw_data['dtlb_walk'] / inst_retired * 1000
 
-        self.processed_data['div_stall'] = self.raw_data['divstall'] / cycle * 100
+            self.processed_data['div_stall'] = self.raw_data['divstall'] / cycle * 100
 
 
 class MicroDepCollector:
