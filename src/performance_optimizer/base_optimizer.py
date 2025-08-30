@@ -6,6 +6,7 @@ from typing import Dict, List, Any, Tuple, Optional
 import yaml
 from pydantic import BaseModel
 
+from src.utils.constant import OPTIMIZE_CONFIG_PATH
 from src.utils.llm import get_llm_response
 from src.utils.shell_execute import SshClient
 
@@ -144,6 +145,8 @@ class BaseOptimizer:
         current_file_path = os.path.abspath(__file__)
         current_dir_path = os.path.dirname(current_file_path)
         config_file = os.path.join(current_dir_path, '..', '..', 'config', 'optimize_config.yaml')
+        if not os.path.exists(config_file) or not os.path.isfile(config_file):
+            config_file = OPTIMIZE_CONFIG_PATH
         try:
             with open(config_file, "r") as f:
                 tuning_config = yaml.safe_load(f)

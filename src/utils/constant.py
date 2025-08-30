@@ -1,0 +1,6 @@
+CONFIG_PATH = "/etc/euler-copilot-tune/config"
+KNOWLEDGE_PATH = "/etc/euler-copilot-tune/knowledge_base"
+ENV_CONFIG_PATH = "/etc/euler-copilot-tune/config/.env.yaml"
+KNOB_RAG_CONFIG_PATH = "/etc/euler-copilot-tune/config/knob_rag_config.json"
+OPTIMIZE_CONFIG_PATH = "/etc/euler-copilot-tune/config/optimize_config.yaml"
+SCRIPTS_PATH = "/etc/euler-copilot-tune/scripts"

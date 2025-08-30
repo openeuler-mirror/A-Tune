@@ -1,8 +1,8 @@
+from mcp.server import FastMCP
 import logging
 from typing import Dict, Any
 
-from fastapi import FastAPI, HTTPException
-
+from fastapi import HTTPException
 from src.config import config
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_collector.metric_collector import MetricCollector
@@ -17,20 +17,16 @@ from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
-from src.start_tune import main as start_tune
-
-# ================= FastAPI 初始化 ===================
-app = FastAPI(
-    title="性能分析与优化 API",
-    description="统一接口：Collector / Analyzer / Optimizer",
-    version="1.0.0",
-)
+from src.start_tune import run_param_optimization, run_strategy_optimization
 
 # ================= 全局配置与缓存 ===================
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 cache: Dict[str, Dict[str, Any]] = {}
+
+# 创建MCP Server
+mcp = FastMCP("性能分析与优化 MCP Server", host="0.0.0.0", port=12147)
 
 host_ip = config["servers"][0]["ip"]
 host_port = config["servers"][0]["port"]
@@ -42,11 +38,18 @@ delay = config["servers"][0]["delay"]
 
 
 # ================= Collector 接口 ===================
-@app.get("/collector")
+@mcp.tool(
+    name="Collector",
+    description="采集数据"
+)
 def run_collector():
+    """
+    采集机器的性能指标，直接输出，不要发散和删减内容
+    """
+
     if not host_ip:
         raise HTTPException(
-            status_code=400, detail=f"需要输入待调优机器IP，否则无法采集数据"
+            status_code=400, detail=f"请参考部署使用指南，预设待调优机器IP，否则无法采集数据"
         )
     ssh_client = SshClient(
         host_ip=host_ip,
@@ -95,8 +98,14 @@ def run_collector():
 
 
 # ================= Analyzer 接口 ===================
-@app.get("/analyzer")
+@mcp.tool(
+    name="Analyzer",
+    description="分析采集到的数据"
+)
 def run_analyzer():
+    """
+    对机器的性能瓶颈进行分析，前提是必须已经进行了数据的采集run_collector，直接输出，不要发散和删减内容
+    """
     if not host_ip or host_ip not in cache or "metrics" not in cache[host_ip]:
         raise HTTPException(
             status_code=400, detail=f"{host_ip} 缺少 metrics，请先采集数据，再进行分析"
@@ -113,8 +122,14 @@ def run_analyzer():
 
 
 # ================= Optimizer（参数+策略）接口 ===================
-@app.get("/optimizer")
+@mcp.tool(
+    name="Optimizer",
+    description="参数+策略"
+)
 def run_optimizer():
+    """
+    优化机器的性能，推荐相应参数，前提是必须已经进行了数据的分析run_analyzer，直接输出，不要发散和删减内容
+    """
     if (
             not host_ip
             or host_ip not in cache
@@ -171,22 +186,42 @@ def run_optimizer():
     }
 
 
-# ================= tune（开始调优）接口 ===================
-@app.get("/start_tune")
+@mcp.tool(
+    name="StartTune",
+    description="开始调优"
+)
 def tune():
     """
     此工具用于开始调优，只有用户明确需要开始调优才调用；
     此工具耗时预计1小时，需要提醒用户注意等待执行结束；
     结果在日志中查看 ，journalctl -xe -u tune-mcpserver --all -f
     """
-    start_tune()
+    feature_cfg = config["feature"][0]
+    report = cache[host_ip]["report"]
+    bottleneck = cache[host_ip]["bottleneck"]
+    server_cfg = config["servers"][0]
+    static_profile_info = cache[host_ip]["static_profile"]
+    ssh_client = SshClient(
+        host_ip=host_ip,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        max_retries=max_retries,
+        delay=delay,
+    )
+    run_param_optimization(
+        server_cfg["app"], report, static_profile_info, ssh_client,
+        feature_cfg["need_restart_application"], feature_cfg["pressure_test_mode"],
+        feature_cfg["tune_system_param"], feature_cfg["tune_app_param"], feature_cfg["need_recover_cluster"],
+        feature_cfg["benchmark_timeout"]
+    )
+    if feature_cfg["strategy_optimization"]:
+        run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)
     return "调优执行完成"
 
 
 def main():
-    import uvicorn
-
-    uvicorn.run(app=app, host="0.0.0.0", port=8092)
+    mcp.run(transport='sse')
 
 
 if __name__ == "__main__":

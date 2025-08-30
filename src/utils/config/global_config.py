@@ -4,6 +4,8 @@ import yaml
 from typing import Any, Optional, Dict, List
 from pathlib import Path
 
+from src.utils.constant import CONFIG_PATH, KNOWLEDGE_PATH
+
 
 class EnvironConfig:
     def __init__(self, config_dir: str):
@@ -74,11 +76,18 @@ class EnvironConfig:
                 result.append(filename)
         return result
 
-CONFIG_PATH = os.path.abspath(
+
+DEFAULT_CONFIG_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config")
 )
+if not os.path.exists(DEFAULT_CONFIG_PATH) or not os.path.isdir(DEFAULT_CONFIG_PATH):
+    DEFAULT_CONFIG_PATH = CONFIG_PATH
+
 PARAMS_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "knowledge_base", "knob_params")
 )
-env_config = EnvironConfig(CONFIG_PATH)
+if not os.path.exists(PARAMS_PATH) or not os.path.isdir(PARAMS_PATH):
+    PARAMS_PATH = os.path.join(KNOWLEDGE_PATH, "knob_params")
+
+env_config = EnvironConfig(DEFAULT_CONFIG_PATH)
 param_config = EnvironConfig(PARAMS_PATH)

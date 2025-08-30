@@ -1,11 +1,15 @@
-import pyfiglet
+
 from typing import Any
 from tabulate import tabulate
 
 
 def display_banner():
-    banner = pyfiglet.figlet_format("EulerCopilot v1.0", font="slant")
-    print(banner)
+    try:
+        import pyfiglet
+        banner = pyfiglet.figlet_format("EulerCopilot v1.0", font="slant")
+        print(banner)
+    except ImportError:
+        print("EulerCopilot v1.0")
 
 
 def truncate_string(s, max_length=30):

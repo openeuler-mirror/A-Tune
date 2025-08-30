@@ -3,7 +3,7 @@ fastapi==0.112.2
 numpy==1.26.4
 openai==1.52.0
 paramiko==3.4.1
-pydantic==2.8.2
+pydantic>=2.8.2
 PyYAML==6.0.2
 scikit_learn==1.5.1
 tqdm==4.66.4
