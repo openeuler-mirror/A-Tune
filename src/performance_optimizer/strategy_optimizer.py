@@ -2,10 +2,14 @@ import json
 import logging
 from typing import List, Dict, Optional, Tuple
 
+from src.utils.constant import KNOWLEDGE_PATH
 from .base_optimizer import BaseOptimizer
 from src.utils.llm import get_llm_response
+import os
 
 knowledge_base_path = "./src/knowledge_base/optimize/strategy/system.jsonl"
+if not os.path.exists(knowledge_base_path) or not os.path.isfile(knowledge_base_path):
+    knowledge_base_path = os.path.join(KNOWLEDGE_PATH, "optimize/strategy/system.jsonl")
 
 
 class StrategyOptimizer(BaseOptimizer):

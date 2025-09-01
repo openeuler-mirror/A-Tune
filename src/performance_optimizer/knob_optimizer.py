@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from src.utils.rag.knob_rag import KnobRag
 from .base_optimizer import BaseOptimizer
+from ..utils.constant import KNOB_RAG_CONFIG_PATH
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -54,6 +55,8 @@ class KnobOptimizer(BaseOptimizer):
                 current_file_path = os.path.abspath(__file__)
                 current_dir_path = os.path.dirname(current_file_path)
                 rag_config_path = os.path.join(current_dir_path, '..', '..', 'config', 'knob_rag_config.json')
+                if not os.path.exists(rag_config_path) or not os.path.isfile(rag_config_path):
+                    rag_config_path = KNOB_RAG_CONFIG_PATH
                 rag = KnobRag(config_path=rag_config_path, bottle_neck=self.args.bottle_neck,
                               application=self.args.application, system_report=self.args.system_report)
                 knobs = rag.run()

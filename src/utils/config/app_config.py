@@ -3,6 +3,8 @@ import re
 from enum import Enum
 from string import Template
 from dataclasses import dataclass, asdict, field
+
+from src.utils.constant import SCRIPTS_PATH
 from src.utils.shell_execute import SshClient
 from src.utils.config.global_config import env_config, param_config
 from src.utils.metrics import PerformanceMetric
@@ -24,7 +26,12 @@ def default_scripts_dir():
     scripts_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "..", "..", "scripts")
     )
-    return scripts_dir
+
+    # 检查原始目录是否存在
+    if os.path.exists(scripts_dir) and os.path.isdir(scripts_dir):
+        return scripts_dir
+    else:
+        return SCRIPTS_PATH
 
 
 def app_template(key):

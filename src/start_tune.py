@@ -1,6 +1,6 @@
 import logging
 
-from performance_collector.micro_dep_collector import MicroDepCollector, COLLECTMODE
+from src.performance_collector.micro_dep_collector import MicroDepCollector, COLLECTMODE
 from src.config import config
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
 from src.performance_collector.metric_collector import MetricCollector
