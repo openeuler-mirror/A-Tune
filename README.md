@@ -55,7 +55,7 @@ servers:
 feature:
   - need_restart_application: False                                     #修改参数之后是否需要重启应用使参数生效
     need_recover_cluster: False                                         #调优过程中是否需要恢复集群
-    microDep_collector: True                                            #是否开启微架构指标踩采集
+    microDep_collector: True                                            #是否开启微架构指标采集
     pressure_test_mode: True                                            #是否通过压测模拟负载环境
     tune_system_param: False                                            #是否调整系统参数
     tune_app_param: True                                                #是否调整应用参数
