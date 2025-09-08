@@ -183,8 +183,15 @@ def df_parser(output: str) -> dict:
     if len(lines) < 2:
         return metrics
     header = re.split(r"\s+", lines[0].strip())
-    idx_fs = header.index("Type")
-    idx_mount = header.index("Mounted")
+    if "Type" and "Mounted" in header:
+
+        idx_fs = header.index("Type")
+        idx_mount = header.index("Mounted")
+    elif "类型" and "挂载点" in header:
+        idx_fs = header.index("类型")
+        idx_mount = header.index("挂载点")
+    else:
+        return metrics
     for l in lines[1:]:
         cols = re.split(r"\s+", l.strip())
         fs = cols[idx_fs]

@@ -185,7 +185,7 @@ class TopDownCollector(PerfCollector):
     def process(self):
         """处理TopDown性能数据"""
         # 提取微架构参数
-        if self.raw_data["cycle"] != 0 and self.raw_data["execstall_cycle"] != 0:
+        try:
             dispatch_size = self.FW_CONFIG["dispatch_size"]
 
             # 计算各级指标
@@ -243,6 +243,8 @@ class TopDownCollector(PerfCollector):
             self.processed_data['context_switches'] = self.raw_data['context_switches']
             self.processed_data['cpu_migrations'] = self.raw_data['cpu_migrations']
             self.processed_data['page_faults'] = self.raw_data['page_faults']
+        except Exception as e:
+            return
 
 
 class CacheCollector(PerfCollector):
@@ -258,7 +260,7 @@ class CacheCollector(PerfCollector):
 
     def process(self):
         """处理缓存性能数据"""
-        if self.raw_data['l1i_access'] != 0:
+        try:
             inst_retired = self.raw_data['inst_retired']
 
             # 计算各级缓存指标
@@ -273,6 +275,8 @@ class CacheCollector(PerfCollector):
 
             self.processed_data['l2i_mpki'] = self.raw_data['l2i_refill'] / inst_retired * 1000
             self.processed_data['l2d_mpki'] = self.raw_data['l2d_refill'] / inst_retired * 1000
+        except Exception as e:
+            return
 
 
 class BranchCollector(PerfCollector):
@@ -288,7 +292,7 @@ class BranchCollector(PerfCollector):
 
     def process(self):
         """处理分支预测性能数据"""
-        if self.raw_data['cycle'] != 0 and self.raw_data['brmisspred'] != 0 and self.raw_data['brpred'] != 0:
+        try:
             cycle = self.raw_data['cycle']
             brmisspred = self.raw_data['brmisspred']
             brpred = self.raw_data['brpred']
@@ -298,6 +302,8 @@ class BranchCollector(PerfCollector):
             self.processed_data['alu_isq_stall'] = self.raw_data['alu_isq_stall'] / cycle * 100
             self.processed_data['lsu_isq_stall'] = self.raw_data['lsu_isq_stall'] / cycle * 100
             self.processed_data['fsu_isq_stall'] = self.raw_data['fsu_isq_stall'] / cycle * 100
+        except Exception as e:
+            return
 
 
 class TlbCollector(PerfCollector):
@@ -313,7 +319,7 @@ class TlbCollector(PerfCollector):
 
     def process(self):
         """处理TLB性能数据"""
-        if self.raw_data['inst_retired'] != 0 and self.raw_data['cycle'] != 0:
+        try:
             inst_retired = self.raw_data['inst_retired']
             cycle = self.raw_data['cycle']
 
@@ -337,6 +343,8 @@ class TlbCollector(PerfCollector):
             self.processed_data['dtlb_walk_mpki'] = self.raw_data['dtlb_walk'] / inst_retired * 1000
 
             self.processed_data['div_stall'] = self.raw_data['divstall'] / cycle * 100
+        except Exception as e:
+            return
 
 
 class MicroDepCollector:
