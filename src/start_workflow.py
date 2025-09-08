@@ -17,7 +17,7 @@ from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
-from src.start_tune import main as start_tune
+from src.start_tune import run_param_optimization, run_strategy_optimization
 
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
@@ -174,12 +174,27 @@ def run_optimizer():
 # ================= tune（开始调优）接口 ===================
 @app.get("/start_tune")
 def tune():
-    """
-    此工具用于开始调优，只有用户明确需要开始调优才调用；
-    此工具耗时预计1小时，需要提醒用户注意等待执行结束；
-    结果在日志中查看 ，journalctl -xe -u tune-mcpserver --all -f
-    """
-    start_tune()
+    feature_cfg = config["feature"][0]
+    report = cache[host_ip]["report"]
+    bottleneck = cache[host_ip]["bottleneck"]
+    server_cfg = config["servers"][0]
+    static_profile_info = cache[host_ip]["static_profile"]
+    ssh_client = SshClient(
+        host_ip=host_ip,
+        host_port=host_port,
+        host_user=host_user,
+        host_password=host_password,
+        max_retries=max_retries,
+        delay=delay,
+    )
+    run_param_optimization(
+        server_cfg["app"], report, static_profile_info, ssh_client,
+        feature_cfg["need_restart_application"], feature_cfg["pressure_test_mode"],
+        feature_cfg["tune_system_param"], feature_cfg["tune_app_param"], feature_cfg["need_recover_cluster"],
+        feature_cfg["benchmark_timeout"]
+    )
+    if feature_cfg["strategy_optimization"]:
+        run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)
     return "调优执行完成"
 
 
