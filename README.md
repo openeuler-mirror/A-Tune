@@ -6,7 +6,9 @@ EulerCopilot Tune通过采集系统、微架构、应用等维度的指标数据
 ### 软件架构
 软件架构说明
 
-### 安装教程
+### 安装部署
+
+#### 方法一：源码安装
 
 1. 下载gitee源码，gitee代码仓地址：
 https://gitee.com/openeuler/A-Tune/tree/euler-copilot-tune/
@@ -174,25 +176,70 @@ export PYTHONPATH="`pwd`:$PYTHONPATH"
 python3 src/start_tune.py
 
 ```
-#### 服务的方式运行：
+#### 方法二：源码服务方式安装
 
-1、安装服务
+##### 1、安装服务
 
 ​		进入项目目录，执行python setup.py install 
 
-2、在/etc/euler-copilot-tune 目录修改配置文件，具体内容参考上面源码部署方式
+##### 2、在/etc/euler-copilot-tune 目录修改配置文件，具体内容参考上面源码部署方式
 
-3、启动服务
+##### 3、启动服务
 
 ~~~bash
 #命令行执行如下命令
 #开启调优
 euler-copilot-tune
 #开启mcpserver 日志通过执行 journalctl -xe -u tune-mcpserver --all -f 查看
-tune-mcpserver
+systemctl start tune-mcpserver
+#开启openapi 日志通过执行 journalctl -xe -u tune-openapi --all -f 查看
+systemctl start tune-openapi
 ~~~
 
-​		
+
+
+#### 方法三：rpm包方式安装
+
+#####  1、下载rpm包
+
+地址：[https://eulermaker.compass-ci.openeuler.openatom.cn/package/download?osProject=houxu:openEuler-24.03-LTS-SP2:epol&packageName=euler-copilot-tune](https://gitee.com/link?target=https%3A%2F%2Feulermaker.compass-ci.openeuler.openatom.cn%2Fpackage%2Fdownload%3FosProject%3Dhouxu%3AopenEuler-24.03-LTS-SP2%3Aepol%26packageName%3Deuler-copilot-tune)
+
+##### 2、安装rpm包
+
+```
+#由于rpm安装过程需要使用pip下载资源，为了加快安装速度，推荐设置镜像源
+pip config set global.index-url  https://repo.huaweicloud.com/repository/pypi/simple/
+
+清华大学TUNA镜像源： https://pypi.tuna.tsinghua.edu.cn/simple
+阿里云镜像源： http://mirrors.aliyun.com/pypi/simple/
+中国科学技术大学镜像源： https://mirrors.ustc.edu.cn/pypi/simple/
+华为云镜像源： https://repo.huaweicloud.com/repository/pypi/simple/
+腾讯云镜像源：https://mirrors.cloud.tencent.com/pypi/simple/
+
+#开始安装
+x86:      dnf install euler-copilot-tune-1.0-1.oe2403sp2.x86_64.rpm
+arm:      dnf install euler-copilot-tune-1.0-1.oe2403sp2.aarch64.rpm
+备注：不要在python虚拟环境中执行，在系统环境下安装pip包
+#安装过程中会在Running scriptlet: euler-copilot-tune-1.0-1.x86_64 处停留较长时间，此处是在pip安装对应依赖包
+#可以通过如下命令查看详细日志
+tail -f /pip_install.log
+#如果按照完成后出现pip包安装失败情况，请单独执行如下命令进行安装
+pip install  fastapi numpy openai paramiko pydantic pyyaml scikit-learn tqdm uvicorn requests langchain langchain-openai email-validator httpx tabulate gssapi pandas faiss-cpu pyfiglet mcp
+```
+
+##### 3、在/etc/euler-copilot-tune 目录修改配置文件，具体内容参考上面源码部署方式
+
+##### 4、启动服务
+
+~~~bash
+#命令行执行如下命令
+#开启调优
+euler-copilot-tune
+#开启mcpserver 日志通过执行 journalctl -xe -u tune-mcpserver --all -f 查看
+systemctl start tune-mcpserver
+#开启openapi 日志通过执行 journalctl -xe -u tune-openapi --all -f 查看
+systemctl start tune-openapi
+~~~
 
 ### 常见问题解决
 
