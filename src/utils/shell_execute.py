@@ -134,6 +134,7 @@ def process_decorated_func(
         result.output = processed_result
     except Exception as e:
         print(traceback.format_exc())
+        result.status_code = -1
         result.err_msg = str(e)
     return result
 
