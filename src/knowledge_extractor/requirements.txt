@@ -1,0 +1,11 @@
+PyMuPDF==1.25.2
+html2text==2024.2.26
+httpx==0.28.1
+jieba==0.42.1
+numpy==2.3.2
+openai==1.98.0
+pandas==2.3.1
+python-docx==1.1.2
+PyYAML==6.0.2
+readability_lxml==0.8.1
+requests==2.32.4

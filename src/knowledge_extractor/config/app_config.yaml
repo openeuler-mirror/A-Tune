@@ -1,0 +1,35 @@
+# ==============================================
+# 知识库构建配置文件
+# ==============================================
+
+# 应用程序信息
+app_name: mysql
+# 参数文件路径
+params_file: ../mysql_knowledge/params.txt
+# 保存路径
+save_path: ../mysql_knowledge/
+# 滑动窗口大小
+window_size: 5000
+# 官方文档 URL 列表
+official_url: ["https://mysql.net.cn/doc/refman/8.0/en/innodb-parameters.html"]
+# Web 网页 URL 列表
+web_url: ["https://www.cnblogs.com/kevingrace/p/6133818.html"]
+# 代码路径（用于源代码参数提取）
+code_path: ../code
+# 额外补充文件列表（支持 Excel、PDF 等格式）
+append_file_paths: ["sample1.xlsx", "sample2.xlsx", "score.xlsx"]
+
+# ==============================================
+# 步骤开关配置
+# ==============================================
+
+step1: true     # 读取参数列表
+step2: true    # 获取官方文档信息
+step3: true    # 获取web网页信息
+step4: true    # 官方文档参数提取
+step5: true    # web信息参数提取
+step6: false    # 源代码参数提取
+step7: true    # GPT生成参数信息
+step8: false    # 补充文件生成参数信息
+step9: true    # 参数知识聚合
+step10: true    # 参数汇总文件生成
