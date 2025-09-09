@@ -1,0 +1,4 @@
+llm:
+  model: deepseek-chat #'deepseek-r1:14b' 'qwen2:72b'
+  api_key: 
+  base_url: 
