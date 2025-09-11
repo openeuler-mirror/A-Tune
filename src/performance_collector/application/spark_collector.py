@@ -1,15 +1,20 @@
-import logging
-import requests
 import json
+import logging
+
+import requests
+
+from src.config import config
 from src.utils.collector.metric_collector import (
     period_task,
     snapshot_task,
     CollectMode,
 )
-from src.config import config
 
-HOST_IP = config["servers"][0]["ip"]
-SPARK_HISTORY_SERVER = f"http://{HOST_IP}:18080"
+SPARK_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["listening_address"] else \
+    config["servers"][0]["ip"]
+SPARK_PORT = config["servers"][0]["listening_port"] if config["servers"][0]["listening_port"] else 18080
+
+SPARK_HISTORY_SERVER = f"http://{SPARK_HOST}:{SPARK_PORT}"
 SAMPLE_INTERVAL = 60
 SAMPLE_COUNT = 2
 DURATION = SAMPLE_INTERVAL * (SAMPLE_COUNT - 1)

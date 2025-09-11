@@ -49,6 +49,8 @@ servers:
     password: ""                                                        #登录机器的密码
     port:                                                               #应用所在ip的具体port
     app: "mysql"                                                        #当前支持mysql、nginx、pgsql、spark
+    listening_address: ""                                               #应用监听的ip(当前仅flink、nginx、spark需要填写)
+    listening_port: ""                                                  #应用监听的端口(当前仅flink、nginx、spark需要填写)
     target_process_name: "mysqld"                                       #调优应用的name
     business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"           #调优应用的描述（用于策略生成）
     max_retries: 3
@@ -63,6 +65,8 @@ feature:
     tune_app_param: True                                                #是否调整应用参数
     strategy_optimization: False                                        #是否需要策略推荐
     benchmark_timeout: 3600                                             #benchmark执行超时限制
+    max_iterations: 10                                                  #最大迭代轮数
+
 ```
 
 2.  完善app_config.yaml，放入项目的config/app_config.yaml中（重点是补充set_param_template、get_param_template、benchmark脚本），具体内容如下：

@@ -4,8 +4,10 @@ import logging
 from src.config import config
 from src.utils.collector.metric_collector import snapshot_task, CollectMode
 
-FLINK_HOST = config["servers"][0]["ip"]
-FLINK_API = f"http://{FLINK_HOST}:8081"
+FLINK_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["listening_address"] else \
+    config["servers"][0]["ip"]
+FLINK_PORT = config["servers"][0]["listening_port"] if config["servers"][0]["listening_port"] else 8081
+FLINK_API = f"http://{FLINK_HOST}:{FLINK_PORT}"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
