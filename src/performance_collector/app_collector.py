@@ -7,7 +7,7 @@ from src.utils.shell_execute import SshClient
 
 def load_app_collector(app: str):
     # 构建模块路径和类名
-    module_path = f".application.{app.lower()}_collector"
+    module_path = f"src.performance_collector.application.{app.lower()}_collector"
     try:
         # 动态导入模块（当前模块是包内的，使用相对导入）
         module = importlib.import_module(module_path, package=__package__)
