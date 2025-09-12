@@ -1,5 +1,7 @@
 import logging
 import re
+
+from src.config import config
 from src.utils.collector.metric_collector import (
     period_task,
     CollectMode,
@@ -9,6 +11,8 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+NINGX_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["listening_address"] else "127.0.0.1"
+NINGX_PORT = config["servers"][0]["listening_port"] if config["servers"][0]["listening_port"] else 10000
 
 NGINX_SAMPLE_INTERVAL = 5  # 每次采样间隔
 SAMPLE_COUNT = 13  # 采样次数
@@ -40,7 +44,7 @@ def parse_stub_status_text(text: str) -> dict:
 
 
 @period_task(
-    cmd="curl -s http://127.0.0.1:10000/status",
+    cmd=f"curl -s http://{NINGX_HOST}:{NINGX_PORT}/status",
     tag="nginx_status指标",
     delay=0,
     sample_count=SAMPLE_COUNT,
@@ -85,4 +89,3 @@ def parse_nginx_status(output: list[str]) -> dict:
     }
     result.update(avg_conns)
     return {"curl -s http://127.0.0.1:10000/status": result}
-
