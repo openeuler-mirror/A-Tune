@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from src.utils.shell_execute import SshClient
 
@@ -176,7 +176,7 @@ class TopDownCollector(PerfCollector):
 
     def __init__(
             self,
-            ssh_client: SshClient | None = None,
+            ssh_client: Optional[SshClient] = None,
             duration: float = 0.1,
             target_pid: int = 0
     ):
@@ -252,7 +252,7 @@ class CacheCollector(PerfCollector):
 
     def __init__(
             self,
-            ssh_client: SshClient | None = None,
+            ssh_client: Optional[SshClient] = None,
             duration: float = 0.1,
             target_pid: int = 0
     ):
@@ -284,7 +284,7 @@ class BranchCollector(PerfCollector):
 
     def __init__(
             self,
-            ssh_client: SshClient | None = None,
+            ssh_client: Optional[SshClient] = None,
             duration: float = 0.1,
             target_pid: int = 0
     ):
@@ -311,7 +311,7 @@ class TlbCollector(PerfCollector):
 
     def __init__(
             self,
-            ssh_client: SshClient | None = None,
+            ssh_client: Optional[SshClient] = None,
             duration: float = 0.1,
             target_pid: int = 0
     ):

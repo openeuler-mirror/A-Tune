@@ -60,7 +60,7 @@ def flink_job_detail(output: str) -> dict:
 
 @snapshot_task(
     cmd=(
-            "curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}/checkpoints"
+            f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}/checkpoints"
     ),
     tag="flink checkpoint状态",
     collect_mode=CollectMode.ASYNC
