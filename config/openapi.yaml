@@ -10,56 +10,35 @@ paths:
     get:
       summary: 获取数据采集结果
       description: 通过ip获取数据采集结果
-      parameters:
-        - name: ip
-          in: query
-          required: true
-          schema:
-            type: string
-          example: "9.82.201.111"
-          description: 待采集指标的ip地址
       responses:
         '200':
           description: 成功采集数据
           content:
             application/json:
-              schema: '#/components/schemas/ApiResponse'
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
   /analyzer:
     get:
       summary: 瓶颈分析接口
       description: 基于采集到的数据分析性能瓶颈
-      parameters:
-        - name: ip
-          in: query
-          required: true
-          schema:
-            type: string
-          example: "9.82.201.111"
-          description: 待分析瓶颈机器的ip地址
       responses:
         '200':
           description: 成功采集数据
           content:
             application/json:
-              schema: '#/components/schemas/ApiResponse'
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
   /optimizer:
     get:
       summary: 参数推荐接口
       description: 基于当前瓶颈推荐对应参数
-      parameters:
-        - name: ip
-          in: query
-          required: true
-          schema:
-            type: string
-          example: "9.82.201.111"
-          description: 待分析瓶颈机器的ip地址
       responses:
         '200':
           description: 成功采集数据
           content:
             application/json:
-              schema: '#/components/schemas/ApiResponse'
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
 components:
   schemas:
     ApiResponse:
