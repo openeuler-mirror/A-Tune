@@ -19,3 +19,4 @@ pyfiglet==1.0.3
 gssapi==1.9.0
 pandas==2.3.1
 mcp==1.6.0
+json5>=0.12.1
