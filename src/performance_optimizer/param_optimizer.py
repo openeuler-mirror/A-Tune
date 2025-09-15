@@ -180,7 +180,7 @@ class ParamOptimizer:
                 self.save_restart_params_to_script(recommend_params, script_path, i + 1)
                 self.recover_cluster()
 
-            if performance_result * symbol < baseline:
+            if performance_result * symbol < baseline * symbol:
                 is_positive = False
             else:
                 is_positive = True
