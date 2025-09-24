@@ -313,7 +313,7 @@ echo $time_taken
 ```
 
 ### 应用示例
-* [Nginx 应用验证示例](doc/zh/README.md)
+* [Nginx 应用验证示例](doc/zh/nginx.md)
 
 
 ## 常见问题解决
