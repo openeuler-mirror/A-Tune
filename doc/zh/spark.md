@@ -51,7 +51,7 @@ spark:
 
 param="$1"
 value="$2"
-config_file="/root/spark_auto_deploy_arm/spark_test/spark_params.sh"
+config_file="/xxx/spark_test/spark_params.sh"
 
 # 参数检查
 if [ -z "$param" ] || [ -z "$value" ]; then
