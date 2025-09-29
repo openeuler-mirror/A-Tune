@@ -38,7 +38,6 @@ ceph安装过程中需要多次输入机器的密码，可以通过配置免密�
 ssh-keygen
 ```
 将公钥分发到各个节点，分发公钥过程中需要输入相应虚拟机的密码：
-Huawei12#$
 ```bash
 ssh-copy-id root@ceph1
 ssh-copy-id root@ceph2
@@ -92,6 +91,7 @@ ceph-deploy new ceph1 ceph2 ceph3
 ```
 各节点之间如果没有配置免密，命令执行后需要多次输入密码。
 该命令执行成功后会生成文件ceph.conf（Ceph 集群的配置文件），ceph.mon.keyring（Monitor 节点的密钥文件），ceph-deploy-ceph.log（Monitor 节点的日志文件）。
+
 **部署MON服务**
 
 在 client 节点上，部署并初始化 MON 服务：
@@ -134,6 +134,7 @@ ceph-deploy mgr create ceph1 ceph2 ceph3
 ceph-deploy admin client ceph1 ceph2 ceph3
 ```
 执行成功后，可以通过 ceph -s 来查看集群中的守护管理进程（ceph-mgr）是否正常运行。
+
 **禁用不安全的MON认证恢复**
 
 在client节点执行，auth_allow_insecure_global_id_reclaim 是 Ceph 配置中的一个参数，默认情况下，Ceph 可能会在认证恢复时使用全局 ID，禁用它可以提高集群的安全性：
@@ -141,6 +142,7 @@ ceph-deploy admin client ceph1 ceph2 ceph3
 ceph config set mon auth_allow_insecure_global_id_reclaim false
 ```
 执行过程中没有error报错，表示执行成功。
+
 **创建OSD存储**
 
 在三个ceph节点，ceph1、ceph2、ceph3上执行。
@@ -151,6 +153,28 @@ lsblk
 ##### 新创建磁盘分区
 
 ```
+umount /dev/mapper/openeuler-home                     # 卸载 /home 逻辑卷（确保数据不被占用才能操作）
+e2fsck -f /dev/mapper/openeuler-home                  # 强制检查并修复 /home 文件系统
+resize2fs /dev/mapper/openeuler-home 20G              # 调整文件系统大小为 20G
+lvreduce -L 20G /dev/mapper/openeuler-home            # 缩小逻辑卷大小到 20G（要先缩文件系统，再缩逻辑卷）
+mount /dev/mapper/openeuler-home /home                # 重新挂载 /home 逻辑卷
+df -h /home                                           # 查看 /home 挂载点的磁盘使用情况
+pvresize --setphysicalvolumesize XG /dev/vda3         # 调整物理卷 /dev/vda3 的可用大小为 XG
+vgdisplay openeuler                                   # 查看卷组 openeuler 的信息
+lvcreate -n ceph-osd-01 -L 9G openeuler               # 在卷组 openeuler 中创建一个 9G 的逻辑卷 ceph-osd-01
+ceph-volume lvm prepare --data /dev/openeuler/ceph-osd-01  # 使用 ceph-volume 工具准备 OSD，指定数据盘为新建的逻辑卷
+
+umount /dev/mapper/openeuler-home
+e2fsck -f /dev/mapper/openeuler-home
+resize2fs /dev/mapper/openeuler-home 20G
+lvreduce -L 20G /dev/mapper/openeuler-home
+mount /dev/mapper/openeuler-home /home
+df -h /home
+pvresize --setphysicalvolumesize  XG /dev/vda3
+vgdisplay openeuler
+lvcreate -n ceph-osd-02 -L 9G openeuler
+ceph-volume lvm prepare --data /dev/openeuler/ceph-osd-02
+
 umount /dev/mapper/openeuler-home
 e2fsck -f /dev/mapper/openeuler-home
 resize2fs /dev/mapper/openeuler-home 20G
@@ -212,4 +236,130 @@ ceph -s
     usage:   414 MiB used, 2.6 GiB / 3.0 GiB avail
     pgs:     33 active+clean
 
+```
+# 部署 copilot
+* 详细安装方法参见[EulerCopilot Tune 安装使用指南](../../README.md)
+
+## 1. 下载 copilot 源码
+```bash
+git clone https://gitee.com/openeuler/A-Tune.git
+cd A-Tune/
+# 切换到 euler-copilot-tune 分支
+git checkout euler-copilot-tune
+```
+## 2. 安装系统依赖
+```bash
+pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+## 3. 修改配置文件
+*  __环境信息 config/.env.yaml 配置__
+```YAML
+# LLM 服务配置示例
+# 根据实际使用的模型服务（如 OpenAI、通义千问、deepseek 等）填写以下字段
+LLM_KEY: "sk-XXXXXX"                    # 必填：模型服务的 API 密钥
+LLM_URL: "https://api.deepseek.com"     # 必填：LLM 服务的 API 接口地址，如 "https://api.deepseek.com"
+LLM_MODEL_NAME: "deepseek-chat"         # 必填：要调用的模型名，如 deepseek-chat
+LLM_MAX_TOKENS:                         # 选填：生成文本的最大 token 数，如512或2048
+
+# 部署应用的机器 ip 信息（重点补充 ip、host_user、password）
+servers:
+  - ip: ""
+    host_user: ""
+    password: ""
+    port: 22
+    app: "ceph"
+    target_process_name: "rados"
+    business_context: "Ceph 客户端节点，负责运行管理命令和压测"
+    max_retries: 3
+    delay: 1.0
+
+  - ip: ""
+    host_user: ""
+    password: ""
+    port: 22
+    app: "ceph-osd,ceph-mon,ceph-mgr"
+    target_process_name: "ceph-osd"
+    business_context: "Ceph 存储节点，负责存储对象数据，并运行 mon/mgr 保障集群一致性和管理"
+    max_retries: 3
+    delay: 1.0
+
+  - ip: ""
+    host_user: ""
+    password: ""
+    port: 22
+    app: "ceph-osd,ceph-mon,ceph-mgr"
+    target_process_name: "ceph-osd"
+    business_context: "Ceph 存储节点，负责存储对象数据，并运行 mon/mgr 保障集群一致性和管理"
+    max_retries: 3
+    delay: 1.0
+
+  - ip: ""
+    host_user: ""
+    password: ""
+    port: 22
+    app: "ceph-osd,ceph-mon,ceph-mgr"
+    target_process_name: "ceph-osd"
+    business_context: "Ceph 存储节点，负责存储对象数据，并运行 mon/mgr 保障集群一致性和管理"
+    max_retries: 3
+    delay: 1.0
+```
+* __应用部署信息 config/app_config.yaml 配置__        
+需按实际环境填写；一般无需修改，若部署方式不同需要修改对应命令。
+```YAML
+ceph:
+  set_param_template: 'ceph config set osd "$param_name" "$param_value"'
+  get_param_template: 'ceph config dump | grep "$param_name" | sed "s/.*$param_name[[:space:]]*\([0-9]*\)/\1/"'
+  stop_workload: "systemctl restart ceph.target"
+  start_workload: "systemctl restart ceph.target"
+  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/parse_benchmark.sh"
+  performance_metric: "BANDWIDTH"
+```
+* __scripts/ceph/benchmark.sh 脚本内容：__
+```YAML
+PG_NUMBER=200
+PGP_NUMBER=200
+
+echo "ceph benchmark start prep data."
+if ceph osd pool ls |grep -q "^testbench$"; then
+    echo "[WARN] pool testbench exist !!!"
+else
+    echo "[INFO] start create testbench ..."
+    ceph osd pool create testbench ${PG_NUMBER} ${PGP_NUMBER}
+    if [ $? -eq 0 ]; then
+        echo "[INFO] Create testbench success ."
+    else
+        echo "[WARN] osd pool create testbench failed."
+    fi
+fi
+
+rados -p testbench bench 60 write > ceph_iops_bandwidth_write.log     # write benchmark
+# rados bench -p testbench 10 rand > ceph_iops_bandwidth_write.log    # random read benchmark, need write first
+count=0
+while true
+do
+    bandwidth_val=$(cat ceph_iops_bandwidth_write.log |grep "Bandwidth (MB/sec):" | awk -F ':' '{print $2}')
+    iops_val=$(cat ceph_iops_bandwidth_write.log |grep "Average IOPS:" | awk -F ':' '{print $2}')
+    if [ -z "${bandwidth_val}" ] || [ -z "${iops_val}" ]; then
+        if [ ${count} -eq 10 ]; then
+            echo "[ERROR] get val has reach 10 times, end !!!"
+            break
+        else
+            count=$((${count}+1))
+            sleep 3
+        fi
+        break
+    else
+        echo "${bandwidth_val} and ${iops_val}"
+        break
+    fi
+done
+echo 'bandwidth_val = '${bandwidth_val}
+echo 'iops_val = '${iops_val}
+```
+
+## 4. 执行调优程序
+```bash
+# 在源码根目录执行
+export PYTHONPATH="`pwd`:$PYTHONPATH"
+python3 src/start_tune.py
 ```
