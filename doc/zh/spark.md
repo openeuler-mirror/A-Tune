@@ -142,7 +142,7 @@ echo "Updated '$param' to '$value' in $config_file"
 #!/bin/bash
 
 param="$1"
-execute_scripts="/root/spark_auto_deploy_arm/spark_test/spark_params.sh"
+execute_scripts="/xxx/spark_test/spark_params.sh"
 
 if [ -z "$param" ]; then
     echo "Usage: $0 <param_name>"

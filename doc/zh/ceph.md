@@ -155,35 +155,35 @@ lsblk
 ```
 umount /dev/mapper/openeuler-home                     # 卸载 /home 逻辑卷（确保数据不被占用才能操作）
 e2fsck -f /dev/mapper/openeuler-home                  # 强制检查并修复 /home 文件系统
-resize2fs /dev/mapper/openeuler-home 20G              # 调整文件系统大小为 20G
+resize2fs /dev/mapper/openeuler-home XXG              # 调整文件系统大小，推荐值为 20G
 lvreduce -L 20G /dev/mapper/openeuler-home            # 缩小逻辑卷大小到 20G（要先缩文件系统，再缩逻辑卷）
 mount /dev/mapper/openeuler-home /home                # 重新挂载 /home 逻辑卷
 df -h /home                                           # 查看 /home 挂载点的磁盘使用情况
-pvresize --setphysicalvolumesize XG /dev/vda3         # 调整物理卷 /dev/vda3 的可用大小为 XG
+pvresize --setphysicalvolumesize XXG /dev/vda3         # 调整物理卷 /dev/vda3 的可用大小
 vgdisplay openeuler                                   # 查看卷组 openeuler 的信息
-lvcreate -n ceph-osd-01 -L 9G openeuler               # 在卷组 openeuler 中创建一个 9G 的逻辑卷 ceph-osd-01
+lvcreate -n ceph-osd-01 -L XG openeuler               # 在卷组 openeuler 中创建一个 XG 的逻辑卷 ceph-osd-01，推荐值为 9G
 ceph-volume lvm prepare --data /dev/openeuler/ceph-osd-01  # 使用 ceph-volume 工具准备 OSD，指定数据盘为新建的逻辑卷
 
 umount /dev/mapper/openeuler-home
 e2fsck -f /dev/mapper/openeuler-home
-resize2fs /dev/mapper/openeuler-home 20G
+resize2fs /dev/mapper/openeuler-home XXG
 lvreduce -L 20G /dev/mapper/openeuler-home
 mount /dev/mapper/openeuler-home /home
 df -h /home
-pvresize --setphysicalvolumesize  XG /dev/vda3
+pvresize --setphysicalvolumesize  XXG /dev/vda3
 vgdisplay openeuler
-lvcreate -n ceph-osd-02 -L 9G openeuler
+lvcreate -n ceph-osd-02 -L XG openeuler
 ceph-volume lvm prepare --data /dev/openeuler/ceph-osd-02
 
 umount /dev/mapper/openeuler-home
 e2fsck -f /dev/mapper/openeuler-home
-resize2fs /dev/mapper/openeuler-home 20G
+resize2fs /dev/mapper/openeuler-home XXG
 lvreduce -L 20G /dev/mapper/openeuler-home
 mount /dev/mapper/openeuler-home /home
 df -h /home
-pvresize --setphysicalvolumesize  XG /dev/vda3
+pvresize --setphysicalvolumesize  XXG /dev/vda3
 vgdisplay openeuler
-lvcreate -n ceph-osd-03 -L 9G openeuler
+lvcreate -n ceph-osd-03 -L XG openeuler
 ceph-volume lvm prepare --data /dev/openeuler/ceph-osd-03
 ```
 
