@@ -26,9 +26,9 @@ LLM_MAX_TOKENS:                         # 选填：生成文本的最大 token �
 
 # 部署应用的机器 ip 信息（重点补充 ip、host_user、password）
 servers:
-  - ip: ""                  # 服务器 IP
-    host_user: ""                   # 登录用户
-    password: ""              # 登录密码（如果用密钥可留空）
+  - ip: ""                              # 服务器 IP
+    host_user: ""                       # 登录用户
+    password: ""                        # 登录密码（如果用密钥可留空）
     port: 22                            # SSH 端口（默认 22）
     app: "spark"                        # 应用类型（这里是 Spark）
     target_process_name: "java"         # Spark 进程名，一般是 java
