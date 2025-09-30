@@ -1,6 +1,7 @@
 import logging
 
 from src.performance_optimizer.param_recommender import ParamRecommender
+from src.performance_optimizer.param_knowledge import ParamKnowledge
 from src.performance_test.pressure_test import wait_for_pressure_test
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
@@ -39,6 +40,16 @@ class ParamOptimizer:
         self.slo_calc_callback = slo_calc_callback
         # 业务预期指标提升的目标
         self.slo_goal = slo_goal
+        # 可调参数知识库，用于给大模型描述应用参数背景知识
+        self.param_knowledge = ParamKnowledge(
+            ssh_client=ssh_client,
+            tune_system_param=tune_system_param,
+            tune_app_param=tune_app_param
+        )
+        self.all_params = self.param_knowledge.get_params(service_name)
+        self.params_set, self.current_params = self.param_knowledge.describe_param_background_knob(
+            service_name, self.all_params
+        )
         # 应用接口，包括应用参数下发、benchmark执行等操作
         self.app_interface = AppInterface(ssh_client).get(service_name)
         self.system_interface = AppInterface(ssh_client).system
@@ -51,8 +62,8 @@ class ParamOptimizer:
             static_profile=static_profile,
             performance_analysis_report=analysis_report,
             ssh_client=ssh_client,
-            tune_system_param=tune_system_param,
-            tune_app_param=tune_app_param
+            all_params=self.all_params,
+            params_set=self.params_set
         )
         self.first_restart_save = True
         self.benchmark_timeout=benchmark_timeout
@@ -69,9 +80,16 @@ class ParamOptimizer:
         logging.info("🔄 正在验证benchmark性能...")
         result = self.app_interface.benchmark()
         if result.status_code == 0 and result.output:
-            return float(result.output)
+            try:
+                perf_value = float(result.output)
+                logging.info(f"Benchmark 成功，性能值: {perf_value}")
+                return perf_value
+            except Exception as e:
+                logging.warning(f"Benchmark 失败，结果是：{result.output}")
+                return None
         else:
-            raise RuntimeError(f"failed to execute benchmark because {result.err_msg}")
+            logging.warning(f"Benchmark 执行失败: {result.err_msg}")
+            return None
 
     def apply_params(self, recommend_params):
         for param_name, param_value in recommend_params.items():
@@ -85,14 +103,12 @@ class ParamOptimizer:
         logging.info("🔄 正在重启应用 ...")
         stop_result = self.app_interface.stop_workload()
         if stop_result.status_code != 0:
-            raise RuntimeError(
-                f"failed to stop application because {stop_result.err_msg}"
-            )
+            logging.warning(f"failed to stop application because {stop_result.err_msg}")
         start_result = self.app_interface.start_workload()
         if start_result.status_code != 0:
-            raise RuntimeError(
-                f"failed to start application because {start_result.err_msg}"
-            )
+            logging.warning(f"failed to start application because {start_result.err_msg}")
+            return False
+        return True
 
     def recover_cluster(self):
         print("🔄 正在恢复集群 ...")
@@ -170,7 +186,13 @@ class ParamOptimizer:
             # 设置参数生效
             self.apply_params(recommend_params)
             if self.need_restart_application:
-                self.restart_application()
+                restart_success = self.restart_application()
+                if not restart_success:
+                    historys["上一轮调优结果"] = {"上一轮性能": "应用重启失败，参数不合法", "参数推荐": recommend_params}
+                    self.apply_params(self.current_params)
+                    restart_success = self.restart_application()
+                    logging.warning(f"[{i + 1}/{self.max_iterations}] 应用重启失败，参数不合法，恢复第 {i} 轮配置，恢复成功：{restart_success}")
+                    continue
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
@@ -179,6 +201,15 @@ class ParamOptimizer:
                 script_path = '/tmp/euler-copilot-params.sh'
                 self.save_restart_params_to_script(recommend_params, script_path, i + 1)
                 self.recover_cluster()
+            if performance_result is None:
+                historys["上一轮调优结果"] = {"上一轮性能": "benchmark失败，参数不合理", "参数推荐": recommend_params}
+                self.apply_params(self.current_params)
+                restart_success = True
+                if self.need_restart_application:
+                    restart_success = self.restart_application()
+                logging.warning(f"[{i + 1}/{self.max_iterations}] benchmark失败，参数不合理，恢复第 {i} 轮配置，恢复成功：{restart_success}")
+                continue
+            self.current_params.update(recommend_params)
 
             if performance_result * symbol < baseline * symbol:
                 is_positive = False

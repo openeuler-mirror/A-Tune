@@ -86,7 +86,7 @@
             1,
             null
         ],
-        "default_value": "1Ki",
+        "default_value": "1024",
         "related_param": []
     },
     "osd_max_pg_log_entries": {
@@ -138,32 +138,6 @@
         ],
         "default_value": "4194304",
         "related_param": []
-    },
-    "osd_mclock_iops_capacity_low_threshold_hdd": {
-        "desc": "该参数用于设置HDD的IOPS容量低阈值（以4KiB块大小为单位），当IOPS容量低于该阈值时，将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_hdd定义的最后有效或默认IOPS容量。减小该值可以避免HDD过载，从而缓解disk IO瓶颈。",
-        "type": "continuous",
-        "dtype": "float",
-        "range": [
-            0,
-            null
-        ],
-        "default_value": "50.0",
-        "related_param": [
-            "osd_mclock_max_capacity_iops_hdd"
-        ]
-    },
-    "osd_mclock_iops_capacity_low_threshold_ssd": {
-        "desc": "该参数定义了SSD的IOPS容量低阈值（以4KiB块大小为单位），当OSD的IOPS性能低于此阈值时，将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_ssd定义的最后有效或默认IOPS容量。减小该值可以避免SSD过载，从而缓解磁盘IO瓶颈。",
-        "type": "continuous",
-        "dtype": "float",
-        "range": [
-            0,
-            null
-        ],
-        "default_value": "1000.0",
-        "related_param": [
-            "osd_mclock_max_capacity_iops_ssd"
-        ]
     },
     "osd_mclock_iops_capacity_threshold_hdd": {
         "desc": "该参数定义了HDD的IOPS容量阈值（以4KiB块大小为单位），超过该阈值后将忽略OSD基准测试结果，并回退到由osd_mclock_max_capacity_iops_hdd定义的最后有效或默认IOPS容量。增大该值可以提高HDD的使用效率，从而缓解磁盘IO瓶颈。",
@@ -553,7 +527,7 @@
             0,
             null
         ],
-        "default_value": "7 days",
+        "default_value": "604800",
         "related_param": [
             "osd_scrub_min_interval"
         ]
