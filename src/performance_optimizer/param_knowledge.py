@@ -62,6 +62,7 @@ class ParamKnowledge:
     def describe_param_background_knob(self, app_name: str, params: Iterable):
         logging.info(f"[ParamKnowledge] building param knowledge base ...")
         params_describe_list = []
+        params_default_info = {}
         app_params = self.param_config.get(app_name.lower())
         system_params = self.param_config.get("system")
         app = AppInterface(self.ssh_client).get(app_name)
@@ -90,8 +91,9 @@ class ParamKnowledge:
             params_describe_list.append(
                 f"{param_name}:{item['desc']},参数数据类型为：{item['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}"
             )
+            params_default_info[param_name] = param_env_value
         logging.info(f"[ParamKnowledge] initialize param knowledge base finished!")
-        return params_describe_list
+        return params_describe_list, params_default_info
 
 
 if __name__ == "__main__":

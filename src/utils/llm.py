@@ -7,7 +7,7 @@ import httpx
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 requests.Session.verify = False
-def get_llm_response(prompt: str) -> str:
+def get_llm_response(prompt: str, **kwargs) -> str:
     if 'enable' == config["ssl"]:
         client = ChatOpenAI(
         openai_api_key=config["LLM_KEY"],
@@ -29,7 +29,7 @@ def get_llm_response(prompt: str) -> str:
         )
     else:
         raise ValueError(f"无效的SSL配置: {config['ssl']}，必须为 'enable' 或 'disable'")
-    result = client.invoke(input=prompt)
+    result = client.invoke(input=prompt, **kwargs)
     return re.sub(r"<think>.*?</think>", "", result.content, flags=re.DOTALL)
 
 
