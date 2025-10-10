@@ -18,6 +18,9 @@ cd nginx-1.21.5/
 chmod 755 configure
 ./configure --prefix=/usr/local/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_stub_status_module --with-http_gzip_static_module --with-pcre --with-stream --with-stream_ssl_module --with-stream_realip_module
 make -j 60 && make install
+ln -s /usr/local/nginx/sbin/nginx /usr/bin/nginx
+# 创建nginx用户
+useradd -s /sbin/nologin -M nginx
 ```
 
 ### 3. 生成 OpenSLL 证书
@@ -41,8 +44,19 @@ openssl rsa -in server_2048.key -out server_2048.key
 openssl x509 -req -days 365 -in server_2048.csr -signkey server_2048.key -out server_2048.crt
 ```
 *注意：若生成 OpenSSL 证书时，提示 "unable to find 'distinguished_name' in config" ，说明与验证 KAE 性能时执行的 export OPENSSL_CONF=/home/openssl.cnf 命令冲突，请参见[部署 vKAE 特性时，在虚拟机部署 Nginx 过程中生成 OpenSSL 证书时报错](https://www.hikunpeng.com/document/detail/zh/kunpengcpfs/systuningguide/systemtg/kunpengvkae_20_022.html)解决该问题。
+
+### 4. 运行nginx
+启动nginx：（监听端口见配置文件中的listen关键字）
+```bash
+nginx -c /usr/local/nginx/conf/nginx.conf
+```
+停止/重载nginx配置：
+```bash
+nginx -s stop
+nginx -s reload
+```
  
-### 4. 配置使能 KAE + Nginx 的同步模式
+### 5. 配置使能 KAE + Nginx 的同步模式
 * 对于不使能 KAE，以及使能 KAE + Nginx 的异步模式的配置详情，请参见[部署 Ngnix 指南](https://www.hikunpeng.com/document/detail/zh/kunpengcpfs/basicAccelFeatures/comAccel/kunpengvkae_20_016.html)。     
 * __在“usr/local/nginx/conf”目录下创建一个名为 nginx_kae.conf 的配置文件，配置内容如下：__
 ```YAML
@@ -160,6 +174,15 @@ git clone https://github.com/yarosla/httpress.git
 cd httpress && make
 # 安装到系统路径
 cp bin/Release/httpress /usr/bin
+```
+
+### 4. 测试httpress
+```bash
+TARGET_HOST=localhost
+TARGET_PORT=80
+# 自动取配置文件中的监听端口：
+# TARGET_PORT=`grep -E -e '^[ ]+listen' /usr/local/nginx/conf/nginx.conf | head -1 | awk '{print $2}' | tr -d ';'`
+httpress -n 200000 -c 512 -t 7 -k http://${TARGET_HOST}:${TARGET_PORT}
 ```
   
 ## 部署 copilot
