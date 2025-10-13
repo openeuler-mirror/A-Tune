@@ -17,9 +17,9 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+from src.utils.prompt_instance import prompt_manager
 
 class ParamRecommender:
-
     def __init__(
             self,
             service_name: str,
@@ -90,27 +90,38 @@ class ParamRecommender:
         return filtered_history
 
     def _process_chunk(self, history_result, cur_params_set, is_positive):
-        filtered_history = self._get_histort(history_result, cur_params_set)
+        history_result = self._get_histort(history_result, cur_params_set)
 
-        recommend_prompt = f"""
-        # CONTEXT # 
-        [{self.service_name}类] 本次性能优化的目标为：
-        性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
-        性能分析报告：
-        {self.performance_analysis_report}
-        你可以分析的参数有：
-        {",".join(cur_params_set)}
-        # OBJECTIVE #
-        你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以上性能分析报告分析有哪些调优思路。
-        # Tone #
-        你应该尽可能秉承严肃、认真、严谨的态度
-        # AUDIENCE #
-        你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
-        """
-        optimized_idea = get_llm_response(recommend_prompt)
-        recommended_params = self.recommend(
-            filtered_history, optimized_idea, cur_params_set, is_positive
-        )
+        params_set_str = ",".join(cur_params_set)
+        allowed_set = set([
+            "self.service_name",
+            "self.performance_metric.name",
+            "self.performance_metric.value",
+            "self.slo_goal",
+            "self.static_profile",
+            "history_result",
+            "self.performance_analysis_report",
+            "params_set_str",
+        ])
+        prompt_mode = prompt_manager.get_mode(self.service_name)
+        if prompt_mode == "fast":
+            recommend_prompt_format = prompt_manager.get(self.service_name, prompt_mode, 'recommender')['value']
+            recommend_prompt, extras = prompt_manager.render_by_parse(recommend_prompt_format, allowed_set)
+            if len(extras) != 0:
+                logging.warn(f"param not in custom offered param {extras}")
+            recommended_params = get_llm_response(recommend_prompt)
+        elif prompt_mode == "normal":
+            idea_prompt_format = prompt_manager.get(self.service_name, prompt_mode, 'idea')['value']
+            idea_prompt, extras = prompt_manager.render_by_parse(idea_prompt_format, allowed_set)
+            optimization_idea = get_llm_response(idea_prompt)
+            allowed_set.add("optimization_idea")
+            recommend_prompt_format = prompt_manager.get(self.service_name, prompt_mode,
+                'recommender_positive' if is_positive else 'recommender_negative')['value']
+            recommend_prompt, extras = prompt_manager.render_by_parse(recommend_prompt_format, allowed_set)
+            recommended_params = get_llm_response(recommend_prompt)
+        else:
+            # todo for slow prompt
+            recommended_params = get_llm_response(recommend_prompt)
 
         recommended_params_set = json_repair(recommended_params)
 
