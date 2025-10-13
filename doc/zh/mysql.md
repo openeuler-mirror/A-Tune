@@ -88,13 +88,14 @@ sysbench --version
 sh -x benchmark.sh 127.0.0.1 3306 root 123456
 ```
 
-## benchmark.sh 内容
+benchmark.sh 内容
 
 ```
 # 1.prepare 阶段
 
 echo "sysbench prepare"
-sysbench \--db-driver=mysql \
+sysbench \
+    --db-driver=mysql \
     --mysql-host=$1 \
     --mysql-port=$2 \
     --mysql-user=$3 \
