@@ -1,0 +1,222 @@
+
+# ==================================================== spark =====================================================
+spark: &common
+  mode: normal  # fast, normal, slow  ;default slow
+  extractor:
+    value: ""
+    meta: {lang: zh, version: 1}
+  analyzer:
+    value: ""
+    meta: {lang: zh, version: 1}
+  collector:
+    value: ""
+    meta: {lang: zh, version: 1}
+  fast:
+    recommender:
+      value: |
+        # CONTEXT #
+        [{self.service_name}类] 本次性能优化的目标为：
+        性能指标为 {self.performance_metric.name} ，该指标的含义为：{self.performance_metric.value} ，目标是提升 {self.slo_goal:.2%}。
+        当前环境的配置信息：
+        {self.static_profile}
+        历史调优信息（可参考改进点）：
+        {filtered_history}
+        当前环境的系统负载与性能分析：
+        {self.metrics}
+        可调整的参数集合：
+        {params_set_str}
+        # OBJECTIVE #
+        当前性能指标没有达到预期，请你基于上述信息，直接输出一份**参数组合**。
+        1. 输出内容必须是一个合法的 JSON 对象。
+        2. 格式如下：
+        {{
+          参数名: 值(如果不确定这个值是否合理， 这组参数可以不推荐)
+        }}
+        3. 只输出键值对，不要任何解释、注释、额外文字。
+        4. 只包含对性能有正向影响的参数调整。
+      meta: {lang: zh, version: 1}
+  normal:
+    idea:
+      value: |
+        # CONTEXT # 
+        本次性能优化的目标为：
+        性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
+        性能分析报告：
+        {self.performance_analysis_report}
+        你可以分析的参数有：
+        {params_set_str}
+        # OBJECTIVE #
+        你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以上性能分析报告分析有哪些调优思路。
+        # Tone #
+        你应该尽可能秉承严肃、认真、严谨的态度
+        # AUDIENCE #
+        你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
+    recommender_positive:
+      value: |
+        [{self.service_name}类] 你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以下调优思路、当前环境的配置信息、可调整参数，选出可调整参数值。
+        请尽量精简描述，将终点需要调整的方向输出出来，不需要总结观点，对性能无影响的也不要输出。
+        当前环境的配置信息有：
+        {self.static_profile}
+        以下是历史调优的信息，历史调优修改了如下参数，你可以参考如下历史调优信息来反思可以可以改进的点: 
+        {history_result}
+        调优思路是：
+        {optimization_idea}
+        你可以调整的参数是：
+        {params_set_str}
+        请以json格式回答问题，key为可调参数名称，请根据上述的环境配置信息给出可调整的参数，若参数不相关则不要给出
+        value是可调参数的推荐取值，请根据上面的环境配置信息给出合理的具体取值，请仔细确认各个值是否可以被使用，避免设置后应用无法启动。
+        请勿给出除了json以外其他的回复,切勿增加注释。
+    recommender_negative:
+      value: |
+        [{self.service_name}类] 你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以下调优思路、当前环境的配置信息、可调整参数，选出可调整参数值。
+        请尽量精简描述，将终点需要调整的方向输出出来，不需要总结观点，对性能无影响的也不要输出。
+        当前环境的配置信息有：
+        {self.static_profile}
+        以下是历史调优的信息，历史调优修改了如下参数，你可以参考如下历史调优信息来反思可以可以改进的点: 
+        {history_result}
+        调优思路是：
+        {optimization_idea}
+        你可以调整的参数是：
+        {params_set_str}
+        请以json格式回答问题，key为可调参数名称，请根据上述的环境配置信息给出可调整的参数，若参数不相关则不要给出
+        value是可调参数的推荐取值，请根据上面的环境配置信息给出合理的具体取值，请仔细确认各个值是否可以被使用，避免设置后应用无法启动。
+        请勿给出除了json以外其他的回复,切勿增加注释。
+  slow:
+    recommender:
+      value: ""
+      meta: {lang: zh, version: 1}    
+# ==================================================== nginx =====================================================
+nginx:
+  mode: normal  # fast, normal, slow  ;default slow
+  extractor:
+    value: ""
+    meta: {lang: zh, version: 1}
+  analyzer:
+    value: ""
+    meta: {lang: zh, version: 1}
+  collector:
+    value: ""
+    meta: {lang: zh, version: 1}
+  fast:
+    recommender:
+      value: |
+        # CONTEXT #
+        [{self.service_name}类] 本次性能优化的目标为：  
+        性能指标为 {self.performance_metric.name} ，该指标的含义为：{self.performance_metric.value} ，目标是提升 {self.slo_goal:.2%}。
+        当前环境的配置信息：  
+        {self.static_profile}  
+        历史调优信息（可参考改进点）：  
+        {history_result}
+        当前环境的系统负载与性能分析：
+        {self.performance_analysis_report}
+        **可调整的参数集合以及其取值范围和功能信息**:
+        {params_set_str}
+        # 要求如下 #
+        请你基于上述信息，直接输出一份 "在可调整的参数集合中选择一些你觉得有提升的参数进行推荐"  
+        **严格要求：**
+        1. 输出内容必须是一个合法的简单的 json 格式字符串。
+        2. 模板参考如下格式(不确定的键值对可以不推荐, 也不要重复推荐， json 对象注意左右括号闭环， 不要引入 [（中括号） 括号)，且禁止出现多余的转义引号（例如 \"value\"）。
+        {{
+          "net.core.dev_weight": 128,
+          "net.ipv4.tcp_keepalive_intvl": 60,
+          "net.ipv4.tcp_keepalive_probes": 5,
+          "net.ipv4.tcp_keepalive_time": 600,
+          "net.ipv4.tcp_tw_reuse": 1,
+          "net.ipv4.tcp_fin_timeout": 30,
+          "net.ipv4.tcp_rmem": "4096 65536 16777216",
+          "net.ipv4.tcp_wmem": "4096 65536 16777216",
+          "net.ipv4.tcp_max_syn_backlog": 8192
+        }}
+        3. 只输出符合格式的 json 字符串，不要任何解释、注释、额外文字。 
+        4. 基于上述内容，请你务必提供一份干净“简单”的 json 参数值推荐，方便我直接通过 json.loads 进行解析。
+      meta: {lang: zh, version: 1}
+  normal:
+    idea:
+      value: |
+        # CONTEXT # 
+        本次性能优化的目标为：
+        性能指标为{self.performance_metric.name}, 该指标的含义为：{self.performance_metric.value}，目标是提升{self.slo_goal:.2%}
+        性能分析报告：
+        {self.performance_analysis_report}
+        你可以分析的参数有：
+        {params_set_str}
+        # OBJECTIVE #
+        你是一个专业的系统运维专家,当前性能指标未达到预期，请你基于以上性能分析报告分析有哪些调优思路。
+        # Tone #
+        你应该尽可能秉承严肃、认真、严谨的态度
+        # AUDIENCE #
+        你的答案将会是其他系统运维专家的重要参考意见，请认真思考后给出你的答案。
+      meta: {lang: zh, version: 1}
+    recommender_positive:
+      value: |
+        你是专业的系统运维专家。当前性能指标未达预期，但上一轮调优为正向结果（性能提升或无退化）。
+        请在“心中完成推理”，只输出最终 JSON；除 JSON 以外不要输出任何文字、代码块或注释。
+
+        目标：基于以下信息，在保持上轮有效方向的前提下，总结参数调整经验，进一步微调参数（在安全边界内适度加大力度），仅给出需要变更的参数与推荐新值。
+
+        当前环境配置信息：
+        {self.static_profile}
+
+        历史调优信息（包含已修改参数与结果）：
+        {history_result}
+
+        调优思路：
+        {optimization_idea}
+
+        可调整参数全集（含类型/范围/枚举/默认值等）以及baseline对应的的取值为：
+        {params_set_str}
+
+        严格规则（务必遵守）：
+        1) 仅输出与当前配置相比“需要变化”的参数；不相关或无收益的参数不要输出。
+        2) 优先沿“上轮有效”的方向小步前进：连续型参数按原步长的 100%~150% 微增（通常为 +10%~+30%），离散/枚举取更激进且仍在安全范围的相邻档位；避免一次性过大变更（单参数变更幅度不超过 2 倍或 ±30%，取更严格者）。
+        3) 不要动已证明对性能“无影响”的参数；避免同时调整明显互斥的参数。
+        4) 必须满足依赖/互斥/上限下限/类型与单位要求；数值默认单位为“字节”。若数值后带单位，请以字符串表示（如 "512MB"）。
+        5) 每个参数的推荐值必须可被系统实际接受并确保应用可启动。
+        6) 若无合适变更，输出空json对象。
+
+        输出格式（必须严格遵守）：
+        - 仅输出一个 JSON 对象，键为“可调参数名称”，值为“推荐取值”。
+        - 不要输出任何多余文字、说明、示例、代码围栏或注释。
+    recommender_negative:
+      value: |
+        你是专业的系统运维专家。当前性能指标未达预期，且上一轮调优为负向结果（性能下降/不稳定/报错等）。
+        请在“心中完成推理”，只输出最终 JSON；除 JSON 以外不要输出任何文字、代码块或注释。
+
+        目标：基于以下信息，总结历史调优经验中的baseline、最佳调优结果、最差调优结果以及上一轮调优结果以及参数取值，反向微调上轮可能导致退化的参数，并选择更保守且安全的值；仅给出需要变更的参数与推荐新值。
+
+        当前环境配置信息：
+        {self.static_profile}
+
+        历史调优信息（包含已修改参数与结果）：
+        {history_result}
+
+        调优思路：
+        {optimization_idea}
+
+        可调整参数全集（含类型/范围/枚举/默认值等）以及baseline对应的的取值为：
+        {params_set_str}
+
+        严格规则（务必遵守）：
+        1) 仅输出与当前配置相比“需要变化”的参数；不相关或无收益的参数不要输出。
+        2) 对上轮参与变更且疑似致退化的参数：沿“相反方向”小步调整（幅度为上轮步长的 30%~50%，通常为 -10%~-20%）；必要时关闭可选的高开销特性。
+        3) 避免一次调整过多参数；不要同时调整互斥参数；优先选择风险更低的修正方案。
+        4) 必须满足依赖/互斥/上限下限/类型与单位要求；数值默认单位为“字节”。若数值后带单位，请以字符串表示（如 "1GB"）。
+        5) 每个参数的推荐值必须可被系统实际接受并确保应用可启动。
+        6) 若无合适变更，输出空json对象。
+
+        输出格式（必须严格遵守）：
+        - 仅输出一个 JSON 对象，键为“可调参数名称”，值为“推荐取值”。
+        - 不要输出任何多余文字、说明、示例、代码围栏或注释。
+  slow:
+    recommender:
+      value: ""
+      meta: {lang: zh, version: 1}
+# ==================================================== mysql =====================================================
+mysql:
+  <<: *common
+# ==================================================== pgsql =====================================================
+pgsql:
+  <<: *common
+# ==================================================== flink =====================================================
+flink:
+  <<: *common
