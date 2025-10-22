@@ -141,7 +141,7 @@ journalctl -xe -u tune-openapi --all -f
 ```bash
 vim config/.env.yaml
 ```
-* 具体格式如下：
+* 具体格式如下： （**调优提升目标**的配置见其中的 feature - slo_goal 字段说明）
 ```YAML
 # 根据实际使用的模型服务填写以下字段
 LLM_KEY: "sk-XXXXXX"                  # 必填：模型服务的 API 密钥
