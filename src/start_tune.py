@@ -133,7 +133,7 @@ def run_strategy_optimization(ssh_client, app, bottleneck, server_cfg, report):
     recommendations = strategy_optimizer.get_recommendations_json(
         bottleneck, top_k=1, business_context=server_cfg["business_context"]
     )
-    logging.info("推荐策略:", recommendations)
+    logging.info(f"推荐策略: \n{recommendations}")
 
 
 def main():
