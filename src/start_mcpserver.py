@@ -35,6 +35,7 @@ host_password = config["servers"][0]["password"]
 app_name = config["servers"][0]["app"]
 max_retries = config["servers"][0]["max_retries"]
 delay = config["servers"][0]["delay"]
+slo_goal = config["feature"][0]["slo_goal"]
 
 
 # ================= Collector 接口 ===================
@@ -153,7 +154,7 @@ def run_optimizer():
 
     param_recommender = ParamRecommender(
         service_name=app_name,
-        slo_goal=0.1,
+        slo_goal=slo_goal,
         performance_metric=AppInterface(ssh_client)
         .get(app_name)
         .performance_metric,
