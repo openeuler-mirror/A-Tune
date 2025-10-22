@@ -137,7 +137,7 @@ journalctl -xe -u tune-openapi --all -f
 ```
 ## 使用指南
 ### 配置文件准备
-#### 1. 修改.env.yaml 配置文件内容（项目 config 目录下）
+#### 1. 修改 .env.yaml 配置文件内容（项目 config 目录下）
 ```bash
 vim config/.env.yaml
 ```
@@ -175,6 +175,7 @@ feature:
     strategy_optimization: False                                        # 是否需要策略推荐
     benchmark_timeout: 3600                                             # benchmark执行超时限制
     max_iterations: 10                                                  # 最大迭代轮数
+    slo_goal: 0.1                                                       # 调优提升目标，默认0.1也即10%，调优达成提升目标后会提前结束
 
 ```
 
