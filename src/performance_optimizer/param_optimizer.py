@@ -173,6 +173,8 @@ class ParamOptimizer:
         }
         best_result = baseline
         worst_result = baseline
+        curr_recommend_params = {}
+        best_recommend_params = {}
         is_positive = True
         symbol = self.app_interface.get_calculate_type()
         logging.info(
@@ -210,6 +212,7 @@ class ParamOptimizer:
                 logging.warning(f"[{i + 1}/{self.max_iterations}] benchmark失败，参数不合理，恢复第 {i} 轮配置，恢复成功：{restart_success}")
                 continue
             self.current_params.update(recommend_params)
+            curr_recommend_params.update(recommend_params)
 
             if performance_result * symbol < baseline * symbol:
                 is_positive = False
@@ -218,6 +221,7 @@ class ParamOptimizer:
 
             if performance_result * symbol > best_result * symbol:
                 best_result = performance_result
+                best_recommend_params = dict(curr_recommend_params)
                 best_history = {"最佳性能": performance_result, "参数推荐": recommend_params}
                 historys["历史最佳结果"] = best_history
 
@@ -241,3 +245,14 @@ class ParamOptimizer:
         logging.info(
             f"调优完毕，{'达到' if self.reached_goal(baseline, best_result, symbol) else '未达到'} 预期目标"
         )
+
+        # 配置最优参数
+        logging.info(f"配置最佳性能参数：")
+        self.apply_params(best_recommend_params)
+        if self.need_restart_application:
+            restart_success = self.restart_application()
+            if restart_success:
+                logging.info(f"应用重启完成")
+            else:
+                logging.err(f"应用重启失败")
+
