@@ -85,8 +85,8 @@ oceanbase:
   password: ""
   config_file: "/root/.obd/cluster/obcluster/config.yaml"
   port: 2881
-  set_param_template: "sh xxx/set_param.sh $param_name $param_value"
-  get_param_template: "grep -P '$param_name' $config_file | awk '{print $2;exit}'"
+  set_param_template: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/set_param.sh $param_name $param_value"
+  get_param_template: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/get_param.sh $param_name"
   stop_workload: "obd cluster stop obcluster"
   start_workload: "obd cluster start obcluster"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/parse_benchmark.sh"
