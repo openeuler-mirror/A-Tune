@@ -76,13 +76,13 @@ class PerformanceAnalyzer(BaseAnalyzer):
         # 如果没有找到明确的瓶颈，返回UNKNOWN BOTTLENECKS
         return "UNKNOWN BOTTLENECKS"
 
-    def generate_report(self) -> Tuple[str, str]:
-        cpu_analyzer_task = self.thread_pool.add_task(self.cpu_analyzer.run)
-        disk_analyzer_task = self.thread_pool.add_task(self.disk_analyzer.run)
-        memory_analyzer_task = self.thread_pool.add_task(self.memory_analyzer.run)
-        network_analyzer_task = self.thread_pool.add_task(self.network_analyzer.run)
-        micro_analyzer_task = self.thread_pool.add_task(self.micro_analyer.run)
-        app_analyzer_task = self.thread_pool.add_task(self.app_analyzer.run)
+    def generate_report(self) -> Tuple[str, str]: 
+        cpu_analyzer_task = self.thread_pool.add_task(self.cpu_analyzer.run) if self.cpu_analyzer.data else None
+        disk_analyzer_task = self.thread_pool.add_task(self.disk_analyzer.run) if self.disk_analyzer.data else None
+        memory_analyzer_task = self.thread_pool.add_task(self.memory_analyzer.run) if self.memory_analyzer.data else None
+        network_analyzer_task = self.thread_pool.add_task(self.network_analyzer.run) if self.network_analyzer.data else None
+        micro_analyzer_task = self.thread_pool.add_task(self.micro_analyer.run) if self.micro_analyer.data else None
+        app_analyzer_task = self.thread_pool.add_task(self.app_analyzer.run) if self.app_analyzer.data else None
 
         self.thread_pool.run_all_tasks()
         task_results = self.thread_pool.get_all_results()
@@ -95,14 +95,14 @@ class PerformanceAnalyzer(BaseAnalyzer):
                 )
             report_results[task_result.uuid] = task_result.result
 
-        os_performance_report = ""
-        os_performance_report += report_results[cpu_analyzer_task]
-        os_performance_report += report_results[disk_analyzer_task]
-        os_performance_report += report_results[memory_analyzer_task]
-        os_performance_report += report_results[network_analyzer_task]
-        os_performance_report += report_results[micro_analyzer_task]
+        os_performance_report = "\n"
+        os_performance_report += (report_results.get(cpu_analyzer_task, "") + "\n") if self.cpu_analyzer.data else ""
+        os_performance_report += (report_results.get(disk_analyzer_task, "") + "\n") if self.disk_analyzer.data else ""
+        os_performance_report += (report_results.get(memory_analyzer_task, "") + "\n") if self.memory_analyzer.data else ""
+        os_performance_report += (report_results.get(network_analyzer_task, "") + "\n") if self.network_analyzer.data else ""
+        os_performance_report += (report_results.get(micro_analyzer_task, "") + "\n") if self.micro_analyer.data else ""
         app_performance_report = ""
-        app_performance_report += report_results[app_analyzer_task]
+        app_performance_report += (report_results.get(app_analyzer_task, "") + "\n") if self.app_analyzer.data else ""
         return os_performance_report, app_performance_report
 
     def run(self) -> Tuple[str, str]:
