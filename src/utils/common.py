@@ -1,6 +1,7 @@
 
-from typing import Any
+from typing import List, Any, Union
 from tabulate import tabulate
+from wcwidth import wcswidth
 
 
 def display_banner():
@@ -9,7 +10,7 @@ def display_banner():
         banner = pyfiglet.figlet_format("EulerCopilot v1.0", font="slant")
         print(banner)
     except ImportError:
-        print("EulerCopilot v1.0")
+        print("EulerCopilot v1.0 \n")
 
 
 def truncate_string(s, max_length=30):
@@ -59,6 +60,53 @@ def preview_data(data: dict, preview_nums: int = 5):
         result.append(truncated_keys + [truncated_value])  # 将键路径和值组合成一个列表
     return result
 
+def cn_tabulate(
+    data: List[List[Any]],
+    headers: Union[List[str], str] = (),
+    tablefmt: str = "grid",
+    **kwargs
+) -> str:
+    if not data:
+        return tabulate([], headers=headers, tablefmt=tablefmt, **kwargs)
+
+    if headers == "keys" and isinstance(data[0], dict):
+        keys = list(data[0].keys())
+        data = [[row.get(k, "") for k in keys] for row in data]
+        headers = keys
+    elif isinstance(headers, list) and isinstance(data[0], dict):
+        data = [[row.get(k, "") for k in headers] for row in data]
+
+    max_cols = max(len(row) for row in data)
+    if headers:
+        max_cols = max(max_cols, len(headers))
+
+    col_widths = []
+    for col in range(max_cols):
+        max_width = 0
+        if headers and col < len(headers):
+            max_width = wcswidth(str(headers[col]))
+        for row in data:
+            if col < len(row):
+                max_width = max(max_width, wcswidth(str(row[col])))
+        col_widths.append(max_width)
+
+    def pad_cell(s, width):
+        s = str(s)
+        pad_len = width - wcswidth(s)
+        return s + " " * pad_len
+
+    padded_data = [
+        [pad_cell(row[col], col_widths[col]) if col < len(row) else " " * col_widths[col]
+         for col in range(max_cols)]
+        for row in data
+    ]
+    padded_headers = (
+        [pad_cell(headers[col], col_widths[col]) if col < len(headers) else " " * col_widths[col]
+         for col in range(max_cols)]
+        if headers else ()
+    )
+
+    return tabulate(padded_data, headers=padded_headers, tablefmt=tablefmt, **kwargs)
 
 def display_metrics(
     metric_data: dict,
@@ -69,14 +117,13 @@ def display_metrics(
     if not isinstance(metric_data, dict):
         raise TypeError(f"display metric_data only support dict data now!")
 
-    table_str = tabulate(
+    table_str = cn_tabulate(
         preview_data(metric_data),
         headers=headers,
         tablefmt="grid",
     )
     display_content = "\n".join([title, table_str])
     print(display_content)
-
 
 class ExecuteResult:
     def __init__(self, status_code: int = -1, output: Any = None, err_msg: str = ""):
