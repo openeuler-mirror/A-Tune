@@ -107,5 +107,5 @@ class PerformanceAnalyzer(BaseAnalyzer):
 
     def run(self) -> Tuple[str, str]:
         os_performance_report, app_performance_report = self.generate_report()
-        bottleneck = self.analyze(os_performance_report)
+        bottleneck = self.analyze(os_performance_report + app_performance_report)
         return os_performance_report + app_performance_report, bottleneck
