@@ -135,6 +135,8 @@ class StringRepository:
             get model, fast slow, normal etc
         """
         with self._lock:
+            if type_ not in self._data:
+                raise ValueError(f"defaults.yaml 中不存在类型：{type_}")
             mode = self._data.get(type_).get('mode', "slow")
             if mode not in ["fast", "slow", "normal"]:
                 return "slow"
