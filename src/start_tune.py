@@ -15,8 +15,9 @@ from src.utils.shell_execute import SshClient
 
 def setup_logging():
     """配置日志格式与级别"""
+    log_level = config["log_level"].upper()
     logging.basicConfig(
-        level=logging.INFO,
+        level=getattr(logging, log_level, logging.INFO),
         format="%(asctime)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
