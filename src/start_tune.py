@@ -151,7 +151,7 @@ def main():
                                                         feature_cfg["microDep_collector"])
 
     report, bottleneck = analyze_performance(metrics_data, server_cfg["app"])
-    logging.info(f">>> PerformanceAnalyzer运行结果：{report} {bottleneck}")
+    logging.info(f">>> PerformanceAnalyzer运行结果：\n{report}\n分析结论：\n{bottleneck}")
 
     run_param_optimization(
         server_cfg["app"], report, static_profile_info, ssh_client,
