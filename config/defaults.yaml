@@ -20,9 +20,9 @@ common: &common
         当前环境的配置信息：
         {self.static_profile}
         历史调优信息（可参考改进点）：
-        {filtered_history}
+        {history_result}
         当前环境的系统负载与性能分析：
-        {self.metrics}
+        {self.performance_analysis_report}
         可调整的参数集合：
         {params_set_str}
         # OBJECTIVE #
