@@ -110,7 +110,7 @@ dnf install euler-copilot-tune-1.0-1.oe2403sp2.aarch64.rpm
 ```bash
 tail -f /pip_install.log
 ``` 
-* 如果按照完成后出现 pip 包安装失败情况，请单独执行如下命令进行安装：
+* 如果安装完成后出现 pip 包安装失败情况，请单独执行如下命令进行安装：
 ```bash
 pip install  fastapi numpy openai paramiko pydantic pyyaml scikit-learn tqdm uvicorn requests langchain langchain-openai email-validator httpx tabulate gssapi pandas faiss-cpu pyfiglet mcp
 ``` 
