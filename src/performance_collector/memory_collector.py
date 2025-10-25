@@ -77,7 +77,6 @@ def sar_parse(
 
     try:
         out = stdout.split("\n")
-        out.pop()  
         date = out[-1].split()
         memory_usage = float(date[4]) 
 
