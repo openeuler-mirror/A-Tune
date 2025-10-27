@@ -3,6 +3,7 @@ import re
 from enum import Enum
 from string import Template
 from dataclasses import dataclass, asdict, field
+from typing import Dict
 
 from src.utils.constant import SCRIPTS_PATH
 from src.utils.shell_execute import SshClient
@@ -257,7 +258,7 @@ class AppInterface:
         # 防止重复初始化
         if not getattr(self, "_initialized", False):
             self._config = env_config.get("app_config")
-            self._instances = {}
+            self._instances : Dict[str, AppTemplate] = {}
             self.ssh_client = ssh_client  # 保存 ssh_client
             self._initialize_instances()
             self.__class__._initialized = True
@@ -276,7 +277,7 @@ class AppInterface:
     def __getattr__(self, item):
         return self.get(item)
 
-    def get(self, item):
+    def get(self, item) -> AppTemplate:
         if item in self._instances:
             return self._instances[item]
         raise AttributeError(f"'AppInterface' object has no attribute '{item}'")
