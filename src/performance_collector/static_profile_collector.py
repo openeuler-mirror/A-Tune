@@ -218,7 +218,7 @@ def nic_queues_parser(output: str) -> dict:
 
 
 @cmd_pipeline(
-    cmd="ethtool -l $(ls /sys/class/net | grep -v lo | head -n1)",
+    cmd="for iface in $(ls /sys/class/net); do ethtool -l $iface &>/dev/null && ethtool $iface && break; done",
     tag="static",
     parallel=True,
 )
