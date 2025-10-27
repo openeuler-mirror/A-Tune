@@ -159,7 +159,7 @@ class ParamOptimizer:
                     f"[ParamOptimizer] failed to run pressure test, err msg is {pressure_test_result.err_msg}"
                 )
 
-            baseline = float(pressure_test_result.output.output)
+            baseline = float(pressure_test_result.output)
             logging.info(
                 f"[ParamOptimizer] pressure test finished, baseline is {baseline}"
             )

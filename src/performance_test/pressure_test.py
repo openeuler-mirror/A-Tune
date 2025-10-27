@@ -47,9 +47,7 @@ class PressureTest(threading.Thread):
         global _pressure_test_running
         try:
             _pressure_test_running.set()
-            benchmark_result = self.app_interface.benchmark()
-            _pressure_test_result.status_code = 0
-            _pressure_test_result.output = benchmark_result
+            _pressure_test_result = self.app_interface.benchmark()
         except Exception as e:
             _pressure_test_result.status_code = -1
             _pressure_test_result.err_msg = (

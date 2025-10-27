@@ -60,7 +60,7 @@ class MetricCollector:
 
             if event_status == TriggerStatus.CLOSE:
                 raise RuntimeError(
-                    f"[MetricCollector] waiting for trigger signale timeout, skip tasks"
+                    f"[MetricCollector] waiting for trigger signal timeout, skip tasks"
                 )
         # 调用每个子收集器的 run 方法
         cpu_data = self.cpu_collector.run()

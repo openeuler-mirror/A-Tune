@@ -133,7 +133,6 @@ def process_decorated_func(
         processed_result = func(result.output, *args, **kwargs)
         result.output = processed_result
     except Exception as e:
-        print(traceback.format_exc())
         result.status_code = -1
         result.err_msg = str(e)
     return result
