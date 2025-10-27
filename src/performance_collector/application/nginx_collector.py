@@ -68,7 +68,7 @@ def parse_nginx_status(output: list[str]) -> dict:
                 conn_sum[k] += item.get(k, 0)
 
     avg_conns = {
-        f"{DURATION}s内平均{k}": conn_sum[k] // valid_samples
+        f"{DURATION}s内平均{k}": conn_sum[k] // valid_samples if valid_samples > 0 else 0
         for k in conn_keys
     }
 
