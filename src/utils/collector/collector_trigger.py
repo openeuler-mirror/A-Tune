@@ -187,12 +187,12 @@ class TriggerEventListener:
             _, stdout, stderr = ssh.exec_command(cmd, timeout=5)
             exit_code = stdout.channel.recv_exit_status()
             if exit_code == 0:
-                logging.debug("clear remote signal file %s", self.remote_path)
+                logging.info("clear remote signal file %s", self.remote_path)
             else:
-                logging.debug("clear remote signal file failed, exit=%s, err=%s",
+                logging.error("clear remote signal file failed, exit=%s, err=%s",
                                 exit_code, stderr.read().decode())
         except Exception as e:
-            logging.debug("clear remote signal file exception: %s", e)
+            logging.error("clear remote signal file exception: %s", e)
 
     def _read_local(self) -> str:
         result = subprocess.run(f"cat {FIFO_PATH}".split(), capture_output=True, text=True)
@@ -205,7 +205,7 @@ class TriggerEventListener:
             if result.returncode == 0:
                 logging.info("clear local signal file %s", FIFO_PATH)
             else:
-                logging.info("clear local signal file failed, exit=%s, err=%s", 
+                logging.error("clear local signal file failed, exit=%s, err=%s", 
                              result.returncode, result.stderr)
         except Exception as e:
             logging.error("clear local signal file exception: %s", e)
