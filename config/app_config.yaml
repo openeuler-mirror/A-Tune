@@ -73,8 +73,8 @@ system:
 redis:
   port: 6379
   config_file: "/etc/redis.conf"
-  set_param_template: "sed -i 's/^$param_name/$param_name $param_value/g' $config_file"
-  get_param_template: "grep -P '$param_name' $config_file | awk '{print $2}"
+  set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s/^\\s*$param_name\\s\\+.*/$param_name $param_value/g" $config_file || echo "$param_name $param_value" >> "$config_file"'
+  get_param_template: 'grep -oP "^\s*$param_name\s*\K.*" "$config_file"'
   start_workload: "systemctl start redis"
   stop_workload: "systemctl stop redis"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/redis/parse_benchmark.sh $host_ip $port "
