@@ -205,7 +205,7 @@ get_param_template: 'grep -E "^$param_name\\s*=" $config_file | cut -d= -f2- | x
 ```YAML  
 # 说明：
 #   - $EXECUTE_MODE:local    → 在 Copilot 控制机本地执行
-#   - $EXECUTE_MODE:remote   → 通过 SSH 跳转到目标机器执行
+#   - $EXECUTE_MODE:remote   → 通过 SSH 跳转到目标机器执行，默认使用remote执行模式
 #   - 其他变量（如 $host_ip, $port, $user）将被自动替换
 
 # 示例（mysql）：
