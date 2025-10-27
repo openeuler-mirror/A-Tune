@@ -140,6 +140,7 @@ class AppTemplate:
             mode = ExecuteMode.REMOTE if mode_str is None else ExecuteMode(mode_str)
             return self.mode_map[mode], remaining_string
         else:
+            # 默认使用remote执行模式
             return self.mode_map[ExecuteMode.REMOTE], cmd
 
     def get_param(self, param_name):
@@ -282,7 +283,7 @@ class AppInterface:
 
 
 if __name__ == "__main__":
-    class SshClient:
+    class SimpleSshClient:
         def __init__(self):
             pass
 
@@ -290,7 +291,7 @@ if __name__ == "__main__":
             print(cmd)
 
 
-    ssh_client = SshClient()
+    ssh_client = SimpleSshClient()
     app_interface = AppInterface(ssh_client)
     app = app_interface.mysql
     sys = app_interface.system
