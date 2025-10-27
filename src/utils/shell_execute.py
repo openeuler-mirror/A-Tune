@@ -145,7 +145,7 @@ def cmd_pipeline(
         parallel: bool = False,
 ):
     '''
-    return a func which first runs cmd, then run decorated parsing function based on cmd output.
+    return a func which first runs cmd using ssh client, then run decorated parsing function based on cmd output.
     
     Also, record decorated function in global dict, including func info like function itself, tag and parallel values by "func", "tag" and "parallel" keys.
     
@@ -170,18 +170,17 @@ def cmd_pipeline(
 def get_registered_cmd_funcs(
         module: ModuleType, parallel: bool = True
 ) -> List[Dict]:
-    '''return func info dicts, with "func" and "tag" keys, filtered by same parallel attribute
+    '''
+    return func info dicts of certain module, with "func" and "tag" keys, filtered by same parallel attribute;
+    these funcs need SshClient as first argument, in order to run cmd remotely.
     '''
     if not isinstance(module, ModuleType) or not hasattr(module, "__file__"):
         raise RuntimeError(
             f"module {module.__name__} has no attr __file__, maybe it is a built-in module"
         )
-    caller_file = module.__file__
-
-    registered_funcs = decorated_funcs.get(caller_file, [])
 
     func_list = []
-    for func_info in registered_funcs:
+    for func_info in decorated_funcs.get(module.__file__, []):
         if func_info["parallel"] == parallel:
             func_list.append({"func": func_info["func"], "tag": func_info["tag"]})
     return func_list
