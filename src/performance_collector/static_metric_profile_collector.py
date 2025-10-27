@@ -24,7 +24,7 @@ class StaticMetricProfileCollector:
 
     def _add_tasks(self, *args):
         for module in args:
-            func_info_list = get_registered_cmd_funcs(module)
+            func_info_list = get_registered_cmd_funcs(module, parallel = True)
             self.thread_pool.add_batch(
                 [(func_info["func"], (self.ssh_client,), {"tag": func_info["tag"]}) for func_info in func_info_list]
             )
