@@ -47,7 +47,9 @@ class ThreadPoolManager:
         self.all_results: List[TaskResult] = []
         self.pending: list[tuple[str, Callable, tuple, dict]] = []
         self.tag_map: dict = {}
+        '''tag_map saves task_id to tag info'''
         self.task_meta: Dict[str, str] = {}
+        '''task_meta saves task_id to func name info''' 
 
     # add a task to be run, every task will be asigned a task id
     # user can query whether this task has been done by is_done method
@@ -58,24 +60,30 @@ class ThreadPoolManager:
         self.tag_map[task_id] = kwargs.pop("tag", "default_tag")
         return task_id
 
-    """
-    batch submit tasks, for example:
-    def hello():
-        return "hello"
-
-    def add(x, y):
-        return x + y
-
-    tasks = [
-        hello,
-        (add, (1, 2), {}),
-        (add, (3, 4), {"z": 5})
-    ]
-    """
-
     def add_batch(
         self, tasks: Iterable[Union[Callable, Tuple[Callable, Tuple, Dict]]]
     ) -> List[str]:
+        """
+        batch submit tasks, tasks will be added into pending list. return task uuids.
+        
+        tasks will start running in multi-thread async way after calling run_all_tasks().
+        
+        wait and get all tasks results by calling get_all_results().
+        
+        for example:
+        
+        def hello():
+            return "hello"
+
+        def add(x, y):
+            return x + y
+
+        tasks = [
+            hello,
+            (add, (1, 2), {}),
+            (add, (3, 4), {"z": 5})
+        ]
+        """
         uuids = []
         for task in tasks:
             if callable(task):
@@ -101,6 +109,7 @@ class ThreadPoolManager:
             uuids_all.extend(uuids_batch)
         return uuids_all
 
+    # submit all tasks in pending list and record in tasks map
     def run_all_tasks(self) -> None:
         for task_id, func, args, kwargs in self.pending:
             future = self.executor.submit(func, *args, **kwargs)
@@ -139,6 +148,7 @@ class ThreadPoolManager:
                 )
             )
 
+    # wait until all task done and return results
     def get_all_results(self) -> List[TaskResult]:
         self.wait_all()
         self.tasks.clear()

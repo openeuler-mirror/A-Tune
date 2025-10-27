@@ -7,7 +7,7 @@ import traceback
 from collections import defaultdict
 from functools import wraps
 from types import ModuleType
-from typing import Callable
+from typing import Callable, Dict, List
 
 import paramiko
 
@@ -144,27 +144,34 @@ def cmd_pipeline(
         tag: str = "default_tag",
         parallel: bool = False,
 ):
+    '''
+    return a func which first runs cmd, then run decorated parsing function based on cmd output.
+    
+    Also, record decorated function in global dict, including func info like function itself, tag and parallel values by "func", "tag" and "parallel" keys.
+    
+    Get all registered func infos of certain module by calling get_registered_cmd_funcs().
+    '''
     def decorator(func):
-        file = inspect.getfile(func)
-
         @wraps(func)
-        def wrapper(ssh_client, *args, **kwargs):
+        def wrapper(ssh_client: SshClient, *args, **kwargs):
             result = ssh_client.run_cmd(cmd)
             if result.status_code == 0:
                 return process_decorated_func(result, func)
             return result
 
+        file = inspect.getfile(func)
         decorated_funcs[file].append(
             {"func": wrapper, "tag": tag, "parallel": parallel}
         )
         return wrapper
-
     return decorator
 
 
 def get_registered_cmd_funcs(
         module: ModuleType, parallel: bool = True
-):
+): -> List[Dict]:
+    '''return func info dicts, with "func" and "tag" keys, filtered by same parallel attribute
+    '''
     if not isinstance(module, ModuleType) or not hasattr(module, "__file__"):
         raise RuntimeError(
             f"module {module.__name__} has no attr __file__, maybe it is a built-in module"
