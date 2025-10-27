@@ -12,7 +12,7 @@ class TaskResult:
         self,
         uuid: str,
         func_name: str = "",
-        result: Any | str = None,
+        result: Any | str | ExecuteResult = None,
         status_code: int = 0,
         tag: str = "default_tag",
     ):
@@ -214,18 +214,14 @@ class SerialTaskManager:
                 result = func(*args, **kwargs)
                 status_code = 0
             except Exception as e:
-                result = ExecuteResult(
-                    status_code=-1, output="", err_msg=traceback.format_exc()
-                )
+                result = traceback.format_exc()
                 status_code = -1
 
         thread = threading.Thread(target=target)
         thread.start()
         thread.join(timeout=30)  # 设置超时时间为30秒
         if thread.is_alive():
-            result = ExecuteResult(
-                status_code=-1, output="", err_msg="Task timed out after 30 seconds"
-            )
+            result = "Task timed out after 30 seconds"
             status_code = -1
         return TaskResult(task_id, func_name, result, status_code, tag)
 

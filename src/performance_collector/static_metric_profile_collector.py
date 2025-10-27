@@ -1,4 +1,5 @@
 import logging
+from typing import Dict
 
 from src.performance_collector import static_profile_collector
 from src.utils.shell_execute import get_registered_cmd_funcs
@@ -40,17 +41,21 @@ class StaticMetricProfileCollector:
         logging.info(
             "[StaticMetricProfileCollector] collecting static profile data ..."
         )
-        parsed_results = {}
+        parsed_results: Dict[str, Dict] = {}
 
         self.thread_pool.run_all_tasks()
         task_results = self.thread_pool.get_all_results()
 
         for task_result in task_results:
+            if task_result.status_code != 0:
+                logging.warning(f"failed to execute task {task_result.func_name}, exception is {task_result.result}")
+                continue
             if task_result.tag not in parsed_results:
                 parsed_results[task_result.tag] = {}
+            # each task returns ExecueteResult object, and its output is dict of matric key and values
             if task_result.result.status_code == 0:
                 parsed_results[task_result.tag].update(task_result.result.output)
             else:
-                logging.warning(f"error while execute task {task_result.func_name}, err_msg is {task_result.result}")
+                logging.warning(f"error while execute task {task_result.func_name}, err_msg is {task_result.result.err_msg}")
 
         return parsed_results

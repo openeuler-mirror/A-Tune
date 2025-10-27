@@ -1,4 +1,5 @@
 import logging
+import subprocess
 import threading
 import time
 from enum import Enum, auto
@@ -128,8 +129,10 @@ class TriggerEventListener:
                     self._set_status(TriggerStatus.CLOSE)
                     break
                 try:
+                    # 尝试读取远程的信号
                     val = self._read_remote(ssh).strip()
                     if val == "1":
+                        logging.info("remote trigger signal received, start collecting ...")
                         self._delete_remote(ssh)
                         self._set_status(TriggerStatus.TRIGGERED)
                         break
@@ -137,6 +140,17 @@ class TriggerEventListener:
                     logging.warning("read error: %s", e)
                     # 可重连
                     ssh = self._reconnect(ssh)
+
+                try:
+                    # 尝试读取本地的信号
+                    val = self._read_local().strip()
+                    if val == "1":
+                        logging.info("local trigger signal received, start collecting ...")
+                        self._delete_local()
+                        self._set_status(TriggerStatus.TRIGGERED)
+                        break
+                except Exception as e:
+                    logging.error("read error: %s", e)
 
                 time.sleep(self.poll_interval)
         finally:
@@ -154,31 +168,47 @@ class TriggerEventListener:
                     timeout=10)
         return ssh
 
-    def _reconnect(self, old_ssh):
+    def _reconnect(self, old_ssh: paramiko.SSHClient):
         try:
             old_ssh.close()
         except:
             pass
         return self._connect()
 
-    def _read_remote(self, ssh):
+    def _read_remote(self, ssh: paramiko.SSHClient):
         cmd = f"cat {self.remote_path}"
         _, stdout, _ = ssh.exec_command(cmd, timeout=5)
         return stdout.read().decode()
 
-    def _delete_remote(self, ssh):
-        """删除 remote_path，失败仅警告"""
+    def _delete_remote(self, ssh: paramiko.SSHClient):
+        """清理 remote_path，失败仅警告"""
         cmd = f"rm -f {self.remote_path}"
         try:
             _, stdout, stderr = ssh.exec_command(cmd, timeout=5)
             exit_code = stdout.channel.recv_exit_status()
             if exit_code == 0:
-                logging.debug("已删除远程文件 %s", self.remote_path)
+                logging.debug("clear remote signal file %s", self.remote_path)
             else:
-                logging.debug("删除远程文件失败，exit=%s, err=%s",
+                logging.debug("clear remote signal file failed, exit=%s, err=%s",
                                 exit_code, stderr.read().decode())
         except Exception as e:
-            logging.debug("删除远程文件异常: %s", e)
+            logging.debug("clear remote signal file exception: %s", e)
+
+    def _read_local(self) -> str:
+        result = subprocess.run(f"cat {FIFO_PATH}".split(), capture_output=True, text=True)
+        return result.stdout.strip()
+
+    def _delete_local(self):
+        """清理本地信号文件，失败仅警告"""
+        try:
+            result = subprocess.run(f"rm -f {FIFO_PATH}".split(), capture_output=True, text=True)
+            if result.returncode == 0:
+                logging.info("clear local signal file %s", FIFO_PATH)
+            else:
+                logging.info("clear local signal file failed, exit=%s, err=%s", 
+                             result.returncode, result.stderr)
+        except Exception as e:
+            logging.error("clear local signal file exception: %s", e)
 
 
 if __name__ == "__main__":

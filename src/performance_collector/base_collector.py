@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from typing import Dict, Any
 from typing import List, Optional
+import logging
 
 from pydantic import BaseModel, Field
 
@@ -30,6 +31,8 @@ class BaseCollector:
             cmd_res = self.args.ssh_client.run_cmd(
                 cmd=cmd
             )
+            if cmd_res.status_code != 0:
+                logging.warning(f"collector cmd {cmd} returns {cmd_res.status_code}: {cmd_res.err_msg}")
             res = {cmd: cmd_res.output}
             result = {**result, **res}
         return result
