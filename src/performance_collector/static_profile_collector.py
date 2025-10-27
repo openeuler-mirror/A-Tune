@@ -233,7 +233,7 @@ def ethtool_speed_parser(output: str) -> dict:
     return metrics
 
 
-@cmd_pipeline(cmd="lspci -vv | grep -i sriov -A5", tag="static", parallel=True)
+@cmd_pipeline(cmd="lspci -vv | grep -i sriov -A5 || echo ''", tag="static", parallel=True)
 def sriov_parser(output: str) -> dict:
     """
     解析 lspci -vv | grep -i sriov -A5：是否支持 SR-IOV，最大 VF 数
