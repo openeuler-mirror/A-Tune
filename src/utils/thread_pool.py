@@ -12,7 +12,7 @@ class TaskResult:
         self,
         uuid: str,
         func_name: str = "",
-        result: Any = None,
+        result: Any | str = None,
         status_code: int = 0,
         tag: str = "default_tag",
     ):
@@ -131,9 +131,7 @@ class ThreadPoolManager:
                 result = future.result()
                 status_code = 0
             except Exception as e:
-                result = ExecuteResult(
-                    status_code=-1, output="", err_msg=traceback.format_exc()
-                )
+                result = traceback.format_exc()
                 status_code = -1
             self.all_results.append(
                 TaskResult(

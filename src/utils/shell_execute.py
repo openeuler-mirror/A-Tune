@@ -89,7 +89,7 @@ class SshClient:
         return result
 
     @retryable()
-    def run_local_cmd(self, cmd):
+    def run_local_cmd(self, cmd) -> ExecuteResult:
         result = ExecuteResult()
         try:
             # 使用 shlex.split 将命令字符串分割为参数列表
@@ -178,3 +178,16 @@ def get_registered_cmd_funcs(
         if func_info["parallel"] == parallel:
             func_list.append({"func": func_info["func"], "tag": func_info["tag"]})
     return func_list
+
+if __name__ == "__main__":
+    ssh_client = SshClient()
+    result = ssh_client.run_local_cmd("ls /root/abc")
+    print(result.status_code)
+    print(result.output)
+    print(result.err_msg)
+    
+    ssh_client = SshClient(host_ip="127.0.0.1", host_password="")
+    result = ssh_client.run_cmd("ls /root/abc")
+    print(result.status_code)
+    print(result.output)
+    print(result.err_msg)
