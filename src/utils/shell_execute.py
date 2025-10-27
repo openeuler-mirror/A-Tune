@@ -128,7 +128,7 @@ class SshClient:
 
 def process_decorated_func(
         result: ExecuteResult, func: Callable, *args, **kwargs
-):
+) -> ExecuteResult:
     try:
         processed_result = func(result.output, *args, **kwargs)
         result.output = processed_result
@@ -169,7 +169,7 @@ def cmd_pipeline(
 
 def get_registered_cmd_funcs(
         module: ModuleType, parallel: bool = True
-): -> List[Dict]:
+) -> List[Dict]:
     '''return func info dicts, with "func" and "tag" keys, filtered by same parallel attribute
     '''
     if not isinstance(module, ModuleType) or not hasattr(module, "__file__"):

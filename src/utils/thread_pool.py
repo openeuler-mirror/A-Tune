@@ -46,7 +46,7 @@ class ThreadPoolManager:
         self.tasks: Dict[str, concurrent.futures.Future] = {}
         self.all_results: List[TaskResult] = []
         self.pending: list[tuple[str, Callable, tuple, dict]] = []
-        self.tag_map: dict = {}
+        self.tag_map: Dict[str, str] = {}
         '''tag_map saves task_id to tag info'''
         self.task_meta: Dict[str, str] = {}
         '''task_meta saves task_id to func name info''' 
