@@ -6,12 +6,6 @@ from src.performance_test.pressure_test import wait_for_pressure_test
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 class ParamOptimizer:
 
     def __init__(

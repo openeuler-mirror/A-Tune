@@ -9,10 +9,6 @@ from src.config import config
 from src.performance_collector.application import pgsql_collector
 from src.performance_analyzer.application.pgsql_analyzer import PgsqlAnalyzer
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 host_ip = config["servers"][0]["ip"]
 host_port = config["servers"][0]["port"]
 host_user = config["servers"][0]["host_user"]

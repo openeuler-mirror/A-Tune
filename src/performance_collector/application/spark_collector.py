@@ -19,9 +19,6 @@ SAMPLE_INTERVAL = 60
 SAMPLE_COUNT = 2
 DURATION = SAMPLE_INTERVAL * (SAMPLE_COUNT - 1)
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-
 @snapshot_task(
     cmd="curl -s {}/api/v1/applications | jq -r '.[0].id'".format(SPARK_HISTORY_SERVER),
     tag="spark作业信息",

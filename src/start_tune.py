@@ -13,16 +13,6 @@ from src.utils.common import display_metrics
 from src.utils.shell_execute import SshClient
 
 
-def setup_logging():
-    """配置日志格式与级别"""
-    log_level = config["log_level"].upper()
-    logging.basicConfig(
-        level=getattr(logging, log_level, logging.INFO),
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
-
 def create_ssh_client(server_cfg):
     """根据配置创建 SSH 客户端"""
     return SshClient(
@@ -138,7 +128,6 @@ def run_strategy_optimization(ssh_client, app, bottleneck, server_cfg, report):
 
 
 def main():
-    setup_logging()
     server_cfg = config["servers"][0]
     feature_cfg = config["feature"][0]
 

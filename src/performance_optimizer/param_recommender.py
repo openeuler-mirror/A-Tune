@@ -12,11 +12,6 @@ from src.utils.metrics import PerformanceMetric
 from src.utils.shell_execute import SshClient
 from src.utils.thread_pool import thread_pool_manager
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 from src.utils.prompt_instance import prompt_manager
 
 class ParamRecommender:

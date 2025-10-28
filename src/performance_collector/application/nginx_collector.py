@@ -7,10 +7,6 @@ from src.utils.collector.metric_collector import (
     CollectMode,
 )
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 NINGX_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["listening_address"] else "127.0.0.1"
 NINGX_PORT = config["servers"][0]["listening_port"] if config["servers"][0]["listening_port"] else 10000
 

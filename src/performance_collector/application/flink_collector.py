@@ -9,9 +9,6 @@ FLINK_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["
 FLINK_PORT = config["servers"][0]["listening_port"] if config["servers"][0]["listening_port"] else 8081
 FLINK_API = f"http://{FLINK_HOST}:{FLINK_PORT}"
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-
 @snapshot_task(
     cmd=(
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}"

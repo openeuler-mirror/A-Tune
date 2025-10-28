@@ -7,10 +7,6 @@ from src.utils.collector.metric_collector import (
     CollectMode,
 )
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 GAUSS_INTERVAL = 60
 
 # -------------------- 1. 后台写入与检查点（两次采样） --------------------

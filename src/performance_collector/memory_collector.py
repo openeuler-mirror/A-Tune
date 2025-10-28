@@ -6,9 +6,6 @@ from enum import Enum
 class MemoryMetric(Enum):
     TODO = "XX"
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 omm_kill_cmd = "(oom_kill1=$(cat /proc/vmstat | grep oom_kill | awk '{print$2}'); sleep 5; oom_kill2=$(cat /proc/vmstat | grep oom_kill | awk '{print$2}')) && echo $((oom_kill2 - oom_kill1))"
 
 def get_memory_cmd()-> List[str]:

@@ -9,8 +9,6 @@ class CpuMetric(Enum):
     FIVE_MINUTE_AVG_LOAD  = "5min"
     TEN_MINUTE_AVG_LOAD  = "10min"
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 perf = "perf stat -e 'syscalls:*' -a sleep 1 2>&1 | grep syscalls| awk '{sum += $1} END {print sum}'"
 
 def get_cpu_cmd()-> List[str]:

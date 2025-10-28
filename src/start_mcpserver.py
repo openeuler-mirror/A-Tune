@@ -20,9 +20,6 @@ from src.utils.shell_execute import SshClient
 from src.start_tune import run_param_optimization, run_strategy_optimization
 
 # ================= 全局配置与缓存 ===================
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 cache: Dict[str, Dict[str, Any]] = {}
 
 # 创建MCP Server
