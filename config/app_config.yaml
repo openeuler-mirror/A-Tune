@@ -59,7 +59,7 @@ gaussdb:
   config_file: "/path/of/config_file"
   port: 5432
   set_param_template: 'gs_guc set -Z datanode  -N all -I all -c "${param_name}=${param_value}"'
-  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}"'
+  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}" | awk -F= "/${param_name}=/"\ {print\ \$2}'
   stop_workload: "cm_ctl stop -m i"
   start_workload: "cm_ctl start"
   recover_workload: "$EXECUTE_MODE:local sh /path/of/gaussdb_cluster_recover.sh"

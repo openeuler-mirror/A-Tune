@@ -5,9 +5,6 @@ from src.performance_collector import static_profile_collector
 from src.utils.shell_execute import get_registered_cmd_funcs
 from src.utils.thread_pool import ThreadPoolManager
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 class StaticMetricProfileCollector:
     def __init__(
         self,

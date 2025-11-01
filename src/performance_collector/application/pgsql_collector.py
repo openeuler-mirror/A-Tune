@@ -9,10 +9,6 @@ from src.utils.collector.metric_collector import (
     CollectMode,
 )
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 BIG_WRITER_COLLECT_INTERVAL = 180
 
 

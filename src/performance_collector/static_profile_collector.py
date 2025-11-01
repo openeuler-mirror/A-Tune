@@ -3,11 +3,6 @@ import re
 
 from src.utils.shell_execute import cmd_pipeline
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 @cmd_pipeline(cmd="lscpu", tag="static", parallel=True)
 def lscpu_parser(output: str) -> dict:
     """解析 lscpu 输出：物理/逻辑核心、主频、L3 Cache、NUMA 拓扑"""
@@ -218,7 +213,7 @@ def nic_queues_parser(output: str) -> dict:
 
 
 @cmd_pipeline(
-    cmd="ethtool -l $(ls /sys/class/net | grep -v lo | head -n1)",
+    cmd="for iface in $(ls /sys/class/net); do ethtool -l $iface &>/dev/null && ethtool $iface && break; done",
     tag="static",
     parallel=True,
 )
@@ -233,7 +228,7 @@ def ethtool_speed_parser(output: str) -> dict:
     return metrics
 
 
-@cmd_pipeline(cmd="lspci -vv | grep -i sriov -A5", tag="static", parallel=True)
+@cmd_pipeline(cmd="lspci -vv | grep -i sriov -A5 || echo ''", tag="static", parallel=True)
 def sriov_parser(output: str) -> dict:
     """
     解析 lspci -vv | grep -i sriov -A5：是否支持 SR-IOV，最大 VF 数

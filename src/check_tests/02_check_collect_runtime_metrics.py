@@ -1,0 +1,10 @@
+import json
+from src.check_tests.check_tests_utils import check_collect_runtime_metrics
+
+def main():
+    result = check_collect_runtime_metrics()
+    
+    print(f"{json.dumps(result, indent=4, ensure_ascii=False)}")
+
+if __name__ == "__main__":
+    main()

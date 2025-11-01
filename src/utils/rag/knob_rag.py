@@ -12,9 +12,6 @@ from tqdm import tqdm
 
 from src.utils.llm import get_llm_response, get_embedding
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 class KnobRag:
     def __init__(self, config_path: str, bottle_neck: str, application: str, system_report: str):
         self.bottle_neck = bottle_neck

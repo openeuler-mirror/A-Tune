@@ -4,6 +4,8 @@ import requests
 from src.config import config
 from langchain_openai import ChatOpenAI
 import httpx
+from colorama import init, Fore, Style
+import logging
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 requests.Session.verify = False
@@ -30,7 +32,18 @@ def get_llm_response(prompt: str, **kwargs) -> str:
     else:
         raise ValueError(f"无效的SSL配置: {config['ssl']}，必须为 'enable' 或 'disable'")
     result = client.invoke(input=prompt, **kwargs)
-    return re.sub(r"<think>.*?</think>", "", result.content, flags=re.DOTALL)
+    logging.debug("%sget_llm_response ask:\n%s\n%s", Fore.YELLOW, prompt, Style.RESET_ALL)
+
+    match = re.search(r"<think>(.*?)</think>(.*)", result.content, flags=re.DOTALL)
+    if match:
+        thought_process = match.group(1).strip("\n")
+        thought_result = match.group(2).strip("\n")
+        logging.debug("%sget_llm_response think:\n%s\n%s", Fore.GREEN, thought_process, Style.RESET_ALL)
+        logging.debug("%sget_llm_response ans:\n%s\n%s", Fore.GREEN, thought_result, Style.RESET_ALL)
+        return thought_result
+    else:
+        logging.debug("%sget_llm_response ans:\n%s\n%s", Fore.GREEN, result, Style.RESET_ALL)
+        return result.content
 
 
 def get_embedding(text: str) -> List[float]:

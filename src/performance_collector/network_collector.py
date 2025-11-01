@@ -8,9 +8,6 @@ from .base_collector import BaseCollector
 class NetworkMetric(Enum):
     TODO = "XX"
 
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 ListenOverflows = ("ListenOverflows1=$(cat /proc/net/netstat | grep 'TcpExt:' | awk '{print$20}' | tail -n 1); sleep 5;"
                    "ListenOverflows2=$(cat /proc/net/netstat | grep 'TcpExt:' | awk '{print$20}' | tail -n 1); "
                    "echo $((ListenOverflows2 - ListenOverflows1))")

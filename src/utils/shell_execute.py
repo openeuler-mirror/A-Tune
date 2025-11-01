@@ -16,12 +16,6 @@ from src.utils.common import ExecuteResult
 decorated_funcs = defaultdict(list)
 cmds_registry = defaultdict(list)
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 def retryable(max_retries: int = 3, delay: int = 1):
     def decorator(func):
         @wraps(func)

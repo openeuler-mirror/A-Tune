@@ -7,8 +7,6 @@ from enum import Enum
 class DiskMetric(Enum):
     TODO = "XX"
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 def get_disk_cmd()-> List[str]:
     return list(DISK_PARSE_FUNCTIONS.keys())
 

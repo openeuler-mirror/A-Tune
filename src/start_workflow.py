@@ -27,9 +27,6 @@ app = FastAPI(
 )
 
 # ================= 全局配置与缓存 ===================
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 cache: Dict[str, Dict[str, Any]] = {}
 
 host_ip = config["servers"][0]["ip"]

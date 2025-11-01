@@ -10,10 +10,6 @@ from src.utils.constant import OPTIMIZE_CONFIG_PATH
 from src.utils.llm import get_llm_response
 from src.utils.shell_execute import SshClient
 
-# 配置日志
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
 class OptimizerArgs(BaseModel):
     bottle_neck: str = ""
     application: str = ""

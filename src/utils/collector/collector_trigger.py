@@ -6,25 +6,14 @@ from enum import Enum, auto
 
 import paramiko
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 # FIFO 文件路径
 FIFO_PATH = "/tmp/euler-copilot-fifo"
 MAX_WAIT_TIMEOUT = 300
-
 
 class TriggerStatus(Enum):
     WAITING = auto()
     TRIGGERED = auto()
     CLOSE = auto()
-
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 
 class TriggerEventListener:
     """

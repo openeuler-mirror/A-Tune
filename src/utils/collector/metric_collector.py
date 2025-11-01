@@ -27,11 +27,6 @@ class CollectType(Enum):
     TRIGGERED = "triggered"
     DIRECT = "direct"
 
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 SYNC_DIRECT_TASKS = defaultdict(list)
 ASYNC_TASKS = defaultdict(list)
 SYNC_TRIGGERED_TASKS = defaultdict(list)

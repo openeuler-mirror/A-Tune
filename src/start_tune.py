@@ -13,15 +13,6 @@ from src.utils.common import display_metrics
 from src.utils.shell_execute import SshClient
 
 
-def setup_logging():
-    """配置日志格式与级别"""
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
-
 def create_ssh_client(server_cfg):
     """根据配置创建 SSH 客户端"""
     return SshClient(
@@ -137,7 +128,6 @@ def run_strategy_optimization(ssh_client, app, bottleneck, server_cfg, report):
 
 
 def main():
-    setup_logging()
     server_cfg = config["servers"][0]
     feature_cfg = config["feature"][0]
 
@@ -151,7 +141,7 @@ def main():
                                                         feature_cfg["microDep_collector"])
 
     report, bottleneck = analyze_performance(metrics_data, server_cfg["app"])
-    logging.info(f">>> PerformanceAnalyzer运行结果：{report} {bottleneck}")
+    logging.info(f">>> PerformanceAnalyzer运行结果：\n{report}\n分析结论：\n{bottleneck}")
 
     run_param_optimization(
         server_cfg["app"], report, static_profile_info, ssh_client,

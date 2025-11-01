@@ -16,11 +16,6 @@ from src.utils.collector.metric_collector import (
 MAX_TASK_TIMEOUT = 300
 triggered_event_listener = TriggerEventListener()
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-
 def wait_for_signal():
     # waiting状态会阻塞程序，close状态和triggered状态是立即返回的
     event_status = triggered_event_listener.wait()

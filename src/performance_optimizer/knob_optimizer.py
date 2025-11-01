@@ -7,8 +7,6 @@ from src.utils.rag.knob_rag import KnobRag
 from .base_optimizer import BaseOptimizer
 from ..utils.constant import KNOB_RAG_CONFIG_PATH
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 CORE_CPU_KNOBS = [
     "kernel.numa_balancing",
     "kernel.sched_autogroup_enabled",

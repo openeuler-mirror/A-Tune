@@ -1,24 +1,18 @@
 import logging
-from io import StringIO
-
 import pandas as pd
-
+from io import StringIO
 from src.utils.collector.metric_collector import (
     period_task,
     snapshot_task,
     CollectMode,
 )
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-GAUSS_INTERVAL = 180
-
+GAUSS_INTERVAL = 60
 
 # -------------------- 1. 后台写入与检查点（两次采样） --------------------
 @period_task(
-    cmd='gsql -d tpch  -A -F , -c "SELECT * FROM pg_stat_bgwriter;"',
+    # cmd='gsql -p 17777 -d tpcc1000w_ustore  -A -F , -c "SELECT * FROM pg_stat_bgwriter;"',
+    cmd='source ~/.bashrc && gsql -d tpcc -p 11111 -c "SELECT * FROM pg_stat_bgwriter;"',
     collect_mode=CollectMode.ASYNC,
     tag="GaussDB后台写入与检查点",
     delay=0,
@@ -53,13 +47,13 @@ def gauss_bgwriter_parser(output: list[str]) -> dict:
         except (ValueError, TypeError):
             delta = 0
         result[f"{GAUSS_INTERVAL // 60}分钟内{label}"] = max(delta, 0)
-    cmd = '''gsql -d tpch  -A -F , -c "SELECT * FROM pg_stat_bgwriter;"'''
-    return {cmd: result}
+    print("GaussDB后台写入与检查点:", result)
+    return result
 
 
 # -------------------- 2. 事务与IO（两次采样） --------------------
 @period_task(
-    cmd='''gsql -d tpch  -A -F , -c "
+    cmd='''source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "
     SELECT sum(xact_commit)   as commits,
         sum(xact_rollback) as rollbacks,
         sum(blks_read)     as blks_read,
@@ -82,34 +76,27 @@ def gauss_dbstat_parser(output: list[str]) -> dict:
         return {}
 
     r1, r2 = df1.iloc[0].to_dict(), df2.iloc[0].to_dict()
-    result = {}
+    res = {}
     for col in ("commits", "rollbacks", "blks_read", "blks_hit", "tup_returned", "tup_fetched"):
         try:
             delta = int(r2[col]) - int(r1[col])
         except (ValueError, TypeError):
             delta = 0
-        result[f"{GAUSS_INTERVAL // 60}分钟内{col}"] = max(delta, 0)
+        res[f"{GAUSS_INTERVAL // 60}分钟内{col}"] = max(delta, 0)
 
     # 计算命中率
-    hit_delta = result[f"{GAUSS_INTERVAL // 60}分钟内blks_hit"]
-    read_delta = result[f"{GAUSS_INTERVAL // 60}分钟内blks_read"]
-    result[f"{GAUSS_INTERVAL // 60}分钟内Buffer命中率"] = (
-        round(hit_delta * 100 / (hit_delta + read_delta), 2) if (hit_delta + read_delta) else 0
+    hit_delta = res.get(f"{GAUSS_INTERVAL // 60}分钟内blks_hit", 0)
+    read_delta = res.get(f"{GAUSS_INTERVAL // 60}分钟内blks_read", 0)
+    res[f"{GAUSS_INTERVAL // 60}分钟内Buffer命中率"] = (
+        round(hit_delta * 100 / (hit_delta + read_delta),
+              2) if (hit_delta + read_delta) else 0
     )
-    cmd = '''gsql -d tpch  -A -F , -c "
-            SELECT sum(xact_commit)   as commits,
-                sum(xact_rollback) as rollbacks,
-                sum(blks_read)     as blks_read,
-                sum(blks_hit)      as blks_hit,
-                sum(tup_returned)  as tup_returned,
-                sum(tup_fetched)   as tup_fetched
-            FROM pg_stat_database;"'''
-    return {cmd: result}
+    return res
 
 
 # -------------------- 3. 会话信息（实时快照） --------------------
 @snapshot_task(
-    cmd='''gsql -d tpch  -A -F , -c "
+    cmd='''source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "
 SELECT datname, state, waiting, enqueue
 FROM pg_stat_activity;"''',
     collect_mode=CollectMode.ASYNC,
@@ -123,33 +110,33 @@ def gauss_activity_parser(output: str) -> dict:
         "waiting": "是否等待",
         "enqueue": "排队/锁信息",
     }
-    cmd = '''gsql -d tpch  -A -F , -c "SELECT datname, state, waiting, enqueueFROM pg_stat_activity;"'''
-    result = [
-        {mapping.get(k, k): v for k, v in row.items()}
-        for _, row in df.iterrows()
-    ]
-    return {cmd: result}
+    return {
+        "会话信息": [
+            {mapping.get(k, k): v for k, v in row.items()}
+            for _, row in df.iterrows()
+        ]
+    }
 
 
 # -------------------- 4. 锁信息（实时快照） --------------------
 @snapshot_task(
-    cmd='''gsql -d tpch  -A -F , -c "SELECT mode, granted, COUNT(*) AS count FROM pg_locks GROUP BY mode, granted;"''',
+    cmd='source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "SELECT mode, granted, COUNT(*) AS count FROM pg_locks GROUP BY mode, granted;"',
     collect_mode=CollectMode.ASYNC,
     tag="GaussDB锁信息",
 )
 def gauss_locks_parser(output: str) -> dict:
     df = pd.read_csv(StringIO(output))
     mapping = {"mode": "锁模式", "granted": "是否已授予", "count": "锁数量"}
-    cmd = '''gsql -d tpch  -A -F , -c "SELECT mode, granted, COUNT(*) AS count FROM pg_locks GROUP BY mode, granted;"'''
-    result = [
-        {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
-    ]
-    return {cmd: result}
+    return {
+        "锁信息": [
+            {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
+        ]
+    }
 
 
 # -------------------- 5. 数据库级统计（实时快照） --------------------
 @snapshot_task(
-    cmd='''gsql -d tpch  -A -F , -c "SELECT datname, numbackends, xact_commit, xact_rollback,
+    cmd='''source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "SELECT datname, numbackends, xact_commit, xact_rollback,
         blks_read, blks_hit, pg_database_size(datname) AS db_size_bytes
         FROM pg_stat_database WHERE datname NOT IN ('template0', 'template1');"''',
     collect_mode=CollectMode.ASYNC,
@@ -166,19 +153,16 @@ def gauss_database_snapshot_parser(output: str) -> dict:
         "blks_hit": "缓冲命中块数",
         "db_size_bytes": "数据库大小(Bytes)",
     }
-    cmd = '''gsql -d tpch  -A -F , -c "SELECT datname, numbackends, xact_commit, xact_rollback,
-        blks_read, blks_hit, pg_database_size(datname) AS db_size_bytes
-        FROM pg_stat_database WHERE datname NOT IN ('template0', 'template1');"'''
-    result = [
-        {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
-    ]
-
-    return {cmd: result}
+    return {
+        "数据库统计": [
+            {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
+        ]
+    }
 
 
 # -------------------- 6. 内存使用（实时快照） --------------------
 @snapshot_task(
-    cmd='''gsql -d tpch -A -F , -c "
+    cmd='''source ~/.bashrc && gsql -p 11111 -d tpcc -A -F , -c "
         SELECT
             'localhost' AS node_name,
             SUM(usedsize) AS dynamic_used_memory_bytes,
@@ -194,13 +178,8 @@ def gauss_memory_parser(output: str) -> dict:
         "dynamic_used_memory": "已使用动态内存(MB)",
         "dynamic_peak_memory": "动态内存峰值(MB)",
     }
-    cmd = '''gsql -d tpch -A -F , -c "
-        SELECT
-            'localhost' AS node_name,
-            SUM(usedsize) AS dynamic_used_memory_bytes,
-            MAX(usedsize) AS dynamic_peak_memory_bytes
-        FROM gs_session_memory_detail;"'''
-    result = [
-        {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
-    ]
-    return {cmd: result}
+    return {
+        "内存信息": [
+            {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
+        ]
+    }
