@@ -352,27 +352,29 @@ OS_model模型基于qwen3-4b模型微调，使用了云大数存场景历史性�
 ### 模型容器化一键部署
 
 #### 文件下载
- - 容器底座container-llama下载：https://gitee.com/openEuler-Intelligence/container-llama.cpp/raw/master/llama.cpp_arm64.tar
+ - 容器底座container-llama下载：
+     - https://gitee.com/openEuler-Intelligence/container-llama.cpp/raw/master/b6602-kunpeng920.tar.aa
+     - https://gitee.com/openEuler-Intelligence/container-llama.cpp/raw/master/b6602-kunpeng920.tar.ab
  - 领域模型文件下载地址：https://ai.gitee.com/openEuler-Intelligence/openEuler-Intelligence-OS_model/tree/master
-   
-PS：openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009 ~ openEuler-Intelligence-OS_model-IQ4_NL-00009-of-00009，共9个文件都需要下载。
+     - PS：openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009 ~ openEuler-Intelligence-OS_model-IQ4_NL-00009-of-00009，共9个文件都需要下载。
 
 #### 加载container-llama容器镜像
 ```BASH
 # 加载容器镜像
+cat b6602-kunpeng920.tar.a* > llama.cpp_arm64.tar
 docker load -i llama.cpp_arm64.tar
 
 # 查看images
 docker images
 
 # 修改镜像tag
-docker tag *image_id* llama.cpp_arm64:b5170（*image_id* 替换成 docker images 命令查询到的id）
+docker tag *image_id* llama.cpp_arm64:b6602（*image_id* 替换成 docker images 命令查询到的id）
 ```
 
 #### 拉起领域模型
 上传领域模型的9个文件至/root/models（也可以自定义路径，后续命令中-v参数相应调整），执行：
 ```BASH
-docker run -d -p 8999:8999 -v /root/models:/models llama.cpp_arm64:b5170 -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434
+docker run -d -p 11434:11434 -v /root/models:/models llama.cpp_arm64:b6602 -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434
 ```
 PS：若容器拉起时遇到报错 operation not permitted，可以在 docker run 命令后增加参数 --security-opt seccomp=unconfined 解决。
 
