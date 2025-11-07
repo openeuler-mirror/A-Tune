@@ -16,7 +16,7 @@ EulerCopilot Tune 通过采集系统、微架构、应用等维度的指标数�
 - oceanbase
 
 ## 安装部署
-提供三种安装方式，包括源码安装、源码服务方式安装以及RPM包安装。
+提供四种安装方式，包括源码安装、源码服务方式安装、RPM包安装、容器安装（适用于oe2003低版本OS）。
 
 ### 方法一：源码安装
 
@@ -147,6 +147,55 @@ journalctl -xe -u tune-mcpserver --all -f
 systemctl start tune-openapi
 journalctl -xe -u tune-openapi --all -f
 ```
+
+### 方法四：容器化部署
+
+#### 1. 下载容器镜像
+
+https://gitee.com/hubin95/euler-copilot-tune-container
+
+- 包含 euler-copilot-tune.tar.gz00 ~ euler-copilot-tune.tar.gz04 共5个镜像分片文件。
+
+#### 2. 导入容器镜像
+
+```bash
+# 合并、解压容器镜像
+cat euler-copilot-tune.tar.gz0* > euler-copilot-tune.tar.gz
+gzip -d euler-copilot-tune.tar.gz
+
+# 导入容器镜像
+docker load -i euler-copilot-tune.tar
+
+# 修改镜像tag
+docker tag <image_id> euler-copilot-tune:latest（*image_id* 替换成 docker images 命令查询到的id）
+```
+
+#### 3. 部署容器
+
+```bash
+docker run -p 8092:8092 euler-copilot-tune
+```
+
+#### 4. 运行Copilot调优
+
+-   进入容器：
+
+```bash
+docker exec -it <docker id> /bin/bash  # <docker id>为前一步docker run返回的容器id
+```
+
+-   修改配置：
+
+容器内的项目路径为 /app/euler-copilot-tune，在项目的 config 文件夹中修改配置文件，具体内容参考[使用指南](https://gitee.com/openeuler/A-Tune/blob/euler-copilot-tune/README.md#使用指南)
+
+-   运行 EulerCopilot Tune：
+
+```
+cd /app/euler-copilot-tune
+export PYTHONPATH="`pwd`:$PYTHONPATH"
+python3 src/start_tune.py
+```
+
 ## 使用指南
 ### 配置文件准备
 #### 1. 修改 .env.yaml 配置文件内容（项目 config 目录下）
