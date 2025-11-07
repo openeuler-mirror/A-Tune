@@ -3,6 +3,18 @@
 ## 项目简介
 EulerCopilot Tune 通过采集系统、微架构、应用等维度的指标数据，结合大语言模型与定制化 Prompt 工程，针对不同应用的可调参数给出可靠的参数推荐。同时，根据推荐的参数运行 benchmark 并与 baseline 进行对比，可以计算出推荐参数对应用性能的提升值。
 
+当前已基于云大数存四大场景的多种应用场景完成验证（环境规格为8u32g oe2403sp2）：
+- mysql：QPS提升22.37%，验证场景sysbench（10张table表，每张表10000行数据，并发线程数128，随机数模式uniform，oltp_read_wrtie读写混合负载模式）
+- pgsql：QPS提升211.45%，验证场景sysbench（10张table表，每张表100000行数据，并发线程数32，随机数模式uniform，oltp_read_wrtie读写混合负载模式）
+- redis：QPS提升8.80%，验证场景redis-benchmark（单机部署应用，无持久化负载，测试过程中动态生成key-value数据，键值均为随机值，测试命令集set/get/incr/rpop/sadd/hset/lrange_600）
+- spark：time_taken(SQL执行耗时)降低27.46%，验证场景spark-sql（单节点部署，运行TPCDS测试，使用 spark-sql 执行 TPC-DS 查询）
+- flink：band_width提升6.58%，验证场景nexmark（运行模式为streaming流处理模式，持续向flink注入事件，测试场景为q0）
+- ceph：band_width提升7.82%，验证场景rados（一个主节点，三个从节点，运行bench基准测试，持续向存储池中写数据）
+- nginx：RPS提升26.40%，验证场景httpress（单机部署，默认编译参数，worker_processes=auto，并发连接数512，并行线程数7，总请求数2000万次）
+
+验证中的应用：
+- oceanbase
+
 ## 安装部署
 提供三种安装方式，包括源码安装、源码服务方式安装以及RPM包安装。
 
