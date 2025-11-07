@@ -15,6 +15,7 @@ from src.performance_collector.static_metric_profile_collector import (
 )
 from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
+from src.performance_optimizer.param_knowledge import ParamKnowledge
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
 from src.start_tune import run_param_optimization, run_strategy_optimization
@@ -33,6 +34,8 @@ app_name = config["servers"][0]["app"]
 max_retries = config["servers"][0]["max_retries"]
 delay = config["servers"][0]["delay"]
 slo_goal = config["feature"][0]["slo_goal"]
+tune_system_param = config["feature"][0]["tune_system_param"]
+tune_app_param = config["feature"][0]["tune_app_param"]
 
 
 # ================= Collector 接口 ===================
@@ -149,6 +152,16 @@ def run_optimizer():
         delay=delay,
     )
 
+    param_knowledge = ParamKnowledge(
+            ssh_client=ssh_client,
+            tune_system_param=tune_system_param,
+            tune_app_param=tune_app_param
+        )
+    all_params = param_knowledge.get_params(app_name)
+    params_set, _ = param_knowledge.describe_param_background_knob(
+            app_name, all_params
+        )
+
     param_recommender = ParamRecommender(
         service_name=app_name,
         slo_goal=slo_goal,
@@ -158,8 +171,16 @@ def run_optimizer():
         static_profile=cache[host_ip]["static_profile"],
         performance_analysis_report=cache[host_ip]["report"],
         ssh_client=ssh_client,
+        all_params=all_params,
+        params_set=params_set,
     )
-    param_opt_result = param_recommender.run(history_result=None)
+
+    history_result = {
+        "历史最佳结果": {},
+        "历史最差结果": {},
+        "上一轮调优结果": {}
+    }
+    param_opt_result = param_recommender.run(history_result)
 
     # --- 策略优化 ---
     strategy_opt = StrategyOptimizer(
@@ -211,7 +232,7 @@ def tune():
         server_cfg["app"], report, static_profile_info, ssh_client,
         feature_cfg["need_restart_application"], feature_cfg["pressure_test_mode"],
         feature_cfg["tune_system_param"], feature_cfg["tune_app_param"], feature_cfg["need_recover_cluster"],
-        feature_cfg["benchmark_timeout"]
+        feature_cfg["benchmark_timeout"], feature_cfg["max_iterations"], feature_cfg["slo_goal"]
     )
     if feature_cfg["strategy_optimization"]:
         run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)
