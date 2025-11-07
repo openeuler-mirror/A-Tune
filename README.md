@@ -331,6 +331,64 @@ echo $time_taken
 * [ceph 应用验证示例](doc/zh/ceph.md)
 * [nginx 应用验证示例](doc/zh/nginx.md)
 
+## OS领域模型部署指南
+
+### 模型介绍
+
+openEuler提供了一个针对智能调优场景而微调泛化构建的领域模型，支持纯CPU部署推理。
+
+OS_model模型基于qwen3-4b模型微调，使用了云大数存场景历史性能调优语料进行微调。
+
+在大数据spark、数据库pgsql/mysql、分布式存储ceph、虚拟化nginx应用上分别测试了领域模型、deepseek_v31(671b)与qwen3-4b原始模型，效果如下：
+
+1、领域模型调优相比开箱性能在大数据spark上提升15%+，数据库pgsql/mysql上提升50%+，虚拟化nginx上提升150%+、分布式存储ceph上提升50%+；
+
+2、领域模型相对于满血版deepseek效果持平，在部分应用上略优于deepseek满血版，全面领先qwen3-4b；
+
+3、领域模型量化到INT4规模，纯CPU部署情况下，相比FP16规模吞吐率提升2倍，达到小时级调优，且性能基本无损。
+
+详见： [openEuler Intelligence OS领域模型](https://ai.gitee.com/openEuler-Intelligence/openEuler-Intelligence-OS_model)
+
+### 模型容器化一键部署
+
+#### 文件下载
+ - 容器底座container-llama下载：https://gitee.com/openEuler-Intelligence/container-llama.cpp/raw/master/llama.cpp_arm64.tar
+ - 领域模型文件下载地址：https://ai.gitee.com/openEuler-Intelligence/openEuler-Intelligence-OS_model/tree/master
+   
+PS：openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009 ~ openEuler-Intelligence-OS_model-IQ4_NL-00009-of-00009，共9个文件都需要下载。
+
+#### 加载container-llama容器镜像
+```BASH
+# 加载容器镜像
+docker load -i llama.cpp_arm64.tar
+
+# 查看images
+docker images
+
+# 修改镜像tag
+docker tag *image_id* llama.cpp_arm64:b5170（*image_id* 替换成 docker images 命令查询到的id）
+```
+
+#### 拉起领域模型
+上传领域模型的9个文件至/root/models（也可以自定义路径，后续命令中-v参数相应调整），执行：
+```BASH
+docker run -d -p 8999:8999 -v /root/models:/models llama.cpp_arm64:b5170 -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434
+```
+PS：若容器拉起时遇到报错 operation not permitted，可以在 docker run 命令后增加参数 --security-opt seccomp=unconfined 解决。
+
+#### 验证测试
+```bash
+curl 'http://127.0.0.1:11434/v1/chat/completions' \
+--header 'Content-Type: application/json' \
+--data '{
+    "model": "openEuler-Intelligence-OS_model",
+    "messages": [
+      {"role": "user", "content": "你好"}
+    ],
+    "stream": false
+  }'
+```
+
 
 ## 常见问题解决
 
