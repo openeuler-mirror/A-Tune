@@ -11,9 +11,7 @@ EulerCopilot Tune 通过采集系统、微架构、应用等维度的指标数�
 - flink：band_width提升6.58%，验证场景nexmark（运行模式为streaming流处理模式，持续向flink注入事件，测试场景为q0）
 - ceph：band_width提升7.82%，验证场景rados（一个主节点，三个从节点，运行bench基准测试，持续向存储池中写数据）
 - nginx：RPS提升26.40%，验证场景httpress（单机部署，默认编译参数，worker_processes=auto，并发连接数512，并行线程数7，总请求数2000万次）
-
-验证中的应用：
-- oceanbase
+- oceanbase: QPS提升6.79%，验证场景sysbench（一个obproxy节点，三个observer节点，在租户数据库中创建10张测试表，每张表插入5000行测试数据，并发线程32，进行随机SELECT查询）
 
 ## 安装部署
 提供四种安装方式，包括源码安装、源码服务方式安装、RPM包安装、容器安装（适用于oe2003低版本OS）。
