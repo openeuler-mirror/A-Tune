@@ -78,40 +78,127 @@ oceanbase:
   password: ""
   config_file: "/root/.obd/cluster/obcluster/config.yaml"
   port: 2881
-  set_param_template: "sh xxx/set_param.sh $param_name $param_value"
-  get_param_template: "grep -P '$param_name' $config_file | awk '{print $2;exit}'"
+  set_param_template: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/set_param.sh $param_name $param_value"
+  get_param_template: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/get_param.sh $param_name"
   stop_workload: "obd cluster stop obcluster"
   start_workload: "obd cluster start obcluster"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/oceanbase/parse_benchmark.sh"
   performance_metric: "QPS"
 ```
+* get_param.sh 脚本内容：
+```YAML
+#!/bin/bash
+# 功能：根据参数 scope 自动选择 observer / obproxy 查询参数
+# 用法：
+#  初始设置时
+#   ./get_param.sh <param_name> <observer_ip> <observer_password> <proxy_ip> <proxy_password> <copilot_path>
+#  参数获取时：
+#   ./get_param.sh <param_name>
+
+PARAM=$1
+OBSERVERIP=$2
+OBSERVERPD=$3
+PROXYIP=$4
+PROXYPD=$5
+COPILOTPATH=$6
+
+# ===== 用户配置区 =====
+OBCLIENT_OBSERVER="obclient -h$OBSERVERIP -P2881 -uroot@sys -p$OBSERVERPD -Doceanbase -A"
+OBCLIENT_PROXY="obclient -h$PROXYIP -P2883 -uroot@proxysys -p$PROXYPD -Doceanbase -A"
+PARAM_FILE="$COPILOTPATH/A-Tune-euler-copilot-tune/src/knowledge_base/knob_params/oceanbase.json"
+# =======================
+
+if [ $# -lt 1 ]; then
+    echo "用法：$0 <param_name>"
+    exit 1
+fi
+
+# 校验参数文件
+if [ ! -f "$PARAM_FILE" ]; then
+    echo "错误：找不到参数文件 $PARAM_FILE"
+    exit 1
+fi
+
+# 从 JSON 提取 scope
+SCOPE=$(jq -r --arg name "$PARAM" '.[$name].scope' "$PARAM_FILE")
+
+if [ "$SCOPE" == "null" ] || [ -z "$SCOPE" ]; then
+    echo "❌  未在参数文件中找到 $PARAM"
+    exit 1
+fi
+
+# ---------- 查询 ----------
+case "$SCOPE" in
+  observer)
+    REMOTE_CMD="$OBCLIENT_OBSERVER -e \"SHOW PARAMETERS LIKE '$PARAM';\" | awk 'NR>3 && \$1==\"zone2\"{print \$7}'"
+    ssh -q root@$OBSERVERIP "$REMOTE_CMD"
+    ;;
+  obproxy)
+    REMOTE_CMD="$OBCLIENT_PROXY -e \"SHOW PROXYCONFIG LIKE '$PARAM';\" | awk -v name=\"$PARAM\" '\$1==name{print \$2}'"
+    ssh -q root@$OBSERVERIP "$REMOTE_CMD"
+    ;;
+  *)
+    echo "❌  未知scope类型：$SCOPE"
+    ;;
+esac
+```
 * set_param.sh 脚本内容：
 ```YAML
 #!/bin/bash
-# 需要把该脚本移动至oceanbase应用部署机器上
+# 功能：根据参数 scope 自动选择 observer / obproxy 设置参数
+# 用法：
+#  初始设置时
+#   ./set_param.sh <param_name> <value> <observer_ip> <observer_password> <proxy_ip> <proxy_password> <copilot_path>
+#  参数设置时：
+#   ./set_param.sh <param_name> <value>
 
-param_name=$1
-param_value=$2
-config_file="/root/.obd/cluster/obcluster/config.yaml"
+PARAM=$1
+VALUE=$2
+OBSERVERIP=$3
+OBSERVERPD=$4
+PROXYIP=$5
+PROXYPD=$6
+COPILOTPATH=$7
 
-# 如果参数已存在，只修改第一次出现的地方
-if grep -q "^[[:space:]]*$param_name:" "$config_file"; then
-  sed -i "0,/^[[:space:]]*$param_name:.*/s//  $param_name: $param_value/" "$config_file"
-else
-  # 如果不存在，在第一个 global: 后插入
-  awk -v key="$param_name" -v val="$param_value" '
-    BEGIN {inserted=0}
-    /^  global:/ {
-      print
-      if (!inserted) {
-        print "    " key ": " val
-        inserted=1
-      }
-      next
-    }
-    {print}
-  ' "$config_file" > /tmp/tmp_conf && mv /tmp/tmp_conf "$config_file"
+# ===== 用户配置区 =====
+OBCLIENT_OBSERVER="obclient -h$OBSERVERIP -P2881 -uroot@sys -p$OBSERVERPD -Doceanbase -A"
+OBCLIENT_PROXY="obclient -h$PROXYIP -P2883 -uroot@proxysys -p$PROXYPD -Doceanbase -A"
+PARAM_FILE="$COPILOTPATH/A-Tune-euler-copilot-tune/src/knowledge_base/knob_params/oceanbase.json"
+# =======================
+
+if [ $# -lt 2 ]; then
+    echo "用法：$0 <param_name> <value>"
+    exit 1
 fi
+
+# 校验参数文件
+if [ ! -f "$PARAM_FILE" ]; then
+    echo "错误：找不到参数文件 $PARAM_FILE"
+    exit 1
+fi
+
+# 从 JSON 提取 scope
+SCOPE=$(jq -r --arg name "$PARAM" '.[$name].scope' "$PARAM_FILE")
+
+if [ "$SCOPE" == "null" ] || [ -z "$SCOPE" ]; then
+    echo "❌  未在参数文件中找到 $PARAM"
+    exit 1
+fi
+
+# ---------- 设置 ----------
+case "$SCOPE" in
+  observer)
+    REMOTE_CMD="$OBCLIENT_OBSERVER -e \"ALTER SYSTEM SET $PARAM = $VALUE;\""
+    ssh -q root@$OBSERVERIP "$REMOTE_CMD"
+    ;;
+  obproxy)
+    REMOTE_CMD="$OBCLIENT_PROXY -e \"ALTER PROXYCONFIG SET $PARAM = $VALUE;\""
+    ssh -q root@$OBSERVERIP "$REMOTE_CMD"
+    ;;
+  *)
+    echo "❌  未知scope类型：$SCOPE"
+    ;;
+esac
 ```
 
 * __scripts/oceanbase/benchmark.sh 脚本内容：__
