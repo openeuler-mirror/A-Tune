@@ -106,7 +106,8 @@ def check_apply_params():
         tune_system_param= feature_cfg["tune_system_param"],
         tune_app_param= feature_cfg["tune_app_param"],
         need_recover_cluster=feature_cfg["need_recover_cluster"],
-        benchmark_timeout=feature_cfg["benchmark_timeout"]
+        benchmark_timeout=feature_cfg["benchmark_timeout"],
+        param_save_path=feature_cfg["best_param_save_path"]
     )
 
     recommend_params = optimizer.param_recommender.run(history_result={}, is_positive=True)

@@ -1,4 +1,5 @@
 import logging
+import json
 
 from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_optimizer.param_knowledge import ParamKnowledge
@@ -22,7 +23,8 @@ class ParamOptimizer:
             tune_system_param: bool = False,
             tune_app_param: bool = True,
             need_recover_cluster: bool = False,
-            benchmark_timeout: int = 3600
+            benchmark_timeout: int = 3600,
+            param_save_path: str = ""
     ):
         self.service_name = service_name
         self.analysis_report = analysis_report
@@ -61,6 +63,7 @@ class ParamOptimizer:
         )
         self.first_restart_save = True
         self.benchmark_timeout=benchmark_timeout
+        self.param_save_path = param_save_path
 
     def calc_improve_rate(self, baseline, benchmark_result, symbol):
         return self.slo_calc_callback(baseline, benchmark_result, symbol)
@@ -142,6 +145,14 @@ class ParamOptimizer:
 
         print(f"已将 {len(commands)} 个参数写入重启脚本: {script_path}")
 
+    def save_best_params(self, params):
+        if self.param_save_path:
+            with open(self.param_save_path, 'w', encoding='utf-8') as f:
+                json.dump(params, f, ensure_ascii=False, indent=4)
+            logging.info(f"[ParamOptimizer] The recommended parameters have beed saved to {self.param_save_path}")
+        else:
+            logging.warning(f"[ParamOptimizer] The recommended parameter save path is not set")
+
     def run(self):
         # 运行benchmark，摸底参数性能指标
         if self.pressure_test_mode:
@@ -218,6 +229,7 @@ class ParamOptimizer:
                 best_recommend_params = dict(curr_recommend_params)
                 best_history = {"最佳性能": performance_result, "参数推荐": recommend_params}
                 historys["历史最佳结果"] = best_history
+                self.save_best_params(recommend_params)
 
             if performance_result * symbol < worst_result * symbol:
                 worst_result = performance_result
