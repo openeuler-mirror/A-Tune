@@ -7,7 +7,7 @@ REDIS_PORT="${2:-6379}"
 echo 1 > /tmp/euler-copilot-fifo
 
 # 运行 redis-benchmark 并保存输出
-redis-benchmark -h "$REDIS_HOST" -p "$REDIS_PORT" -t set,get,incr,rpop,sadd,hset,lrange_600 --csv 
+OUTPUT=$(redis-benchmark -h "$REDIS_HOST" -p "$REDIS_PORT" -t set,get,incr,rpop,sadd,hset,lrange_600 --csv)
 
 echo $OUTPUT > benchmark.log
 

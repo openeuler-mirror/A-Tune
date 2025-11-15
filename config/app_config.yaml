@@ -48,7 +48,7 @@ nginx:
 
 ceph:
   set_param_template: 'ceph config set osd "$param_name" "$param_value"'
-  get_param_template: 'sh /path/of/get_params.sh'
+  get_param_template: '$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/get_params.sh'
   start_workload: "sh /path/of/restart_ceph.sh"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/parse_benchmark.sh"
   performance_metric: "BANDWIDTH"
