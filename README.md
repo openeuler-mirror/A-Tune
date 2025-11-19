@@ -377,6 +377,7 @@ echo $time_taken
 * [spark 应用验证示例](doc/zh/spark.md)
 * [ceph 应用验证示例](doc/zh/ceph.md)
 * [nginx 应用验证示例](doc/zh/nginx.md)
+* [flink 应用验证示例](doc/zh/flink.md)
 * [oceanbase 应用验证示例](doc/zh/oceanbase.md)
 
 ## OS领域模型部署指南
