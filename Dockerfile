@@ -16,10 +16,12 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     python3-dev \
     libkrb5-dev krb5-config gcc \
+    ssh busybox \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装Python依赖
 RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # 设置容器启动时的命令
-#CMD ["python3", "src/start_workflow.py"]
+ENV PYTHONPATH=/euler-copilot-tune:$PYTHONPATH
+CMD ["python3", "src/start_workflow.py"]
