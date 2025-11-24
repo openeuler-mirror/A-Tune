@@ -1,4 +1,7 @@
 import re
+import os
+import threading
+import time
 from typing import List
 import requests
 from src.config import config
@@ -9,17 +12,53 @@ import logging
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 requests.Session.verify = False
+
+g_llm_req_id = 0
+g_llm_req_id_lock = threading.Lock()
+g_llm_log_path = ""
+g_llm_log_inited = False
+
+def init_llm_log_dir():
+    '''初始化llm log目录
+    '''
+    global g_llm_log_inited, g_llm_log_path
+    if g_llm_log_inited:
+        return
+    # 默认使用log/llm路径，如果有配置log_dir，则使用 ${log_dir}/llm 路径
+    log_dir = "log"
+    if config["log_dir"]:
+        log_dir = str(config["log_dir"])
+    # 支持相对路径和绝对路径
+    if not log_dir.startswith("/"):
+        log_dir = os.path.join(os.getcwd(), log_dir)
+    g_llm_log_path = os.path.join(log_dir, "llm")
+    logging.info("init llm log dir: %s\n", g_llm_log_path)
+    os.makedirs(g_llm_log_path, exist_ok=True)
+    g_llm_log_inited = True
+
+init_llm_log_dir()
+
+def get_next_llm_req_id():
+    # 为每个llm请求按顺序分配一个id
+    global g_llm_req_id_lock, g_llm_req_id
+    llm_req_id = 0
+    with g_llm_req_id_lock:
+        llm_req_id = g_llm_req_id
+        g_llm_req_id += 1
+    return llm_req_id
+
 def get_llm_response(prompt: str, **kwargs) -> str:
-    if 'enable' == config["ssl"]:
+    global g_llm_log_path
+    if config["ssl"] == 'enable':
         client = ChatOpenAI(
-        openai_api_key=config["LLM_KEY"],
-        openai_api_base=config["LLM_URL"],
-        model_name=config["LLM_MODEL_NAME"],
-        tiktoken_model_name="cl100k_base",
-        max_tokens=config["LLM_MAX_TOKENS"],
-        streaming=True
+            openai_api_key=config["LLM_KEY"],
+            openai_api_base=config["LLM_URL"],
+            model_name=config["LLM_MODEL_NAME"],
+            tiktoken_model_name="cl100k_base",
+            max_tokens=config["LLM_MAX_TOKENS"],
+            streaming=True
         )
-    elif 'disable' ==  config["ssl"]:
+    elif config["ssl"] == 'disable':
         client = ChatOpenAI(
             openai_api_key=config["LLM_KEY"],
             openai_api_base=config["LLM_URL"],
@@ -31,20 +70,37 @@ def get_llm_response(prompt: str, **kwargs) -> str:
         )
     else:
         raise ValueError(f"无效的SSL配置: {config['ssl']}，必须为 'enable' 或 'disable'")
+
+    llm_req_id = get_next_llm_req_id()
+    time_start = time.time()
     result = client.invoke(input=prompt, **kwargs)
-    logging.debug("%sget_llm_response ask:\n%s\n%s", Fore.YELLOW, prompt, Style.RESET_ALL)
+    time_end = time.time()
+    time_cost = time_end - time_start
 
     match = re.search(r"<think>(.*?)</think>(.*)", result.content, flags=re.DOTALL)
     if match:
         thought_process = match.group(1).strip("\n")
         thought_result = match.group(2).strip("\n")
-        logging.debug("%sget_llm_response think:\n%s\n%s", Fore.GREEN, thought_process, Style.RESET_ALL)
-        logging.debug("%sget_llm_response ans:\n%s\n%s", Fore.GREEN, thought_result, Style.RESET_ALL)
-        return thought_result
+        output = thought_result
     else:
-        logging.debug("%sget_llm_response ans:\n%s\n%s", Fore.GREEN, result, Style.RESET_ALL)
-        return result.content
+        output = result.content
 
+    input_len = len(prompt)
+    output_len = len(result.content)
+    if config["llm_log_to_file"]:
+        logging.info("log to llm log dir: %s\n", g_llm_log_path)
+        with open(os.path.join(g_llm_log_path, f"req-{llm_req_id}.log"), "w") as f:
+            f.write(f"===== ask: ===== (request id {llm_req_id})\n")
+            f.write(f"{prompt}\n\n")
+            f.write(f"===== ans: ===== (input len {input_len}, output len {output_len}, use {time_cost:.2f}s)\n")
+            f.write(f"{result.content}\n\n")
+    if config["llm_log_to_console"]:
+        logging.info("%sget_llm_response ask: (request id %d)\n%s\n%s", Fore.YELLOW, llm_req_id, prompt, Style.RESET_ALL)
+        logging.info("%sget_llm_response info: (request id %d) input len %d, output len %d, use %s\n%s", 
+                     Fore.GREEN, llm_req_id, input_len, output_len, f"{time_cost:.2f}s", Style.RESET_ALL)
+        logging.info("%sget_llm_response ans: (request id %d)\n%s\n%s", Fore.GREEN, llm_req_id, result.content, Style.RESET_ALL)
+
+    return output
 
 def get_embedding(text: str) -> List[float]:
     data = {
@@ -56,4 +112,6 @@ def get_embedding(text: str) -> List[float]:
         return []
     return res.json()[0]
 
-  
+
+if __name__ == "__main__":
+    get_llm_response("introduce yourself")
