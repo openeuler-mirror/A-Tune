@@ -32,7 +32,7 @@ def init_llm_log_dir():
     if not log_dir.startswith("/"):
         log_dir = os.path.join(os.getcwd(), log_dir)
     g_llm_log_path = os.path.join(log_dir, "llm")
-    logging.info("init llm log dir: %s\n", g_llm_log_path)
+    logging.info("llm log dir: %s\n", g_llm_log_path)
     os.makedirs(g_llm_log_path, exist_ok=True)
     g_llm_log_inited = True
 
@@ -88,17 +88,15 @@ def get_llm_response(prompt: str, **kwargs) -> str:
     input_len = len(prompt)
     output_len = len(result.content)
     if config["llm_log_to_file"]:
-        logging.info("log to llm log dir: %s\n", g_llm_log_path)
         with open(os.path.join(g_llm_log_path, f"req-{llm_req_id}.log"), "w") as f:
             f.write(f"===== ask: ===== (request id {llm_req_id})\n")
-            f.write(f"{prompt}\n\n")
+            f.write(f"{prompt}\n")
             f.write(f"===== ans: ===== (input len {input_len}, output len {output_len}, use {time_cost:.2f}s)\n")
-            f.write(f"{result.content}\n\n")
+            f.write(f"{result.content}\n")
     if config["llm_log_to_console"]:
-        logging.info("%sget_llm_response ask: (request id %d)\n%s\n%s", Fore.YELLOW, llm_req_id, prompt, Style.RESET_ALL)
-        logging.info("%sget_llm_response info: (request id %d) input len %d, output len %d, use %s\n%s", 
-                     Fore.GREEN, llm_req_id, input_len, output_len, f"{time_cost:.2f}s", Style.RESET_ALL)
-        logging.info("%sget_llm_response ans: (request id %d)\n%s\n%s", Fore.GREEN, llm_req_id, result.content, Style.RESET_ALL)
+        logging.info("%sget_llm_response ask: (request id %d)\n%s%s", Fore.YELLOW, llm_req_id, prompt, Style.RESET_ALL)
+        logging.info("%sget_llm_response ans: (request id %d) input len %d, output len %d, use %s\n%s%s", 
+                     Fore.GREEN, llm_req_id, input_len, output_len, f"{time_cost:.2f}sec", result.content, Style.RESET_ALL)
 
     return output
 
