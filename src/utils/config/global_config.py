@@ -1,7 +1,7 @@
 import os
 import json
 import yaml
-from typing import Any, Optional, Dict, List
+from typing import Any, Optional, Dict, List, Union
 from pathlib import Path
 
 from src.utils.constant import CONFIG_PATH, KNOWLEDGE_PATH
@@ -38,7 +38,7 @@ class EnvironConfig:
                         f"[Warning] Failed to load config file: {file.name}, error: {e}"
                     )
 
-    def get(self, key_path: str, default: Optional[Any] = None) -> Any:
+    def get(self, key_path: str, default: Optional[Any] = None) -> Union[Dict, Any]:
         """
         获取配置值，使用点号分隔的路径访问嵌套字段
 

@@ -51,8 +51,6 @@ def run_collector():
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
-        max_retries=max_retries,
-        delay=delay,
     )
 
     # 1. 静态指标
@@ -130,8 +128,6 @@ def run_optimizer():
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
-        max_retries=max_retries,
-        delay=delay,
     )
 
     param_recommender = ParamRecommender(
@@ -182,8 +178,6 @@ def tune():
         host_port=host_port,
         host_user=host_user,
         host_password=host_password,
-        max_retries=max_retries,
-        delay=delay,
     )
     run_param_optimization(
         server_cfg["app"], report, static_profile_info, ssh_client,

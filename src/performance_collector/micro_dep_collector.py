@@ -156,7 +156,7 @@ class PerfCollector(BaseCollector):
 
             # 处理未计数的事件
             if value == "<not":
-                logging.error(f"Event not counted: {line}")
+                logging.warning(f"Event not counted: {line}")
                 self._store_event(event_name, 0)
                 continue
 

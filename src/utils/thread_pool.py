@@ -35,12 +35,10 @@ class TaskResult:
         return str(self.as_dict())
 
 
-"""
-ThreadPoll Manager, used for accelerate speed of performance collector command
-"""
-
-
 class ThreadPoolManager:
+    """
+    ThreadPoll Manager, used for accelerate speed of collector command
+    """
     def __init__(self, max_workers: int = 5):
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
         self.tasks: Dict[str, concurrent.futures.Future] = {}
