@@ -126,7 +126,7 @@ def display_metrics(
     print(display_content)
 
 class ExecuteResult:
-    def __init__(self, status_code: int = -1, output: Any = None, err_msg: str = ""):
+    def __init__(self, status_code: int = -1, output: str = "", err_msg: str = ""):
         self.status_code = status_code
         self.output = output
         self.err_msg = err_msg

@@ -35,7 +35,7 @@ yum install python3-devel krb5-devel
 ```
 * 安装调优依赖并重启 sysstat（目标应用所在机器）
 ```bash
-yum install sysstat perf
+yum install sysstat perf ethtool
 systemctl start sysstat
 ```
 

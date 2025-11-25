@@ -35,9 +35,7 @@ class StaticMetricProfileCollector:
         pass
 
     def run(self):
-        logging.info(
-            "[StaticMetricProfileCollector] collecting static profile data ..."
-        )
+        logging.info("[StaticMetricProfileCollector] collecting static profile data ...")
         parsed_results: Dict[str, Dict] = {}
 
         self.thread_pool.run_all_tasks()

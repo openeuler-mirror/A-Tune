@@ -12,34 +12,31 @@ from typing import Callable, Dict, List
 import paramiko
 
 from src.utils.common import ExecuteResult
+from src.config import config
 
 decorated_funcs = defaultdict(list)
 cmds_registry = defaultdict(list)
+max_retries = config["feature"][0]["max_retries"]
+retry_delay = config["feature"][0]["delay"]
 
-def retryable(max_retries: int = 3, delay: int = 1):
+def retryable(max_retries: int = max_retries, delay: int = retry_delay):
     def decorator(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             retries = 0
             while retries < max_retries:
+                retries += 1
                 try:
                     return func(self, *args, **kwargs)
                 except Exception as e:
-                    retries += 1
-                    print(
-                        f"Attempt {retries} failed in function '{func.__name__}': {e}"
-                    )
-                    if retries < max_retries:
-                        print(f"Retrying in {delay} second(s)...")
-                        time.sleep(delay)
-                    else:
-                        print(
-                            f"Function '{func.__name__}' failed after {retries} attempts."
-                        )
-                        raise
+                    logging.warning(f"Attempt {retries} failed in function '{func.__name__}': {e}")
 
+                if retries < max_retries:
+                    logging.info(f"Retry in {delay} second(s)...")
+                    time.sleep(delay)
+                else:
+                    raise RuntimeError(f"Function '{func.__name__}' failed after {retries} attempts.")
         return wrapper
-
     return decorator
 
 
@@ -50,16 +47,11 @@ class SshClient:
             host_port: int = 22,
             host_user: str = "root",
             host_password: str = "",
-            max_retries: int = 0,
-            delay: float = 1.0,
     ):
         self.host_ip = host_ip
         self.host_port = host_port
         self.host_user = host_user
         self.host_password = host_password
-
-        self.max_retries = max_retries
-        self.delay = delay
 
     @retryable()
     def run_cmd(self, cmd) -> ExecuteResult:

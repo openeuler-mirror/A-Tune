@@ -10,35 +10,15 @@ from src.utils.shell_execute import SshClient
 
 
 class ParamKnowledge:
-    _instance = None
-    _lock = threading.Lock()
-
-    def __new__(cls,
-                ssh_client: SshClient,
-                tune_system_param: bool = False,
-                tune_app_param: bool = True):
-        if not cls._instance:
-            with cls._lock:
-                if not cls._instance:
-                    cls._instance = super(ParamKnowledge, cls).__new__(cls)
-                    cls._instance.param_config = param_config
-                    cls._instance.ssh_client = ssh_client  # 保存 ssh_client
-                    cls._instance.tune_system_param = tune_system_param
-                    cls._instance.tune_app_param = tune_app_param
-        return cls._instance
-
     def __init__(self,
                  ssh_client: SshClient,
                  tune_system_param: bool = False,
                  tune_app_param: bool = True):
         logging.info(f"[ParamKnowledge] initializing param knowledge base ...")
-        # 防止重复初始化
-        if not hasattr(self, "tune_system_param"):
-            self.tune_system_param = tune_system_param
-        if not hasattr(self, "tune_app_param"):
-            self.tune_app_param = tune_app_param
-        if not hasattr(self, "ssh_client"):
-            self.ssh_client = ssh_client
+        self.param_config = param_config
+        self.ssh_client = ssh_client
+        self.tune_system_param = tune_system_param
+        self.tune_app_param = tune_app_param
 
     def get_params(self, app_name):
         # check 应用和系统参数是否有重名的
@@ -67,13 +47,12 @@ class ParamKnowledge:
         system_params = self.param_config.get("system")
         app = AppInterface(self.ssh_client).get(app_name)
         for param_name in tqdm(params):
-            item = (
-                app_params.get(param_name)
-                if param_name in app_params
-                else system_params.get(param_name)
-            )
+            if param_name in app_params:
+                item = app_params.get(param_name)
+            else:
+                item = system_params.get(param_name)
             if not item:
-                print(f"param {param_name} not in app param or system param")
+                logging.warning(f"param {param_name} not in app param or system param")
                 continue
             # 1.描述参数范围
             if item["range"]:
@@ -85,9 +64,7 @@ class ParamKnowledge:
                 param_range = None
             # 2.当前环境取值
             param_result = app.get_param(param_name=param_name)
-            param_env_value = (
-                param_result.output if param_result.status_code == 0 else "默认值"
-            )
+            param_env_value = param_result.output if param_result.status_code == 0 else "默认值"
             params_describe_list.append(
                 f"{param_name}:{item['desc']},参数数据类型为：{item['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}"
             )

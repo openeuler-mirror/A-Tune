@@ -20,8 +20,6 @@ def create_ssh_client(server_cfg):
         host_port=server_cfg["port"],
         host_user=server_cfg["host_user"],
         host_password=server_cfg["password"],
-        max_retries=server_cfg["max_retries"],
-        delay=server_cfg["delay"],
     )
 
 
