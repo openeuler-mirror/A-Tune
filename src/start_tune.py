@@ -150,7 +150,7 @@ def main():
         feature_cfg["need_restart_application"], feature_cfg["pressure_test_mode"],
         feature_cfg["tune_system_param"], feature_cfg["tune_app_param"], feature_cfg["need_recover_cluster"],
         feature_cfg["benchmark_timeout"], feature_cfg["max_iterations"], feature_cfg["slo_goal"],
-        feature_vfg["best_param_save_path"]
+        feature_cfg["best_param_save_path"]
     )
     if feature_cfg["strategy_optimization"]:
         run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)
