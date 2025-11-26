@@ -22,3 +22,5 @@ mcp==1.6.0
 json5>=0.12.1
 wcwidth>=0.2.13
 colorama>=0.4.6
+python-multipart>=0.0.20
+ruamel.yaml>=0.18.16

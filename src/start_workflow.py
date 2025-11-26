@@ -1,7 +1,11 @@
-import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
 
 from fastapi import FastAPI, HTTPException
+
+from pydantic import BaseModel
+from ruamel.yaml import YAML
+from ruamel.yaml.scalarstring import SingleQuotedScalarString
+from ruamel.yaml.comments import CommentedMap
 
 from src.config import config
 from src.performance_analyzer.performance_analyzer import PerformanceAnalyzer
@@ -22,7 +26,7 @@ from src.start_tune import run_param_optimization, run_strategy_optimization
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
     title="性能分析与优化 API",
-    description="统一接口：Collector / Analyzer / Optimizer",
+    description="统一接口：Setter / Collector / Analyzer / Optimizer",
     version="1.0.0",
 )
 
@@ -34,10 +38,127 @@ host_port = config["servers"][0]["port"]
 host_user = config["servers"][0]["host_user"]
 host_password = config["servers"][0]["password"]
 app_name = config["servers"][0]["app"]
-max_retries = config["servers"][0]["max_retries"]
-delay = config["servers"][0]["delay"]
+max_retries = config["feature"][0]["max_retries"]
+delay = config["feature"][0]["delay"]
 slo_goal = config["feature"][0]["slo_goal"]
 
+yaml = YAML()
+yaml.preserve_quotes = True
+
+class EnvConfig(BaseModel):
+    general: Optional[Dict[str, Any]] = None
+    servers: Optional[List[Dict[str, Any]]] = None
+    feature: Optional[List[Dict[str, Any]]] = None
+
+class AppConfig(BaseModel):
+    app_section: Optional[str] = None
+    data: Optional[Dict[str, Any]] = None
+
+class ConfigRequest(BaseModel):
+    env_config: Optional[EnvConfig] = None
+    app_config: Optional[List[AppConfig]] = None
+
+def assign_with_type(orig_val, new_val):
+    if isinstance(orig_val, str):
+        return SingleQuotedScalarString(str(new_val))
+    elif isinstance(orig_val, bool):
+        if str(new_val).lower() in ("true", "yes", "on", "1"):
+            return True
+        elif str(new_val).lower()in("false", "no", "off", "0"):
+            return False
+        else:
+            return bool(new_val)
+    elif isinstance(orig_val, int):
+        try:
+            return int(new_val)
+        except Exception:
+            return new_val
+    elif isinstance(orig_val, float):
+        try:
+            return float(new_val)
+        except Exception:
+            return new_val
+    else:
+        return new_val
+
+def update_config(env_config: dict):
+    with open(config.config_file, 'r', encoding='utf-8') as f:
+        cfg = yaml.load(f)
+
+    general = env_config.get("general", {})
+    for key, value in general.items():
+        if key not in cfg or value is None:
+            continue
+        cfg[key] = assign_with_type(cfg[key], value)
+
+    servers = env_config.get("servers", {})
+    for server in servers:
+        for key, value in server.items():
+            if key not in cfg["servers"][0] or value is None:
+                continue
+            cfg["servers"][0][key] = assign_with_type(cfg["servers"][0][key], value)
+
+    feature = env_config.get("feature", {})
+    for ft in feature:
+        for key, value in ft.items():
+            if key not in cfg["feature"][0] or value is None:
+                continue
+            cfg["feature"][0][key] = assign_with_type(cfg["feature"][0][key], value)
+
+    with open(config.config_file, 'w', encoding='utf-8') as f:
+        yaml.dump(cfg, f)
+
+def update_app_config(app_configs: List[dict]):
+    file_path="config/app_config.yaml"
+    with open(file_path, 'r', encoding='utf-8') as f:
+        cfg = yaml.load(f)
+
+    for apps in app_configs:
+        app_section = apps.get("app_section")
+        data = apps.get("data", {})
+
+        cm = cfg.get(app_section)
+        if cm is None:
+            cm = CommentedMap()
+            cfg[app_section] = cm
+
+        for key, value in data.items():
+            if value is None:
+                continue
+
+            if key in cm:
+                cm[key] = assign_with_type(cm[key], value)
+            else:
+                keys = list(cm.keys())
+                if keys:
+                    cm.insert(0, key, SingleQuotedScalarString(value))
+                else:
+                    cm[key] = SingleQuotedScalarString(value)
+
+    with open(file_path, 'w', encoding='utf-8') as f:
+        yaml.dump(cfg, f)
+
+# ================= Setterr 接口 ===================
+@app.post("/setter")
+def run_setter(request: ConfigRequest):
+    if request.env_config:
+        update_config(request.env_config.model_dump(exclude_none=True))
+
+    if request.app_config:
+        update_app_config([app.model_dump(exclude_none=True) for app in request.app_config])
+
+    config.reload()
+    global host_ip, host_port, host_user, host_password, app_name, max_retries, delay, slo_goal
+    host_ip = config["servers"][0]["ip"]
+    host_port = config["servers"][0]["port"]
+    host_user = config["servers"][0]["host_user"]
+    host_password = config["servers"][0]["password"]
+    app_name = config["servers"][0]["app"]
+    max_retries = config["feature"][0]["max_retries"]
+    delay = config["feature"][0]["delay"]
+    slo_goal = config["feature"][0]["slo_goal"]
+
+    return "Set successful"
 
 # ================= Collector 接口 ===================
 @app.get("/collector")
