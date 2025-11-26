@@ -1,6 +1,7 @@
 import time
 import threading
 from datetime import datetime
+import traceback
 
 from src.utils.shell_execute import SshClient
 from src.utils.config.app_config import AppInterface
@@ -61,11 +62,11 @@ class PressureTest(threading.Thread):
                 _pressure_test_result.status_code = execute_result.status_code
                 _pressure_test_result.output = execute_result.output
                 _pressure_test_result.err_msg = execute_result.err_msg
-                save_snapshot(_pressure_test_result.__dict__(), "pressure_test_result")
+                save_snapshot(_pressure_test_result.__dict__, "pressure_test_result")
         except Exception as e:
             _pressure_test_result.status_code = -1
             _pressure_test_result.err_msg = (
-                f"pressure test failed, exception is {str(e)}"
+                f"pressure test failed: {str(e)}\n{traceback.format_exc()}"
             )
         finally:
             self.running = False
