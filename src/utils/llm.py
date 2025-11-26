@@ -32,7 +32,7 @@ def init_llm_log_dir():
     if not log_dir.startswith("/"):
         log_dir = os.path.join(os.getcwd(), log_dir)
     g_llm_log_path = os.path.join(log_dir, "llm")
-    logging.info("llm log dir: %s\n", g_llm_log_path)
+    logging.info("llm log dir: %s", g_llm_log_path)
     os.makedirs(g_llm_log_path, exist_ok=True)
     g_llm_log_inited = True
 
@@ -113,3 +113,8 @@ def get_embedding(text: str) -> List[float]:
 
 if __name__ == "__main__":
     get_llm_response("introduce yourself")
+    # get_llm_response("introduce yourself, reply in English.")
+    # get_llm_response("introduce yourself, reply in Chinese.")
+    # get_llm_response("介绍你自己")
+    # get_llm_response("介绍你自己, 用英文回答")
+    # get_llm_response("介绍你自己, 用中文回答")

@@ -131,12 +131,9 @@ class ExecuteResult:
         self.output = output
         self.err_msg = err_msg
 
-    def __dict__(self):
-        return {
-            "status_code": self.status_code,
-            "err_msg": self.err_msg,
-            "output": self.output,
-        }
-
     def __repr__(self):
-        return str(self.__dict__())
+        return str({
+            "status_code": self.status_code,
+            "output": self.output,
+            "err_msg": self.err_msg,
+        })

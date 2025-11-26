@@ -14,9 +14,10 @@ snapshot_path = ""
 if not snapshot_path_inited:
     if os.path.exists(DATA_PATH) and os.path.isdir(DATA_PATH):
         snapshot_path = os.path.join(DATA_PATH, "snapshot")
+        os.makedirs(snapshot_path, mode=0o755, exist_ok=True)
     else:
         snapshot_path = os.path.join(os.getcwd(), "data", "snapshot")
-        os.mkdirs(snapshot_path, mode=0o755, exist_ok=True)
+        os.makedirs(snapshot_path, mode=0o755, exist_ok=True)
     snapshot_path_inited = True
     logging.info(f"save_snapshot: {enable_save_snapshot}; use_snapshot: {enable_use_snapshot}")
     if enable_save_snapshot or enable_use_snapshot:
@@ -38,8 +39,16 @@ def load_snapshot(filename: str):
     try:
         snapshot_file_path = os.path.join(snapshot_path, f"{filename}.pickle")
         with open(snapshot_file_path, 'rb') as f:
-            var = pickle.load(f)
             logging.info(f"{filename} snapshot loaded from {snapshot_file_path}")
-            return var
+            return pickle.load(f)
     except FileNotFoundError:
         return None
+
+
+if __name__ == "__main__":
+    from src.utils.shell_execute import ExecuteResult
+    a = ExecuteResult()
+    save_snapshot(a, "a")
+    b = load_snapshot("a")
+    print(b)
+        
