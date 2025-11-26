@@ -106,6 +106,10 @@ if not os.path.exists(PARAMS_PATH) or not os.path.isdir(PARAMS_PATH):
 env_config = EnvironConfig(DEFAULT_CONFIG_PATH)
 param_config = EnvironConfig(PARAMS_PATH)
 
+def get_main_version(version: str):
+    # version: v{x.y.z} -> x
+    return version.strip("v").split(".")[0]
+
 def init():
     env_app_name = env_config._configs[".env"]["servers"][0]["app"]
     env_app_version = env_config.get(f"app_config.{env_app_name}.version")
@@ -115,10 +119,14 @@ def init():
     param_versions = list(param_config.get(env_app_name).keys())
     logging.info(f"available {env_app_name} param knowledge versions: {param_versions}")
     
-    # 找到相同或更高的版本号
+    # 找到相同或稍低的版本号，若主版本号相同，则优先级更高
     choosen_param_version = sorted(param_versions)[0]
+    env_app_main_version = get_main_version(env_app_version)
     for param_version in sorted(param_config.get(env_app_name).keys()):
         if param_version >= env_app_version:
+            if get_main_version(choosen_param_version) != env_app_main_version \
+                and get_main_version(param_version) == env_app_main_version:
+                choosen_param_version = param_version
             break
         choosen_param_version = param_version
     logging.info(f"use {env_app_name} param knowledge version: {choosen_param_version}")
