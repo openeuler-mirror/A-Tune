@@ -1,4 +1,5 @@
 mysql:
+  version: "v5.7"
   user: "root"
   password: "123456"
   config_file: "/etc/my.cnf"
@@ -11,6 +12,7 @@ mysql:
   performance_metric: "QPS"
 
 flink:
+  version: "v1.13.0"
   set_param_template: 'sh /home/wsy/set_param.sh $param_name $param_value'
   get_param_template: 'sh /home/wsy/get_param.sh $param_name'
   benchmark: "sh /home/wsy/nexmark_test.sh"
@@ -19,6 +21,7 @@ flink:
   performance_metric: "THROUGHPUT"
 
 pgsql:
+  version: "v15.10"
   user: "postgres"
   password: "postgres"
   config_file: "/data/data1/pgsql/postgresql.conf"
@@ -31,12 +34,14 @@ pgsql:
   performance_metric: "QPS"
 
 spark:
+  version: "v3.3.1"
   set_param_template: 'sh /path/of/set_param.sh $param_name $param_value'
   get_param_template: 'sh /path/of/get_param.sh $param_name'
   benchmark: "sh /path/of/spark_benchmark.sh"
   performance_metric: "DURATION"
 
 nginx:
+  version: "v1.21.5"
   port: 10000
   config_file: "/usr/local/nginx/conf/nginx.conf"
   set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s|^\\s*$param_name\\s\\+.*|    $param_name $param_value;|" "$config_file" || sed -i "/http\\s*{/a\    $param_name $param_value;" "$config_file"'
@@ -47,6 +52,7 @@ nginx:
   performance_metric: "QPS"
 
 ceph:
+  version: "v18.2.2"
   set_param_template: 'ceph config set osd "$param_name" "$param_value"'
   get_param_template: '$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/get_param.sh "$param_name"'
   start_workload: "sh /path/of/restart_ceph.sh"
@@ -54,6 +60,7 @@ ceph:
   performance_metric: "BANDWIDTH"
 
 gaussdb:
+  version: "v5.7"
   user: ""
   password: ""
   config_file: "/path/of/config_file"
@@ -67,10 +74,12 @@ gaussdb:
   performance_metric: "DURATION"
 
 system:
+  version: "v5.7"
   set_param_template: 'sysctl -w $param_name=$param_value'
   get_param_template: 'sysctl $param_name'
 
 redis:
+  version: "v6.0.20"
   port: 6379
   config_file: "/etc/redis.conf"
   set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s/^\\s*$param_name\\s\\+.*/$param_name $param_value/g" $config_file || echo "$param_name $param_value" >> "$config_file"'
@@ -81,6 +90,7 @@ redis:
   performance_metric: "QPS"
 
 oceanbase:
+  version: "v5.7"
   user: "root@sysbench_tenant"
   password: ""
   config_file: "/root/.obd/cluster/obcluster/config.yaml"

@@ -70,6 +70,7 @@ def shell_template(template_str, **kwargs):
 @dataclass
 class AppMetaConfig:
     app_name: str
+    version: str
     user: str
     port: str
     password: str
@@ -84,6 +85,7 @@ class AppTemplate:
             self,
             ssh_client: SshClient,
             app_name: str = "",
+            version: str = "",
             user: str = "",
             port: str = "",
             password: str = "",
@@ -100,6 +102,7 @@ class AppTemplate:
         self.meta_data = asdict(
             AppMetaConfig(
                 app_name=app_name,
+                version=version,
                 user=user,
                 port=port,
                 password=password,
