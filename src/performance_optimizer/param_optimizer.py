@@ -1,11 +1,13 @@
 import logging
 import json
+import time
 
 from src.performance_optimizer.param_recommender import ParamRecommender
 from src.performance_optimizer.param_knowledge import ParamKnowledge
 from src.performance_test.pressure_test import wait_for_pressure_test
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
+from src.utils.snapshot import load_snapshot, save_snapshot
 
 class ParamOptimizer:
 
@@ -16,7 +18,7 @@ class ParamOptimizer:
             analysis_report: str,
             static_profile: str,
             ssh_client: SshClient,
-            slo_calc_callback: callable,
+            slo_calc_callback: callable = None,
             max_iterations: int = 10,
             need_restart_application: bool = False,
             pressure_test_mode: bool = False,
@@ -33,7 +35,7 @@ class ParamOptimizer:
         self.pressure_test_mode = pressure_test_mode
         self.max_iterations = max_iterations
         # 计算slo指标提升方式的回调函数，输入是benchmark返回的性能指标，输出是业务性能提升比例
-        self.slo_calc_callback = slo_calc_callback
+        self.slo_calc_callback = None
         # 业务预期指标提升的目标
         self.slo_goal = slo_goal
         # 可调参数知识库，用于给大模型描述应用参数背景知识
@@ -66,7 +68,9 @@ class ParamOptimizer:
         self.param_save_path = param_save_path
 
     def calc_improve_rate(self, baseline, benchmark_result, symbol):
-        return self.slo_calc_callback(baseline, benchmark_result, symbol)
+        if baseline is None or abs(baseline) < 1e-9:
+            return 0.0
+        return symbol * (benchmark_result - baseline) / baseline
 
     def reached_goal(self, baseline, benchmark_result, symbol):
         if self.calc_improve_rate(baseline, benchmark_result, symbol) >= self.slo_goal:
@@ -74,7 +78,7 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        logging.info("🔄 正在验证benchmark性能...")
+        logging.info("🔄 开始验证benchmark性能...")
         result = self.app_interface.benchmark()
         if result.status_code == 0 and result.output:
             try:
@@ -85,11 +89,14 @@ class ParamOptimizer:
                 logging.warning(f"Benchmark 失败，结果是：{result.output}")
                 return None
         else:
-            logging.warning(f"Benchmark 执行失败: {result.err_msg}")
+            logging.warning(f"Benchmark 执行失败: ret code {result.status_code} {result.err_msg}")
             return None
 
     def apply_params(self, recommend_params):
         for param_name, param_value in recommend_params.items():
+            # 跳过空参数值
+            if param_value == "" or param_value is None:
+                continue
             apply_result = self.app_interface.set_param(param_name, param_value)
             if apply_result.status_code == 0:
                 logging.info(f"设置参数{param_name}为{param_value}")
@@ -105,6 +112,7 @@ class ParamOptimizer:
         if start_result.status_code != 0:
             logging.warning(f"failed to start application because {start_result.err_msg}")
             return False
+        logging.info("🔄 重启应用成功")
         return True
 
     def recover_cluster(self):
@@ -195,11 +203,14 @@ class ParamOptimizer:
             if self.need_restart_application:
                 restart_success = self.restart_application()
                 if not restart_success:
+                    logging.warning(f"[{i + 1}/{self.max_iterations}] 应用重启失败，参数不合法，恢复第 {i} 轮配置...")
                     historys["上一轮调优结果"] = {"上一轮性能": "应用重启失败，参数不合法", "参数推荐": recommend_params}
                     self.apply_params(self.current_params)
                     restart_success = self.restart_application()
-                    logging.warning(f"[{i + 1}/{self.max_iterations}] 应用重启失败，参数不合法，恢复第 {i} 轮配置，恢复成功：{restart_success}")
+                    logging.warning(f"第 {i} 轮配置恢复{'成功' if {restart_success} else '失败'}")
                     continue
+                # 重启后等待2秒，防止压测启动过快
+                time.sleep(2)
 
             # 执行benchmark，反馈调优结果
             performance_result = self.benchmark()
