@@ -207,7 +207,7 @@ class ParamOptimizer:
                     historys["上一轮调优结果"] = {"上一轮性能": "应用重启失败，参数不合法", "参数推荐": recommend_params}
                     self.apply_params(self.current_params)
                     restart_success = self.restart_application()
-                    logging.warning(f"第 {i} 轮配置恢复{'成功' if {restart_success} else '失败'}")
+                    logging.warning(f"第 {i} 轮配置恢复{'成功' if restart_success else '失败'}")
                     continue
                 # 重启后等待2秒，防止压测启动过快
                 time.sleep(2)
