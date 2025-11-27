@@ -115,13 +115,15 @@ def update_app_config(app_configs: List[dict]):
 
     for apps in app_configs:
         app_section = apps.get("app_section")
-        data = apps.get("data", {})
+        if app_section is None:
+            continue
 
         cm = cfg.get(app_section)
         if cm is None:
             cm = CommentedMap()
             cfg[app_section] = cm
 
+        data = apps.get("data", {})
         for key, value in data.items():
             if value is None:
                 continue
