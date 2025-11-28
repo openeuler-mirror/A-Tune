@@ -58,7 +58,7 @@ class BaseOptimizer:
             # 执行脚本
             script_res = self.args.ssh_client.run_cmd(cmd='./temp_script.sh')
         except Exception as e:
-            print("执行优化脚本时发生错误：", e)
+            logging.info("An error occurred while executing the optimization script: ", e)
             return not is_execute
         finally:
             # 清理临时文件

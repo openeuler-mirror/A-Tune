@@ -99,13 +99,13 @@ class StrategyOptimizer(BaseOptimizer):
         """
         # 1. 过滤出相关策略
         candidate_strategies = self._filter_strategies(bottleneck)
-        logging.info(f">>> 过滤大类瓶颈后的策略数量：{len(candidate_strategies)}")
+        logging.info(f">>> number of strategies after filtering out bottlenecks in major categories: {len(candidate_strategies)}")
 
         if not candidate_strategies:
             return []
 
         # 2. 生成LLM提示词并获取响应
-        logging.info(f">>> 根据策略功能说明，匹配合适top K策略：")
+        logging.info(f">>> according to the strategy function description, match the appropriate top K strategy.")
         prompt = self._generate_llm_prompt(candidate_strategies, bottleneck, business_context)
         llm_response = get_llm_response(prompt)
 
@@ -135,7 +135,7 @@ class StrategyOptimizer(BaseOptimizer):
             return selected_strategies
 
         except Exception as e:
-            logging.info(f"解析LLM响应失败: {e}")
+            logging.info(f"parsing LLM response failed: {e}")
             # 如果解析失败，返回前top_k个策略
             return candidate_strategies[:top_k]
 
@@ -166,10 +166,10 @@ class StrategyOptimizer(BaseOptimizer):
                 top_k=1,
                 business_context="高并发Web服务，CPU负载主要集中在用户态处理"
             )
-            logging.info(f">>> 匹配的策略数量：{len(recommendations)}")
+            logging.info(f">>> number of matching strategies: {len(recommendations)}")
             cmd_list = []
             for strategy in recommendations:
-                logging.info(f">>> - 策略名称：{strategy['策略名称']}")
+                logging.info(f">>> - strategy name: {strategy['策略名称']}")
                 cmd_list.append(strategy['优化步骤'])
             return False, self.get_bash_script(cmd_list)
         else:
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     # 假设这是本地实现的LLM接口
     def get_llm_response(prompt: str) -> str:
         # 这里应该是实际调用LLM的代码
-        logging.info("\nLLM提示词:\n", prompt)
+        logging.info("\nLLM prompt:\n", prompt)
         # 模拟LLM返回
         return "策略1"
 
@@ -218,4 +218,4 @@ if __name__ == "__main__":
         business_context="高并发Web服务，CPU负载主要集中在用户态处理"
     )
 
-    logging.info("\n推荐策略:\n", recommendations)
+    logging.info("\nrecommend strategy:\n", recommendations)

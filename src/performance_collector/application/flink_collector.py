@@ -51,7 +51,7 @@ def flink_job_detail(output: str) -> dict:
         }
 
     except Exception as e:
-        logging.warning(f"解析 flink job detail 失败: {e}")
+        logging.warning(f"Failed to parse Flink job detail: {e}")
         return {}
 
 
@@ -89,7 +89,7 @@ def flink_checkpoint_status(output: str) -> dict:
                 }
         }
     except Exception as e:
-        logging.warning(f"解析 flink checkpoint 信息失败: {e}")
+        logging.warning(f"Failed to parse Flink checkpoint information: {e}")
         return {}
 
 
@@ -111,7 +111,7 @@ def flink_job_overview(output: str) -> dict:
                 }
         }
     except Exception as e:
-        logging.warning(f"解析 flink jobs overview 失败: {e}")
+        logging.warning(f"Failed to parse Flink jobs overview: {e}")
         return {}
 
 
@@ -141,7 +141,7 @@ def flink_resource_usage(output: str) -> dict:
                 }
         }
     except Exception as e:
-        logging.warning(f"解析 flink taskmanagers 信息失败: {e}")
+        logging.warning(f"Failed to parse Flink TaskManagers information: {e}")
         return {}
 
 
@@ -166,7 +166,7 @@ def flink_backpressure(output: str) -> dict:
                 }
         }
     except Exception as e:
-        logging.warning(f"解析 flink backpressure 失败: {e}")
+        logging.warning(f"Failed to parse Flink backpressure: {e}")
         return {}
 
 
@@ -217,7 +217,7 @@ def flink_throughput_metrics(output: str) -> dict:
 
         return {"flink_throughput_metrics": result}
     except Exception as e:
-        logging.error(f"解析吞吐量指标失败: {e}")
+        logging.error(f"Failed to parse throughput metric: {e}")
         # 返回默认值而不是空字典
         return {"flink_throughput_metrics": {
             "输入吞吐": 0.0,
@@ -260,7 +260,7 @@ def flink_resource_usage(output: str) -> dict:
 
         return {"flink_resource_usage": resource_data}
     except Exception as e:
-        logging.error(f"解析资源指标失败: {e}")
+        logging.error(f"Failed to parse resource metrics: {e}")
         # 返回默认值而不是空字典
         return {"flink_resource_usage": {
             "CPU负载": 0.0,
