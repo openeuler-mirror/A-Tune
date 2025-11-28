@@ -78,18 +78,18 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        logging.info("🔄 开始验证benchmark性能...")
+        logging.info("🔄 start to verify benchmark performance...")
         result = self.app_interface.benchmark()
         if result.status_code == 0 and result.output:
             try:
                 perf_value = float(result.output)
-                logging.info(f"Benchmark 成功，性能值: {perf_value}")
+                logging.info(f"benchmark success, performance value: {perf_value}")
                 return perf_value
             except Exception as e:
-                logging.warning(f"Benchmark 失败，结果是：{result.output}")
+                logging.warning(f"benchmark failed, the result is: {result.output}")
                 return None
         else:
-            logging.warning(f"Benchmark 执行失败: ret code {result.status_code} {result.err_msg}")
+            logging.warning(f"benchmark execute failed: ret code {result.status_code} {result.err_msg}")
             return None
 
     def apply_params(self, recommend_params):
@@ -99,12 +99,12 @@ class ParamOptimizer:
                 continue
             apply_result = self.app_interface.set_param(param_name, param_value)
             if apply_result.status_code == 0:
-                logging.info(f"设置参数{param_name}为{param_value}")
+                logging.info(f"set param {param_name} to {param_value}")
             else:
-                logging.info(f"设置参数{param_name}失败，原因是：{apply_result.err_msg}")
+                logging.info(f"set param {param_name} failed, reason: {apply_result.err_msg}")
 
     def restart_application(self):
-        logging.info("🔄 正在重启应用 ...")
+        logging.info("🔄 restarting the application ...")
         stop_result = self.app_interface.stop_workload()
         if stop_result.status_code != 0:
             logging.warning(f"failed to stop application because {stop_result.err_msg}")
@@ -112,11 +112,11 @@ class ParamOptimizer:
         if start_result.status_code != 0:
             logging.warning(f"failed to start application because {start_result.err_msg}")
             return False
-        logging.info("🔄 重启应用成功")
+        logging.info("🔄 application restarted successfully")
         return True
 
     def recover_cluster(self):
-        print("🔄 正在恢复集群 ...")
+        logging.info("🔄 restoring the cluster ...")
         recover_result = self.app_interface.recover_workload()
         if recover_result.status_code != 0:
             raise RuntimeError(
@@ -135,7 +135,7 @@ class ParamOptimizer:
                 commands.append(cmd)
 
         if not commands:
-            print(f"第 {batch_id} 轮无需要重启生效的参数，跳过写入脚本。")
+            logging.info(f"No parameters require restart to take effect in round {batch_id}; skipping script writing.")
             return
 
         # 构建要追加的内容
@@ -146,12 +146,12 @@ class ParamOptimizer:
             init_cmd = f"echo '#!/bin/bash' > {script_path}"
             self.ssh_client.run_cmd(init_cmd)
             self.first_restart_save = False
-            print(f"首次创建重启参数脚本: {script_path}")
+            logging.info(f"first-time creation of restart parameter script: {script_path}")
 
         append_cmd = f"cat << 'EOF' >> {script_path}\n{content}\nEOF"
         self.ssh_client.run_cmd(append_cmd)
 
-        print(f"已将 {len(commands)} 个参数写入重启脚本: {script_path}")
+        logging.info(f"{len(commands)} parameters have been written to the restart script: {script_path}")
 
     def save_best_params(self, params):
         if self.param_save_path:
@@ -191,7 +191,7 @@ class ParamOptimizer:
         is_positive = True
         symbol = self.app_interface.get_calculate_type()
         logging.info(
-            f"[{0}/{self.max_iterations}] 性能基线是：{baseline}"
+            f"[{0}/{self.max_iterations}] performance baseline is: {baseline}"
         )
 
         for i in range(self.max_iterations):
@@ -203,11 +203,11 @@ class ParamOptimizer:
             if self.need_restart_application:
                 restart_success = self.restart_application()
                 if not restart_success:
-                    logging.warning(f"[{i + 1}/{self.max_iterations}] 应用重启失败，参数不合法，恢复第 {i} 轮配置...")
+                    logging.warning(f"[{i + 1}/{self.max_iterations}] application restart failed due to invalid parameters, reverting to round {i} configuration...")
                     historys["上一轮调优结果"] = {"上一轮性能": "应用重启失败，参数不合法", "参数推荐": recommend_params}
                     self.apply_params(self.current_params)
                     restart_success = self.restart_application()
-                    logging.warning(f"第 {i} 轮配置恢复{'成功' if restart_success else '失败'}")
+                    logging.warning(f"round {i} configuration recovery {'succeeded' if restart_success else 'failed'}")
                     continue
                 # 重启后等待2秒，防止压测启动过快
                 time.sleep(2)
@@ -225,7 +225,8 @@ class ParamOptimizer:
                 restart_success = True
                 if self.need_restart_application:
                     restart_success = self.restart_application()
-                logging.warning(f"[{i + 1}/{self.max_iterations}] benchmark失败，参数不合理，恢复第 {i} 轮配置，恢复成功：{restart_success}")
+                logging.warning(f"[{i + 1}/{self.max_iterations}] benchmark failed, because param is invalid. \
+                                    Restoring configuration for round {i}, restoration successful: {restart_success}")
                 continue
             self.current_params.update(recommend_params)
             curr_recommend_params.update(recommend_params)
@@ -252,7 +253,8 @@ class ParamOptimizer:
             ratio = self.calc_improve_rate(baseline, performance_result, symbol)
 
             logging.info(
-                f"[{i + 1}/{self.max_iterations}] 性能基线是：{baseline}, 最佳结果：{best_result}, 本轮结果:{performance_result if performance_result is not None else '-'}, 性能提升：{ratio:.2%}"
+                f"[{i + 1}/{self.max_iterations}] performance baseline is {baseline}, best result: {best_result}, \
+                this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
             )
 
             # 达到预期效果，则退出循环
@@ -260,16 +262,16 @@ class ParamOptimizer:
                 break
 
         logging.info(
-            f"调优完毕，{'达到' if self.reached_goal(baseline, best_result, symbol) else '未达到'} 预期目标"
+            f"optimization completed, {'reached' if self.reached_goal(baseline, best_result, symbol) else 'did not reach'} expected goal"
         )
 
         # 配置最优参数
-        logging.info(f"配置最佳性能参数：")
+        logging.info(f"configure best performance param: ")
         self.apply_params(best_recommend_params)
         if self.need_restart_application:
             restart_success = self.restart_application()
             if restart_success:
-                logging.info(f"应用重启完成")
+                logging.info(f"application restart completed")
             else:
-                logging.err(f"应用重启失败")
+                logging.error(f"failed to restart the application.")
 

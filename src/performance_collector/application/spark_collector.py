@@ -53,7 +53,7 @@ def spark_job_info(app_id: str) -> dict:
         return {cmd: result}
 
     except Exception as e:
-        logging.warning(f"获取 job 信息失败: {e}")
+        logging.warning(f"Failed to get job info: {e}")
         return {}
 
 
@@ -90,7 +90,7 @@ def spark_stage_info(app_id: str) -> dict:
         }
         return {cmd: result}
     except Exception as e:
-        logging.warning(f"获取 stage 信息失败: {e}")
+        logging.warning(f"Failed to get stage info: {e}")
         return {}
 
 
@@ -144,5 +144,5 @@ def spark_executor_info(output: list[str]) -> dict:
         }
         return {cmd: result}
     except Exception as e:
-        logging.error(f"解析 executor 指标失败: {e}")
+        logging.error(f"Failed to parse executor metrics: {e}")
         return {}

@@ -24,7 +24,7 @@ def split_json_to_files(json_text: str, output_dir: str) -> None:
     try:
         json_data = json.loads(json_text)
     except json.JSONDecodeError as e:
-        print(f"JSON解析错误：{e}")
+        print(f"JSON parsing error: {e}")
         return
 
     # 遍历JSON对象并为每个参数创建或更新JSON文件
@@ -48,6 +48,6 @@ def split_json_to_files(json_text: str, output_dir: str) -> None:
         if len(new_content) > len(existing_content):
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(new_content)
-                print(f"已将参数 {param['name']} 更新到文件 {file_path}")
+                print(f"The parameter {param['name']} has been updated to the file {file_path}")
         else:
-            print(f"文件 {file_path} 已存在且内容较多，未更新")
+            print(f"The file {file_path} already exists and contains a large amount of content; it has not been updated.")

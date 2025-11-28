@@ -25,7 +25,7 @@ from src.start_tune import run_param_optimization, run_strategy_optimization
 
 # ================= FastAPI 初始化 ===================
 app = FastAPI(
-    title="性能分析与优化 API",
+    title="Performance Analysis and Optimization API",
     description="统一接口：Setter / Collector / Analyzer / Optimizer",
     version="1.0.0",
 )

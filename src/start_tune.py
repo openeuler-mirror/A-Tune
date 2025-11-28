@@ -138,7 +138,7 @@ def run_strategy_optimization(ssh_client, app, bottleneck, server_cfg, report):
             bottleneck, top_k=1, business_context=server_cfg["business_context"]
         )
         save_snapshot(strategy_recommendations, "strategy_recommendations")
-    logging.info(f"推荐策略: \n{strategy_recommendations}")
+    logging.info(f"recommend strategy: \n{recommendations}")
 
 
 def main():

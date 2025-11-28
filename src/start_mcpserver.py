@@ -24,7 +24,7 @@ from src.start_tune import run_param_optimization, run_strategy_optimization
 cache: Dict[str, Dict[str, Any]] = {}
 
 # 创建MCP Server
-mcp = FastMCP("性能分析与优化 MCP Server", host="0.0.0.0", port=12147)
+mcp = FastMCP("Performance Analysis and Optimization MCP Server", host="0.0.0.0", port=12147)
 
 host_ip = config["servers"][0]["ip"]
 host_port = config["servers"][0]["port"]
