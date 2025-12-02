@@ -197,83 +197,98 @@ python3 src/start_tune.py
 ## 使用指南
 ### 配置文件准备
 #### 1. 修改 .env.yaml 配置文件内容（项目 config 目录下）
+
+根据调优需要，修改相应配置字段：
 ```bash
 vim config/.env.yaml
 ```
+
 * 具体格式如下： （**调优提升目标**的配置见其中的 feature - slo_goal 字段说明）
 ```YAML
 # 根据实际使用的模型服务填写以下字段
 LLM_KEY: "sk-XXXXXX"                  # 必填：模型服务的 API 密钥
 LLM_URL: "https://api.deepseek.com"   # 必填：LLM 服务的 API 接口地址，如 "https://api.deepseek.com"
 LLM_MODEL_NAME: "deepseek-chat"       # 必填：要调用的模型名，如 deepseek-chat
-LLM_MAX_TOKENS:                       # 选填：生成文本的最大 token 数，如512或2048
+LLM_MAX_TOKENS: 8192                  # 选填：生成文本的最大 token 数，如4096
 
-REMOTE_EMBEDDING_ENDPOINT: "https://api.embedding.com/v1/embeddings"  # 嵌入模型服务地址
-REMOTE_EMBEDDING_MODEL_NAME: "bge-large-zh"                           # 嵌入模型名称，如 text-embedding-3-small、bge-large-zh
+REMOTE_EMBEDDING_ENDPOINT: "https://api.embedding.com/v1/embeddings"  # 选填：嵌入模型服务地址
+REMOTE_EMBEDDING_MODEL_NAME: "bge-large-zh"                           # 选填：嵌入模型名称，如 text-embedding-3-small、bge-large-zh
  
 servers:
-  - ip: ""                                                              # 应用所在ip
-    host_user: ""                                                       # 登录机器的usr id
-    password: ""                                                        # 登录机器的密码
-    port:                                                               # 应用所在ip的具体port
-    app: "mysql"                                                        # 当前支持mysql、nginx、pgsql、spark
-    listening_address: ""                                               # 应用监听的ip(当前仅flink、nginx、spark需要填写)
-    listening_port: ""                                                  # 应用监听的端口(当前仅flink、nginx、spark需要填写)
-    target_process_name: "mysqld"                                       # 调优应用的name
-    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"           #调优应用的描述（用于策略生成）
-    max_retries: 3
-    delay: 1.0
+  - ip: ""                                                              # 必填：调优目标机器ip
+    host_user: ""                                                       # 必填：调优机器的usr id
+    password: ""                                                        # 必填：登录机器的密码
+    port: 22                                                            # 必填：应用所在ip的SSH连接port
+    app: "mysql"                                                        # 必填：当前支持的应用见 app_config.yaml 中已定义的字段
+    listening_address: ""                                               # 选填：应用监听的ip(当前仅flink、nginx、spark需要填写)
+    listening_port: ""                                                  # 选填：应用监听的端口(当前仅flink、nginx、spark需要填写)
+    target_process_name: "mysqld"                                       # 选填：调优应用进程的name
+    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"       # 选填：调优应用的描述（用于策略生成）
     
 feature:
-  - need_restart_application: False                                     # 修改参数之后是否需要重启应用使参数生效
+  - need_restart_application: True                                      # 修改参数之后是否需要重启应用使参数生效
     need_recover_cluster: False                                         # 调优过程中是否需要恢复集群
-    microDep_collector: True                                            # 是否开启微架构指标采集
-    pressure_test_mode: True                                            # 是否通过压测模拟负载环境
-    tune_system_param: False                                            # 是否调整系统参数
-    tune_app_param: True                                                # 是否调整应用参数
+    microDep_collector: True                                            # 是否开启微架构指标采集，虚拟化环境不支持无需开启
+    pressure_test_mode: True                                            # 是否通过压测模拟负载环境，若系统自带负载无需压测打流，则可关闭
+    tune_system_param: False                                            # 是否调整系统参数，若打开，则调优范围增加系统参数，因调优效果一般不如应用参数效果明显，默认关闭
+    tune_app_param: True                                                # 是否调整应用参数，若打开，则调优范围增加应用参数，优先调优此类参数，应用参数与系统参数调优必须至少打开一个
     strategy_optimization: False                                        # 是否需要策略推荐
     benchmark_timeout: 3600                                             # benchmark执行超时限制
     max_iterations: 10                                                  # 最大迭代轮数
     slo_goal: 0.1                                                       # 调优提升目标，默认0.1也即10%，调优达成提升目标后会提前结束
-
+    best_param_save_path: "best_params.json"                            # 最优参数保存文件路径
+    data_dir: "data"                                                    # 中间数据的文件夹路径
+    save_snapshot: False                                                # 保存快照开关，用于保存采集、分析、调优初始化中间结果，保存路径为 ${data_dir}/snapshot/
+    use_snapshot: False                                                 # 使用快照开关，用于跳过采集、分析、调优初始化等步骤，直接使用已保存结果
+    max_retries: 3                                                      # 执行命令的失败重试次数
+    delay: 1.0                                                          # 执行命令的失败重试间隔
 ```
 
 #### 2. 完善 app_config.yaml（项目 config 目录下）  
-(需按实际环境修改，重点关注 set_param_template、 get_param_template、 benchmark 脚本)  
-* set_param_template：设置应用配置参数（copilot调优时，会使用此脚本修改参数值）  
+(需按实际环境修改，重点关注 set_param_template、 get_param_template、 benchmark 配置）
+* set_param_template：参数设置方法（copilot调优时，会在调优机器以bash运行此方法修改参数值） 
 ```YAML
+# 示例（mysql）：
+set_param_template: 'grep -q "^$param_name\\s*=" "$config_file" && sed -i "s/^$param_name\\s*=.*/$param_name = $param_value/" "$config_file" || sed -i "/\\[mysqld\\]/a $param_name = $param_value" "$config_file"'
+
 # 说明：
 #   - $param_name：将被copilot替换为待修改的参数名（如 worker_connections）
 #   - $param_value：将被copilot替换为参数目标值（如 8192）
-#   - $config_file：指向应用配置文件路径（已在 config 中定义）
-
-# 示例（mysql）：
-set_param_template: 'grep -q "^$param_name\\s*=" "$config_file" && sed -i "s/^$param_name\\s*=.*/$param_name = $param_value/" "$config_file" || sed -i "/\\[mysqld\\]/a $param_name = $param_value" "$config_file"'
+#   - $config_file：指向应用配置文件路径（使用 config 中定义的值）
 ```
 
-* get_param_template：获取应用配置参数  
+* get_param_template：参数获取方法（copilot调优时，会在调优机器以bash运行此方法获取参数值） 
 ```YAML
-# 说明：
-#   - $param_name：将被copilot替换为参数名
-
 # 示例（mysql）：
 get_param_template: 'grep -E "^$param_name\\s*=" $config_file | cut -d= -f2- | xargs'
+
+# 说明：
+#   - $param_name：将被copilot替换为参数名（如 worker_connections）
 ```
 
 * benchmark：压测命令模版
 ```YAML  
+# 示例（mysql）：
+benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
+
 # 说明：
 #   - $EXECUTE_MODE:local    → 在 Copilot 控制机本地执行
 #   - $EXECUTE_MODE:remote   → 通过 SSH 跳转到目标机器执行，默认使用remote执行模式
-#   - 其他变量（如 $host_ip, $port, $user）将被自动替换
-
-# 示例（mysql）：
-benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
+#   - 其他变量（如 $host_ip, $port, $user）将被自动替换 config 中定义的值
 ```
 
-* __完整配置示例如下：__
+* version：应用版本（用于选择合适的调优参数范围）
+```YAML  
+# 示例（mysql）：
+version: "v5.7"
+
+# 说明：版本号必须以 v 开头，例如 v{x}.{y}.{z}，可参考 app_config.yaml 中各应用的默认配置。
+```
+
+* __mysql应用配置示例如下：__
 ```YAML
 mysql:
+  version: "v5.7"
   user: "root"
   password: "123456"
   config_file: "/etc/my.cnf"
@@ -284,93 +299,23 @@ mysql:
   start_workload: "systemctl start mysqld"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
   performance_metric: "QPS"
-
-flink:
-  set_param_template: '/patch/to/script/set_param.sh $param_name $param_value'
-  get_param_template: '/patch/to/script/get_param.sh $param_name'
-  benchmark: "/patch/to/script/nexmark_test.sh"
-  stop_workload: 'docker exec -i flink_jm_8c32g bash -c "source /etc/profile && /usr/local/flink-1.16.3/bin/stop-cluster.sh && /usr/local/nexmark/bin/shutdown_cluster.sh"'
-  start_workload: 'docker exec -i flink_jm_8c32g bash -c "source /etc/profile && /usr/local/flink-1.16.3/bin/start-cluster.sh"'
-  performance_metric: "THROUGHPUT"
-
-pgsql:
-  user: "postgres"
-  password: "postgres"
-  config_file: "/data/data1/pgsql/postgresql.conf"
-  port: 5432
-  set_param_template: 'grep -qE "^\s*$param_name\s*=" "$config_file" && sed -i "s/^[[:space:]]*$param_name[[:space:]]*=.*/$param_name = $param_value/" "$config_file" || echo "$param_name = $param_value" >> "$config_file"'
-  get_param_template: 'grep -oP "^\s*$param_name\s*=\s*\K.*" "$config_file"'
-  stop_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl stop -D /data/data1/pgsql/ -m fast'"
-  start_workload: "su - postgres -c '/usr/local/pgsql/bin/pg_ctl start -D /data/data1/pgsql/ -l /var/log/postgresql/postgresql.log'"
-  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/postgresql/parse_benchmark.sh $host_ip $port $user $password"
-  performance_metric: "QPS"
-
-spark:
-  set_param_template: 'sh /path/of/set_param.sh $param_name $param_value'
-  get_param_template: 'sh /path/of/get_param.sh $param_name'
-  benchmark: "sh /path/of/spark_benchmark.sh"
-  performance_metric: "DURATION"
-
-nginx:
-  port: 10000
-  config_file: "/usr/local/nginx/conf/nginx.conf"
-  set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s|^\\s*$param_name\\s\\+.*|    $param_name $param_value;|" "$config_file" || sed -i "/http\\s*{/a\    $param_name $param_value;" "$config_file"'
-  get_param_template: 'grep -E "^\\s*$param_name\\s+" $config_file | head -1 | sed -E "s/^\\s*$param_name\\s+(.*);/\\1/"'
-  stop_workload: "/usr/local/nginx/sbin/nginx -s reload"
-  start_workload: "/usr/local/nginx/sbin/nginx -s reload"
-  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
-  performance_metric: "QPS"
-
-ceph:
-  set_param_template: 'ceph config set osd "$param_name" "$param_value"'
-  get_param_template: 'sh /path/of/get_params.sh'
-  start_workload: "sh /path/of/restart_ceph.sh"
-  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/ceph/parse_benchmark.sh"
-  performance_metric: "BANDWIDTH"
-
-gaussdb:
-  user: ""
-  password: ""
-  config_file: "/path/of/config_file"
-  port: 5432
-  set_param_template: 'gs_guc set -Z datanode  -N all -I all -c "${param_name}=${param_value}"'
-  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}"'
-  stop_workload: "cm_ctl stop -m i"
-  start_workload: "cm_ctl start"
-  recover_workload: "$EXECUTE_MODE:local sh /path/of/gaussdb_cluster_recover.sh"
-  benchmark: "$EXECUTE_MODE:local sh/path/of/gaussdb_benchmark.sh"
-  performance_metric: "DURATION"
-
-system:
-  set_param_template: 'sysctl -w $param_name=$param_value'
-  get_param_template: 'sysctl $param_name'
-
-redis:
-  port: 6379
-  config_file: "/etc/redis.conf"
-  set_param_template: "sed -i 's/^$param_name/$param_name $param_value/g' $config_file"
-  get_param_template: "grep -P '$param_name' $config_file | awk '{print $2}"
-  start_workload: "systemctl start redis"
-  stop_workload: "systemctl stop redis"
-  benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/redis/parse_benchmark.sh $host_ip $port "
-  performance_metric: "QPS"
-
 ```
 
-#### 3. benchmark.sh 脚本具体内容如下：
+#### 3. benchmark.sh 脚本具体内容参考如下：
 ```YAML
 #（必须有）用于通知框架可以执行指标采集的标识
 echo 1 > /tmp/euler-copilot-fifo  
 
-# benchmark 具体执行
+#（必须有）benchmark 具体执行
 cd /root/spark_auto_deploy_arm/spark_test
-sh tpcds_test_1t_spark331_linearity_2p.sh > /home/cxm/spark_benchmark.log 2>&1
+sh tpcds_test_1t_spark331_linearity_2p.sh > /root/spark_auto_deploy_arm/spark_benchmark.log 2>&1
 
 #（必须有）计算并输出相应的 performance_metric 的语句
-cd /home/cxm
+cd /root/spark_auto_deploy_arm
 time_taken=$(grep "time_taken:" "spark_benchmark.log" | sed -E 's/.*time_taken:([0-9.]+)s.*/\1/' | paste -sd+ | bc | xargs printf "%.2f")
 echo $time_taken
 ```
+注：此脚本的输出用于Copilot获取性能指标值，必须为纯数字，不能带其他文本输出，若有输出则需重定向到文件中。
 
 ### 应用示例
 * [mysql 应用验证示例](doc/zh/mysql.md)
