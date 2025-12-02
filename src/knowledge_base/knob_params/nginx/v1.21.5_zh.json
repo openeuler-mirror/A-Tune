@@ -1,0 +1,420 @@
+{
+    "access_log": {
+        "desc": "设置访问日志的路径和格式。合理配置可以缓解磁盘IO瓶颈，优化日志记录，提高日志的可读性和分析效率。可以在同一配置级别上指定多个日志。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "off",
+            "logs/access.log combined"
+        ]
+    },
+    "aio_write": {
+        "desc": "aio_write参数用于指定是否在启用异步IO（aio）时用于写入文件。设置为on时启用异步写入，可以缓解磁盘IO瓶颈；设置为off时禁用异步写入。该参数适用于需要优化文件写入性能的场景。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "client_body_buffer_size": {
+        "desc": "设置客户端请求体的缓冲区大小。该参数用于定义读取客户端请求体的缓冲区大小。如果请求体大于缓冲区，整个请求体或其部分将被写入临时文件。增大该值可以处理更大的请求体，但会增加内存使用，可能有助于缓解内存瓶颈。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            "8k",
+            "16k"
+        ]
+    },
+    "client_header_buffer_size": {
+        "desc": "设置客户端请求头的缓冲区大小。对于大多数请求，1K字节的缓冲区足够。增大该值可以处理更大的请求头，但会增加内存使用，适用于缓解内存瓶颈。",
+        "type": "discrete",
+        "dtype": "int",
+        "range": [
+            "1k",
+            "8k"
+        ]
+    },
+    "directio_alignment": {
+        "desc": "设置直接I/O的对齐字节数。该参数用于优化磁盘I/O性能，增大该值可以提高对齐性能，适合大文件的处理，而减小该值则更适合小文件的处理。通过合理设置该参数，可以缓解磁盘I/O瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            512,
+            4096
+        ]
+    },
+    "gzip": {
+        "desc": "启用或禁用响应内容的 gzip 压缩，可以提高网络传输效率，缓解网络瓶颈。取值为 on（启用）或 off（禁用）。启用后，Nginx 会对响应内容进行压缩，减少传输数据量。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "gzip_buffers": {
+        "desc": "设置用于压缩响应的缓冲区数量和大小。增大该值可以提高Gzip压缩性能，但会占用更多内存，适用于缓解内存瓶颈。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "16 8k",
+            "8 16k"
+        ]
+    },
+    "gzip_comp_level": {
+        "desc": "设置响应的 gzip 压缩级别，范围从 1 到 9。增大该值可以提高压缩率，但会增加 CPU 负担，减小则会降低压缩率但提高速度。该参数可以缓解网络瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            9
+        ]
+    },
+    "gzip_http_version": {
+        "desc": "设置支持的 Gzip 压缩的 HTTP 版本，通常为 1.0 或 1.1。选择 1.1 可以支持更多的特性，但可能会影响兼容性。该参数可以帮助缓解网络瓶颈。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "1.0",
+            "1.1"
+        ]
+    },
+    "gzip_min_length": {
+        "desc": "设置要进行 Gzip 压缩的响应内容的最小长度，单位为字节。该长度由 “Content-Length” 响应头字段决定。增大该值可以避免对小文件进行压缩，从而节省 CPU 资源，并缓解网络瓶颈。建议设置为 20 字节以上，以确保有效的压缩。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            20,
+            8192
+        ]
+    },
+    "gzip_vary": {
+        "desc": "启用或禁用插入“Vary: Accept-Encoding”响应头字段。该设置可以帮助代理服务器根据客户端的压缩支持情况缓存不同的响应，从而缓解网络瓶颈。启用后，响应头中将包含Vary: Accept-Encoding字段，允许更好的缓存管理和内容分发。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "keepalive_disable": {
+        "desc": "用于禁用某些用户代理的 keep-alive 功能，以防止与表现不佳的浏览器建立持久连接。可以缓解内存瓶颈。通过 `browser` 参数指定受影响的浏览器，多个值用空格分隔。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "msie6",
+            "safari",
+            "none"
+        ]
+    },
+    "keepalive_requests": {
+        "desc": "设置可以通过一个 keep-alive 连接提供服务的最大请求数。该参数可以缓解内存瓶颈，增大该值可以提高连接的复用率，但过高可能导致资源占用过多。适当调整该值以优化性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            10000
+        ]
+    },
+    "keepalive_time": {
+        "desc": "限制在关闭连接之前，keep-alive 连接保持的最大时间。增大该值可以减少连接的关闭频率，从而缓解内存瓶颈，但可能导致资源占用增加。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "1h",
+            "2h"
+        ]
+    },
+    "keepalive_timeout": {
+        "desc": "keepalive_timeout参数设置客户端保持连接的超时时间，超过该时间后，连接将被关闭。该参数可以缓解内存瓶颈，增大该值可以减少频繁的连接建立和关闭。默认值为75秒。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "30s",
+            "60s",
+            "90s",
+            "120s"
+        ]
+    },
+    "limit_rate_after": {
+        "desc": "设置在传输开始后，达到限制速率的时间，单位为字节。该参数用于控制在响应传输给客户端后，达到限制速率之前的初始传输量。增大该值可以让用户在开始时享受更高的下载速度，之后再限制带宽，从而缓解网络瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1048576
+        ]
+    },
+    "lingering_close": {
+        "desc": "控制Nginx关闭客户端连接的方式。该参数可以设置为'on'、'off'或'always'。当设置为'on'时，Nginx会在关闭连接时等待一段时间，以便客户端可以完成数据传输，从而缓解网络瓶颈。设置为'off'时，连接会立即关闭，而设置为'always'则会在每次关闭连接时都进行延迟处理。此参数的合理配置可以提高服务器的性能和用户体验。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "off",
+            "on",
+            "always"
+        ]
+    },
+    "lingering_time": {
+        "desc": "指定在关闭连接时，nginx 处理来自客户端的额外数据的最大时间。增大该值可以提高连接关闭的稳定性，减小则适合高并发场景，能够缓解网络瓶颈。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "0",
+            "120s"
+        ]
+    },
+    "lingering_timeout": {
+        "desc": "指定在关闭连接时等待更多客户端数据到达的最大时间。增大该值可以提高连接关闭的稳定性，减小则适合高并发场景。该参数可以缓解网络瓶颈。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "0",
+            "120s"
+        ]
+    },
+    "open_file_cache": {
+        "desc": "配置一个缓存，用于存储打开的文件描述符、文件大小和修改时间、目录的存在信息以及文件查找错误。通过启用该参数，可以提高Nginx的文件访问性能，减少磁盘I/O瓶颈。该参数的取值可以是OFF（关闭缓存）、ON（开启缓存）或一个具体的缓存大小。开启缓存后，Nginx会在内存中缓存打开的文件句柄，减少对文件系统的访问。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "off",
+            "max=N inactive=time"
+        ]
+    },
+    "open_file_cache_errors": {
+        "desc": "该参数用于启用或禁用对open_file_cache的文件查找错误的缓存。通过缓存错误，可以减少因文件错误导致的频繁打开文件操作，从而缓解磁盘IO瓶颈。建议在需要频繁访问文件的场景中使用。设置为off时，禁用该功能。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "open_file_cache_min_uses": {
+        "desc": "设置在缓存中保留文件句柄的最小使用次数。该参数定义了在open_file_cache指令的inactive参数配置的时间段内，文件被访问的最小次数。增大该值可以使得不常用的文件句柄被更快地移除，从而释放内存，缓解磁盘IO瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            10
+        ]
+    },
+    "open_file_cache_valid": {
+        "desc": "设置缓存文件句柄的有效时间，单位为秒。增大该值可以减少文件句柄的重新打开频率，从而缓解磁盘IO瓶颈，降低系统负担。建议根据实际需求调整该值，以优化性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            3600
+        ]
+    },
+    "output_buffers": {
+        "desc": "设置用于从磁盘读取响应的缓冲区数量和大小。增大该值可以提高并发性能，适合高流量场景；减小则适合低流量场景。该参数可以缓解内存瓶颈。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "2 32k"
+        ]
+    },
+    "postpone_output": {
+        "desc": "该参数设置在发送响应之前可以推迟的字节数。如果可能，客户端数据的传输将被推迟，直到nginx至少有指定字节数的数据可发送。增大该值可以提高网络利用率，适合高带宽场景；减小该值则适合低延迟场景，以缓解网络瓶颈。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1048576
+        ]
+    },
+    "proxy_buffering": {
+        "desc": "启用或禁用从代理服务器的响应缓冲。启用后可以提高性能，但会增加内存使用，适用于缓解内存瓶颈。取值为 ON 时启用，OFF 时禁用。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "proxy_buffers": {
+        "desc": "设置用于读取来自代理服务器响应的缓冲区数量和大小。该参数可以帮助缓解内存瓶颈，增大该值可以处理更大的响应，但会增加内存使用。建议根据实际需求进行调整。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "8 4k",
+            "8 8k"
+        ]
+    },
+    "proxy_buffer_size": {
+        "desc": "设置用于读取从代理服务器接收到的响应的第一部分的缓冲区大小。增大该值可以处理更大的响应，有助于缓解内存瓶颈，但会增加内存使用。建议根据实际需求进行调整。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "4k",
+            "1024k"
+        ]
+    },
+    "proxy_busy_buffers_size": {
+        "desc": "当启用从代理服务器缓冲响应时，限制可以忙于向客户端发送响应的缓冲区的总大小。增大该值可以提高性能，但会增加内存使用。建议根据实际情况进行调整，以缓解内存瓶颈。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "4k",
+            "1024k"
+        ]
+    },
+    "proxy_cache_min_uses": {
+        "desc": "设置缓存最小使用次数。该参数用于控制缓存内容的有效性，增大该值可以确保只有被频繁请求的内容才会被缓存，从而缓解磁盘IO瓶颈，减小该值则可能导致不常用内容被缓存。该参数的合理设置可以提高缓存的效率和性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            10
+        ]
+    },
+    "proxy_cache_use_stale": {
+        "desc": "该参数决定在与代理服务器通信时，何种情况下可以使用过期的缓存响应。启用此选项可以缓解磁盘IO瓶颈，减少对后端的请求，从而提高响应速度，但可能返回过期的数据。可选值包括：error、timeout、invalid_header、updating、http_500、http_502、http_503、http_504、http_403、http_404、http_429和off。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "error",
+            "timeout",
+            "invalid_header",
+            "updating",
+            "http_500",
+            "http_502",
+            "http_503",
+            "http_504",
+            "http_403",
+            "http_404",
+            "http_429",
+            "off"
+        ]
+    },
+    "proxy_connect_timeout": {
+        "desc": "定义与代理服务器建立连接的超时时间，单位为秒。该超时时间可以帮助缓解网络瓶颈，增大该值可以避免因网络延迟导致的连接失败，而减小该值则可以加快失败检测。请注意，该超时时间通常不能超过75秒。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            1,
+            75
+        ]
+    },
+    "proxy_ignore_client_abort": {
+        "desc": "确定当客户端关闭连接时是否关闭与代理服务器的连接。设置为ON时，代理服务器将忽略客户端的中止请求，确保后端继续处理请求，从而提高后端处理的稳定性，缓解网络瓶颈。设置为OFF时，代理服务器将不忽略客户端的中止请求。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "proxy_max_temp_file_size": {
+        "desc": "设置允许的最大临时文件大小，以处理不适合缓冲区的响应。增大该值可以缓解磁盘IO瓶颈，处理更大的响应，但会增加磁盘使用。建议根据实际需求进行调整。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "0",
+            "1024m"
+        ]
+    },
+    "proxy_read_timeout": {
+        "desc": "定义从代理服务器读取后端服务器响应的超时时间。该参数可以帮助缓解网络瓶颈，防止长时间未响应的连接占用资源。取值为时间，单位为秒，增大该值可以处理更慢的后端响应，减小则可以更快释放资源。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            "1s",
+            "120s"
+        ]
+    },
+    "proxy_request_buffering": {
+        "desc": "启用或禁用客户端请求体的缓冲。启用缓冲可以提高性能，减少内存使用，适用于高并发场景。禁用缓冲可能会减少内存使用，但可能会影响性能。取值为ON或OFF，ON表示启用缓冲，OFF表示禁用缓冲。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "proxy_send_timeout": {
+        "desc": "设置代理服务器向客户端发送响应的超时时间。该参数用于控制向被代理服务器发送请求的超时时间，能够有效缓解网络瓶颈，防止长时间未响应的连接占用资源。取值为时间，单位为秒，增大该值可以处理更慢的客户端连接，减小则可以更快释放资源。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "1s",
+            "120s"
+        ]
+    },
+    "proxy_temp_file_write_size": {
+        "desc": "设置写入临时文件的缓冲区大小。增大该值可以提高性能，尤其是在高负载情况下，有助于缓解磁盘IO瓶颈，但会增加磁盘使用。建议根据实际情况进行调整，以优化性能和资源使用。",
+        "type": "continuous",
+        "dtype": "string",
+        "range": [
+            "64k",
+            "1024k"
+        ]
+    },
+    "read_ahead": {
+        "desc": "设置读取前的预读字节数。该参数用于在处理文件时，内核会提前读取指定数量的字节，以缓解磁盘IO瓶颈。增大该值可以提高读取性能，适合大文件；减小则适合小文件。通过合理配置该参数，可以优化系统的文件读取效率。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            0,
+            1048576
+        ]
+    },
+    "reset_timedout_connection": {
+        "desc": "该参数用于设置是否重置超时的连接和使用非标准代码444关闭的连接。启用此功能可以缓解内存瓶颈，并更快释放资源。取值为 ON 时启用，OFF 时禁用。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "sendfile": {
+        "desc": "启用或禁用sendfile()系统调用，用于高效地将文件内容发送到网络连接。该功能可以显著提高文件传输的效率，减少磁盘I/O瓶颈。取值为ON时启用，OFF时禁用。默认情况下，该参数为OFF。",
+        "type": "discrete",
+        "dtype": "string",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "sendfile_max_chunk": {
+        "desc": "设置sendfile()系统调用中每次发送的最大字节数。增大该值可以提高大文件传输的效率，减小则适合小文件。该参数可以缓解磁盘I/O瓶颈，优化文件传输性能。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            1,
+            1048576
+        ]
+    },
+    "send_timeout": {
+        "desc": "设置发送响应的超时时间。该参数可以帮助缓解网络瓶颈，增大该值可以提高长连接的稳定性，适合需要长时间保持连接的场景；而减小该值则更适合短连接场景，以提高资源的利用率和响应速度。",
+        "type": "continuous",
+        "dtype": "int",
+        "range": [
+            "0",
+            "120s"
+        ]
+    },
+    "tcp_nodelay": {
+        "desc": "启用或禁用TCP_NODELAY选项。该选项在连接进入保持活动状态时启用。此外，在SSL连接、无缓冲代理和WebSocket代理中也会启用此选项。启用此选项可以缓解网络瓶颈，提升性能。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    },
+    "tcp_nopush": {
+        "desc": "该参数用于控制在使用sendfile时是否启用TCP_NOPUSH（在FreeBSD上）或TCP_CORK（在Linux上）选项。这些选项可以在发送数据时将多个小数据包合并为一个大数据包，从而减少网络延迟，缓解网络瓶颈。启用时取值为on，禁用时取值为off。",
+        "type": "discrete",
+        "dtype": "boolean",
+        "range": [
+            "on",
+            "off"
+        ]
+    }
+}

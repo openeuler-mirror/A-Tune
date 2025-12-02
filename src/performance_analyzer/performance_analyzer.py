@@ -7,6 +7,7 @@ from .micro_dep_analyzer import MicroDepAnalyzer
 from .base_analyzer import BaseAnalyzer
 from typing import Tuple
 from src.utils.thread_pool import ThreadPoolManager
+from src.utils.common import translate
 
 
 class PerformanceAnalyzer(BaseAnalyzer):
@@ -33,7 +34,8 @@ class PerformanceAnalyzer(BaseAnalyzer):
         self.thread_pool = ThreadPoolManager(max_workers=5)
 
     def analyze(self, report: str) -> str:
-        bottle_neck_prompt = f"""
+        bottle_neck_prompt = translate(
+            f"""
 # CONTEXT # 
 当前linux系统的性能分析报告如下,报告中所涉及到的数据准确无误,真实可信:
 {report}
@@ -57,7 +59,32 @@ class PerformanceAnalyzer(BaseAnalyzer):
 
 # RESPONSE FORMAT #
 请直接回答五个选项之一,不要包含多余文字
-        """
+        """,
+        f"""
+# CONTEXT #
+The performance analysis report of the current Linux system is as follows. The data mentioned in the report is accurate and reliable:
+{report}
+
+# OBJECTIVE #
+Based on the system performance analysis report, determine whether there is a performance bottleneck in the current system; if there is a bottleneck, identify which aspect of the system it primarily exists in.
+You should make a comprehensive judgment based on multiple pieces of information and data from various metrics. Do not jump to conclusions based on single-point information. Your final conclusion should be supported by multiple pieces of evidence.
+Requirements:
+1. You must choose one option from [CPU, NETWORK, DISK, MEMORY, NONE] as your answer.
+2. Do not include any additional text. Your answer must strictly match the description of the options provided.
+3. If you believe there is no performance bottleneck, choose NONE.
+
+# STYLE #
+You are a professional system operations expert. You should only answer with one of the five options listed above.
+
+# TONE #
+You should maintain a serious, careful, and rigorous attitude.
+
+# AUDIENCE #
+Your answer will be an important reference for other system operations experts. Please think carefully before providing your answer.
+
+# RESPONSE FORMAT #
+Please directly answer with one of the five options, without including any additional text.
+""")
         result = self.ask_llm(bottle_neck_prompt)
         bottlenecks = {
             "cpu": "CPU",

@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from src.utils.constant import OPTIMIZE_CONFIG_PATH
 from src.utils.llm import get_llm_response
 from src.utils.shell_execute import SshClient
+from src.utils.common import translate
 
 class OptimizerArgs(BaseModel):
     bottle_neck: str = ""
@@ -58,7 +59,7 @@ class BaseOptimizer:
             # 执行脚本
             script_res = self.args.ssh_client.run_cmd(cmd='./temp_script.sh')
         except Exception as e:
-            logging.info("An error occurred while executing the optimization script: ", e)
+            logging.error("An error occurred while executing the optimization script: ", e)
             return not is_execute
         finally:
             # 清理临时文件
@@ -75,7 +76,8 @@ class BaseOptimizer:
     ) -> Dict:
         if not is_execute:
             human_response = self.get_human_response(plan=plan)
-            prompt = f"""
+            prompt = translate(
+                f"""
             # CONTEXT # 
             以下内容是用户基于调优结果的反馈: 
             {human_response}
@@ -95,7 +97,30 @@ class BaseOptimizer:
             # RESPONSE FORMAT #
             请回答True或False,不要有多余文字。
 
-            """
+            """,
+                f"""
+            # CONTEXT # 
+            The following content is user feedback based on the tuning results:
+            {human_response}
+
+            # OBJECTIVE #
+            Please determine whether the user's performance optimization 
+            goals have been achieved based on the above information.
+
+            # STYLE #
+            You are a professional system operations expert; you should only answer True or False.
+
+            # Tone #
+            You should maintain a serious, earnest, and rigorous attitude as much as possible.
+
+            # AUDIENCE #
+            Your answer will serve as an important reference for other system operations experts. 
+            Please think carefully before providing your answer.
+
+            # RESPONSE FORMAT #
+            Please answer True or False, without any additional text.
+
+            """)
             if "true" in get_llm_response(prompt=prompt).lower():
                 return {
                     "isfinished": True,

@@ -31,7 +31,7 @@ def collect_static_metrics(ssh_client):
         static_collector = StaticMetricProfileCollector(ssh_client=ssh_client, max_workers=5)
         static_profile_info = static_collector.run()
         save_snapshot(static_profile_info, "static_profile_info")
-    display_metrics(static_profile_info["static"], headers=["指标名称", "指标值"])
+    display_metrics(static_profile_info["static"], headers=["metric name", "metric value"])
     return static_profile_info
 
 
@@ -62,7 +62,7 @@ def collect_runtime_metrics(ssh_client, server_cfg, pressure_test_mode):
         )
         data = metric_collector.run()
         save_snapshot(data, "metrics_data")
-    display_metrics(data, headers=["负载类型", "指标名", "指标值"])
+    display_metrics(data, headers=["load type", "metric name", "metric value"])
     return data
 
 

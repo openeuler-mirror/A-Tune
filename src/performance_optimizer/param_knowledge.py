@@ -59,14 +59,16 @@ class ParamKnowledge:
                 if item["type"] == "discrete":
                     param_range = "、".join(list(map(str, item["range"])))
                 else:
-                    param_range = f"从{item['range'][0]}到{item['range'][1]}"
+                    param_range = f"from {item['range'][0]} to {item['range'][1]}"
             else:
                 param_range = None
             # 2.当前环境取值
             param_result = app.get_param(param_name=param_name)
-            param_env_value = param_result.output if param_result.status_code == 0 else "默认值"
+            param_env_value = (
+                param_result.output if param_result.status_code == 0 else "default"
+            )
             params_describe_list.append(
-                f"{param_name}:{item['desc']},参数数据类型为：{item['dtype']}，参数的取值范围是：{param_range}, 当前环境取值为：{param_env_value}"
+                f"{param_name}:{item['desc']}, param type is: {item['dtype']}, param range is: {param_range}, current value is: {param_env_value}"
             )
             params_default_info[param_name] = param_env_value
         logging.info(f"[ParamKnowledge] initialize param knowledge base finished!")

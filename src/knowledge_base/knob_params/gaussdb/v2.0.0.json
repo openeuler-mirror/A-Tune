@@ -1,382 +1,382 @@
 {
   "work_mem": {
-    "desc": "设置内部排序操作和Hash表在开始写入临时磁盘文件之前使用的内存大小。ORDER BY，DISTINCT和merge joins都要用到排序操作。Hash表在散列连接、散列为基础的聚集、散列为基础的IN子查询处理中都要用到。建议此参数设置值大于算子执行时占用内存的最大值，否则可能会触发落盘",
-    "type": "continuous",
-    "range": [
-      64,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 65536
+      "desc": "Sets the memory size used for internal sort operations and hash tables before starting to write to temporary disk files. ORDER BY, DISTINCT, and merge joins all use sort operations. Hash tables are used in hash joins, hash-based aggregations, and hash-based IN subquery processing. It is recommended to set this parameter value larger than the maximum memory occupied during operator execution, otherwise it may trigger disk spilling.",
+      "type": "continuous",
+      "range": [
+          64,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 65536
   },
   "max_connections": {
-    "desc": "允许和数据库连接的最大并发连接数。此参数会影响数据库的并发能力。该参数调小会导致实际可用连接数变小。设置过大可能因内存不足导致DN启动失败或运行时异常",
-    "type": "continuous",
-    "range": [
-      10,
-      40000
-    ],
-    "dtype": "Integer",
-    "default_value": 40000
+      "desc": "Sets the maximum number of concurrent connections allowed to the database. This parameter affects the database's concurrency capability. Setting this parameter too small will reduce the actual available connections. Setting it too large may cause DN startup failure or runtime exceptions due to insufficient memory.",
+      "type": "continuous",
+      "range": [
+          10,
+          40000
+      ],
+      "dtype": "Integer",
+      "default_value": 40000
   },
   "checkpoint_segments": {
-    "desc": "设置checkpoint_timeout周期内所保留WAL日志文件的最大数量。每个日志文件大小为16MB。提升此参数可加快大数据的导入速度，但需要结合checkpoint_timeout、shared_buffers这两个参数统一考虑。该参数设置过小会导致频繁触发checkpoint；设置过大可能会增大RTO，且会导致WAL日志保留的文件数量增多，增大占用磁盘空间。",
-    "type": "continuous",
-    "range": [
-      1,
-      2147483646
-    ],
-    "dtype": "Integer",
-    "default_value": 1024
+      "desc": "Sets the maximum number of WAL log files retained during the checkpoint_timeout period. Each log file size is 16MB. Increasing this parameter can speed up large data import but needs to be considered together with checkpoint_timeout and shared_buffers parameters. Setting this parameter too small will cause frequent checkpoint triggers; setting it too large may increase RTO and cause more WAL log files to be retained, occupying more disk space.",
+      "type": "continuous",
+      "range": [
+          1,
+          2147483646
+      ],
+      "dtype": "Integer",
+      "default_value": 1024
   },
   "checkpoint_timeout": {
-    "desc": "设置自动检查点之间的最长时间。在提升checkpoint_segments以加快大数据导入的场景需将此参数调大，同时这两个参数提升会加大shared_buffers的负担，需要综合考虑。",
-    "type": "continuous",
-    "range": [
-      30,
-      3600
-    ],
-    "dtype": "Integer",
-    "default_value": 900
+      "desc": "Sets the maximum time between automatic checkpoints. When increasing checkpoint_segments to speed up large data import, this parameter needs to be increased accordingly. Increasing both parameters will increase the burden on shared_buffers and requires comprehensive consideration.",
+      "type": "continuous",
+      "range": [
+          30,
+          3600
+      ],
+      "dtype": "Integer",
+      "default_value": 900
   },
   "max_files_per_process": {
-    "desc": "设置每个数据库线程允许同时打开的最大文件数量。",
-    "type": "continuous",
-    "range": [
-      25,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 1024
+      "desc": "Sets the maximum number of files that each database thread can open simultaneously.",
+      "type": "continuous",
+      "range": [
+          25,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 1024
   },
   "max_prepared_transactions": {
-    "desc": "设置可以同时处于“预备”状态的事务的最大数目。增加此参数的值会使GaussDB Kernel比系统默认设置需要更多的System V共享内存。一般推荐200（196核CPU/1536G内存，128核CPU/1024G内存，104核CPU/1024G内存，96核CPU/1024G内存，96核CPU/768G内存，80核CPU/640G内存，64核CPU/512G内存，60核CPU/480G内存，32核CPU/256G内存，16核CPU/128G内存，8核CPU/64G内存，4核CPU/32G内存）；0（4核CPU/16G内存）",
-    "type": "continuous",
-    "range": [
-      0,
-      262143
-    ],
-    "dtype": "Integer",
-    "default_value": 200
+      "desc": "Sets the maximum number of transactions that can be in 'prepared' state simultaneously. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. Generally recommended 200 (for 196-core CPU/1536G memory, 128-core CPU/1024G memory, 104-core CPU/1024G memory, 96-core CPU/1024G memory, 96-core CPU/768G memory, 80-core CPU/640G memory, 64-core CPU/512G memory, 60-core CPU/480G memory, 32-core CPU/256G memory, 16-core CPU/128G memory, 8-core CPU/64G memory, 4-core CPU/32G memory); 0 (for 4-core CPU/16G memory).",
+      "type": "continuous",
+      "range": [
+          0,
+          262143
+      ],
+      "dtype": "Integer",
+      "default_value": 200
   },
   "shared_buffers": {
-    "desc": "设置GaussDB Kernel使用的共享内存大小。增加此参数的值会使GaussDBKernel比系统默认设置需要更多的System V共享内存。建议设置shared_buffers值为内存的40%以内。如果设置较大的shared_buffers，需要同时增加checkpoint_segments的值，因为写入大量新增数据、修改数据需要消耗更多的时间周期。",
-    "type": "continuous",
-    "range": [
-      16,
-      1073741823
-    ],
-    "dtype": "Integer",
-    "default_value": 35389440
+      "desc": "Sets the shared memory size used by GaussDB Kernel. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. It is recommended to set shared_buffers value within 40% of memory. If setting larger shared_buffers, checkpoint_segments value needs to be increased simultaneously because writing large amounts of new data and modified data requires more time cycles.",
+      "type": "continuous",
+      "range": [
+          16,
+          1073741823
+      ],
+      "dtype": "Integer",
+      "default_value": 35389440
   },
   "use_workload_manager": {
-    "desc": "设置是否开启资源管理功能。多租数据库特性（enable_mtd）需要开启该参数。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "Sets whether to enable resource management function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "wal_buffers": {
-    "desc": "设置用于存放WAL数据的共享内存空间的大小，可以以XLOG_BLCKSZ数量表示，同时也可以以实际的大小表示。XLOG_BLCKSZ是XLOG块的大小，一般默认为8kB。取值2048表示wal_buffers为2048 * 8kB；取值20480kB表示wal_buffers为20480kB。取值如果要带单位，必须为kB、MB、GB，且必须设置为8kB整数倍。",
-    "type": "continuous",
-    "range": [
-      -1,
-      262144
-    ],
-    "dtype": "Integer",
-    "default_value": 131072
+      "desc": "Sets the size of shared memory space used to store WAL data, which can be expressed in XLOG_BLCKSZ quantities or actual size. XLOG_BLCKSZ is the XLOG block size, generally defaulting to 8kB. Value 2048 means wal_buffers is 2048 * 8kB; value 20480kB means wal_buffers is 20480kB. If values need units, they must be kB, MB, GB, and must be set to multiples of 8kB.",
+      "type": "continuous",
+      "range": [
+          -1,
+          262144
+      ],
+      "dtype": "Integer",
+      "default_value": 131072
   },
   "maintenance_work_mem": {
-    "desc": "指定在维护性操作中使用的最大的内存量。参数取值一定要大于向量索引构建时对数据进行采样所需的内存。对于gsivfflat索引，采样所需内存估算为max(nlist, nlist2) * dim * 0.2kB。对于gsdiskann索引，开启pq时，采样所需内存为dim * 80kB。该参数设置过小，会导致索引无法正常创建，其他需要较大内存的业务也会失败",
-    "type": "continuous",
-    "range": [
-      1024,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 65536
+      "desc": "Specifies the maximum amount of memory used in maintenance operations. The parameter value must be greater than the memory required for data sampling during vector index construction. For gsivfflat index, the sampling memory is estimated as max(nlist, nlist2) * dim * 0.2kB. For gsdiskann index with pq enabled, the sampling memory is dim * 80kB. Setting this parameter too small will cause index creation to fail, and other operations requiring large memory will also fail.",
+      "type": "continuous",
+      "range": [
+          1024,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 65536
   },
   "vacuum_cost_limit": {
-    "desc": "设置清理线程休眠的开销限制。当vacuum线程执行的代价达到vacuum_cost_limit时，该线程休眠一次，休眠vacuum_cost_delay时间。该值越大，Vacuum 的I/O频次限制越小，越不容易进入休眠状态，Vacuum效率越高，对业务I/O的影响就越大。",
-    "type": "continuous",
-    "range": [
-      1,
-      10000
-    ],
-    "dtype": "Integer",
-    "default_value": 1000
+      "desc": "Sets the cost limit for vacuum thread sleep. When the cost executed by vacuum thread reaches vacuum_cost_limit, the thread sleeps once for vacuum_cost_delay time. The larger this value, the smaller the I/O frequency limit for Vacuum, the less likely it is to enter sleep state, the higher the Vacuum efficiency, and the greater the impact on business I/O.",
+      "type": "continuous",
+      "range": [
+          1,
+          10000
+      ],
+      "dtype": "Integer",
+      "default_value": 1000
   },
   "autovacuum_max_workers": {
-    "desc": "设置能同时运行的自动清理线程的最大数量，该参数的取值上限与GUC参数max_connections和job_queue_processes大小有关。此参数设置越大，自动清理功能创建的线程数越多，占用的系统CPU和内存资源越多，所以设置时不建议设置过大，避免由于此参数设置过大导致内存无法分配或者占用过多CPU资源，导致数据库启动报错或业务受到影响。如果将该参数设置得过低，可能会导致autovacuum线程无法及时清理和回收不再使用的表空间，从而导致数据库膨胀和性能下降。",
-    "type": "continuous",
-    "range": [
-      0,
-      262143
-    ],
-    "dtype": "Integer",
-    "default_value": 3
+      "desc": "Sets the maximum number of autovacuum worker threads that can run simultaneously. The upper limit of this parameter is related to GUC parameters max_connections and job_queue_processes. Setting this parameter larger creates more threads for autovacuum function, occupying more system CPU and memory resources, so it is not recommended to set it too large to avoid memory allocation failure or excessive CPU resource occupation causing database startup errors or business impact. Setting this parameter too low may cause autovacuum threads unable to clean and reclaim unused tablespace in time, leading to database bloat and performance degradation.",
+      "type": "continuous",
+      "range": [
+          0,
+          262143
+      ],
+      "dtype": "Integer",
+      "default_value": 3
   },
   "autovacuum_naptime": {
-    "desc": "设置两次自动清理操作的时间间隔。例如，不带单位取值600，表示autovacuum_naptime为600s；带单位取值10min，表示autovacuum_naptime为10min。取值如果要带单位，必须为s、min、h、d。仅用Ustore表时推荐使用默认值。仅用Ustore表时推荐使用默认值。对于Astore表，设置值取决于用户的数据库环境和应用程序负载。如果数据库环境中有大量表的更新或删除操作，建议将该参数设置为较短的时间间隔，以确保及时清理无用的数据并避免数据库空间不足的情况。如果数据库环境中的更新或删除操作较少，则可以将该参数设置为较长的时间间隔，以减少自动清理线程的开销。如果将autovacuum_naptime设置为过短的时间间隔，可能会导致autovacuum线程的开销过大，从而影响数据库的性能。如果将autovacuum_naptime设置为过长的时间间隔，可能会导致无用的数据堆积，从而占用数据库空间，影响数据库的性能。",
-    "type": "continuous",
-    "range": [
-      1,
-      2147483
-    ],
-    "dtype": "Integer",
-    "default_value": 600
+      "desc": "Sets the time interval between two autovacuum operations. For example, value 600 without unit means autovacuum_naptime is 600s; value 10min with unit means autovacuum_naptime is 10min. If values need units, they must be s, min, h, d. Default value is recommended when using only Ustore tables. For Astore tables, the setting value depends on the user's database environment and application load. If there are大量表的更新或删除操作 in the database environment, it is recommended to set this parameter to a shorter time interval to ensure timely cleaning of useless data and avoid database space shortage. If there are fewer update or delete operations in the database environment, this parameter can be set to a longer time interval to reduce autovacuum thread overhead. Setting autovacuum_naptime too short may cause excessive autovacuum thread overhead, affecting database performance. Setting autovacuum_naptime too long may cause useless data accumulation, occupying database space and affecting database performance.",
+      "type": "continuous",
+      "range": [
+          1,
+          2147483
+      ],
+      "dtype": "Integer",
+      "default_value": 600
   },
   "autovacuum_vacuum_cost_delay": {
-    "desc": "设置在自动VACUUM操作里使用的开销延迟数值。其中-1表示使用常规的vacuum_cost_delay。",
-    "type": "continuous",
-    "range": [
-      -1,
-      100
-    ],
-    "dtype": "Integer",
-    "default_value": 20
+      "desc": "Sets the cost delay value used in automatic VACUUM operations. -1 means using regular vacuum_cost_delay.",
+      "type": "continuous",
+      "range": [
+          -1,
+          100
+      ],
+      "dtype": "Integer",
+      "default_value": 20
   },
   "autovacuum_vacuum_scale_factor": {
-    "desc": "VACUUM时表的规模因子，用于计算触发VACUUM的阈值。触发VACUUM的阈值=autovacuum_vacuum_threshold+reltuples（表上元组的个数）*autovacuum_vacuum_scale_factor。当表上被删除或更新的记录数超过阈值时，才会对这个表执行VACUUM操作。",
-    "type": "continuous",
-    "range": [
-      "0.0",
-      "100.0"
-    ],
-    "dtype": "float",
-    "default_value": 0.2
+      "desc": "Table scale factor for VACUUM, used to calculate the threshold for triggering VACUUM. VACUUM trigger threshold = autovacuum_vacuum_threshold + reltuples (number of tuples on the table) * autovacuum_vacuum_scale_factor. VACUUM operation is performed on this table only when the number of deleted or updated records on the table exceeds the threshold.",
+      "type": "continuous",
+      "range": [
+          "0.0",
+          "100.0"
+      ],
+      "dtype": "float",
+      "default_value": 0.2
   },
   "autovacuum_analyze_scale_factor": {
-    "desc": "ANALYZE时表的规模因子，用于计算触发ANALYZE的阈值。触发ANALYZE的阈值=autovacuum_analyze_threshold+reltuples（表上元组的个数）*autovacuum_analyze_scale_factor。当表上被删除、插入或更新的记录数超过阈值时，才会对这个表执行ANALYZE操作。",
-    "type": "continuous",
-    "range": [
-      "0.0",
-      "100.0"
-    ],
-    "dtype": "float",
-    "default_value": 0.1
+      "desc": "Table scale factor for ANALYZE, used to calculate the threshold for triggering ANALYZE. ANALYZE trigger threshold = autovacuum_analyze_threshold + reltuples (number of tuples on the table) * autovacuum_analyze_scale_factor. ANALYZE operation is performed on this table only when the number of deleted, inserted or updated records on the table exceeds the threshold.",
+      "type": "continuous",
+      "range": [
+          "0.0",
+          "100.0"
+      ],
+      "dtype": "float",
+      "default_value": 0.1
   },
   "enable_thread_pool": {
-    "desc": "控制是否使用线程池功能。多租数据库特性（enable_mtd）需要开启该参数。在低并发长连接性能敏感场景下，建议关闭该参数，其他场景下建议打开该参数。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "off"
+      "desc": "Controls whether to use thread pool function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled. In low-concurrency long-connection performance-sensitive scenarios, it is recommended to disable this parameter; in other scenarios, it is recommended to enable this parameter.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "off"
   },
   "session_timeout": {
-    "desc": "表明与服务器建立连接后，不进行任何操作的最长时间。当该参数取值不为0，用户不进行任何操作的时间超过该参数取值后，会与服务器断开连接。0表示关闭超时设置。正数表示与服务器建立连接后，不进行任何操作的最长时间。当超过设定的值后，会与服务器断开连接。",
-    "type": "continuous",
-    "range": [
-      0,
-      86400
-    ],
-    "dtype": "Integer",
-    "default_value": 600
+      "desc": "Indicates the maximum time without any operation after establishing connection with the server. When this parameter value is not 0, if the user does not perform any operation for longer than this parameter value, the connection with the server will be disconnected. 0 means timeout setting is disabled. Positive number means the maximum time without any operation after establishing connection with the server. When exceeding the set value, the connection with the server will be disconnected.",
+      "type": "continuous",
+      "range": [
+          0,
+          86400
+      ],
+      "dtype": "Integer",
+      "default_value": 600
   },
   "enable_beta_opfusion": {
-    "desc": "在enable_opfusion参数打开的状态下，如果开启该参数，可以支持TPCC中出现的聚集函数，排序两类SQL语句的加速执行，提升SQL执行性能。该参数可在PDB级别设置。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "off"
+      "desc": "When enable_opfusion parameter is enabled, if this parameter is enabled, it can support acceleration execution of aggregate functions and sorting SQL statements that appear in TPCC, improving SQL execution performance. This parameter can be set at PDB level.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "off"
   },
   "bgwriter_flush_after": {
-    "desc": "设置background writer线程刷脏页个数超过设定的阈值时，告知操作系统将文件缓存中的数据页面异步刷盘。GaussDB Kernel中，磁盘页大小为8kB。",
-    "type": "continuous",
-    "range": [
-      0,
-      256
-    ],
-    "dtype": "continuous",
-    "default_value": 64
+      "desc": "Sets when the number of dirty pages flushed by background writer thread exceeds the set threshold, notify the operating system to asynchronously flush data pages in file cache to disk. In GaussDB Kernel, disk page size is 8kB.",
+      "type": "continuous",
+      "range": [
+          0,
+          256
+      ],
+      "dtype": "continuous",
+      "default_value": 64
   },
   "wal_keep_segments": {
-    "desc": "Xlog日志文件的数量，设置“pg_xlog”目录下保留日志文件的最小数量。备机通过获取主机的Xlog日志进行流复制。 当服务器开启日志归档或者从检查点恢复时，保留的日志文件数量可能大于wal_keep_segments设定的值。当双机为异步传输时，以COPY方式连续导入4G以上数据需要增大wal_keep_segments配置。以T6000单板为例，如果导入数据量为50G，建议调整参数为1000。可以在导入完成并且日志同步正常后，动态恢复此参数设置。若synchronous_commit级别小于LOCAL_FLUSH，重建备机时，建议调大该参数为1000，避免重建过程中，主机日志回收导致重建失败。如果设置过大，可能会导致pg_xlog文件夹占用过大的磁盘空间。如果设置过小，则在备机请求事务日志时，此事务日志可能已经被产生的新事务日志覆盖，导致请求失败，主备关系断开。",
-    "type": "continuous",
-    "range": [
-      2,
-      2147483647
-    ],
-    "dtype": "continuous",
-    "default_value": 128
+      "desc": "Number of Xlog log files, sets the minimum number of log files retained in 'pg_xlog' directory. Standby performs stream replication by obtaining Xlog logs from primary. When server enables log archiving or recovers from checkpoint, the number of retained log files may be greater than the value set by wal_keep_segments. When dual-machine uses asynchronous transmission, importing more than 4G data continuously in COPY mode requires increasing wal_keep_segments configuration. Taking T6000 single board as example, if imported data volume is 50G, it is recommended to adjust parameter to 1000. This parameter setting can be dynamically restored after import completion and log synchronization is normal. If synchronous_commit level is less than LOCAL_FLUSH, when rebuilding standby, it is recommended to increase this parameter to 1000 to avoid rebuild failure caused by primary log recycling during rebuild process. If set too large, it may cause pg_xlog folder to occupy too much disk space. If set too small, when standby requests transaction log, this transaction log may have been overwritten by newly generated transaction logs, causing request failure and primary-standby relationship disconnection.",
+      "type": "continuous",
+      "range": [
+          2,
+          2147483647
+      ],
+      "dtype": "continuous",
+      "default_value": 128
   },
   "bgwriter_delay": {
-    "desc": "定期循环逐块扫描缓冲区刷脏的时间间隔。全量checkpoint模式下，根据bgwriter_lru_maxpages参数控制每次写的量，然后休眠bgwriter_delay毫秒后才再次启动；增量checkpoint模式下，根据设定candidate_buf_percent_target计算目标空闲缓冲页面个数，当候选缓冲页面不足时，每隔bgwriter_delay毫秒扫描一次10GB的缓冲区页面，当遇到脏页时把脏页刷盘后再放进候选链表，当遇到干净的页面直接放进候选链表。在许多系统上，休眠延时的有效分辨率是10毫秒。因此，设置一个不是10倍数的数值与把它设置为一个10的倍数是一样的效果。",
-    "type": "continuous",
-    "range": [
-      10,
-      10000
-    ],
-    "dtype": "continuous",
-    "default_value": 2000
+      "desc": "Time interval for regular cyclic block-by-block buffer scanning and dirty page flushing. In full checkpoint mode, the amount written each time is controlled by bgwriter_lru_maxpages parameter, then sleeps for bgwriter_delay milliseconds before starting again; in incremental checkpoint mode, when candidate buffer pages are insufficient, scan 10GB buffer pages every bgwriter_delay milliseconds, when encountering dirty pages, flush dirty pages to disk before putting them into candidate list, when encountering clean pages directly put them into candidate list. On many systems, the effective resolution of sleep delay is 10 milliseconds. Therefore, setting a value that is not a multiple of 10 has the same effect as setting it to a multiple of 10.",
+      "type": "continuous",
+      "range": [
+          10,
+          10000
+      ],
+      "dtype": "continuous",
+      "default_value": 2000
   },
   "incremental_checkpoint_timeout": {
-    "desc": "开启增量检查点开关（enable_incremental_checkpoint）之后，设置自动检查点之间的最长时间。",
-    "type": "continuous",
-    "range": [
-      1,
-      3600
-    ],
-    "dtype": "continuous",
-    "default_value": 60
+      "desc": "After enabling incremental checkpoint switch (enable_incremental_checkpoint), sets the maximum time between automatic checkpoints.",
+      "type": "continuous",
+      "range": [
+          1,
+          3600
+      ],
+      "dtype": "continuous",
+      "default_value": 60
   },
   "walwriter_sleep_threshold": {
-    "desc": "xlogflusher进入休眠之前空闲xlog刷新的次数，达到阈值会休眠。",
-    "type": "continuous",
-    "range": [
-      1,
-      50000
-    ],
-    "dtype": "continuous",
-    "default_value": 50
+      "desc": "Number of idle xlog flushes before xlogflusher enters sleep, will sleep when threshold is reached.",
+      "type": "continuous",
+      "range": [
+          1,
+          50000
+      ],
+      "dtype": "continuous",
+      "default_value": 50
   },
   "reserve_space_for_nullable_atts": {
-    "desc": "指定是否为Ustore表的可空属性预留空间。该参数可在PDB级别设置。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "Specifies whether to reserve space for nullable attributes of Ustore tables. This parameter can be set at PDB level.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "enable_default_ustore_table": {
-    "desc": "指定是否默认使用Ustore存储引擎。仅当enable_ustore参数开启时，该参数设置有效。该参数为on时，创建的表默认都为Ustore表；该参数为off时，创建的表默认都为Astore表。该参数可在PDB级别设置。升级场景下该参数的默认值会优先保证兼容性，即升级后的默认值与老版本的取值一致。需要特别注意的是，使用Ustore表时，必须要开启track_counts和track_activities参数，否则会引起空间膨胀。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "Specifies whether to use Ustore storage engine by default. This parameter setting is effective only when enable_ustore parameter is enabled. When this parameter is on, created tables are Ustore tables by default; when this parameter is off, created tables are Astore tables by default. This parameter can be set at PDB level. In upgrade scenarios, the default value of this parameter will prioritize compatibility, meaning the default value after upgrade is consistent with the old version value. It is particularly important to note that when using Ustore tables, track_counts and track_activities parameters must be enabled, otherwise it will cause space bloat.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "max_redo_log_size": {
-    "desc": "备DN表示最新日志回放点到最新检查点位置之间日志量的期望值，主DN表示最新日志插入点到最新检查点位置之间日志量的期望值。该参数被用来参与控制检查点刷页速度。",
-    "type": "continuous",
-    "range": [
-      163840,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 1048576
+      "desc": "For standby DN, represents the expected log volume between the latest log replay point and the latest checkpoint position; for primary DN, represents the expected log volume between the latest log insertion point and the latest checkpoint position. This parameter is used to participate in controlling checkpoint page flushing speed.",
+      "type": "continuous",
+      "range": [
+          163840,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 1048576
   },
   "recovery_time_target": {
-    "desc": "备机完成日志写入和回放的流控阈值。当备机的回放完成预期时间大于此参数，主机会触发日志流控，将降低主机向备机发送日志的速率。设置过小会影响主机的性能，例如设置为10，说明备机回放相对备机接收日志有延迟，允许延迟最大为10s，如果超过了10s，则会限制主机往备机段发送日志，对主机的性能会有限制，在主备场景下，主机的事务需要有备机日志落盘才能提交，限制了日志的发送会限制主机的事务执行影响到性能。设置过大会失去流控效果。关闭流控后，可能会出现RTO/RPO升高的情况。",
-    "type": "continuous",
-    "range": [
-      0,
-      3600
-    ],
-    "dtype": "Integer",
-    "default_value": 60
+      "desc": "Flow control threshold for standby to complete log writing and replay. When standby's replay completion expected time exceeds this parameter, primary will trigger log flow control, reducing the rate at which primary sends logs to standby. Setting too small will affect primary performance; setting too large will lose flow control effect. After disabling flow control, RTO/RPO may increase.",
+      "type": "continuous",
+      "range": [
+          0,
+          3600
+      ],
+      "dtype": "Integer",
+      "default_value": 60
   },
   "lockwait_timeout": {
-    "desc": "控制单个锁的最长等待时间。当申请的锁等待时间超过设定值时，系统会报错。该参数仅针对常规锁生效。该参数可在PDB级别设置。设置过大时，锁冲突造成的阻塞时间更长；设置过小时，可能会出现更多的锁超时报错。",
-    "type": "continuous",
-    "range": [
-      1,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 120000
+      "desc": "Controls the maximum waiting time for a single lock. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting too large will cause longer blocking time due to lock conflicts; setting too small may cause more lock timeout errors.",
+      "type": "continuous",
+      "range": [
+          1,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 120000
   },
   "update_lockwait_timeout": {
-    "desc": "在业务允许并发更新的情况下，该参数控制并发更新同一行时单个锁的最长等待时间。取值如果要带单位，必须为ms、s、min、h、d。当申请的锁等待时间超过设定值时，系统会报错。该参数仅针对常规锁生效。该参数可在PDB级别设置。设置值主要取决于并发更新同一行的事务的workload。一般TP业务，执行时间较短小于两分钟，因此等待并发更新事务提交时间较短，按默认值2min的配置误报锁超时概率较小；如果业务出现大量并发更新同一行事务，执行时间超过两分钟，可以调大该参数避免等锁超时误报。设置过大时，并发更新同一行时锁冲突造成的阻塞时间更长；设置过小时，可能会出现更多的锁超时报错。",
-    "type": "continuous",
-    "range": [
-      1,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 120000
+      "desc": "When business allows concurrent updates, this parameter controls the maximum waiting time for a single lock when concurrently updating the same row. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting value mainly depends on the workload of transactions concurrently updating the same row. Setting too large will cause longer blocking time due to lock conflicts when concurrently updating the same row; setting too small may cause more lock timeout errors.",
+      "type": "continuous",
+      "range": [
+          1,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 120000
   },
   "recovery_parse_workers": {
-    "desc": "是极致RTO特性中ParseRedoRecord线程的数量。1. 需要配合recovery_redo_workers使用。recovery_parse_workers或者recovery_redo_workers大于1，则开启极致RTO。如不期望开启极致RTO，请保持recovery_parse_workers为默认值1；2. 在开启极致RTO时确保参数replication_type为1；3. 若同时开启极致RTO和并行回放，则极致RTO特性生效，并行回放特性失效；4. 极致RTO不支持流控，流控统一由recovery_time_target参数控制。",
-    "type": "continuous",
-    "range": [
-      1,
-      16
-    ],
-    "dtype": "Integer",
-    "default_value": 1
+      "desc": "Number of ParseRedoRecord threads in极致RTO feature. 1. Needs to be used with recovery_redo_workers. If recovery_parse_workers or recovery_redo_workers is greater than 1, then极致RTO is enabled. If极致RTO is not expected to be enabled, please keep recovery_parse_workers at default value 1; 2. When enabling极致RTO, ensure parameter replication_type is 1; 3. If both极致RTO and parallel replay are enabled, then极致RTO feature takes effect, parallel replay feature becomes invalid; 4.极致RTO does not support flow control, flow control is uniformly controlled by recovery_time_target parameter.",
+      "type": "continuous",
+      "range": [
+          1,
+          16
+      ],
+      "dtype": "Integer",
+      "default_value": 1
   },
   "recovery_max_workers": {
-    "desc": "设置并行回放线程的最大数量。recovery_parse_workers和recovery_redo_workers同时为1，即不开启极致RTO，此参数才能生效。",
-    "type": "continuous",
-    "range": [
-      0,
-      20
-    ],
-    "dtype": "Integer",
-    "default_value": 4
+      "desc": "Sets the maximum number of parallel replay threads. This parameter takes effect only when recovery_parse_workers and recovery_redo_workers are both 1, i.e.,极致RTO is not enabled.",
+      "type": "continuous",
+      "range": [
+          0,
+          20
+      ],
+      "dtype": "Integer",
+      "default_value": 4
   },
   "track_counts": {
-    "desc": "控制是否收集数据库活动的统计数据。该参数可在PDB级别设置。在AutoVacuum自动清理线程中选择清理的数据库时，需要数据库的统计数据，故默认值设置为on。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "Controls whether to collect statistics on database activity. This parameter can be set at PDB level. When AutoVacuum automatic cleanup thread selects database to clean, database statistics are needed, so default value is set to on.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "enable_pbe_optimization": {
-    "desc": "设置优化器是否对以PBE（Parse Bind Execute）形式执行的语句进行查询计划的优化，优化原理是使FQS选择gplan计划。该参数可在PDB级别设置。",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "off"
+      "desc": "Sets whether the optimizer optimizes query plans for statements executed in PBE (Parse Bind Execute) form. The optimization principle is to make FQS choose gplan plan. This parameter can be set at PDB level.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "off"
   },
   "check_disconnect_query": {
-    "desc": "该参数控制的是，当客户端异常断连（如JDBC触发socketTimeout、libpq触发rwtimeout且关闭连接、运行业务过程中客户端进程终止等）后，GaussDB服务端语句是否终止执行",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "This parameter controls whether GaussDB server-side statements terminate execution after client abnormal disconnection (such as JDBC triggering socketTimeout, libpq triggering rwtimeout and closing connection, client process termination during business operation, etc.).",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "enable_cached_context": {
-    "desc": "控制缓存内存上下文的个数。多租场景下，该参数可在PDB级别设置。",
-    "type": "continuous",
-    "range": [
-      0,
-      1024
-    ],
-    "dtype": "Integer",
-    "default_value": "128"
+      "desc": "Controls the number of cached memory contexts. In multi-tenant scenarios, this parameter can be set at PDB level.",
+      "type": "continuous",
+      "range": [
+          0,
+          1024
+      ],
+      "dtype": "Integer",
+      "default_value": "128"
   },
   "enable_cached_operator": {
-    "desc": "控制算子执行态缓存特性的开关",
-    "type": "discrete",
-    "range": [
-      "on",
-      "off"
-    ],
-    "dtype": "boolean",
-    "default_value": "on"
+      "desc": "Controls the switch for operator execution state caching feature.",
+      "type": "discrete",
+      "range": [
+          "on",
+          "off"
+      ],
+      "dtype": "boolean",
+      "default_value": "on"
   },
   "max_process_memory": {
-    "desc": "设置一个数据库节点可用的最大物理内存。该参数用于防止数据库内存使用超出系统承载能力，避免节点OOM。建议值为物理内存的66.5%以内（考虑预留操作系统内存）。修改后需重启实例生效。",
-    "type": "continuous",
-    "range": [
-      2097152,
-      2147483647
-    ],
-    "dtype": "Integer",
-    "default_value": 696320000
+      "desc": "Sets the maximum physical memory available for a database node. This parameter is used to prevent database memory usage from exceeding system capacity and avoid node OOM. Recommended value is within 66.5% of physical memory (considering reserved operating system memory). Restart instance required after modification.",
+      "type": "continuous",
+      "range": [
+          2097152,
+          2147483647
+      ],
+      "dtype": "Integer",
+      "default_value": 696320000
   }
 }

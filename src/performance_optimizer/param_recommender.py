@@ -11,6 +11,7 @@ from src.utils.llm import get_llm_response
 from src.utils.metrics import PerformanceMetric
 from src.utils.shell_execute import SshClient
 from src.utils.thread_pool import thread_pool_manager
+from src.utils.common import translate
 
 from src.utils.prompt_instance import prompt_manager
 
@@ -48,30 +49,30 @@ class ParamRecommender:
         history_entries = []
 
         # 1. 上一轮
-        if "上一轮调优结果" in history_result:
-            entry = history_result["上一轮调优结果"]
-            if isinstance(entry, dict) and "参数推荐" in entry:
+        if "previous_result" in history_result:
+            entry = history_result["previous_result"]
+            if isinstance(entry, dict) and "recommend_param" in entry:
                 history_entries.append((
-                    f"上一轮性能: {entry.get('上一轮性能', 'N/A')}",
-                    entry["参数推荐"]
+                    f"previous_performance: {entry.get('previous_performance', 'N/A')}",
+                    entry["recommend_param"]
                 ))
 
         # 2. 历史最佳
-        if "历史最佳结果" in history_result:
-            entry = history_result["历史最佳结果"]
-            if isinstance(entry, dict) and "参数推荐" in entry:
+        if "best_result" in history_result:
+            entry = history_result["best_result"]
+            if isinstance(entry, dict) and "recommend_param" in entry:
                 history_entries.append((
-                    f"历史最佳: {entry.get('最佳性能', 'N/A')}",
-                    entry["参数推荐"]
+                    f"best_history: {entry.get('best_performance', 'N/A')}",
+                    entry["recommend_param"]
                 ))
 
         # 3. 历史最差
-        if "历史最差结果" in history_result:
-            entry = history_result["历史最差结果"]
-            if isinstance(entry, dict) and "参数推荐" in entry:
+        if "worst_result" in history_result:
+            entry = history_result["worst_result"]
+            if isinstance(entry, dict) and "recommend_param" in entry:
                 history_entries.append((
-                    f"历史最差: {entry.get('最差性能', 'N/A')}",
-                    entry["参数推荐"]
+                    f"worst_history: {entry.get('worst_performance', 'N/A')}",
+                    entry["recommend_param"]
                 ))
 
         # 过滤参数
@@ -152,7 +153,8 @@ class ParamRecommender:
         history_result = str(history_result) if history_result else "无"
         params_set_str = "\n".join(cur_params_set)
         if is_positive:
-            prompt = f"""
+            prompt = translate(
+                f"""
             [{self.service_name}类] 你是专业的系统运维专家。当前性能指标未达预期，但上一轮调优为正向结果（性能提升或无退化）。
             请在“心中完成推理”，只输出最终 JSON；除 JSON 以外不要输出任何文字、代码块或注释。
 
@@ -181,14 +183,45 @@ class ParamRecommender:
             输出格式（必须严格遵守）：
             - 仅输出一个 JSON 对象，键为“可调参数名称”，值为“推荐取值”。
             - 不要输出任何多余文字、说明、示例、代码围栏或注释。
-            """
+            """,
+                f"""
+            [{self.service_name}] You are a professional system operations expert. The current performance metrics have not met expectations, but the previous round of optimization yielded positive results (performance improvement or no degradation).
+            Please perform reasoning internally and output only the final JSON; do not output any text, code blocks, or comments other than the JSON.
+            
+            Objective: Based on the following information, summarize parameter adjustment experiences while maintaining the effective direction from the previous round, and further fine-tune the parameters (with a moderate increase in intensity within the safe boundaries). Only provide the parameters that need to be changed and their recommended new values.
+            
+            Current environment configuration information:
+            {self.static_profile}
+            
+            Historical optimization information (including modified parameters and results):
+            {history_result}
+            
+            Optimization approach:
+            {optimization_idea}
+           
+            The full set of adjustable parameters (including type, range, enumeration, default value, etc.) and the baseline values corresponding to these parameters are:
+            {params_set_str}
+            
+            Strict rules (must be followed):
+            1) Output only the parameters that need to be changed compared to the current configuration; do not output any irrelevant or non-beneficial parameters.
+            2) Prioritize making small steps in the direction that was effective in the previous round: for continuous parameters, increase them by 100% to 150% of the original step size (usually +10% to +30%); for discrete or enumerated parameters, choose a more aggressive but still safe adjacent value. Avoid making large changes at once (the change for a single parameter should not exceed 2 times or ±30% of the original value, whichever is stricter).
+            3) Do not change parameters that have been proven to have "no impact" on performance; avoid adjusting parameters that are clearly mutually exclusive.
+            4) All changes must meet the requirements for dependencies, mutual exclusions, upper and lower limits, type, and unit.
+            5) The recommended value for each parameter must be acceptable to the system and ensure that the application can start.
+
+            6) If no suitable changes are available, output an empty JSON object.
+            Output format (must be strictly followed):
+            - Output only one JSON object, with the key being the "adjustable parameter name" and the value being the "recommended value."
+            - Do not output any additional text, explanations, examples, code blocks, or comments.
+            """)
 
         else:
-            prompt = f"""
+            prompt = translate(
+                f"""
             [{self.service_name}类] 你是专业的系统运维专家。当前性能指标未达预期，且上一轮调优为负向结果（性能下降/不稳定/报错等）。
             请在“心中完成推理”，只输出最终 JSON；除 JSON 以外不要输出任何文字、代码块或注释。
 
-            目标：基于以下信息，总结历史调优经验中的baseline、最佳调优结果、最差调优结果以及上一轮调优结果以及参数取值，反向微调上轮可能导致退化的参数，并选择更保守且安全的值；仅给出需要变更的参数与推荐新值。
+            目标：基于以下信息，总结历史调优经验中的baseline、最佳调优结果、最差调优结果以及previous_result以及参数取值，反向微调上轮可能导致退化的参数，并选择更保守且安全的值；仅给出需要变更的参数与推荐新值。
 
             当前环境配置信息：
             {self.static_profile}
@@ -213,8 +246,37 @@ class ParamRecommender:
             输出格式（必须严格遵守）：
             - 仅输出一个 JSON 对象，键为“可调参数名称”，值为“推荐取值”。
             - 不要输出任何多余文字、说明、示例、代码围栏或注释。
-            """
+            """,
+                f"""
+            [{self.service_name}] You are a professional system operations expert. The current performance metrics are not meeting expectations, and the last round of optimization resulted in a negative outcome (performance degradation, instability, errors, etc.).
+            Please perform reasoning internally and output only the final JSON; do not output any text, code blocks, or comments other than the JSON.
 
+            Objective: Based on the following information, summarize the baseline, the best and worst optimization results, the previous result, and the parameter values from historical optimization experiences. Reverse-tune the parameters that may have caused degradation in the last round and select more conservative and safe values. Only provide the parameters that need to be changed and the recommended new values.
+
+            Current environment configuration information:
+            {self.static_profile}
+
+            Historical optimization information (including modified parameters and results):
+            {history_result}
+
+            Optimization approach:
+            {optimization_idea}
+
+            The full set of adjustable parameters (including type, range, enumerations, default values, etc.) and the baseline values corresponding to these parameters are:
+            {params_set_str}
+
+            Strict rules (must be followed):
+            1) Output only the parameters that need to be changed compared to the current configuration; do not output any irrelevant or non-beneficial parameters.
+            2) For parameters that were changed in the last round and are suspected to have caused degradation: adjust them in the opposite direction with small steps (usually 30% to 50% of the previous step size, typically -10% to -20%); if necessary, disable optional high-overhead features.
+            3) Avoid adjusting too many parameters at once; do not adjust mutually exclusive parameters simultaneously; prefer correction methods with lower risk.
+            4) The recommended values must meet the requirements for dependencies, mutual exclusions, upper and lower limits, types, and units.
+            5) The recommended value for each parameter must be actually acceptable by the system and ensure that the application can start.
+            6) If no suitable changes are available, output an empty JSON object.
+            
+            Output format (must be strictly followed):
+            - Output only one JSON object, with the key being "tunable parameter name" and the value being "recommended value".
+            - Do not output any extra text, explanations, examples, code fences, or comments.
+            """)
         response = get_llm_response(prompt, max_tokens=1024)
         return response
 

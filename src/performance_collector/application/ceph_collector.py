@@ -1,5 +1,6 @@
 import json
 import re
+from src.utils.common import translate
 
 from src.utils.collector.metric_collector import (
     snapshot_task,
@@ -10,7 +11,7 @@ from src.utils.collector.metric_collector import (
 @snapshot_task(
     cmd="ceph -s",
     collect_mode=CollectMode.ASYNC,
-    tag="ceph集群状态信息",
+    tag=translate("ceph集群状态信息", "Ceph cluster status information"),
 )
 def parse_ceph_s(output: str) -> dict:
     result = {}
@@ -36,7 +37,7 @@ def parse_ceph_s(output: str) -> dict:
 @snapshot_task(
     cmd="ceph df",
     collect_mode=CollectMode.ASYNC,
-    tag="ceph磁盘使用情况",
+    tag=translate("ceph磁盘使用情况", "Ceph disk usage"),
 )
 def parse_ceph_df_output(text: str) -> dict:
     result = {
@@ -100,7 +101,7 @@ def parse_ceph_df_output(text: str) -> dict:
 @snapshot_task(
     cmd="ceph pg stat",
     collect_mode=CollectMode.ASYNC,
-    tag="ceph PG（Placement Groups，数据放置组）的详细状态统计",
+    tag=translate("ceph PG（Placement Groups，数据放置组）的详细状态统计", "Detailed status statistics of Ceph PG (Placement Groups)"),
 )
 def parse_ceph_pg_stat(output: str) -> dict:
     result = {}
@@ -113,7 +114,7 @@ def parse_ceph_pg_stat(output: str) -> dict:
 @snapshot_task(
     cmd="ceph tell osd.* perf dump",
     collect_mode=CollectMode.ASYNC,
-    tag="所有 OSD 的性能统计数据，包含操作延迟、IOPS、吞吐等指标",
+    tag=translate("所有 OSD 的性能统计数据，包含操作延迟、IOPS、吞吐等指标", "Performance statistics for all OSDs, including metrics such as operation latency, IOPS, throughput, etc."),
 )
 def parse_perf_dump_str(raw_str: str) -> dict:
     def get_value_by_path(d, path):

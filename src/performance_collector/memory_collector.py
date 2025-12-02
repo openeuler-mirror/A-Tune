@@ -29,7 +29,7 @@ def free_parse(
         total_swap = float(data[1])  
         free_swap = float(data[3])  
 
-        res = {"总的交换空间总量": total_swap, "可用的交换空间总量": free_swap}
+        res = {"total_swap_space": total_swap, "available_swap_space": free_swap}
     except IndexError as e:
         logging.error(f"Failed to parse memory and swap usage: {e}")
         raise ValueError("Failed to parse memory and swap usage from stdout") from e
@@ -77,7 +77,7 @@ def sar_parse(
         date = out[-1].split()
         memory_usage = float(date[4]) 
 
-        res = {"内存使用率": memory_usage}
+        res = {"memory_utilization": memory_usage}
     except IndexError as e:
         logging.error(f"Failed to parse memory usage from sar output: {e}")
         raise ValueError("Failed to parse memory usage from sar output") from e
@@ -129,13 +129,13 @@ class MemoryCollector(BaseCollector):
         memory_process_result = {}
 
         # 计算交换空间使用率
-        memory_process_result["交换空间使用率"] = self.calculate_swap_usage(
-            memory_parse_result["可用的交换空间总量"],
-            memory_parse_result["总的交换空间总量"]
+        memory_process_result["swap_utilization"] = self.calculate_swap_usage(
+            memory_parse_result["available_swap_space"],
+            memory_parse_result["total_swap_space"]
         )
 
         # 内存使用率
-        memory_process_result["内存使用率"] = memory_parse_result["内存使用率"] / 100
+        memory_process_result["memory_utilization"] = memory_parse_result["memory_utilization"] / 100
 
         # # Swapout 判断
         # SWAPOUT_THRESHOLD = 5  # 定义阈值常量

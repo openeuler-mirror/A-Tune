@@ -2,7 +2,19 @@
 from typing import List, Any, Union
 from tabulate import tabulate
 from wcwidth import wcswidth
+from src.config import config
 
+def language():
+    if config["language"] == "zh":
+        return "zh"
+    else:
+        return "en"
+
+def translate(chinese, english):
+    if language() == "zh":
+        return chinese
+    else:
+        return english
 
 def display_banner():
     try:

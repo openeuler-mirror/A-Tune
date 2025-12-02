@@ -3,6 +3,7 @@ import logging
 
 from src.config import config
 from src.utils.collector.metric_collector import snapshot_task, CollectMode
+from src.utils.common import translate
 
 FLINK_HOST = config["servers"][0]["listening_address"] if config["servers"][0]["listening_address"] else \
     config["servers"][0]["ip"]
@@ -13,7 +14,7 @@ FLINK_API = f"http://{FLINK_HOST}:{FLINK_PORT}"
     cmd=(
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}"
     ),
-    tag="flink作业详情",
+    tag=translate("flink作业详情", "Flink Job Details"),
     collect_mode=CollectMode.ASYNC
 )
 def flink_job_detail(output: str) -> dict:
@@ -42,11 +43,11 @@ def flink_job_detail(output: str) -> dict:
         return {
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' ":
                 {
-                    "任务总数": total_tasks,
-                    "运行中任务数": running_tasks,
-                    "失败任务数": failed_tasks,
-                    "平均并行度": avg_parallelism,
-                    "最大并行度": max_parallelism,
+                    "total_tasks": total_tasks,
+                    "running_tasks": running_tasks,
+                    "failed_tasks": failed_tasks,
+                    "avg_parallelism": avg_parallelism,
+                    "max_parallelism": max_parallelism,
                 }
         }
 
@@ -59,7 +60,7 @@ def flink_job_detail(output: str) -> dict:
     cmd=(
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}/checkpoints"
     ),
-    tag="flink checkpoint状态",
+    tag=translate("flink checkpoint状态", "Flink Checkpoint Status"),
     collect_mode=CollectMode.ASYNC
 )
 def flink_checkpoint_status(output: str) -> dict:
@@ -83,9 +84,9 @@ def flink_checkpoint_status(output: str) -> dict:
         return {
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' ":
                 {
-                    "最近一次Checkpoint耗时(ms)": latest_duration,
-                    "最近一次Checkpoint状态大小(bytes)": latest_state_size,
-                    "Checkpoint失败次数": failed_count,
+                    "latest_checkpoint_duration_ms": latest_duration,
+                    "latest_checkpoint_state_size_bytes": latest_state_size,
+                    "failed_checkpoint_count": failed_count,
                 }
         }
     except Exception as e:
@@ -95,7 +96,7 @@ def flink_checkpoint_status(output: str) -> dict:
 
 @snapshot_task(
     cmd=f"curl -s {FLINK_API}/jobs/overview",
-    tag="flink作业总览",
+    tag=translate("flink作业总览", "Flink Job Overview"),
     collect_mode=CollectMode.ASYNC
 )
 def flink_job_overview(output: str) -> dict:
@@ -105,9 +106,9 @@ def flink_job_overview(output: str) -> dict:
         return {
             f"curl -s {FLINK_API}/jobs/overview":
                 {
-                    "作业总数": len(jobs),
-                    "运行中作业数": sum(1 for j in jobs if j.get("state") == "RUNNING"),
-                    "失败作业数": sum(1 for j in jobs if j.get("state") == "FAILED"),
+                    "total_jobs": len(jobs),
+                    "running_jobs": sum(1 for j in jobs if j.get("state") == "RUNNING"),
+                    "failed_jobs": sum(1 for j in jobs if j.get("state") == "FAILED"),
                 }
         }
     except Exception as e:
@@ -117,7 +118,7 @@ def flink_job_overview(output: str) -> dict:
 
 @snapshot_task(
     cmd=f"curl -s {FLINK_API}/taskmanagers",
-    tag="flink资源使用",
+    tag=translate("flink资源使用", "Flink Resource Usage"),
     collect_mode=CollectMode.ASYNC
 )
 def flink_resource_usage(output: str) -> dict:
@@ -131,13 +132,13 @@ def flink_resource_usage(output: str) -> dict:
         total_managed = sum(tm.get("managedMemoryUsed", 0) for tm in tms)
 
         return {
-            "flink资源使用":
+            "flink_resource_usage":
                 {
-                    "TaskManager数量": len(tms),
-                    "总Slots数": total_slots,
-                    "空闲Slots数": available_slots,
-                    "Heap内存使用(MB)": round(total_heap / 1024 / 1024, 2),
-                    "Managed内存使用(MB)": round(total_managed / 1024 / 1024, 2),
+                    "taskmanager_count": len(tms),
+                    "total_slots": total_slots,
+                    "available_slots": available_slots,
+                    "heap_memory_used_mb": round(total_heap / 1024 / 1024, 2),
+                    "managed_memory_used_mb": round(total_managed / 1024 / 1024, 2),
                 }
         }
     except Exception as e:
@@ -149,7 +150,7 @@ def flink_resource_usage(output: str) -> dict:
     cmd=(
             f"curl -s {FLINK_API}/jobs | jq -r '.jobs[0].id' | xargs -I{{}} curl -s {FLINK_API}/jobs/{{}}/backpressure"
     ),
-    tag="flink反压指标",
+    tag=translate("flink反压指标", "Flink Backpressure Metrics"),
     collect_mode=CollectMode.ASYNC
 )
 def flink_backpressure(output: str) -> dict:
@@ -161,8 +162,8 @@ def flink_backpressure(output: str) -> dict:
         return {
             f"curl -s {FLINK_API}/taskmanagers":
                 {
-                    "阻塞算子数量": blocked,
-                    "Backpressure阻塞率": ratio
+                    "blocked_operator_count": blocked,
+                    "backpressure_ratio": ratio
                 }
         }
     except Exception as e:
@@ -190,12 +191,12 @@ def flink_throughput_metrics(output: str) -> dict:
     try:
         metrics = json.loads(output)
         result = {
-            "输入吞吐": 0.0,
-            "输出吞吐": 0.0,
-            "输入数据量": 0.0,
-            "输出数据量": 0.0,
-            "延迟指标": 0.0,
-            "检查点大小": 0
+            "input_throughput": 0.0,
+            "output_throughput": 0.0,
+            "input_data_volume": 0.0,
+            "output_data_volume": 0.0,
+            "latency_metric": 0.0,
+            "checkpoint_size": 0
         }
 
         for metric in metrics:
@@ -203,29 +204,29 @@ def flink_throughput_metrics(output: str) -> dict:
             value = metric["value"]
 
             if "numRecordsInPerSecond" in metric_id:
-                result["输入吞吐"] = float(value)
+                result["input_throughput"] = float(value)
             elif "numRecordsOutPerSecond" in metric_id:
-                result["输出吞吐"] = float(value)
+                result["output_throughput"] = float(value)
             elif "numBytesInPerSecond" in metric_id:
-                result["输入数据量"] = float(value)
+                result["input_data_volume"] = float(value)
             elif "numBytesOutPerSecond" in metric_id:
-                result["输出数据量"] = float(value)
+                result["output_data_volume"] = float(value)
             elif "latency" in metric_id and "p99" in metric_id:
-                result["延迟指标"] = float(value)
+                result["latency_metric"] = float(value)
             elif "lastCheckpointSize" in metric_id:
-                result["检查点大小"] = int(value)
+                result["checkpoint_size"] = int(value)
 
         return {"flink_throughput_metrics": result}
     except Exception as e:
         logging.error(f"Failed to parse throughput metric: {e}")
         # 返回默认值而不是空字典
         return {"flink_throughput_metrics": {
-            "输入吞吐": 0.0,
-            "输出吞吐": 0.0,
-            "输入数据量": 0.0,
-            "输出数据量": 0.0,
-            "延迟指标": 0.0,
-            "检查点大小": 0
+            "input_throughput": 0.0,
+            "output_throughput": 0.0,
+            "input_data_volume": 0.0,
+            "output_data_volume": 0.0,
+            "latency_metric": 0.0,
+            "checkpoint_size": 0
         }}
 
 
@@ -245,8 +246,8 @@ def flink_resource_usage(output: str) -> dict:
     try:
         metrics = json.loads(output)
         resource_data = {
-            "CPU负载": 0.0,
-            "堆内存使用": 0
+            "cpu_load": 0.0,
+            "heap_memory_usage": 0
         }
 
         for metric in metrics:
@@ -254,15 +255,15 @@ def flink_resource_usage(output: str) -> dict:
             value = metric["value"]
 
             if "CPU.Load" in metric_id:
-                resource_data["CPU负载"] = float(value) * 100  # 转换为百分比
+                resource_data["cpu_load"] = float(value) * 100  # 转换为百分比
             elif "Heap.Used" in metric_id:
-                resource_data["堆内存使用"] = int(value)
+                resource_data["heap_memory_usage"] = int(value)
 
         return {"flink_resource_usage": resource_data}
     except Exception as e:
         logging.error(f"Failed to parse resource metrics: {e}")
         # 返回默认值而不是空字典
         return {"flink_resource_usage": {
-            "CPU负载": 0.0,
-            "堆内存使用": 0
+            "cpu_load": 0.0,
+            "heap_memory_usage": 0
         }}

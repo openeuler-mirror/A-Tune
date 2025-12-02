@@ -15,7 +15,7 @@ def parse_disk_data(
 ) -> Dict:
     device_name = data["disk_device"]
     r, rkb, w, wkb = float(data["r/s"]), float(data["rkB/s"]), float(data["w/s"]), float(data["wkB/s"])
-    return {device_name: {"单位时间读速率": r, "单位时间读大小": rkb, "单位时间写速率": w, "单位时间写大小": wkb}}
+    return {device_name: {"read_rate_per_unit_time": r, "read_size_per_unit_time": rkb, "write_rate_per_unit_time": w, "write_size_per_unit_time": wkb}}
 
 def parse_disk_util_data(a_data: dict, b_data: dict) -> dict:
     device_name = b_data["disk_device"]
@@ -45,7 +45,7 @@ def parse_disk_util_data(a_data: dict, b_data: dict) -> dict:
     except (TypeError, ValueError, KeyError):
         util = 0.0
 
-    return {device_name: {"磁盘平均等待时间变化趋势": await_change, "磁盘平均请求队列长度变化趋势": aqu_sz_change, "磁盘利用率": util}}
+    return {device_name: {"disk_avg_wait_time_trend": await_change, "disk_avg_request_queue_length_trend": aqu_sz_change, "disk_utilization": util}}
 
 
 def iostat_parse(cmd, stdout):
@@ -53,7 +53,7 @@ def iostat_parse(cmd, stdout):
         try:
             stdout = json.loads(stdout)
             disk = [parse_disk_data(data) for data in stdout["sysstat"]["hosts"][0]["statistics"][1]["disk"]]
-            res = {"磁盘读写性能": disk}
+            res = {"disk_read_write_performance": disk}
         except json.JSONDecodeError as e:
             logging.error(f"Failed to parse JSON from stdout: {e}")
             raise ValueError("Failed to parse JSON from stdout") from e
@@ -67,7 +67,7 @@ def iostat_parse(cmd, stdout):
             disk = [parse_disk_util_data(a_data, b_data) for a_data, b_data in zip(
                 a_json["sysstat"]["hosts"][0]["statistics"][1]["disk"],
                 b_json["sysstat"]["hosts"][0]["statistics"][1]["disk"])]
-            res = {"磁盘利用": disk}
+            res = {"disk_utilization": disk}
         except (ValueError, json.JSONDecodeError) as e:
             logging.error(f"Failed to parse disk utilization data: {e}")
             raise ValueError("Failed to parse disk utilization data") from e
@@ -105,11 +105,11 @@ class DiskCollector(BaseCollector):
     ) -> Dict:
         logging.info(f"[DiskCollector] collecting disk workload metrics")
         disk_process_result = {
-            # "iowait": disk_parse_result["系统有未完成的磁盘I/O请求时，等待IO占用CPU的百分比"] / 100,
-            "磁盘信息": disk_parse_result["磁盘利用"],
+            # "iowait": disk_parse_result["io_wait_percentage"] / 100,
+            "disk_information": disk_parse_result["disk_utilization"],
         }
-        for i in range(len(disk_process_result["磁盘信息"])):
-            for key in disk_process_result["磁盘信息"][i]:
-                disk_process_result["磁盘信息"][i][key].update(disk_parse_result["磁盘读写性能"][i][key])
+        for i in range(len(disk_process_result["disk_information"])):
+            for key in disk_process_result["disk_information"][i]:
+                disk_process_result["disk_information"][i][key].update(disk_parse_result["disk_read_write_performance"][i][key])
 
         return disk_process_result

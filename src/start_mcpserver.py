@@ -19,6 +19,7 @@ from src.performance_optimizer.param_knowledge import ParamKnowledge
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
 from src.start_tune import run_param_optimization, run_strategy_optimization
+from src.utils.common import translate
 
 # ================= 全局配置与缓存 ===================
 cache: Dict[str, Dict[str, Any]] = {}
@@ -41,7 +42,7 @@ tune_app_param = config["feature"][0]["tune_app_param"]
 # ================= Collector 接口 ===================
 @mcp.tool(
     name="Collector",
-    description="采集数据"
+    description=translate("采集数据", "collect data")
 )
 def run_collector():
     """
@@ -50,7 +51,7 @@ def run_collector():
 
     if not host_ip:
         raise HTTPException(
-            status_code=400, detail=f"请参考部署使用指南，预设待调优机器IP，否则无法采集数据"
+            status_code=400, detail=f"Please refer to the deployment and usage guide to set the IP address of the optimized machine; otherwise, data cannot be collected"
         )
     ssh_client = SshClient(
         host_ip=host_ip,
@@ -99,7 +100,7 @@ def run_collector():
 # ================= Analyzer 接口 ===================
 @mcp.tool(
     name="Analyzer",
-    description="分析采集到的数据"
+    description=translate("分析采集到的数据", "analyze the collected data")
 )
 def run_analyzer():
     """
@@ -107,7 +108,7 @@ def run_analyzer():
     """
     if not host_ip or host_ip not in cache or "metrics" not in cache[host_ip]:
         raise HTTPException(
-            status_code=400, detail=f"{host_ip} 缺少 metrics，请先采集数据，再进行分析"
+            status_code=400, detail=f"{host_ip} lack of metrics. Please collect data first, then proceed with analysis"
         )
 
     analyzer = PerformanceAnalyzer(
@@ -123,7 +124,7 @@ def run_analyzer():
 # ================= Optimizer（参数+策略）接口 ===================
 @mcp.tool(
     name="Optimizer",
-    description="参数+策略"
+    description=translate("参数+策略", "param+strategy")
 )
 def run_optimizer():
     """
@@ -137,7 +138,7 @@ def run_optimizer():
     ):
         raise HTTPException(
             status_code=400,
-            detail=f"{host_ip} 缺少 report 或 static_profile，请先执行 /collector 和 /analyzer",
+            detail=f"{host_ip} is missing report or static_profile. Please run /collector and /analyzer first."
         )
 
     # --- 参数优化 ---
@@ -172,9 +173,9 @@ def run_optimizer():
     )
 
     history_result = {
-        "历史最佳结果": {},
-        "历史最差结果": {},
-        "上一轮调优结果": {}
+        "best_result": {},
+        "worst_result": {},
+        "previous_result": {}
     }
     param_opt_result = param_recommender.run(history_result)
 
@@ -192,7 +193,7 @@ def run_optimizer():
     recommendations = strategy_opt.get_recommendations_json(
         bottleneck=cache[host_ip]["bottleneck"],
         top_k=1,
-        business_context="高并发Web服务，CPU负载主要集中在用户态处理",
+        business_context="High-concurrency web services, with CPU load primarily concentrated on user-mode processing",
     )
 
     return {
@@ -203,7 +204,7 @@ def run_optimizer():
 
 @mcp.tool(
     name="StartTune",
-    description="开始调优"
+    description=translate("开始调优", "start tune")
 )
 def tune():
     """
@@ -230,7 +231,7 @@ def tune():
     )
     if feature_cfg["strategy_optimization"]:
         run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)
-    return "调优执行完成"
+    return "tune is complete"
 
 
 def main():

@@ -96,7 +96,7 @@ def sar_parse(
     if cmd != "sar -n DEV 1 1":
         logging.error("Command is not 'sar -n DEV 1 1'.")
         raise ValueError("Command is not 'sar -n DEV 1 1'.")
-    return {"网卡指标": stdout}
+    return {"network_adapter_metrics": stdout}
 
 
 NETWORK_PARSE_FUNCTIONS = {
@@ -132,5 +132,5 @@ class NetworkCollector(BaseCollector):
         network_process_result = {"listenOverflows": int(network_parse_result["listenOverflows"] > 0),
                                   "fulldocookies": int(network_parse_result["fulldocookies"] > 0),
                                   "fulldrop": int(network_parse_result["fulldrop"] > 0),
-                                  "网卡指标": network_parse_result["网卡指标"]}
+                                  "network_adapter_metrics": network_parse_result["network_adapter_metrics"]}
         return network_process_result

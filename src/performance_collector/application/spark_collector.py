@@ -4,6 +4,7 @@ import logging
 import requests
 
 from src.config import config
+from src.utils.common import translate
 from src.utils.collector.metric_collector import (
     period_task,
     snapshot_task,
@@ -21,7 +22,7 @@ DURATION = SAMPLE_INTERVAL * (SAMPLE_COUNT - 1)
 
 @snapshot_task(
     cmd="curl -s {}/api/v1/applications | jq -r '.[0].id'".format(SPARK_HISTORY_SERVER),
-    tag="spark作业信息",
+    tag=translate("spark作业信息", "Spark job information"),
     collect_mode=CollectMode.ASYNC
 )
 def spark_job_info(app_id: str) -> dict:
@@ -41,14 +42,14 @@ def spark_job_info(app_id: str) -> dict:
         total_skipped_tasks = sum(job.get("numSkippedTasks") for job in jobs)
         total_completed_stages = sum(job.get("numCompletedStages") for job in jobs)
         result = {
-            "Job总数": total_jobs,
-            "运行中Job数": running_jobs,
-            "失败Job数": failed_jobs,
-            "任务总数": total_tasks,
-            "失败Task总数": total_failed_tasks,
-            "被杀Task总数": total_killed_tasks,
-            "跳过Task总数": total_skipped_tasks,
-            "已完成Stage总数": total_completed_stages,
+            "total_jobs": total_jobs,
+            "running_jobs": running_jobs,
+            "failed_jobs": failed_jobs,
+            "total_tasks": total_tasks,
+            "failed_tasks": total_failed_tasks,
+            "killed_tasks": total_killed_tasks,
+            "skipped_tasks": total_skipped_tasks,
+            "completed_stages": total_completed_stages
         }
         return {cmd: result}
 
@@ -59,7 +60,7 @@ def spark_job_info(app_id: str) -> dict:
 
 @snapshot_task(
     cmd="curl -s {}/api/v1/applications | jq -r '.[0].id'".format(SPARK_HISTORY_SERVER),
-    tag="spark阶段信息",
+    tag=translate("spark阶段信息", "Spark stage information"),
     collect_mode=CollectMode.ASYNC
 )
 def spark_stage_info(app_id: str) -> dict:
@@ -79,14 +80,14 @@ def spark_stage_info(app_id: str) -> dict:
         total_disk_spill = sum(s.get("diskBytesSpilled", 0) for s in stages)
         failed_stages = sum(1 for s in stages if s["status"] == "FAILED")
         result = {
-            "Stage总数": total_stages,
-            "失败Stage数": failed_stages,
-            "总任务数": total_tasks,
-            "总执行时间(ms)": total_executor_time,
-            "总GC时间(ms)": total_gc_time,
-            "GC占比": f"{(total_gc_time / total_executor_time) * 100:.2f}%" if total_executor_time else "0%",
-            "总Memory Spill": total_mem_spill,
-            "总Disk Spill": total_disk_spill,
+            "total_stages": total_stages,
+            "failed_stages": failed_stages,
+            "total_tasks": total_tasks,
+            "total_executor_time_ms": total_executor_time,
+            "total_gc_time_ms": total_gc_time,
+            "gc_ratio": f"{(total_gc_time / total_executor_time) * 100:.2f}%" if total_executor_time else "0%",
+            "total_memory_spill": total_mem_spill,
+            "total_disk_spill": total_disk_spill
         }
         return {cmd: result}
     except Exception as e:
@@ -98,7 +99,7 @@ def spark_stage_info(app_id: str) -> dict:
     cmd="curl -s {}/api/v1/applications/$(curl -s {}/api/v1/applications | jq -r '.[0].id')/executors".format(
         SPARK_HISTORY_SERVER, SPARK_HISTORY_SERVER
     ),
-    tag="spark执行器信息",
+    tag=translate("spark执行器信息", "Spark executor information"),
     collect_mode=CollectMode.ASYNC,
     delay=0,
     sample_count=SAMPLE_COUNT,
