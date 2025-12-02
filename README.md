@@ -195,7 +195,17 @@ python3 src/start_tune.py
 ```
 
 ## 使用指南
-### 配置文件准备
+
+### （调优前提）调优目标环境部署
+
+1. 部署应用，保证应用处于运行状态。
+2. 明确应用配置文件：例如mysql默认为 /etc/my.cnf。
+3. 明确参数修改方法：例如修改应用配置文件中的字段值。
+4. 明确参数修改是否需重启生效：若需要，则明确启停命令，例如mysql可通过 systemctl start mysqld/systemctl stop mysqld 命令启动或停止。
+5. 准备压测脚本：benchmark.sh（名称不限制），保证运行benchmark.sh可成功执行压测，并且性能指标在日志输出中。调优前建议先手动测试，验证可跑通。
+
+### 配置copilot调优
+
 #### 1. 修改 .env.yaml 配置文件内容（项目 config 目录下）
 
 根据调优需要，修改相应配置字段：
@@ -209,43 +219,52 @@ vim config/.env.yaml
 LLM_KEY: "sk-XXXXXX"                  # 必填：模型服务的 API 密钥
 LLM_URL: "https://api.deepseek.com"   # 必填：LLM 服务的 API 接口地址，如 "https://api.deepseek.com"
 LLM_MODEL_NAME: "deepseek-chat"       # 必填：要调用的模型名，如 deepseek-chat
-LLM_MAX_TOKENS: 8192                  # 选填：生成文本的最大 token 数，如4096
+LLM_MAX_TOKENS: 8192                  # 选填：生成文本的最大 token 数，如4096，根据模型能力调整
 
 REMOTE_EMBEDDING_ENDPOINT: "https://api.embedding.com/v1/embeddings"  # 选填：嵌入模型服务地址
 REMOTE_EMBEDDING_MODEL_NAME: "bge-large-zh"                           # 选填：嵌入模型名称，如 text-embedding-3-small、bge-large-zh
  
 servers:
   - ip: ""                                                              # 必填：调优目标机器ip
-    host_user: ""                                                       # 必填：调优机器的usr id
-    password: ""                                                        # 必填：登录机器的密码
-    port: 22                                                            # 必填：应用所在ip的SSH连接port
-    app: "mysql"                                                        # 必填：当前支持的应用见 app_config.yaml 中已定义的字段
+    host_user: ""                                                       # 必填：调优目标机器SSH登录用户
+    password: ""                                                        # 必填：调优目标机器SSH登录密码
+    port: 22                                                            # 必填：调优目标机器SSH连接port
+    app: "mysql"                                                        # 必填：调优目标应用，当前支持的应用见 config/app_config.yaml 中已定义的字段
     listening_address: ""                                               # 选填：应用监听的ip(当前仅flink、nginx、spark需要填写)
     listening_port: ""                                                  # 选填：应用监听的端口(当前仅flink、nginx、spark需要填写)
-    target_process_name: "mysqld"                                       # 选填：调优应用进程的name
-    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"       # 选填：调优应用的描述（用于策略生成）
+    target_process_name: "mysqld"                                       # 选填：调优应用进程名，使能微架构分析时必须填写
+    business_context: "高并发数据库服务，CPU负载主要集中在用户态处理"       # 选填：调优应用的描述，启用调优策略推荐时必须填写
     
 feature:
-  - need_restart_application: True                                      # 修改参数之后是否需要重启应用使参数生效
-    need_recover_cluster: False                                         # 调优过程中是否需要恢复集群
-    microDep_collector: True                                            # 是否开启微架构指标采集，虚拟化环境不支持无需开启
-    pressure_test_mode: True                                            # 是否通过压测模拟负载环境，若系统自带负载无需压测打流，则可关闭
-    tune_system_param: False                                            # 是否调整系统参数，若打开，则调优范围增加系统参数，因调优效果一般不如应用参数效果明显，默认关闭
-    tune_app_param: True                                                # 是否调整应用参数，若打开，则调优范围增加应用参数，优先调优此类参数，应用参数与系统参数调优必须至少打开一个
-    strategy_optimization: False                                        # 是否需要策略推荐
-    benchmark_timeout: 3600                                             # benchmark执行超时限制
-    max_iterations: 10                                                  # 最大迭代轮数
-    slo_goal: 0.1                                                       # 调优提升目标，默认0.1也即10%，调优达成提升目标后会提前结束
-    best_param_save_path: "best_params.json"                            # 最优参数保存文件路径
-    data_dir: "data"                                                    # 中间数据的文件夹路径
-    save_snapshot: False                                                # 保存快照开关，用于保存采集、分析、调优初始化中间结果，保存路径为 ${data_dir}/snapshot/
-    use_snapshot: False                                                 # 使用快照开关，用于跳过采集、分析、调优初始化等步骤，直接使用已保存结果
-    max_retries: 3                                                      # 执行命令的失败重试次数
-    delay: 1.0                                                          # 执行命令的失败重试间隔
+  - need_restart_application: True                                      # True/False，表示是否需要重启应用以使参数修改生效
+    need_recover_cluster: False                                         # True/False，表示是否需要恢复集群以使参数修改生效
+    microDep_collector: True                                            # True/False，表示是否开启微架构指标采集，虚拟化环境不支持无需开启
+    pressure_test_mode: True                                            # True/False，表示是否通过压测模拟负载环境，若系统自带负载无需压测打流，则可关闭
+    tune_system_param: False                                            # True/False，表示是否调整系统参数，若打开，则调优范围增加系统参数，因调优效果一般不如应用参数效果明显，默认关闭
+    tune_app_param: True                                                # True/False，表示是否调整应用参数，若打开，则调优范围增加应用参数，优先调优此类参数，注：应用参数与系统参数调优必须至少打开一个
+    strategy_optimization: False                                        # True/False，表示是否启用策略推荐，注：调优策略无法自动化使能，推荐仅供参考
+    benchmark_timeout: 3600                                             # 正整数，单位秒，表示benchmark执行超时限制
+    max_iterations: 10                                                  # 正整数，单位秒，表示最大迭代轮数
+    slo_goal: 0.1                                                       # 浮点数，表示调优提升目标，默认0.1也即10%，若调优迭代过程中已达成提升目标，则提前结束迭代
+    best_param_save_path: "best_params.json"                            # 绝对/相对路径，表示最优参数保存文件路径
+    data_dir: "data"                                                    # 绝对/相对路径，表示中间数据的文件夹路径
+    save_snapshot: False                                                # True/False，表示是否保存快照，也即保存采集、分析、调优初始化等步骤结果快照，保存路径为 ${data_dir}/snapshot/
+    use_snapshot: False                                                 # True/False，表示是否使用快照，也即跳过采集、分析、调优初始化等步骤，直接使用已保存结果快照
+    max_retries: 3                                                      # 正整数，表示执行命令的失败重试次数
+    delay: 1.0                                                          # 浮点数，表示执行命令的失败重试间隔
 ```
 
-#### 2. 完善 app_config.yaml（项目 config 目录下）  
-(需按实际环境修改，重点关注 set_param_template、 get_param_template、 benchmark 配置）
+#### 2. 修改 app_config.yaml 文件内容（项目 config 目录下）  
+(需按实际环境修改，重点关注 version、set_param_template、get_param_template、benchmark 配置）
+
+* version：应用版本（用于copilot选取对应最近版本的调优参数知识库）
+```YAML  
+# 示例（mysql）：
+version: "v5.7"
+
+# 说明：版本号必须以 v 开头，例如 v{x}.{y}.{z}，可参考 app_config.yaml 中各应用的默认配置。
+```
+
 * set_param_template：参数设置方法（copilot调优时，会在调优机器以bash运行此方法修改参数值） 
 ```YAML
 # 示例（mysql）：
@@ -266,24 +285,55 @@ get_param_template: 'grep -E "^$param_name\\s*=" $config_file | cut -d= -f2- | x
 #   - $param_name：将被copilot替换为参数名（如 worker_connections）
 ```
 
-* benchmark：压测命令模版
+* benchmark：性能指标获取方法（copilot调优时，会在调优机器或本地运行此方法获取性能指标）
 ```YAML  
 # 示例（mysql）：
 benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
 
 # 说明：
-#   - $EXECUTE_MODE:local    → 在 Copilot 控制机本地执行
-#   - $EXECUTE_MODE:remote   → 通过 SSH 跳转到目标机器执行，默认使用remote执行模式
-#   - 其他变量（如 $host_ip, $port, $user）将被自动替换 config 中定义的值
+#   $EXECUTE_MODE：表示命令执行模式
+#   - $EXECUTE_MODE:local    → 在 Copilot 部署机器本地执行
+#   - $EXECUTE_MODE:remote   → 通过 SSH 跳转到调优目标机器执行，默认使用remote执行模式
+#   其他变量：
+#   - $SCRIPTS_DIR 会自动展开为 copilot 项目内置脚本目录路径，其中保存有一些应用示例，也即 ${copilot_tune_dir}/scripts 目录
+#   - $host_ip, $port, $user 会自动替换为 config 中定义的值
 ```
+parse_benchmark.sh 建议写法：
+1.运行benchmark.sh，日志重定向到benchmark.log；
+2.从benchmark.log中提取性能指标输出。
 
-* version：应用版本（用于选择合适的调优参数范围）
-```YAML  
-# 示例（mysql）：
-version: "v5.7"
-
-# 说明：版本号必须以 v 开头，例如 v{x}.{y}.{z}，可参考 app_config.yaml 中各应用的默认配置。
+parse_benchmark.sh 示例：
+假设mysql benchmark.sh 输出如下格式：
 ```
+...
+SQL statistics:
+    queries performed:
+        read:                            0
+        write:                           221668
+        other:                           110834
+        total:                           332502
+    transactions:                        55417  (306.88 per sec.)
+    queries:                             332502 (1841.30 per sec.)
+    ignored errors:                      0      (0.00 per sec.)
+    reconnects:                          0      (0.00 per sec.)
+...
+```
+mysql指标为queries per second，也即queries行中的数字 1841.30，则 mysql parse_benchmark.sh 可编写如下：
+```bash
+#!/bin/bash
+SCRIPT_PATH="$(realpath "$0")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+cd "$SCRIPT_DIR"
+sh benchmark.sh $1 $2 $3 $4 > benchmark.log 2>&1
+
+# extract performance metric from log
+grep "queries:" benchmark.log | awk -F'[()]' '{print $2}' | awk '{print $1}'
+# 说明：
+# grep "queries:" benchmark.log 表示过滤包含 queries 的一行，得到 【queries:         332502 (1841.30 per sec.)】
+# awk -F'[()]' '{print $2}' 表示提取以 '()' 作为分隔后的第2个字符串，得到 【1841.30 per sec.】
+# awk '{print $1}' 表示提前以空格作为分隔后的第1个字符串，得到 【1841.30】
+```
+运行copilot前，建议手动运行 parse_benchmark.sh 以确认输出指标值正确性。
 
 * __mysql应用配置示例如下：__
 ```YAML
