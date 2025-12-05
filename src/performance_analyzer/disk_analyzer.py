@@ -1,25 +1,28 @@
 from .base_analyzer import BaseAnalyzer
+from src.utils.common import translate
 
 class DiskAnalyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def analyze(self) -> str:
-        report = "基于采集的系统指标, 磁盘初步的性能分析报告如下: \n"
-        disks_info, iowait = self.data.get("磁盘信息", {})[0], self.data.get("iowait", 0)
-        report += f"系统iowait的值是{iowait}\n"
+        report = translate("基于采集的系统指标, 磁盘初步的性能分析报告如下: \n", 
+            "Based on the collected system metrics, the preliminary performance analysis report for the disk is as follows: \n")
+        disks_info, iowait = self.data.get("disk_information", {})[0], self.data.get("iowait", 0)
+        report += translate(f"系统iowait的值是{iowait}\n", f"The value of system iowait is {iowait}\n")
         for disk_name, disk_info in disks_info.items():
             wait_time, queue_lenth, util, read_speed, write_speed, read_size, write_size = (
-                disk_info.get("磁盘平均等待时间变化趋势", 0),
-                disk_info.get("磁盘平均请求队列长度变化趋势", 0),
-                disk_info.get("磁盘利用率", 0),
-                disk_info.get("单位时间读速率", 0),
-                disk_info.get("单位时间写速率", 0),
-                disk_info.get("单位时间读大小", 0),
-                disk_info.get("单位时间写大小", 0),
+                disk_info.get("disk_avg_wait_time_trend", 0),
+                disk_info.get("disk_avg_request_queue_length_trend", 0),
+                disk_info.get("disk_utilization", 0),
+                disk_info.get("read_rate_per_unit_time", 0),
+                disk_info.get("write_rate_per_unit_time", 0),
+                disk_info.get("read_size_per_unit_time", 0),
+                disk_info.get("write_size_per_unit_time", 0),
             )
-            report += f"磁盘{disk_name}的基本信息如下：\n"
-            report += f"磁盘利用率是{util}，磁盘读速率是{read_speed}，磁盘写速率是{write_speed}\n"
+            report += translate(f"磁盘{disk_name}的基本信息如下：\n", f"The basic information of disk {disk_name} is as follows:\n")
+            report += translate(f"磁盘利用率是{util}，磁盘读速率是{read_speed}，磁盘写速率是{write_speed}\n", 
+                f"Disk utilization is {util}, disk read rate is {read_speed}, and disk write rate is {write_speed}\n")
             report += self.disk_info_analysis(wait_time, queue_lenth, util)
             report += self.disk_rw_analysis(read_speed, write_speed, read_size, write_size, util)
         return report
@@ -32,14 +35,16 @@ class DiskAnalyzer(BaseAnalyzer):
     ) -> str:
         disk_info_report = ""
         queue_lenth_message = (
-            "该磁盘设备请求队列的长度在增加，且设备利用率超过预设阈值，这可能表明该磁盘正在接近或达到其处理能力的极限"
+            translate("该磁盘设备请求队列的长度在增加，且设备利用率超过预设阈值，这可能表明该磁盘正在接近或达到其处理能力的极限", 
+                "The length of the disk device request queue is increasing, and the device utilization exceeds the preset threshold, which may indicate that the disk is approaching or reaching its processing capacity limit.")
             if queue_lenth > 0 and util > 0.90
             else ""
         )
         disk_info_report += self.generate_report_line(queue_lenth_message, queue_lenth_message)
 
         wait_time_message = (
-            "该磁盘设备请求处理速度在下降，且设备利用率超过预设阈值, 这可能表明该磁盘正在接近或达到其处理能力的极限"
+            translate("该磁盘设备请求处理速度在下降，且设备利用率超过预设阈值, 这可能表明该磁盘正在接近或达到其处理能力的极限", 
+                "The disk device's request processing speed is declining, and the device utilization exceeds the preset threshold, which may indicate that the disk is approaching or reaching its processing capacity limit.")
             if wait_time > 0 and util > 0.90
             else ""
         )
@@ -59,14 +64,16 @@ class DiskAnalyzer(BaseAnalyzer):
         write_size= write_size/1024
 
         iops_message = (
-            "该磁盘平均 Input/Ouput Operations Per Second (IOPS) 操作数超过预设限制，且设备利用率超过预设阈值, 这可能表明该磁盘正在接近或达到其处理能力的极限"
+            translate("该磁盘平均 Input/Ouput Operations Per Second (IOPS) 操作数超过预设限制，且设备利用率超过预设阈值, 这可能表明该磁盘正在接近或达到其处理能力的极限", 
+                "The disk's average Input/Output Operations Per Second (IOPS) exceeds the preset limit, and the device utilization exceeds the preset threshold, which may indicate that the disk is approaching or reaching its processing capacity limit.")
             if read_speed + write_speed > 120 and util > 0.90
             else ""
         )
         disk_rw_report += self.generate_report_line(iops_message, iops_message)
 
         size_message = (
-            "该磁盘的平均传输速率超过预设带宽限制，且设备利用率超过预设阈值，这可能表明该磁盘正在接近或达到其处理能力的极限"
+            translate("该磁盘的平均传输速率超过预设带宽限制，且设备利用率超过预设阈值，这可能表明该磁盘正在接近或达到其处理能力的极限", 
+                "The disk's average transfer rate exceeds the preset bandwidth limit, and the device utilization exceeds the preset threshold, which may indicate that the disk is approaching or reaching its processing capacity limit.")
             if read_size + write_size > 100 and util > 0.90
             else ""
         )
@@ -80,7 +87,8 @@ class DiskAnalyzer(BaseAnalyzer):
     ) -> str:
         # TO DO
         # 要有一个报告模板，指明包含哪些信息，以及报告格式
-        report_prompt = f"""
+        report_prompt = translate(
+            f"""
 以下内容是linux系统中磁盘相关的性能信息:
 {disk_report}
 信息中所涉及到的数据准确无误,真实可信。
@@ -104,5 +112,32 @@ class DiskAnalyzer(BaseAnalyzer):
 # RESPONSE FORMAT #
 回答以"磁盘分析如下:"开头，然后另起一行逐条分析。
 如果有多条分析结论，请用数字编号分点作答。    
-        """
+        """,
+        f"""
+The following content contains performance information related to the disk in a Linux system:
+{disk_report}
+The data mentioned in the information is accurate and reliable.
+
+# OBJECTIVE #
+Please analyze the performance status of the system's disk based on the above information.
+Requirements:
+1. Do not include any optimization suggestions in your answer.
+2. Retain as much of the real and valid data from the information as possible.
+3. Do not omit any information that is worth analyzing.
+
+# STYLE #
+You are a professional system operations expert. 
+Your response should be logically rigorous, objective, concise, and easy to understand, 
+with clear and logical organization, making your answer credible.
+
+# TONE #
+You should maintain a serious, earnest, and rigorous attitude.
+
+# AUDIENCE #
+Your answer will serve as an important reference for other system operations experts. Please provide as much real and useful information as possible, and do not fabricate any information.
+
+# RESPONSE FORMAT #
+Begin your answer with "disk analysis is as follows:" and then start a new line to analyze each point separately.
+If there are multiple analysis conclusions, please number them and list them separately.
+        """)
         return self.ask_llm(report_prompt) + "\n"

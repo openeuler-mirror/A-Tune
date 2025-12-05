@@ -2,6 +2,7 @@ import logging
 import re
 
 from src.utils.shell_execute import cmd_pipeline
+from src.utils.common import translate
 
 @cmd_pipeline(cmd="lscpu", tag="static", parallel=True)
 def lscpu_parser(output: str) -> dict:
@@ -12,11 +13,11 @@ def lscpu_parser(output: str) -> dict:
             continue
         k, v = [x.strip() for x in line.split(":", 1)]
         if k == "CPU(s)":
-            metrics["CPU 逻辑核心数量"] = int(v)
+            metrics[translate("CPU 逻辑核心数量", "number of CPU logical cores")] = int(v)
         elif k == "Core(s) per socket":
-            metrics["每个物理 CPU 插槽上的核心数"] = int(v)
+            metrics[translate("每个物理 CPU 插槽上的核心数", "number of cores per physical CPU socket")] = int(v)
         elif k == "Socket(s)":
-            metrics["物理 CPU 插槽数量"] = int(v)
+            metrics[translate("物理 CPU 插槽数量", "number of physical CPU sockets")] = int(v)
         elif k == "CPU MHz":
             metrics["cpu_mhz"] = float(v)
         elif k == "L3 cache":
@@ -33,9 +34,9 @@ def lscpu_parser(output: str) -> dict:
                     bytes_val = num * 1024**3
                 else:
                     bytes_val = num
-                metrics["L3 缓存容量（字节）"] = bytes_val
+                metrics[translate("L3 缓存容量（字节）", "L3 cache capacity (bytes)")] = int(v)
         elif k == "NUMA node(s)":
-            metrics["NUMA 节点数量"] = int(v)
+            metrics[translate("NUMA 节点数量", "number of NUMA nodes")] = int(v)
         elif k.startswith("NUMA node") and "CPU(s)" in k:
             key_name = k.lower().replace(" ", "_")
             metrics[key_name] = v
@@ -51,7 +52,7 @@ def free_parser(output: str) -> dict:
     if len(parts) >= 2 and parts[0].startswith("Mem"):
         total_bytes = int(parts[1])
         total_gb = total_bytes / (1024**3)
-        metrics["总共内存大小（GB）"] = round(total_gb, 2)  # 保留 2 位小数
+        metrics[translate("总共内存大小（GB）", "total memory size (GB)")] = round(total_gb, 2)
     return metrics
 
 
@@ -65,13 +66,14 @@ def page_hugepages_parser(output: str) -> dict:
     metrics = {}
     lines = output.splitlines()
     if lines:
-        metrics["系统页大小（字节）"] = int(lines[0].strip())
+        # metrics["系统页大小（字节）"] = int(lines[0].strip())
+        metrics["system page size (bytes)"] = int(lines[0].strip())
 
     field_map = {
-        "Total": "HugePages 总数",
-        "Free": "HugePages 空闲数",
-        "Rsvd": "HugePages 保留但未使用数",
-        "Surp": "HugePages 超量分配数",
+        "Total": translate("HugePages 总数", "Total HugePages"),
+        "Free": translate("HugePages 空闲数", "Free HugePages"),
+        "Rsvd": translate("HugePages 保留但未使用数", "Reserved but unused HugePages"),
+        "Surp": translate("HugePages 超量分配数", "Overcommitted HugePages")
     }
 
     for line in lines[1:]:
@@ -96,8 +98,8 @@ def lsblk_parser(output: str) -> dict:
         name, rota, typ = line.split()
         if typ != "d":
             continue
-        t = "机械硬盘（HDD）" if rota == "1" else "固态硬盘（SSD/NVMe）"
-        metrics[f"磁盘 {name} 类型"] = t
+        t = translate("机械硬盘（HDD）", "hard disk drive (HDD)") if rota == "1" else translate("固态硬盘（SSD/NVMe）", "solid state drive (SSD/NVMe)")
+        metrics[translate(f"磁盘 {name} 类型", f"Disk {name} Type")] = t
     return metrics
 
 
@@ -131,8 +133,8 @@ def iostat_parser(output: str) -> dict:
         # IOPS
         metrics[f"{dev}_iops"] = float(data.get("r/s", 0)) + float(data.get("w/s", 0))
         # 吞吐
-        metrics[f"{dev}_读操作吞吐率_kB_s"] = float(data.get("rkB/s", 0))
-        metrics[f"{dev}_写操作吞吐率_kB_s"] = float(data.get("wkB/s", 0))
+        metrics[translate(f"{dev}_读操作吞吐率_kB_s", f"{dev}_read throughput_kB_s")] = float(data.get("rkB/s", 0))
+        metrics[translate(f"{dev}_写操作吞吐率_kB_s", f"{dev}_write throughput_kB_s")] = float(data.get("wkB/s", 0))
     return metrics
 
 
@@ -147,7 +149,7 @@ def queue_depth_parser(output: str) -> dict:
     for line in output.splitlines():
         path, val = line.split()
         dev = path.split("/")[3]
-        metrics[f"块设备{dev}_队列请求深度"] = int(val)
+        metrics[translate(f"块设备{dev}_队列请求深度", f"block device {dev} queue request depth")] = int(val)
     return metrics
 
 
@@ -163,7 +165,7 @@ def raid_parser(output: str) -> dict:
             if "raid" in line:
                 m = re.search(r"raid(\d+)", line)
                 if m:
-                    metrics[f"阵列设备 {name} 类型"] = f"RAID{m.group(1)}"
+                    metrics[translate(f"阵列设备 {name} 类型", f"array device {name} type")] = f"RAID{m.group(1)}"
     return metrics
 
 
@@ -224,7 +226,7 @@ def ethtool_speed_parser(output: str) -> dict:
     metrics = {}
     m = re.search(r"Speed:\s*(\d+)([GM]b/s)", output)
     if m:
-        metrics["网络速度"] = m.group(1) + m.group(2)
+        metrics[translate("网络速度", "network speed")] = m.group(1) + m.group(2)
     return metrics
 
 
@@ -245,4 +247,4 @@ def sriov_parser(output: str) -> dict:
 @cmd_pipeline(cmd="ulimit -n", tag="static", parallel=True)
 def fdlimit_parser(output: str) -> dict:
     """解析 ulimit -n 输出：文件描述符上限"""
-    return {"最大文件描述符": int(output.strip())}
+    return {translate("最大文件描述符", "maximum file descriptor"): int(output.strip())}

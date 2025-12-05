@@ -1,3 +1,4 @@
+from src.utils.common import translate
 from src.utils.collector.metric_collector import (
     snapshot_task,
     CollectMode,
@@ -7,7 +8,7 @@ from src.utils.collector.metric_collector import (
 @snapshot_task(
     cmd="redis-cli INFO",
     collect_mode=CollectMode.ASYNC,
-    tag="Redis 实例的基本运行状态",
+    tag=translate("Redis 实例的基本运行状态", "Basic operational status of Redis instances"),
 )
 def parse_redis_info(info_output: str) -> dict:
     """解析 redis-cli info 命令输出为带中文 key 的字典"""
@@ -20,32 +21,32 @@ def parse_redis_info(info_output: str) -> dict:
         key, value = line.strip().split(":", 1)
         info.update(
             {
-                "运行时间（秒）": (
-                    info.get("运行时间（秒）") or int(value)
+                "uptime_in_seconds": (
+                    info.get("uptime_in_seconds") or int(value)
                     if key == "uptime_in_seconds"
                     else None
                 ),
-                "已连接客户端数": (
+                "connected_clients": (
                     int(value)
                     if key == "connected_clients"
-                    else info.get("已连接客户端数")
+                    else info.get("connected_clients")
                 ),
-                "内存使用（字节）": (
-                    int(value) if key == "used_memory" else info.get("内存使用（字节）")
+                "used_memory": (
+                    int(value) if key == "used_memory" else info.get("used_memory")
                 ),
-                "每秒请求数（QPS）": (
+                "instantaneous_ops_per_sec": (
                     int(value)
                     if key == "instantaneous_ops_per_sec"
-                    else info.get("每秒请求数（QPS）")
+                    else info.get("instantaneous_ops_per_sec")
                 ),
-                "总命中次数": (
-                    int(value) if key == "keyspace_hits" else info.get("总命中次数")
+                "keyspace_hits": (
+                    int(value) if key == "keyspace_hits" else info.get("keyspace_hits")
                 ),
-                "总未命中次数": (
-                    int(value) if key == "keyspace_misses" else info.get("总未命中次数")
+                "keyspace_misses": (
+                    int(value) if key == "keyspace_misses" else info.get("keyspace_misses")
                 ),
-                "阻塞客户端数": (
-                    int(value) if key == "blocked_clients" else info.get("阻塞客户端数")
+                "blocked_clients": (
+                    int(value) if key == "blocked_clients" else info.get("blocked_clients")
                 ),
             }
         )
@@ -57,7 +58,7 @@ def parse_redis_info(info_output: str) -> dict:
 @snapshot_task(
     cmd="redis-cli INFO commandstats",
     collect_mode=CollectMode.ASYNC,
-    tag="Redis 命令的调用次数、耗时",
+    tag=translate("Redis 命令的调用次数、耗时", "Number of Redis command calls and their execution time"),
 )
 def parse_commandstats(commandstats_output: str) -> dict:
     """解析 commandstats 为每个命令调用次数和平均耗时"""
@@ -69,9 +70,9 @@ def parse_commandstats(commandstats_output: str) -> dict:
         cmd = parts[0].replace("cmdstat_", "")
         values = dict(item.split("=") for item in parts[1].split(","))
         result[cmd] = {
-            "调用次数": int(values.get("calls", 0)),
-            "总耗时（微秒）": int(values.get("usec", 0)),
-            "平均耗时（微秒）": float(values.get("usec_per_call", 0)),
+            "command_calls": int(values.get("calls", 0)),
+            "total_time_microseconds": int(values.get("usec", 0)),
+            "avg_time_microseconds": float(values.get("usec_per_call", 0))
         }
     cmd = "redis-cli INFO commandstats"
     return {cmd: result}
@@ -80,7 +81,7 @@ def parse_commandstats(commandstats_output: str) -> dict:
 @snapshot_task(
     cmd="redis-cli INFO stats",
     collect_mode=CollectMode.ASYNC,
-    tag="Redis key的命中率",
+    tag=translate("Redis key的命中率", "Hit rate of Redis keys"),
 )
 def parse_hit_rate_from_info_stats(info_stats_output: str) -> dict:
     """
@@ -102,6 +103,6 @@ def parse_hit_rate_from_info_stats(info_stats_output: str) -> dict:
 
     total = hits + misses
     hit_rate = round(hits / total * 100, 2) if total else 0.0
-    cmd = "redis-cli INFO commandstats"
-    result = {"命中次数": hits, "未命中次数": misses, "命中率(%)": hit_rate}
+    cmd = "redis-cli INFO stats"
+    result = {"cache_hits": hits,  "cache_misses": misses, "hit_rate_percent": hit_rate}
     return {cmd: result}

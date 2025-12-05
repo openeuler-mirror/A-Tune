@@ -1,5 +1,6 @@
 from .base_collector import BaseCollector
 from typing import Dict, Any, List
+from src.utils.common import translate
 import logging
 import json
 from enum import Enum
@@ -32,7 +33,7 @@ def nproc_parse(
         logging.error(f"Failed to parse CPU count from stdout: {e}")
         raise ValueError("Failed to parse CPU count from stdout") from e
 
-    res = {"cpu核数": logical_cpu_cores}
+    res = {"cpu_core_count": logical_cpu_cores}
     return res
 
 def loadavg_parse(
@@ -53,9 +54,9 @@ def loadavg_parse(
         if len(data) < 3:
             raise ValueError("Not enough data to parse load averages.")
         
-        load_avgs = {"过去1min平均负载": float(data[0]),
-                     "过去5min平均负载": float(data[1]),
-                     "过去10min平均负载": float(data[2])}
+        load_avgs = {"past_1min_average_load": float(data[0]),
+                     "past_5min_average_load": float(data[1]),
+                     "past_10min_average_load": float(data[2])}
     except (IndexError, ValueError) as e:
         logging.error(f"Failed to parse system load averages from stdout: {e}")
         raise ValueError("Failed to parse system load averages from stdout") from e
@@ -80,7 +81,7 @@ def perf_syscall_parse(
         logging.error(f"Failed to parse system call rate from stdout: {e}")
         raise ValueError("Failed to parse system call rate from stdout") from e
 
-    res = {"系统单位时间调用次数": sys_call_rate}
+    res = {"system_calls_per_unit_time": sys_call_rate}
     return res
 
 def mpstat_parse(
@@ -99,19 +100,18 @@ def mpstat_parse(
         stdout_data = json.loads(stdout)
         data = stdout_data["sysstat"]["hosts"][0]["statistics"][0]["cpu-load"][0]
 
-        usr, nice, sys, iowait, irq, soft, steal, guest, gnice, idle = map(float, (data["usr"], data["nice"], data["sys"], data["iowait"], data["irq"], data["soft"], data["steal"], data["guest"], data["gnice"], data["idle"]))
-
+        usr, nice, sys, iowait, irq, soft, steal, guest, gnice, idle = map(float, (data["usr"], data["nice"], data["sys"], data["iowait"], data["irq"], data["soft"], data["steal"], data["guest"], data["gnice"], data["idle"]))   
         res = {
-            "用户态中的cpu利用率": usr,
-            "具有nice优先级的用户态CPU使用率": nice,
-            "kernel内核态执行时的CPU利用率": sys,
-            "系统有未完成的磁盘I/O请求时，等待IO占用CPU的百分比": iowait,
-            "硬中断占用CPU时间的百分比": irq,
-            "软中断占用CPU时间的百分比": soft,
-            "虚拟化环境中，其他虚拟机占用的CPU时间百分比": steal,
-            "运行虚拟处理器时CPU花费时间的百分比": guest,
-            "运行带有nice优先级的虚拟CPU所花费的时间百分比": gnice,
-            "CPU处在空闲状态的时间百分比": idle
+            "user_mode_utilization": usr,
+            "nice_priority_utilization": nice,
+            "kernel_mode_utilization": sys,
+            "io_wait_percentage": iowait,
+            "hardware_interrupt_percentage": irq,
+            "software_interrupt_percentage": soft,
+            "virtual_machine_steal_time_percentage": steal,
+            "guest_operating_system_utilization": guest,
+            "nice_guest_utilization": gnice,
+            "idle_time_percentage": idle
         }
     except json.JSONDecodeError as e:
         logging.error(f"Failed to parse JSON from stdout: {e}")
@@ -137,7 +137,7 @@ def process_parse(cmd, stdout):
         logging.error(f"Failed to parse total process count from stdout: {e}")
         raise ValueError("Failed to parse total process count from stdout") from e
 
-    res = {"总进程数": total_process}
+    res = {"total_process_count": total_process}
     return res
 
 def vmstat_parse(
@@ -162,9 +162,9 @@ def vmstat_parse(
         context_switch = int(data[11])  
 
         res = {
-            "运行队列中进程的数量": runtime_num,
-            "被阻塞的进程数": blocked_num,
-            "系统每秒进行上下文切换的次数": context_switch
+            "running_process_count": runtime_num,
+            "blocked_process_count": blocked_num,
+            "context_switch_per_second": context_switch
         }
     except IndexError as e:
         logging.error(f"Failed to parse vmstat memory attributes: {e}")
@@ -182,7 +182,7 @@ def pid_parse(
     if cmd != "pidstat -d | head -6":
         logging.error("Command is not 'pidstat'.")
         raise ValueError("Command is not 'pidstat'.")
-    return {"进程信息": stdout}
+    return {"process_information": stdout}
 
 CPU_PARSE_FUNCTIONS = {
     "nproc": nproc_parse,
@@ -235,15 +235,16 @@ class CpuCollector(BaseCollector):
         # 计算平均负载
         for metric in [CpuMetric.ONE_MINUTE_AVG_LOAD, CpuMetric.FIVE_MINUTE_AVG_LOAD, CpuMetric.TEN_MINUTE_AVG_LOAD]:
             cpu_process_result[metric.value] = self.normalize_percentage(
-                cpu_parse_result[f"过去{metric.value}平均负载"], 
-                cpu_parse_result["cpu核数"]
+                # cpu_parse_result[f"过去{metric.value}平均负载"], 
+                cpu_parse_result[f"past_{metric.value}_average_load"],
+                cpu_parse_result["cpu_core_count"]
             )
 
         # 计算CPU利用率
         cpu_utilizations = [
-            "用户态中的cpu利用率",
-            "具有nice优先级的用户态CPU使用率",
-            "kernel内核态执行时的CPU利用率"
+            "user_mode_utilization",
+            "nice_priority_utilization",
+            "kernel_mode_utilization"
         ]
         for utilization in cpu_utilizations:
             cpu_process_result[utilization] = self.normalize_percentage(
@@ -252,51 +253,51 @@ class CpuCollector(BaseCollector):
 
         # 其他百分比计算
         for key in [
-            "硬中断占用CPU时间的百分比",
-            "软中断占用CPU时间的百分比",
-            "虚拟化环境中，其他虚拟机占用的CPU时间百分比",
-            "运行虚拟处理器时CPU花费时间的百分比",
-            "运行带有nice优先级的虚拟CPU所花费的时间百分比"
+            "hardware_interrupt_percentage",
+            "software_interrupt_percentage",
+            "virtual_machine_steal_time_percentage",
+            "guest_operating_system_utilization",
+            "nice_guest_utilization"
         ]:
             cpu_process_result[key] = self.normalize_percentage(
                 cpu_parse_result[key], 100
             )
 
         # 计算CPU利用率和上下文切换次数
-        cpu_process_result["CPU利用率"] = 1 - self.normalize_percentage(
-            cpu_parse_result["CPU处在空闲状态的时间百分比"], 100
+        cpu_process_result["cpu_utilization"] = 1 - self.normalize_percentage(
+            cpu_parse_result["idle_time_percentage"], 100
         )
-        cpu_process_result["系统每秒进行上下文切换的次数"] = cpu_parse_result.get(
-            "系统每秒进行上下文切换的次数", 0
+        cpu_process_result["context_switch_per_second"] = cpu_parse_result.get(
+            "context_switch_per_second", 0
         )
 
         # 阻塞进程率
-        cpu_process_result["阻塞进程率"] = self.normalize_percentage(
-            cpu_parse_result["被阻塞的进程数"], cpu_parse_result["总进程数"]
+        cpu_process_result["blocked_process_rate"] = self.normalize_percentage(
+            cpu_parse_result["blocked_process_count"], cpu_parse_result["total_process_count"]
         )
 
         # 确保内核态执行时的CPU利用率不为0
-        cpu_process_result["kernel内核态执行时的CPU利用率"] = max(
-            0.01, cpu_process_result["kernel内核态执行时的CPU利用率"]
+        cpu_process_result["kernel_mode_utilization"] = max(
+            0.01, cpu_process_result["kernel_mode_utilization"]
         )
 
         # 判断计算密集型或IO密集型
-        user_mode_ratio = cpu_process_result["用户态中的cpu利用率"] / cpu_process_result["kernel内核态执行时的CPU利用率"]
-        is_heavy_io = self.is_heavy_load(cpu_process_result["用户态中的cpu利用率"]) or self.is_heavy_load(cpu_process_result["kernel内核态执行时的CPU利用率"])
+        user_mode_ratio = cpu_process_result["user_mode_utilization"] / cpu_process_result["kernel_mode_utilization"]
+        is_heavy_io = self.is_heavy_load(cpu_process_result["user_mode_utilization"]) or self.is_heavy_load(cpu_process_result["kernel_mode_utilization"])
 
         if user_mode_ratio > 2:
-            cpu_process_result["计算密集型"] = 1 if is_heavy_io else 0
+            cpu_process_result["compute_intensive"] = 1 if is_heavy_io else 0
         else:
-            cpu_process_result["计算密集型"] = 0
+            cpu_process_result["compute_intensive"] = 0
 
         if user_mode_ratio < 2:
-            cpu_process_result["IO密集型"] = 1 if is_heavy_io else 0
+            cpu_process_result["io_intensive"] = 1 if is_heavy_io else 0
         else:
-            cpu_process_result["IO密集型"] = 0
+            cpu_process_result["io_intensive"] = 0
 
         # 复制其他信息
-        cpu_process_result["进程信息"] = cpu_parse_result.get("进程信息", [])
-        cpu_process_result["系统单位时间调用次数"] = cpu_parse_result.get("系统单位时间调用次数", 0)
-        cpu_process_result["cpu核数"] = cpu_parse_result.get("cpu核数", 0)
+        cpu_process_result["process_information"] = cpu_parse_result.get("process_information", [])
+        cpu_process_result["system_calls_per_unit_time"] = cpu_parse_result.get("system_calls_per_unit_time", 0)
+        cpu_process_result["cpu_core_count"] = cpu_parse_result.get("cpu_core_count", 0)
 
         return cpu_process_result

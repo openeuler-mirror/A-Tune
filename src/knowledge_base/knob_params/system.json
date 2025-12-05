@@ -1,6 +1,6 @@
 {
   "kernel.sched_cfs_bandwidth_slice_us": {
-    "desc": "1. 当需要更精细控制CFS带宽分配时（如高负载容器环境），可适当减小该值（默认5000微秒），但需注意过小会增加调度开销;2. 在CPU资源充足且需要减少调度开销的场景下，可增大该值以减少全局时间池的分配频率",
+    "desc": "1. When finer control over CFS bandwidth allocation is needed (e.g., in high-load container environments), this value (default 5000 microseconds) can be appropriately decreased, but note that excessively small values will increase scheduling overhead; 2. In scenarios where CPU resources are sufficient and the goal is to reduce scheduling overhead, this value can be increased to decrease the allocation frequency from the global time pool.",
     "type": "continuous",
     "range": [
       1000,
@@ -11,7 +11,7 @@
     "get": "sysctl -n kernel.sched_cfs_bandwidth_slice_us"
   },
   "kernel.sched_latency_ns": {
-    "desc": "1. 当系统运行高优先级实时任务时，若出现调度延迟过高的情况，可适当减小该值以提高调度响应速度;2. 对于CPU密集型负载且任务数量较多(超过8个逻辑CPU)的系统，应增大该值以减少上下文切换开销",
+    "desc": "1. When the system runs high-priority real-time tasks and experiences high scheduling latency, this value can be appropriately decreased to improve scheduling response speed; 2. For systems with CPU-intensive workloads and a large number of tasks (exceeding 8 logical CPUs), this value should be increased to reduce context switching overhead.",
     "type": "continuous",
     "range": [
       1000000,
@@ -22,7 +22,7 @@
     "get": "sysctl -n kernel.sched_latency_ns"
   },
   "kernel.sched_min_granularity_ns": {
-    "desc": "1. 当系统负载较高且存在大量短时间运行的进程时，可以适当增大该值以减少上下文切换开销，建议从默认值(通常为1,000,000 ns)逐步增加测试，观察性能变化;2. 对于CPU密集型工作负载且进程运行时间普遍较长的情况，可以适当减小该值以提高系统响应能力，建议从默认值逐步减少测试",
+    "desc": "1. When the system load is high and there are many short-running processes, this value can be appropriately increased to reduce context switching overhead. It is recommended to gradually increase it from the default value (usually 1,000,000 ns) and test, observing performance changes; 2. For CPU-intensive workloads where processes generally have long runtimes, this value can be appropriately decreased to improve system responsiveness. It is recommended to gradually decrease it from the default value and test.",
     "type": "continuous",
     "range": [
       1000000,
@@ -33,7 +33,7 @@
     "get": "sysctl -n kernel.sched_min_granularity_ns"
   },
   "transparent_hugepage.defrag": {
-    "desc": "1. 对于需要低延迟的应用（如数据库、实时系统），建议禁用该参数（设置为never），以避免因内存碎片整理导致的性能波动;2. 对于内存密集型且对延迟不敏感的应用（如批处理作业），建议启用该参数（设置为always或defer+madvise），以提高大内存页使用率减少TLB缺失",
+    "desc": "1. For applications requiring low latency (e.g., databases, real-time systems), it is recommended to disable this parameter (set to 'never') to avoid performance fluctuations caused by memory defragmentation; 2. For memory-intensive applications that are not latency-sensitive (e.g., batch processing jobs), it is recommended to enable this parameter (set to 'always' or 'defer+madvise') to increase large memory page usage and reduce TLB misses.",
     "range": [
       "always",
       "defer",
@@ -47,7 +47,7 @@
     "get": "cat /sys/kernel/mm/transparent_hugepage/defrag | sed -n 's/.*\\[\\(.*\\)\\].*/\\1/p'"
   },
   "transparent_hugepage.enabled": {
-    "desc": "1. 对于延迟敏感型应用（如数据库、实时系统），建议禁用（设置为never或madvise），以避免因透明大页碎片整理导致的不可预测延迟;2. 对于内存密集型批处理作业（如科学计算、大数据处理），建议启用（设置为always），以通过减少页表项提升内存访问效率",
+    "desc": "1. For latency-sensitive applications (e.g., databases, real-time systems), it is recommended to disable it (set to 'never' or 'madvise') to avoid unpredictable latency caused by transparent huge page defragmentation; 2. For memory-intensive batch processing jobs (e.g., scientific computing, big data processing), it is recommended to enable it (set to 'always') to improve memory access efficiency by reducing page table entries.",
     "range": [
       "always",
       "madvise",
@@ -59,7 +59,7 @@
     "get": "cat /sys/kernel/mm/transparent_hugepage/enabled | sed -n 's/.*\\[\\(.*\\)\\].*/\\1/p'"
   },
   "net.netfilter.nf_conntrack_max": {
-    "desc": "1. 当服务器处理大量并发连接（如超过默认值65536）时，若出现\"table full\"相关内核日志或连接跟踪表频繁满导致丢包，应增加该值（通常设置为总内存MB数/16384，如8GB内存可设为524288）;2. 在高并发短连接场景下，若nf_conntrack_count经常接近nf_conntrack_max值，应结合连接跟踪超时时间（nf_conntrack_tcp_timeout_*系列参数）一同调整，避免过早占满跟踪表",
+    "desc": "1. When the server handles a large number of concurrent connections (e.g., exceeding the default value of 65536) and kernel logs show 'table full' related messages or frequent connection tracking table full conditions leading to packet loss, this value should be increased (usually set to total memory in MB / 16384, e.g., 524288 for 8GB memory); 2. In high-concurrency short-connection scenarios, if nf_conntrack_count frequently approaches nf_conntrack_max, this value should be adjusted together with the connection tracking timeout parameters (nf_conntrack_tcp_timeout_* series) to avoid prematurely filling the tracking table.",
     "type": "continuous",
     "range": [
       0,
@@ -70,7 +70,7 @@
     "get": "sysctl -n net.netfilter.nf_conntrack_max"
   },
   "kernel.pid_max": {
-    "desc": "- 当系统频繁达到当前pid_max限制导致无法创建新进程时，应适当增大该值，通常可设置为默认值(32768)的2-4倍 , - 在容器化环境中若需支持大量短生命周期进程，建议将pid_max提升至262144(2^18)以匹配现代Linux内核支持的上限",
+    "desc": "- When the system frequently reaches the current pid_max limit causing inability to create new processes, this value should be appropriately increased, usually to 2-4 times the default value (32768). - In containerized environments requiring support for a large number of short-lived processes, it is recommended to increase pid_max to 262144 (2^18) to match the upper limit supported by modern Linux kernels.",
     "type": "continuous",
     "range": [
       1048576,
@@ -81,7 +81,7 @@
     "get": "sysctl -n kernel.pid_max"
   },
   "kernel.shmmni": {
-    "desc": "- 当运行需要大量共享内存段的数据库（如Oracle）或科学计算应用时，若出现\"SHMMNI\"相关错误日志，应增加该值至超过应用实际需求的20%冗余量。- 在容器化或虚拟化环境中，若单个物理节点需承载多个共享内存密集型实例，应按实例数乘以单个实例需求量的1.5倍进行设置",
+    "desc": "- When running databases requiring a large number of shared memory segments (e.g., Oracle) or scientific computing applications, if error logs related to 'SHMMNI' appear, this value should be increased to exceed the application's actual requirement by 20% redundancy. - In containerized or virtualized environments where a single physical node needs to host multiple shared memory-intensive instances, this value should be set to 1.5 times the number of instances multiplied by the requirement of a single instance.",
     "type": "continuous",
     "range": [
       1024,
@@ -92,7 +92,7 @@
     "get": "sysctl -n kernel.shmmni"
   },
   "kernel.shmmax": {
-    "desc": "1. 当运行需要大量共享内存的应用（如Oracle数据库、SAP HANA等）时，如果应用报错提示共享内存不足，需要将kernel.shmmax设置为至少等于所有共享内存段总和的80%-90%，但不超过物理内存的90%;2. 在容器化或虚拟化环境中，当多个实例需要共享内存通信且出现性能瓶颈时，应根据每个实例的实际共享内存需求总和来调整kernel.shmmax，确保其值大于所有实例需求之和",
+    "desc": "1. When running applications requiring a large amount of shared memory (e.g., Oracle database, SAP HANA), if the application reports errors indicating insufficient shared memory, kernel.shmmax needs to be set to at least 80%-90% of the total sum of all shared memory segments, but not exceeding 90% of physical memory; 2. In containerized or virtualized environments, when multiple instances require shared memory communication and performance bottlenecks occur, kernel.shmmax should be adjusted based on the actual shared memory requirement sum of each instance, ensuring its value is greater than the sum of all instance requirements.",
     "type": "continuous",
     "range": [
       17179869184,
@@ -103,7 +103,7 @@
     "get": "sysctl -n kernel.shmmax"
   },
   "kernel.shmall": {
-    "desc": "1. 当系统运行需要大量共享内存的应用（如Oracle数据库）且出现\"SHMMAX too small\"错误时，需要增加该值至物理内存的80%左右;2. 当系统频繁使用共享内存但未充分利用物理内存时，可适当降低该值以避免资源浪费，通常设置为(总物理内存 - 系统保留内存) / PAGE_SIZE",
+    "desc": "1. When the system runs applications requiring a large amount of shared memory (e.g., Oracle database) and encounters 'SHMMAX too small' errors, this value needs to be increased to about 80% of physical memory; 2. When the system frequently uses shared memory but does not fully utilize physical memory, this value can be appropriately decreased to avoid resource waste, usually set to (Total Physical Memory - System Reserved Memory) / PAGE_SIZE.",
     "type": "continuous",
     "range": [
       1073741824,
@@ -114,7 +114,7 @@
     "get": "sysctl -n kernel.shmall"
   },
   "kernel.core_uses_pid": {
-    "desc": "1. 当需要快速定位崩溃进程时，建议启用该参数(设为1)，通过core文件名中的PID可以快速关联到具体进程信息;2. 当系统频繁产生core文件且磁盘空间紧张时，建议禁用该参数(设为0)，避免文件名过长导致管理困难",
+    "desc": "1. When needing to quickly locate crashing processes, it is recommended to enable this parameter (set to 1). The PID in the core filename allows quick association with specific process information; 2. When the system frequently generates core files and disk space is tight, it is recommended to disable this parameter (set to 0) to avoid management difficulties caused by long filenames.",
     "range": [
       "0",
       "1"
@@ -125,7 +125,7 @@
     "get": "sysctl -n kernel.core_uses_pid"
   },
   "kernel.msgmni": {
-    "desc": "1. 当系统日志频繁出现\"msgmni limit reached\"错误时，表明当前队列数量不足以支撑应用需求，需要增加该值;2. 对于频繁使用System V消息队列的中间件应用(如Oracle数据库)，建议将该值设置为进程数量的4倍以上",
+    "desc": "1. When system logs frequently show 'msgmni limit reached' errors, it indicates the current number of queues is insufficient to support application demands, and this value needs to be increased; 2. For middleware applications that frequently use System V message queues (e.g., Oracle database), it is recommended to set this value to at least 4 times the number of processes.",
     "type": "continuous",
     "range": [
       8000,
@@ -136,7 +136,7 @@
     "get": "sysctl -n kernel.msgmni"
   },
   "kernel.msgmax": {
-    "desc": "1. 当应用频繁发送超过当前 kernel.msgmax 限制的大消息导致消息队列操作失败时，应适当增大该值，但需确保不超过系统可用内存的合理比例;2. 若系统存在大量小消息传输且 msgmax 设置过大导致内存碎片化，应降低该值以匹配实际消息大小，通常不低于 8KB",
+    "desc": "1. When applications frequently send large messages exceeding the current kernel.msgmax limit, causing message queue operations to fail, this value should be appropriately increased, but ensure it does not exceed a reasonable proportion of available system memory; 2. If the system handles a large number of small messages and an excessively large msgmax setting leads to memory fragmentation, this value should be decreased to match the actual message size, usually not lower than 8KB.",
     "type": "continuous",
     "range": [
       4096,
@@ -147,7 +147,7 @@
     "get": "sysctl -n kernel.msgmax"
   },
   "kernel.msgmnb": {
-    "desc": "增加该值当消息队列频繁达到默认上限(通常为16384字节)导致应用报错时  , 降低该值当系统存在大量闲置消息队列且需要减少内核内存占用时",
+    "desc": "Increase this value when message queues frequently reach the default upper limit (usually 16384 bytes) causing application errors. Decrease this value when the system has many idle message queues and needs to reduce kernel memory usage.",
     "type": "continuous",
     "range": [
       4096,
@@ -158,7 +158,7 @@
     "get": "sysctl -n kernel.msgmnb"
   },
   "kernel.hung_task_timeout_secs": {
-    "desc": "1. 当系统频繁出现hung_task警告但实际任务仍在正常执行时，可适当增大该值（如从默认120秒调整为300秒），避免误报;2. 对于存储密集型应用（如数据库服务器），若观察到存储设备响应较慢导致任务频繁超时，应结合存储延迟指标调高该值至存储设备平均响应时间的2-3倍",
+    "desc": "1. When the system frequently reports hung_task warnings but tasks are actually executing normally, this value can be appropriately increased (e.g., from the default 120 seconds to 300 seconds) to avoid false positives; 2. For storage-intensive applications (e.g., database servers), if tasks frequently timeout due to slow storage device responses, this value should be increased to 2-3 times the average response time of the storage device, combined with storage latency metrics.",
     "type": "continuous",
     "range": [
       30,
@@ -169,7 +169,7 @@
     "get": "sysctl -n kernel.hung_task_timeout_secs"
   },
   "kernel.nmi_watchdog": {
-    "desc": "1. 在生产服务器上建议禁用该参数(设置为0)，因为NMI watchdog会周期性触发NMI中断，可能对系统性能产生轻微影响，尤其在高负载场景下;2. 在调试内核死锁或硬件问题时可以临时启用(设置为1)，帮助捕获长时间关中断导致的挂起问题",
+    "desc": "1. On production servers, it is recommended to disable this parameter (set to 0) because the NMI watchdog periodically triggers NMI interrupts, which may slightly impact system performance, especially under high load; 2. When debugging kernel deadlocks or hardware issues, it can be temporarily enabled (set to 1) to help capture hangs caused by long interrupt disables.",
     "range": [
       "0",
       "1"
@@ -180,7 +180,7 @@
     "get": "sysctl -n kernel.nmi_watchdog"
   },
   "kernel.sched_rt_runtime_us": {
-    "desc": "1. 当系统需要运行更多实时任务时，可以适当增加该值（但不超过sched_rt_period_us的95%），默认值950000微秒可提高到990000微秒;2. 当非实时任务出现严重饥饿现象时，应减小该值（建议不低于800000微秒），为普通任务保留更多CPU时间",
+    "desc": "1. When the system needs to run more real-time tasks, this value can be appropriately increased (but not exceeding 95% of sched_rt_period_us). The default value of 950000 microseconds can be increased to 990000 microseconds; 2. When non-real-time tasks experience severe starvation, this value should be decreased (recommended not lower than 800000 microseconds) to reserve more CPU time for ordinary tasks.",
     "type": "continuous",
     "range": [
       950000,
@@ -191,7 +191,7 @@
     "get": "sysctl -n kernel.sched_rt_runtime_us"
   },
   "kernel.timer_migration": {
-    "desc": "1. 在NUMA架构服务器上运行低延迟应用时，若出现跨节点时钟中断导致的性能抖动，应禁用该参数以保持本地CPU处理时钟中断;2. 当系统负载主要集中运行在单个NUMA节点且出现时钟中断处理不均衡时，可启用该参数允许时钟中断在CPU间迁移",
+    "desc": "1. On NUMA architecture servers running low-latency applications, if performance jitter occurs due to cross-node clock interrupts, this parameter should be disabled to keep clock interrupts handled by the local CPU; 2. When the system load is mainly concentrated on a single NUMA node and clock interrupt handling is unbalanced, this parameter can be enabled to allow clock interrupt migration between CPUs.",
     "range": [
       "0",
       "1"
@@ -202,7 +202,7 @@
     "get": "sysctl -n kernel.timer_migration"
   },
   "kernel.threads-max": {
-    "desc": "1. 当系统频繁出现\"fork: Cannot allocate memory\"错误或应用程序因无法创建新线程而崩溃时，需要增加该值。可通过计算系统内存容量和单个线程平均内存占用来确定合理上限，通常设置为物理内存(MB)/8。;2. 在高并发容器环境或运行大量轻量级线程的应用(如Java微服务)时，若/proc/sys/kernel/pid_max已调高但仍有线程创建限制，应将该值提升至至少pid_max值的2倍。",
+    "desc": "1. When the system frequently encounters 'fork: Cannot allocate memory' errors or applications crash due to inability to create new threads, this value needs to be increased. A reasonable upper limit can be determined by calculating system memory capacity and the average memory footprint per thread, usually set to Physical Memory (MB) / 8.; 2. In high-concurrency container environments or when running applications with many lightweight threads (e.g., Java microservices), if /proc/sys/kernel/pid_max has been increased but thread creation limits still exist, this value should be increased to at least 2 times the pid_max value.",
     "type": "continuous",
     "range": [
       655360,
@@ -213,7 +213,7 @@
     "get": "sysctl -n kernel.threads-max"
   },
   "kernel.sysrq": {
-    "desc": "1. 生产环境中建议设置为1（仅启用基本功能）或0（完全禁用），避免通过SysRq组合键意外触发系统操作，降低安全风险;2. 调试崩溃或死机问题时临时设置为1或更大值（如176/128），启用更多调试功能后需立即恢复默认安全配置",
+    "desc": "1. In production environments, it is recommended to set it to 1 (only enable basic functions) or 0 (completely disable) to avoid accidentally triggering system operations via SysRq key combinations and reduce security risks; 2. When debugging crash or hang issues, temporarily set it to 1 or a larger value (e.g., 176/128) to enable more debugging functions, and immediately restore the default secure configuration afterwards.",
     "range": [
       "0",
       "1"
@@ -224,7 +224,7 @@
     "get": "sysctl -n kernel.sysrq"
   },
   "kernel.sched_autogroup_enabled": {
-    "desc": "1. 在服务器环境下建议禁用该参数(设为0)，因为自动任务分组主要针对桌面交互程序优化，服务器工作负载通常不需要这种调度特性;2. 当服务器运行大量短时交互式任务且出现调度延迟问题时，可尝试启用(设为1)观察效果，但需注意可能影响批处理任务的吞吐量",
+    "desc": "1. In server environments, it is recommended to disable this parameter (set to 0) because automatic task grouping is primarily optimized for desktop interactive programs, and server workloads typically do not require this scheduling feature; 2. When the server runs many short interactive tasks and experiences scheduling latency issues, enabling it (set to 1) can be tried to observe the effect, but note that it may affect the throughput of batch processing tasks.",
     "range": [
       "0",
       "1"
@@ -235,7 +235,7 @@
     "get": "sysctl -n kernel.sched_autogroup_enabled"
   },
   "kernel.numa_balancing": {
-    "desc": "1. 当系统运行NUMA架构且应用存在跨节点内存访问时，应启用该参数(设置为1)以减少远程内存访问延迟;2. 对于内存密集型且对延迟敏感的应用，若观察到较高比例的跨节点内存访问，建议禁用该参数(设置为0)以避免自动平衡带来的性能波动",
+    "desc": "1. When the system runs on NUMA architecture and applications have cross-node memory access, this parameter should be enabled (set to 1) to reduce remote memory access latency; 2. For memory-intensive and latency-sensitive applications, if a high proportion of cross-node memory access is observed, it is recommended to disable this parameter (set to 0) to avoid performance fluctuations caused by automatic balancing.",
     "range": [
       "0",
       "1"
@@ -246,7 +246,7 @@
     "get": "sysctl -n kernel.numa_balancing"
   },
   "kernel.randomize_va_space": {
-    "desc": "1. 当系统运行安全性要求较高的服务时，建议保持默认值2（完全随机化），以增强对抗内存攻击的能力;2. 若应用程序出现因地址随机化导致的兼容性问题，且运行环境可信，可临时调整为1（仅对数据段随机化）或0（禁用）进行测试",
+    "desc": "1. When the system runs services with high security requirements, it is recommended to keep the default value of 2 (full randomization) to enhance resistance against memory attacks; 2. If applications experience compatibility issues due to address randomization and the runtime environment is trusted, it can be temporarily adjusted to 1 (only randomize data segments) or 0 (disable) for testing.",
     "type": "continuous",
     "range": [
       0,
@@ -257,7 +257,7 @@
     "get": "sysctl -n kernel.randomize_va_space"
   },
   "kernel.dmesg_restrict": {
-    "desc": "1. 如果系统需要满足安全合规要求（如PCI-DSS、HIPAA等），建议设置为1以限制普通用户查看内核日志，防止敏感信息泄露;2. 在需要开发调试或故障排查的环境中，建议设置为0以便非特权用户也能查看完整的系统日志信息",
+    "desc": "1. If the system needs to meet security compliance requirements (e.g., PCI-DSS, HIPAA), it is recommended to set it to 1 to restrict ordinary users from viewing kernel logs and prevent sensitive information leakage; 2. In environments requiring development debugging or troubleshooting, it is recommended to set it to 0 so that non-privileged users can also view complete system log information.",
     "range": [
       "0",
       "1"
@@ -268,7 +268,7 @@
     "get": "sysctl -n kernel.dmesg_restrict"
   },
   "vm.swappiness": {
-    "desc": "1. 对于内存密集型应用（如数据库、缓存服务），建议将 vm.swappiness 设置为 10-30 以减少交换空间使用，优先利用物理内存;2. 当系统频繁发生 OOM (Out of Memory) 时，可适当提高 vm.swappiness 至 60-80 以增加交换空间使用，避免进程被强制终止",
+    "desc": "1. For memory-intensive applications (e.g., databases, cache services), it is recommended to set vm.swappiness to 10-30 to reduce swap space usage and prioritize physical memory; 2. When the system frequently experiences OOM (Out of Memory), vm.swappiness can be appropriately increased to 60-80 to increase swap space usage and avoid processes being forcibly terminated.",
     "type": "continuous",
     "range": [
       0,
@@ -279,7 +279,7 @@
     "get": "sysctl -n vm.swappiness"
   },
   "vm.vfs_cache_pressure": {
-    "desc": "1. 当系统频繁进行目录和inode缓存回收导致性能下降时，可适当降低该值（如设为50-100），减少内核回收缓存内存的频率;2. 当系统内存充足但缓存利用率不足时，可适当提高该值（如设为150-200），促使内核更积极地回收缓存内存",
+    "desc": "1. When the system frequently performs directory and inode cache reclamation leading to performance degradation, this value can be appropriately decreased (e.g., set to 50-100) to reduce the frequency of kernel reclaiming cached memory; 2. When system memory is sufficient but cache utilization is low, this value can be appropriately increased (e.g., set to 150-200) to prompt the kernel to more actively reclaim cached memory.",
     "type": "continuous",
     "range": [
       0,
@@ -290,7 +290,7 @@
     "get": "sysctl -n vm.vfs_cache_pressure"
   },
   "vm.dirty_background_ratio": {
-    "desc": "1. 对于写入密集型应用（如数据库服务器），建议将值从默认的10%提高到15-20%，以减少频繁的后台刷写对I/O性能的影响;2. 对于内存较小的系统（如低于8GB），建议保持默认值或降至5-10%，以避免过多脏页堆积导致内存压力",
+    "desc": "1. For write-intensive applications (e.g., database servers), it is recommended to increase the value from the default 10% to 15-20% to reduce the impact of frequent background flushes on I/O performance; 2. For systems with smaller memory (e.g., less than 8GB), it is recommended to keep the default value or decrease it to 5-10% to avoid excessive dirty page accumulation causing memory pressure.",
     "type": "continuous",
     "range": [
       0,
@@ -301,7 +301,7 @@
     "get": "sysctl -n vm.dirty_background_ratio"
   },
   "vm.dirty_ratio": {
-    "desc": "1. 当系统频繁因脏页刷盘导致I/O瓶颈时，可适当降低该值（如从默认20%降至10%），以减少单次刷盘的数据量，但会增加刷盘频率;2. 若系统内存较大且主要处理顺序写入负载，可适当提高该值（如升至30%-40%），利用内存缓冲更多脏数据，减少磁盘I/O次数",
+    "desc": "1. When the system frequently experiences I/O bottlenecks due to dirty page flushing, this value can be appropriately decreased (e.g., from the default 20% to 10%) to reduce the amount of data flushed at once, but this will increase the flush frequency; 2. If the system has large memory and primarily handles sequential write loads, this value can be appropriately increased (e.g., to 30%-40%) to use memory to buffer more dirty data, reducing disk I/O次数.",
     "type": "continuous",
     "range": [
       0,
@@ -312,7 +312,7 @@
     "get": "sysctl -n vm.dirty_ratio"
   },
   "vm.stat_interval": {
-    "desc": "1. 当系统需要更频繁监控内存使用情况（如内存压力大或频繁交换时），可适当减小该值（如从默认10秒降至5秒），但需注意增加的系统开销  ;2. 在内存使用稳定且低负载环境中，可增大该值（如调至30秒）以减少/proc/vmstat的更新频率，降低内核开销",
+    "desc": "1. When the system requires more frequent monitoring of memory usage (e.g., under high memory pressure or frequent swapping), this value can be appropriately decreased (e.g., from the default 10 seconds to 5 seconds), but note the increased system overhead; 2. In stable memory usage and low-load environments, this value can be increased (e.g., adjusted to 30 seconds) to reduce the update frequency of /proc/vmstat and lower kernel overhead.",
     "type": "continuous",
     "range": [
       1,
@@ -323,7 +323,7 @@
     "get": "sysctl -n vm.stat_interval"
   },
   "vm.dirty_expire_centisecs": {
-    "desc": "1. 对于需要快速持久化数据的应用（如数据库），建议将值调低至100-300（1-3秒），以减少数据丢失风险  ;2. 对于写入密集型负载且对延迟敏感的应用，可适当提高至1000-3000（10-30秒），通过合并更多写操作来提升I/O吞吐量",
+    "desc": "1. For applications requiring fast data persistence (e.g., databases), it is recommended to lower the value to 100-300 (1-3 seconds) to reduce the risk of data loss; 2. For write-intensive workloads with latency-sensitive applications, it can be appropriately increased to 1000-3000 (10-30 seconds) to improve I/O throughput by merging more write operations.",
     "type": "continuous",
     "range": [
       100,
@@ -334,7 +334,7 @@
     "get": "sysctl -n vm.dirty_expire_centisecs"
   },
   "vm.dirty_writeback_centisecs": {
-    "desc": "1. 当系统频繁出现I/O等待或磁盘写入延迟较高时，可适当降低该值（如从默认500调整为200-300），以加快脏页回写频率，减少突发写入导致的性能波动;2. 对于写入密集型负载且使用电池供电的设备（如服务器UPS环境），可适当提高该值（如设置为1000-1500），通过减少磁盘写入次数来降低I/O开销和能耗",
+    "desc": "1. When the system frequently experiences I/O waits or high disk write latency, this value can be appropriately decreased (e.g., from the default 500 to 200-300) to speed up the dirty page writeback frequency and reduce performance fluctuations caused by burst writes; 2. For write-intensive workloads on battery-powered devices (e.g., server UPS environments), this value can be appropriately increased (e.g., set to 1000-1500) to reduce disk write frequency, lowering I/O overhead and energy consumption.",
     "type": "continuous",
     "range": [
       100,
@@ -345,7 +345,7 @@
     "get": "sysctl -n vm.dirty_writeback_centisecs"
   },
   "vm.overcommit_ratio": {
-    "desc": "1. 当物理服务器内存使用率长期低于50%且需要运行大量内存申请不确定的应用程序时，可适当提高该比例(如设置为80-90%)以提升内存利用率;2. 在内存密集型应用场景下，若频繁触发OOM killer且监控显示实际内存使用接近物理内存总量，应降低该比例(如设置为50-70%)以避免过度承诺内存",
+    "desc": "1. When physical server memory usage is consistently below 50% and there is a need to run many applications with uncertain memory requests, this ratio can be appropriately increased (e.g., set to 80-90%) to improve memory utilization; 2. In memory-intensive application scenarios, if the OOM killer is frequently triggered and monitoring shows actual memory usage is close to the total physical memory, this ratio should be decreased (e.g., set to 50-70%) to avoid overcommitting memory.",
     "type": "continuous",
     "range": [
       0,
@@ -356,7 +356,7 @@
     "get": "sysctl -n vm.overcommit_ratio"
   },
   "vm.overcommit_memory": {
-    "desc": "1. 当系统运行内存密集型应用且频繁触发OOM killer时，建议将值设为0（保守策略）或2（严格策略）以避免过度分配;2. 当系统主要运行已知内存需求的批量任务且需要最大化内存利用率时，可设为1（总是允许过度分配）以提升吞吐量",
+    "desc": "1. When the system runs memory-intensive applications and frequently triggers the OOM killer, it is recommended to set the value to 0 (conservative policy) or 2 (strict policy) to avoid overallocation; 2. When the system primarily runs batch tasks with known memory requirements and needs to maximize memory utilization, it can be set to 1 (always allow overcommitment) to improve throughput.",
     "range": [
       "0",
       "1"
@@ -367,7 +367,7 @@
     "get": "sysctl -n vm.overcommit_memory"
   },
   "vm.min_free_kbytes": {
-    "desc": "1. 当系统频繁触发直接内存回收(direct reclaim)导致性能下降时，需要增加该值以减少直接回收频率，建议设置为物理内存的1-3%;2. 当系统存在大量不可移动页(unmovable pages)导致内存碎片化严重时，需适当提高该值以预留更多连续内存空间",
+    "desc": "1. When the system frequently triggers direct memory reclaim leading to performance degradation, this value needs to be increased to reduce the frequency of direct reclaim. It is recommended to set it to 1-3% of physical memory; 2. When the system has a large number of unmovable pages causing severe memory fragmentation, this value should be appropriately increased to reserve more contiguous memory space.",
     "type": "continuous",
     "range": [
       10240,
@@ -378,7 +378,7 @@
     "get": "sysctl -n vm.min_free_kbytes"
   },
   "vm.page-cluster": {
-    "desc": "1. 当系统频繁进行大块连续内存交换时，可适当增大该值（默认3，建议范围3-10），减少交换操作的I/O开销;2. 在SSD存储的交换分区环境中，由于随机访问性能较好，可降低该值（建议1-3）以减少单次交换延迟",
+    "desc": "1. When the system frequently performs large contiguous memory swapping, this value can be appropriately increased (default 3, recommended range 3-10) to reduce the I/O overhead of swap operations; 2. In SSD swap partition environments, due to better random access performance, this value can be decreased (recommended 1-3) to reduce single swap latency.",
     "type": "continuous",
     "range": [
       0,
@@ -389,7 +389,7 @@
     "get": "sysctl -n vm.page-cluster"
   },
   "vm.max_map_count": {
-    "desc": "增加该值当运行内存密集型应用（如Elasticsearch或数据库）时出现\"max virtual memory areas vm.max_map_count [65530] is too low\"错误。将该值设置为262144或更高当运行需要大量内存映射的Java应用（如Hadoop或Spark）时",
+    "desc": "Increase this value when running memory-intensive applications (like Elasticsearch or databases) and encountering the error 'max virtual memory areas vm.max_map_count [65530] is too low'. Set this value to 262144 or higher when running Java applications that require a large number of memory mappings (like Hadoop or Spark).",
     "type": "continuous",
     "range": [
       100000,
@@ -400,7 +400,7 @@
     "get": "sysctl -n vm.max_map_count"
   },
   "vm.zone_reclaim_mode": {
-    "desc": "1. 当系统运行在NUMA架构且存在跨节点内存访问延迟问题时，建议将vm.zone_reclaim_mode设置为1，优先尝试在本地节点回收内存以减少远程访问延迟;2. 当系统内存压力较大且本地节点回收效果不佳时，建议将vm.zone_reclaim_mode设置为0，允许从其他节点回收内存以提高整体回收效率",
+    "desc": "1. When the system runs on NUMA architecture and experiences cross-node memory access latency issues, it is recommended to set vm.zone_reclaim_mode to 1, prioritizing memory reclamation on the local node to reduce remote access latency; 2. When the system is under high memory pressure and local node reclamation is ineffective, it is recommended to set vm.zone_reclaim_mode to 0, allowing memory reclamation from other nodes to improve overall reclamation efficiency.",
     "range": [
       "0",
       "1",
@@ -413,7 +413,7 @@
     "get": "sysctl -n vm.zone_reclaim_mode"
   },
   "vm.watermark_scale_factor": {
-    "desc": "1. 当系统频繁触发直接内存回收(direct reclaim)且kswapd进程活跃度不足时，可适当降低该值(如从默认的10调整至5-8)，使kswapd更早介入内存回收;2. 在内存压力较大且kswapd持续运行的场景下，若观察到系统响应延迟增加，可尝试增大该值(如调整至15-20)，延迟kswapd休眠时机以提升回收效率",
+    "desc": "1. When the system frequently triggers direct memory reclaim and the kswapd process activity is insufficient, this value can be appropriately decreased (e.g., from the default 10 to 5-8) to make kswapd intervene in memory reclamation earlier; 2. Under high memory pressure scenarios where kswapd runs continuously, if increased system response latency is observed, try increasing this value (e.g., adjust to 15-20) to delay kswapd's sleep timing and improve reclamation efficiency.",
     "type": "continuous",
     "range": [
       10,
@@ -424,7 +424,7 @@
     "get": "sysctl -n vm.watermark_scale_factor"
   },
   "vm.numa_stat": {
-    "desc": "1. 当系统内存资源紧张且NUMA统计对当前业务场景不重要时，可将该参数设为0以降低统计精度，减少内存开销;2. 在需要精确监控NUMA内存行为的高性能计算场景中，应保持该参数启用(默认值1)以获得完整统计信息",
+    "desc": "1. When system memory resources are tight and NUMA statistics are not critical for the current business scenario, this parameter can be set to 0 to reduce statistical accuracy and decrease memory overhead; 2. In high-performance computing scenarios requiring precise monitoring of NUMA memory behavior, this parameter should remain enabled (default value 1) to obtain complete statistical information.",
     "range": [
       "0",
       "1"
@@ -435,7 +435,7 @@
     "get": "sysctl -n vm.numa_stat"
   },
   "vm.drop_caches": {
-    "desc": "1. 当系统内存压力较大且缓存占用过高时，可临时设置为3释放pagecache、dentries和inodes缓存，但不宜频繁操作以免影响性能;2. 在运行内存密集型应用前，可设置为1仅释放pagecache，避免缓存干扰应用性能测试结果",
+    "desc": "1. When system memory pressure is high and cache usage is excessive, it can be temporarily set to 3 to release pagecache, dentries, and inodes caches, but frequent operation is not advisable as it may affect performance; 2. Before running memory-intensive applications, it can be set to 1 to release only pagecache, avoiding cache interference with application performance test results.",
     "range": [
       "1",
       "2",
@@ -447,7 +447,7 @@
     "get": "sysctl -n vm.drop_caches"
   },
   "fs.inotify.max_user_watches": {
-    "desc": "1. 当监控大量文件或目录时（如日志目录、代码仓库等），若出现\"Too many open files\"或\"User limit of inotify watches reached\"错误，需增加该值;2. 对于高并发文件监控场景（如实时日志分析、文件同步服务），建议将该值调整为默认值（通常8192）的4-8倍，具体数值应根据实际监控文件数量确定",
+    "desc": "1. When monitoring a large number of files or directories (e.g., log directories, code repositories), if errors like 'Too many open files' or 'User limit of inotify watches reached' occur, this value needs to be increased; 2. For high-concurrency file monitoring scenarios (e.g., real-time log analysis, file synchronization services), it is recommended to adjust this value to 4-8 times the default value (usually 8192). The specific value should be determined based on the actual number of monitored files.",
     "type": "continuous",
     "range": [
       4096,
@@ -458,7 +458,7 @@
     "get": "sysctl -n fs.inotify.max_user_watches"
   },
   "fs.nr_open": {
-    "desc": "1. 当应用（如数据库、Web服务器）频繁报告\"too many open files\"错误且ulimit -n已调高时，需增加该值至大于等于进程实际需要的最大文件描述符数;2. 在内存资源紧张的系统中，若该值设置过高（如接近memlock限制），应适当降低以防止内存耗尽",
+    "desc": "1. When applications (e.g., databases, Web servers) frequently report 'too many open files' errors and ulimit -n has already been increased, this value needs to be increased to be greater than or equal to the maximum number of file descriptors actually needed by the process; 2. In systems with tight memory resources, if this value is set too high (e.g., close to the memlock limit), it should be appropriately decreased to prevent memory exhaustion.",
     "type": "continuous",
     "range": [
       10240,
@@ -469,7 +469,7 @@
     "get": "sysctl -n fs.nr_open"
   },
   "fs.file-max": {
-    "desc": "1. 当系统频繁出现\"Too many open files\"错误或监控显示文件句柄使用率持续接近当前限制时，需要增加该值;2. 对于高并发服务（如Web服务器、数据库等），建议将该值设置为物理内存大小（KB）的10%-20%（例如64GB内存可设置为6,400,000-12,800,000）",
+    "desc": "1. When the system frequently encounters 'Too many open files' errors or monitoring shows file handle usage consistently approaching the current limit, this value needs to be increased; 2. For high-concurrency services (e.g., Web servers, databases), it is recommended to set this value to 10%-20% of the physical memory size in KB (e.g., for 64GB memory, set to 6,400,000-12,800,000).",
     "type": "continuous",
     "range": [
       102400,
@@ -480,7 +480,7 @@
     "get": "sysctl -n fs.file-max"
   },
   "fs.aio-max-nr": {
-    "desc": "- 当系统日志频繁出现\"aio-max-nr reached\"警告或应用程序因异步I/O请求被拒绝而报错时，需要增加该值, - 对于高并发数据库服务器(如MySQL/PostgreSQL)或大规模文件处理应用，建议将该值设置为(并发线程数×每个线程可能持有的未完成AIO请求数)×2",
+    "desc": "- When system logs frequently show 'aio-max-nr reached' warnings or applications report errors due to rejected asynchronous I/O requests, this value needs to be increased. - For high-concurrency database servers (e.g., MySQL/PostgreSQL) or large-scale file processing applications, it is recommended to set this value to (number of concurrent threads × number of outstanding AIO requests each thread may hold) × 2.",
     "type": "continuous",
     "range": [
       102400,
@@ -491,7 +491,7 @@
     "get": "sysctl -n fs.aio-max-nr"
   },
   "fs.inotify.max_user_instances": {
-    "desc": "1. 当系统日志频繁出现\"inotify instance limit reached\"或类似错误时，表明当前用户运行的监控进程（如文件同步工具、开发热加载工具等）数量超过限制，需要增加该值;2. 对于运行大量容器或微服务的环境，每个容器实例可能需要独立的inotify实例监控文件变化，此时应根据实际容器数量合理调高该参数",
+    "desc": "1. When system logs frequently show 'inotify instance limit reached' or similar errors, it indicates that the number of monitoring processes (e.g., file synchronization tools, development hot-reload tools) run by the current user exceeds the limit, and this value needs to be increased; 2. In environments running many containers or microservices, where each container instance may require an independent inotify instance to monitor file changes, this parameter should be reasonably increased based on the actual number of containers.",
     "type": "continuous",
     "range": [
       64,
@@ -502,7 +502,7 @@
     "get": "sysctl -n fs.inotify.max_user_instances"
   },
   "fs.suid_dumpable": {
-    "desc": "1. 当系统需要调试setuid程序崩溃问题时，建议将值设为1（debug模式），允许生成核心转储文件用于故障分析;2. 在注重安全性的生产环境中，建议保持默认值0，避免潜在的安全风险，防止敏感信息通过核心转储泄露",
+    "desc": "1. When the system needs to debug setuid program crash issues, it is recommended to set the value to 1 (debug mode), allowing core dump files to be generated for fault analysis; 2. In production environments focused on security, it is recommended to keep the default value of 0 to avoid potential security risks and prevent sensitive information leakage through core dumps.",
     "type": "continuous",
     "range": [
       0,
@@ -513,7 +513,7 @@
     "get": "sysctl -n fs.suid_dumpable"
   },
   "blockdev": {
-    "desc": "增大预读值(如设置为8192)可提升顺序读性能，适用于频繁大文件顺序读场景。降低预读值(如设置为128)可减少IO开销，适用于随机访问为主的场景",
+    "desc": "Increasing the read-ahead value (e.g., setting it to 8192) can improve sequential read performance, suitable for scenarios involving frequent large file sequential reads. Decreasing the read-ahead value (e.g., setting it to 128) can reduce I/O overhead, suitable for scenarios dominated by random access.",
     "type": "continuous",
     "range": [
       0,
@@ -524,7 +524,7 @@
     "get": "/sbin/blockdev --getra /dev/sda"
   },
   "block.fifo_batch": {
-    "desc": "1. 当系统需要更高吞吐量且能容忍更高延迟时（如批量数据处理场景），可适当增大该值（如32-64）  ;2. 当系统对延迟敏感（如实时数据库）且当前吞吐量足够时，可降低该值（如8-12）以减少单个批次的处理延迟",
+    "desc": "1. When the system requires higher throughput and can tolerate higher latency (e.g., batch data processing scenarios), this value can be appropriately increased (e.g., 32-64); 2. When the system is latency-sensitive (e.g., real-time databases) and current throughput is sufficient, this value can be decreased (e.g., 8-12) to reduce the processing latency of a single batch.",
     "type": "continuous",
     "range": [
       1,
@@ -535,7 +535,7 @@
     "get": "cat /sys/block/sda/queue/iosched/fifo_batch"
   },
   "block.front_merges": {
-    "desc": "1. 在I/O负载主要来自顺序写入且存储设备性能良好时，建议保持默认值1以允许前向合并，这能减少请求数量提升吞吐量;2. 当系统处理大量随机I/O或使用某些特定存储设备时出现性能下降，可尝试将该参数设为0禁用前向合并，减少不必要的合并操作开销",
+    "desc": "1. When the I/O load primarily comes from sequential writes and the storage device performs well, it is recommended to keep the default value of 1 to allow forward merging, which can reduce the number of requests and improve throughput; 2. When the system handles a large amount of random I/O or experiences performance degradation with certain storage devices, try setting this parameter to 0 to disable forward merging and reduce unnecessary merge operation overhead.",
     "range": [
       "0",
       "1"
@@ -546,7 +546,7 @@
     "get": "cat /sys/block/sda/queue/iosched/front_merges"
   },
   "block.read_expire": {
-    "desc": "1. 当系统主要处理高优先级读操作（如数据库查询）且存在读延迟敏感型应用时，可适当降低该值（如从默认的125ms降至50-100ms），确保读请求能更快得到响应;2. 若系统频繁出现读请求超时丢弃现象（可通过监控deadline调度器的统计信息发现），且存储设备实际响应能力优于当前设置，应适当调高该值（如增至150-200ms）以避免不必要的请求重试",
+    "desc": "1. When the system primarily handles high-priority read operations (e.g., database queries) and has read latency-sensitive applications, this value can be appropriately decreased (e.g., from the default 125ms to 50-100ms) to ensure read requests are responded to faster; 2. If the system frequently experiences read request timeout discards (detectable by monitoring the deadline scheduler's statistics) and the storage device's actual response capability is better than the current setting, this value should be appropriately increased (e.g., to 150-200ms) to avoid unnecessary request retries.",
     "type": "continuous",
     "range": [
       100,
@@ -557,7 +557,7 @@
     "get": "cat /sys/block/sda/queue/iosched/read_expire"
   },
   "block.writes_starved": {
-    "desc": "1. 当系统主要处理随机读取密集型负载（如数据库服务）且需要低延迟响应时，可适当提高该值（默认2-5范围），优先处理读请求以减少读延迟;2. 当系统存在大量顺序写操作（如日志写入、数据备份）且写性能成为瓶颈时，应降低该值（最小可设为1），防止读请求过度抢占I/O带宽影响写入吞吐量",
+    "desc": "1. When the system primarily handles random read-intensive loads (e.g., database services) and requires low-latency responses, this value can be appropriately increased (default range 2-5) to prioritize read requests and reduce read latency; 2. When the system has a large number of sequential write operations (e.g., log writing, data backup) and write performance becomes a bottleneck, this value should be decreased (minimum can be set to 1) to prevent read requests from excessively preempting I/O bandwidth and affecting write throughput.",
     "type": "continuous",
     "range": [
       1,
@@ -568,7 +568,7 @@
     "get": "cat /sys/block/sda/queue/iosched/writes_starved"
   },
   "block.max_sectors_kb": {
-    "desc": "1. 当使用高性能存储设备（如NVMe SSD）且存在大量大块I/O操作时，可适当增大该值（如1024-4096 KB）以提高吞吐量;2. 当出现I/O错误或设备驱动不稳定时，应降低该值至默认值512 KB或更小以增强稳定性",
+    "desc": "1. When using high-performance storage devices (e.g., NVMe SSD) and there are many large-block I/O operations, this value can be appropriately increased (e.g., 1024-4096 KB) to improve throughput; 2. When I/O errors occur or the device driver is unstable, this value should be decreased to the default 512 KB or lower to enhance stability.",
     "type": "continuous",
     "range": [
       64,
@@ -579,7 +579,7 @@
     "get": "cat /sys/block/sda/queue/max_sectors_kb"
   },
   "block.queue_depth": {
-    "desc": "1. 当使用高性能存储设备（如NVMe SSD）且系统负载较高时，若观察到存储设备利用率不足或IOPS未达预期，可适当增加该值（通常建议从默认32逐步上调至64-256范围），但需确保不超过设备硬件队列深度限制;2. 对于虚拟机环境或低性能旋转磁盘（如HDD），若延迟显著增加或出现请求超时，应将值降低至16-32范围以减少IO堆积",
+    "desc": "1. When using high-performance storage devices (e.g., NVMe SSD) and the system is under high load, if storage device utilization is insufficient or IOPS do not meet expectations, this value can be appropriately increased (usually recommended to gradually increase from the default 32 to the range of 64-256), but ensure it does not exceed the device's hardware queue depth limit; 2. For virtual machine environments or low-performance spinning disks (e.g., HDD), if latency increases significantly or request timeouts occur, the value should be decreased to the range of 16-32 to reduce I/O backlog.",
     "type": "continuous",
     "range": [
       64,
@@ -590,7 +590,7 @@
     "get": "cat /sys/block/sda/device/queue_depth"
   },
   "block.nr_requests": {
-    "desc": "1. 当系统有高性能存储设备（如NVMe SSD）且IOPS吞吐量不足时，可适当增加该值（默认128），建议范围256-1024，以充分发挥设备并行处理能力;2. 当系统出现高延迟或请求堆积时，若存储设备为机械硬盘，应降低该值（建议64-128），避免单个设备队列过深导致寻道时间增加",
+    "desc": "1. When the system has high-performance storage devices (e.g., NVMe SSD) and IOPS throughput is insufficient, this value can be appropriately increased (default 128), recommended range 256-1024, to fully utilize the device's parallel processing capability; 2. When the system experiences high latency or request backlog, if the storage device is a mechanical hard drive, this value should be decreased (recommended 64-128) to avoid increased seek time due to overly deep single device queues.",
     "type": "continuous",
     "range": [
       128,
@@ -601,7 +601,7 @@
     "get": "cat /sys/block/sda/queue/nr_requests"
   },
   "block.read_ahead_kb": {
-    "desc": "1. 当系统主要运行顺序读取大文件的应用（如数据库、视频流服务）且内存充足时，可适当增大该值（如从默认128KB调整为512KB-1MB），以减少I/O等待时间;2. 当系统内存压力较大或主要处理随机访问负载时，应降低该值（如调整为64KB或更低），避免预读过多无用数据占用宝贵的内存资源",
+    "desc": "1. When the system primarily runs applications that sequentially read large files (e.g., databases, video streaming services) and memory is sufficient, this value can be appropriately increased (e.g., from the default 128KB to 512KB-1MB) to reduce I/O wait time; 2. When the system is under memory pressure or primarily handles random access loads, this value should be decreased (e.g., adjusted to 64KB or lower) to avoid pre-reading too much useless data occupying precious memory resources.",
     "type": "continuous",
     "range": [
       0,
@@ -612,7 +612,7 @@
     "get": "cat /sys/block/sda/queue/read_ahead_kb"
   },
   "block.rq_affinity": {
-    "desc": "1. 当系统在高I/O负载下出现CPU利用率不均衡时，建议调整该参数以提高本地CPU处理I/O请求的效率;2. 在使用多队列存储设备时，若发现I/O性能未达到预期，建议调整此参数以充分利用多核CPU的并行处理能力",
+    "desc": "1. When the system experiences unbalanced CPU utilization under high I/O load, it is recommended to adjust this parameter to improve the efficiency of local CPU processing I/O requests; 2. When using multi-queue storage devices, if I/O performance does not meet expectations, it is recommended to adjust this parameter to fully utilize the parallel processing capability of multi-core CPUs.",
     "range": [
       "0",
       "1",
@@ -624,7 +624,7 @@
     "get": "cat /sys/block/sda/queue/rq_affinity"
   },
   "block.add_random": {
-    "desc": "1. 当系统对随机数质量要求极高且性能开销可接受时，建议启用该参数以增强熵池的随机性来源;2. 在高性能计算或低延迟要求的场景下，若系统已有足够熵源，建议禁用该参数以避免I/O事件带来的额外开销",
+    "desc": "1. When the system requires extremely high random number quality and performance overhead is acceptable, it is recommended to enable this parameter to enhance the randomness source of the entropy pool; 2. In high-performance computing or low-latency scenarios, if the system already has sufficient entropy sources, it is recommended to disable this parameter to avoid additional overhead from I/O events.",
     "range": [
       "0",
       "1"
@@ -635,7 +635,7 @@
     "get": "cat /sys/block/sda/queue/add_random"
   },
   "block.rotational": {
-    "desc": "1. 当存储设备为SSD时，必须将该参数设置为0，以避免系统错误地应用针对机械硬盘的I/O调度策略;2. 当存储设备为机械硬盘时，该参数应保持默认值1，以确保系统能正确应用适合旋转介质的相关优化",
+    "desc": "1. When the storage device is an SSD, this parameter must be set to 0 to prevent the system from incorrectly applying I/O scheduling policies intended for mechanical hard drives; 2. When the storage device is a mechanical hard drive, this parameter should remain at the default value of 1 to ensure the system correctly applies relevant optimizations suitable for rotating media.",
     "range": [
       "0",
       "1"
@@ -646,7 +646,7 @@
     "get": "cat /sys/block/sda/queue/rotational"
   },
   "block.scheduler": {
-    "desc": "1. 对于MySQL数据库场景，建议将block.scheduler设置为deadline，该调度算法能更好地处理数据库的随机I/O负载，减少I/O延迟;2. 如果系统使用的是SSD存储设备，可以考虑设置为noop调度器，因为SSD没有机械磁盘的寻道时间，简单的FIFO队列调度即可发挥最佳性能",
+    "desc": "1. For MySQL database scenarios, it is recommended to set block.scheduler to 'deadline'. This scheduling algorithm can better handle the random I/O load of databases and reduce I/O latency; 2. If the system uses SSD storage devices, consider setting the scheduler to 'noop' because SSDs have no seek time of mechanical disks, and simple FIFO queue scheduling can achieve optimal performance.",
     "range": [
       "mq-deadline",
       "kyber",
@@ -659,7 +659,7 @@
     "get": "cat /sys/block/sda/queue/scheduler | sed -n 's/.*\\[\\(.*\\)\\].*/\\1/p'"
   },
   "block.write_cache": {
-    "desc": "1. 当系统需要更高的写入性能且能容忍少量数据丢失风险时，建议设置为 write back 模式;2. 当数据安全性要求极高且性能不是首要考虑时，建议设置为 write through 模式",
+    "desc": "1. When the system requires higher write performance and can tolerate a small risk of data loss, it is recommended to set it to write back mode; 2. When data security requirements are extremely high and performance is not the primary consideration, it is recommended to set it to write through mode.",
     "range": [
       "write back",
       "write through"
@@ -670,7 +670,7 @@
     "get": "cat /sys/block/sda/queue/write_cache"
   },
   "block.nomerges": {
-    "desc": "1. 仅在调试I/O请求合并相关问题时设置为0，生产环境应保持默认值1以获得合并带来的性能优势  ;2. 当使用blktrace等工具进行底层块设备分析时，可临时禁用合并(设为0)以获取更精确的请求跟踪数据",
+    "desc": "1. Set to 0 only when debugging I/O request merging related issues. The production environment should keep the default value of 1 to benefit from the performance advantages of merging; 2. When using tools like blktrace for low-level block device analysis, merging can be temporarily disabled (set to 0) to obtain more accurate request tracking data.",
     "range": [
       "0",
       "1",
@@ -682,7 +682,7 @@
     "get": "cat /sys/block/sda/queue/nomerges"
   },
   "net.core.netdev_budget": {
-    "desc": "1. 当网络接口频繁出现丢包（ifconfig显示RX dropped增加）且CPU软中断（softirq）占用过高时，建议适当增大该值（默认300可尝试调整为600-800）以提升单次软中断处理的包数量，减少中断次数;2. 在低吞吐量但延迟敏感型场景（如高频交易系统）中，若网络延迟出现波动，可尝试降低该值（如调整为150-200）以减少单次软中断处理时间，降低处理延迟",
+    "desc": "1. When network interfaces frequently experience packet drops (ifconfig shows increasing RX dropped) and CPU soft interrupt (softirq) usage is high, it is recommended to appropriately increase this value (default 300 can be tried to adjust to 600-800) to increase the number of packets processed per soft interrupt and reduce interrupt frequency; 2. In low-throughput but latency-sensitive scenarios (e.g., high-frequency trading systems), if network latency fluctuates, try decreasing this value (e.g., adjust to 150-200) to reduce the processing time per soft interrupt and lower processing latency.",
     "type": "continuous",
     "range": [
       100,
@@ -693,7 +693,7 @@
     "get": "sysctl -n net.core.netdev_budget"
   },
   "net.core.optmem_max": {
-    "desc": "- 当应用程序（如高性能网络服务）需要处理大量并发连接或大容量数据时，若出现 socket 缓冲区不足导致的性能瓶颈，可适当增加该值, - 在内存资源充足的服务器上，若默认值（通常为 20480）无法满足特定应用（如视频流、大数据传输）的需求，可按 2 的幂次方逐步调高至合理范围（如 65536 或 131072）",
+    "desc": "- When applications (such as high-performance network services) need to handle a large number of concurrent connections or high-capacity data, and performance bottlenecks occur due to insufficient socket buffers, this value can be appropriately increased. - On servers with ample memory resources, if the default value (usually 20480) cannot meet the needs of specific applications (such as video streaming, big data transmission), gradually increase it in powers of 2 to a reasonable range (e.g., 65536 or 131072).",
     "type": "continuous",
     "range": [
       20480,
@@ -704,7 +704,7 @@
     "get": "sysctl -n net.core.optmem_max"
   },
   "net.core.wmem_max": {
-    "desc": "1. 当服务器处理大量高吞吐量网络连接（如视频流、大文件传输等场景）时出现写缓冲区不足导致的性能瓶颈，建议将值从默认229376调整为16777216;2. 在高并发TCP长连接场景（如WebSocket服务、消息队列等）中观察到因写缓冲区溢出导致的连接异常或数据丢失时，建议采用16777216值",
+    "desc": "1. When the server handles a large number of high-throughput network connections (e.g., video streaming, large file transfer scenarios) and experiences performance bottlenecks due to insufficient write buffers, it is recommended to change the value from the default 229376 to 16777216; 2. In high-concurrency TCP long-connection scenarios (e.g., WebSocket services, message queues), if connection abnormalities or data loss are observed due to write buffer overflow, it is recommended to use the value 16777216.",
     "type": "continuous",
     "range": [
       1048576,
@@ -715,7 +715,7 @@
     "get": "sysctl -n net.core.wmem_max"
   },
   "net.core.wmem_default": {
-    "desc": "1. 当应用主要处理大量小数据包传输时，若网络吞吐量低于预期且系统监控显示发送缓冲区频繁填满，可适当增大该值至32768-65535字节范围，减少频繁缓冲区填满导致的延迟  ;2. 在高带宽高延迟网络环境下（如跨数据中心传输），若TCP窗口缩放功能已启用但实际窗口仍受限于默认值，应将该值提升至至少163840字节（160KB）以匹配BDP（带宽延迟积）需求",
+    "desc": "1. When the application primarily handles a large number of small data packet transmissions, if network throughput is lower than expected and system monitoring shows the send buffer frequently fills up, this value can be appropriately increased to the range of 32768-65535 bytes to reduce latency caused by frequent buffer filling; 2. In high-bandwidth, high-latency network environments (e.g., cross-data center transmission), if the TCP window scaling function is enabled but the actual window is still limited by the default value, this value should be increased to at least 163840 bytes (160KB) to match the BDP (Bandwidth-Delay Product) requirement.",
     "type": "continuous",
     "range": [
       8192,
@@ -726,7 +726,7 @@
     "get": "sysctl -n net.core.wmem_default"
   },
   "net.core.rmem_default": {
-    "desc": "1. 当应用需要处理大量网络数据流（如视频流、大数据传输）且观察到频繁的TCP窗口缩放或重传时，建议将值从默认的212992字节提升至1-4MB范围（1048576-4194304字节），需配合net.core.rmem_max同步调整;2. 在高吞吐低延迟网络环境（如10Gbps以上）中，若netstat -s显示\"pruned\"或\"collapsed\"包统计持续增长，建议将值设置为BDP（带宽延迟积）的1/4至1/2，计算公式为：(带宽(bps) × 往返时延(s)) / 8 × 0.25",
+    "desc": "1. When the application needs to handle a large amount of network data flow (e.g., video streaming, big data transmission) and frequent TCP window scaling or retransmission is observed, it is recommended to increase the value from the default 212992 bytes to the range of 1-4 MB (1048576-4194304 bytes), and adjust net.core.rmem_max simultaneously; 2. In high-throughput, low-latency network environments (e.g., 10Gbps and above), if netstat -s shows continuous growth in 'pruned' or 'collapsed' packet statistics, it is recommended to set the value to 1/4 to 1/2 of the BDP (Bandwidth-Delay Product). Calculation formula: (Bandwidth(bps) × Round-trip Time(s)) / 8 × 0.25.",
     "type": "continuous",
     "range": [
       8192,
@@ -737,7 +737,7 @@
     "get": "sysctl -n net.core.rmem_default"
   },
   "net.core.rmem_max": {
-    "desc": "1. 当应用需要处理高吞吐量网络数据流（如视频流、大数据传输）时，应将此值调整为16777216以提升接收性能  ;2. 在存在大量TCP长连接且频繁出现接收缓冲区不足警告（如内核日志报\"TCP: too much of memory\"）时，应增大该值",
+    "desc": "1. When the application needs to handle high-throughput network data flows (e.g., video streaming, big data transmission), this value should be adjusted to 16777216 to improve receiving performance; 2. When there are a large number of TCP long connections and frequent warnings about insufficient receive buffers (e.g., kernel logs report 'TCP: too much of memory'), this value should be increased.",
     "type": "continuous",
     "range": [
       1048576,
@@ -748,7 +748,7 @@
     "get": "sysctl -n net.core.rmem_max"
   },
   "net.core.netdev_max_backlog": {
-    "desc": "1. 当服务器频繁出现网络丢包或高负载时，且通过监控发现 netdev_backlog 值持续接近或达到当前 netdev_max_backlog 设置值，应适当增大该参数值（例如从默认的1000调整为2000-3000）  ;2. 对于10Gbps及以上高速网络接口，若默认值导致数据包处理延迟增加，需根据实际网络吞吐量和CPU处理能力按比例提升该参数值",
+    "desc": "1. When the server frequently experiences network packet loss or high load, and monitoring shows the netdev_backlog value consistently approaches or reaches the current netdev_max_backlog setting, this parameter value should be appropriately increased (e.g., from the default 1000 to 2000-3000); 2. For 10Gbps and higher-speed network interfaces, if the default value causes increased data packet processing latency, this parameter value needs to be increased proportionally based on the actual network throughput and CPU processing capability.",
     "type": "continuous",
     "range": [
       1000,
@@ -759,7 +759,7 @@
     "get": "sysctl -n net.core.netdev_max_backlog"
   },
   "net.ipv4.tcp_thin_linear_timeouts": {
-    "desc": "1. 当服务器处理大量短生命周期TCP连接且频繁出现超时重传时，建议启用该参数(tcp_thin_linear_timeouts=1)以更精确检测瘦流并减少不必要的重传等待时间  ;2. 若服务器主要处理大文件传输或视频流等持续高吞吐连接，建议保持默认值(tcp_thin_linear_timeouts=0)以避免对正常数据流产生误判",
+    "desc": "1. When the server handles a large number of short-lived TCP connections and frequently experiences timeout retransmissions, it is recommended to enable this parameter (tcp_thin_linear_timeouts=1) to more accurately detect thin streams and reduce unnecessary retransmission wait times; 2. If the server primarily handles large file transfers or video streaming and other sustained high-throughput connections, it is recommended to keep the default value (tcp_thin_linear_timeouts=0) to avoid misjudging normal data flows.",
     "range": [
       "0",
       "1"
@@ -770,7 +770,7 @@
     "get": "sysctl -n net.ipv4.tcp_thin_linear_timeouts"
   },
   "net.unix.max_dgram_qlen": {
-    "desc": "1. 当系统频繁处理大量UDP数据报且出现丢包现象时，应考虑增加该值以提高队列容量;2. 在高吞吐量UDP应用场景中，若观察到应用处理速度跟不上数据接收速度导致队列溢出，应适当调高此参数",
+    "desc": "1. When the system frequently handles a large number of UDP datagrams and experiences packet loss, consider increasing this value to improve queue capacity; 2. In high-throughput UDP application scenarios, if the application processing speed cannot keep up with the data receiving speed, leading to queue overflow, this parameter should be appropriately increased.",
     "type": "continuous",
     "range": [
       128,
@@ -781,7 +781,7 @@
     "get": "sysctl -n net.unix.max_dgram_qlen"
   },
   "net.core.somaxconn": {
-    "desc": "1. 当服务器需要处理大量并发连接请求（如高负载Web服务器）且出现连接被丢弃或排队延迟时，应将此值从默认128增大到1024或更高;2. 在运行需要频繁建立短连接的服务（如反向代理、负载均衡器）时，建议将该值调整为至少等于或大于服务的worker_processes与worker_connections乘积的1/4",
+    "desc": "1. When the server needs to handle a large number of concurrent connection requests (e.g., high-load Web servers) and experiences connection drops or queuing delays, this value should be increased from the default 128 to 1024 or higher; 2. When running services that frequently establish short connections (e.g., reverse proxies, load balancers), it is recommended to adjust this value to at least equal to or greater than 1/4 of the product of the service's worker_processes and worker_connections.",
     "type": "continuous",
     "range": [
       128,
@@ -792,7 +792,7 @@
     "get": "sysctl -n net.core.somaxconn"
   },
   "net.core.busy_poll": {
-    "desc": "1. 在高吞吐量网络环境中（如10Gbps以上），若CPU利用率不足且存在延迟敏感型应用，可适当增加该值（如50-100微秒）以减少中断频率，但需监控CPU负载避免过度占用;2. 在低延迟网络环境（如高频交易系统）中，若网络延迟指标不达标且CPU资源充足，可尝试设置为0禁用该功能，强制使用中断模式降低延迟",
+    "desc": "1. In high-throughput network environments (e.g., 10Gbps and above), if CPU utilization is insufficient and there are latency-sensitive applications, this value can be appropriately increased (e.g., 50-100 microseconds) to reduce interrupt frequency, but CPU load must be monitored to avoid excessive occupation; 2. In low-latency network environments (e.g., high-frequency trading systems), if network latency indicators do not meet standards and CPU resources are sufficient, try setting it to 0 to disable this function, forcing the use of interrupt mode to reduce latency.",
     "type": "continuous",
     "range": [
       0,
@@ -803,7 +803,7 @@
     "get": "sysctl -n net.core.busy_poll"
   },
   "net.core.busy_read": {
-    "desc": "1. 当网络设备处理高吞吐量小包时出现频繁读超时或性能下降，可尝试增加该值至100-200微秒范围，需结合具体硬件性能测试确定最优值;2. 在低延迟网络环境中若观察到CPU使用率异常升高且与网络中断处理相关，可测试降低该值至20-30微秒以减少等待时间",
+    "desc": "1. When network devices handle high-throughput small packets and experience frequent read timeouts or performance degradation, try increasing this value to the range of 100-200 microseconds. The optimal value needs to be determined by testing combined with specific hardware performance; 2. In low-latency network environments, if abnormal CPU usage increase is observed and related to network interrupt processing, test decreasing this value to 20-30 microseconds to reduce waiting time.",
     "type": "continuous",
     "range": [
       0,
@@ -814,7 +814,7 @@
     "get": "sysctl -n net.core.busy_read"
   },
   "net.core.dev_weight": {
-    "desc": "1. 当网络中断处理成为性能瓶颈时（通过监控发现CPU软中断时间占比过高），可适当增加该值以提高单次中断处理的数据包数量，但需注意避免单个CPU过载;2. 对于高吞吐量网卡（如10G/25G以上）或大量小包场景，建议将该值从默认的64提高到128-256范围，需结合具体硬件和负载测试确定最优值",
+    "desc": "1. When network interrupt processing becomes a performance bottleneck (monitoring shows high CPU soft interrupt time percentage), this value can be appropriately increased to increase the number of data packets processed per interrupt, but care must be taken to avoid overloading a single CPU; 2. For high-throughput network cards (e.g., 10G/25G and above) or scenarios with many small packets, it is recommended to increase this value from the default 64 to the range of 128-256. The optimal value needs to be determined by testing based on specific hardware and load.",
     "type": "continuous",
     "range": [
       16,
@@ -825,7 +825,7 @@
     "get": "sysctl -n net.core.dev_weight"
   },
   "net.ipv4.tcp_keepalive_intvl": {
-    "desc": "1. 当服务器需要检测长时间空闲连接的健康状态时，若默认值75秒导致故障检测延迟过高，可适当减小至30-60秒范围以加快故障发现，但需权衡网络负载增加的影响;2. 在高延迟网络环境中，若频繁出现误判连接中断的情况，可考虑增大该值至90-120秒范围以减少不必要的探测流量，同时需配合调整tcp_keepalive_probes确保总体检测窗口合理",
+    "desc": "1. When the server needs to detect the health status of long-idle connections, if the default value of 75 seconds causes high fault detection delay, it can be appropriately decreased to the range of 30-60 seconds to speed up fault discovery, but the impact of increased network load must be weighed; 2. In high-latency network environments, if false connection interruptions frequently occur, consider increasing this value to the range of 90-120 seconds to reduce unnecessary probe traffic, while ensuring the overall detection window is reasonable by adjusting tcp_keepalive_probes accordingly.",
     "type": "continuous",
     "range": [
       30,
@@ -836,7 +836,7 @@
     "get": "sysctl -n net.ipv4.tcp_keepalive_intvl"
   },
   "net.ipv4.tcp_keepalive_probes": {
-    "desc": "1. 当服务器需要快速检测并释放失效连接（如负载均衡器后端健康检查场景）时，可适当减少该值（默认9），建议调整为3-5次以加快失效连接回收;2. 在高延迟或不可靠网络环境中（如跨国VPN），为防止误判活跃连接为失效，应增大该值至12-15次，同时配合调整tcp_keepalive_time和tcp_keepalive_intvl参数",
+    "desc": "1. When the server needs to quickly detect and release failed connections (e.g., load balancer backend health check scenarios), this value (default 9) can be appropriately reduced. It is recommended to adjust to 3-5 times to speed up the recycling of failed connections; 2. In high-latency or unreliable network environments (e.g., cross-border VPN), to prevent misjudging active connections as failed, this value should be increased to 12-15 times, while adjusting the tcp_keepalive_time and tcp_keepalive_intvl parameters accordingly.",
     "type": "continuous",
     "range": [
       3,
@@ -847,7 +847,7 @@
     "get": "sysctl -n net.ipv4.tcp_keepalive_probes"
   },
   "net.ipv4.tcp_keepalive_time": {
-    "desc": "1. 当服务器需要检测长时间空闲连接的有效性时（如负载均衡器或反向代理场景），若默认值（7200秒）过长可能导致无效连接占用资源，可适当调低至300-600秒区间  ;2. 在高并发短连接业务场景下，若出现大量TIME_WAIT状态连接导致端口耗尽，可配合减小tcp_keepalive_probes和tcp_keepalive_intvl参数，将本参数值提升至10800秒以上以减少keepalive探测频率",
+    "desc": "1. When the server needs to detect the validity of long-idle connections (e.g., load balancer or reverse proxy scenarios), if the default value (7200 seconds) is too long and may cause invalid connections to occupy resources, it can be appropriately reduced to the range of 300-600 seconds; 2. In high-concurrency short-connection business scenarios, if a large number of TIME_WAIT state connections cause port exhaustion, this parameter value can be increased to above 10800 seconds by reducing the tcp_keepalive_probes and tcp_keepalive_intvl parameters to decrease the keepalive probe frequency.",
     "type": "continuous",
     "range": [
       600,
@@ -858,7 +858,7 @@
     "get": "sysctl -n net.ipv4.tcp_keepalive_time"
   },
   "net.ipv4.tcp_tw_reuse": {
-    "desc": "1. 当服务器面临大量短连接请求且TIME-WAIT状态连接过多导致端口耗尽时，建议启用该参数(设置为1)以复用TIME-WAIT套接字;2. 在NAT网络环境下或需要严格保证TCP连接可靠性的场景下，建议保持该参数为默认值0以避免潜在连接混乱风险",
+    "desc": "1. When the server faces a large number of short connection requests and too many TIME-WAIT state connections cause port exhaustion, it is recommended to enable this parameter (set to 1) to reuse TIME-WAIT sockets; 2. In NAT network environments or scenarios requiring strict TCP connection reliability, it is recommended to keep this parameter at the default value of 0 to avoid potential connection confusion risks.",
     "range": [
       "0",
       "1",
@@ -870,7 +870,7 @@
     "get": "sysctl -n net.ipv4.tcp_tw_reuse"
   },
   "net.ipv4.tcp_window_scaling": {
-    "desc": "1. 在高带宽或高延迟网络环境下（如长距离传输或高速网络），应确保该参数值为1以启用窗口缩放功能，提升大窗口TCP连接性能;2. 当网络设备不支持RFC 1323或存在兼容性问题时，应将该参数设为0以禁用窗口缩放功能",
+    "desc": "1. In high-bandwidth or high-latency network environments (e.g., long-distance transmission or high-speed networks), ensure this parameter value is 1 to enable the window scaling function and improve large-window TCP connection performance; 2. When network devices do not support RFC 1323 or have compatibility issues, this parameter should be set to 0 to disable the window scaling function.",
     "range": [
       "0",
       "1"
@@ -881,7 +881,7 @@
     "get": "sysctl -n net.ipv4.tcp_window_scaling"
   },
   "net.ipv4.tcp_fin_timeout": {
-    "desc": "1. 当服务器需要处理大量短连接请求时，如果观察到大量连接处于FIN_WAIT_2状态导致端口耗尽，建议将该值从默认的60秒降低到30秒或更低，以加快连接资源释放;2. 对于高延迟网络环境或需要保持长时间连接的应用场景，如果发现连接异常终止问题，建议适当增加该值至120秒以上，确保连接正常关闭",
+    "desc": "1. When the server needs to handle a large number of short connection requests, if a large number of connections are observed in the FIN_WAIT_2 state causing port exhaustion, it is recommended to reduce this value from the default 60 seconds to 30 seconds or lower to speed up connection resource release; 2. For high-latency network environments or application scenarios that require maintaining long-term connections, if abnormal connection termination issues are found, it is recommended to appropriately increase this value to above 120 seconds to ensure normal connection closure.",
     "type": "continuous",
     "range": [
       1,
@@ -892,7 +892,7 @@
     "get": "sysctl -n net.ipv4.tcp_fin_timeout"
   },
   "net.ipv4.udp_mem": {
-    "desc": "1. 当服务器频繁处理大量UDP流量（如DNS服务器、视频流服务器）且出现丢包或性能下降时，可适当增加high值（如默认值的2-3倍），确保有足够内存缓冲队列数据包;2. 若系统空闲内存充足但UDP应用仍频繁触发压力模式（可通过监控/proc/net/sockstat观察），应按比例同步提高low和assure值（如low设为总内存的1%，assure设为2%）以避免不必要的内存回收抖动",
+    "desc": "1. When the server frequently handles a large amount of UDP traffic (e.g., DNS servers, video streaming servers) and experiences packet loss or performance degradation, the high value can be appropriately increased (e.g., 2-3 times the default value) to ensure sufficient memory buffers for queue data packets; 2. If the system has ample free memory but UDP applications still frequently trigger pressure mode (observable by monitoring /proc/net/sockstat), the low and assure values should be increased proportionally (e.g., low set to 1% of total memory, assure set to 2%) to avoid unnecessary memory reclamation抖动.",
     "range": [
       "12582912 16777216 25165824",
       "25165824 33554432 50331648",
@@ -904,7 +904,7 @@
     "get": "sysctl -n net.ipv4.udp_mem"
   },
   "net.ipv4.tcp_mem": {
-    "desc": "1. 当系统在高并发TCP连接场景下出现内存不足或频繁触发OOM killer时，应适当增加三个值（最小压力值/压力阈值/最大值），建议按总物理内存的1%-3%计算，并确保最大值不超过系统可用内存的50%;2. 若系统出现TCP性能下降或连接被拒绝（尤其在高吞吐量场景），需检查当前值是否过小，建议将最小值设为当前活跃连接内存占用的1.5倍，最大值设为系统空闲内存的30%-40%",
+    "desc": "1. When the system experiences memory shortage or frequently triggers the OOM killer under high-concurrency TCP connection scenarios, the three values (min pressure value/pressure threshold/max value) should be appropriately increased. It is recommended to calculate based on 1%-3% of the total physical memory, ensuring the max value does not exceed 50% of the system's available memory; 2. If the system experiences TCP performance degradation or connection refusal (especially in high-throughput scenarios), check if the current value is too small. It is recommended to set the min value to 1.5 times the memory footprint of current active connections, and the max value to 30%-40% of the system's free memory.",
     "range": [
       "6168306 8224411 12336612",
       "12336612 16448822 24673224"
@@ -915,7 +915,7 @@
     "get": "sysctl -n net.ipv4.tcp_mem"
   },
   "net.ipv4.tcp_rmem": {
-    "desc": "1. 在高吞吐量网络环境中（如视频流服务器、大数据传输节点），当默认最大值6291456（6MB）导致TCP接收窗口成为瓶颈时，建议将第三个值调整为16777216（16MB）以提升吞吐量;2. 对于内存资源受限的服务器（如云主机或容器环境），若默认值87380（85KB）的初始缓冲区导致内存压力，可将中间值降至65536（64KB）以平衡性能与资源消耗",
+    "desc": "1. In high-throughput network environments (e.g., video streaming servers, big data transfer nodes), when the default maximum value of 6291456 (6MB) causes the TCP receive window to become a bottleneck, it is recommended to adjust the third value to 16777216 (16MB) to improve throughput; 2. For servers with limited memory resources (e.g., cloud hosts or container environments), if the default initial buffer value of 87380 (85KB) causes memory pressure, the middle value can be reduced to 65536 (64KB) to balance performance and resource consumption.",
     "range": [
       "4096 16384 4194304",
       "4096 32768 8388608",
@@ -927,7 +927,7 @@
     "get": "sysctl -n net.ipv4.tcp_rmem"
   },
   "net.ipv4.tcp_wmem": {
-    "desc": "1. 在高吞吐量网络环境中（如视频流服务器、文件传输服务器），建议将参数调整为 4096 65536 16777216，以提升大流量场景下的TCP写缓冲区性能;2. 对于内存资源受限的服务器（如云主机或容器环境），若出现内存压力时应适当降低最大值（如调整为 4096 32768 8388608），避免TCP写缓冲区占用过多内存",
+    "desc": "1. In high-throughput network environments (e.g., video streaming servers, file transfer servers), it is recommended to adjust the parameter to 4096 65536 16777216 to enhance TCP write buffer performance in high-traffic scenarios; 2. For servers with limited memory resources (e.g., cloud hosts or container environments), if memory pressure occurs, the maximum value should be appropriately reduced (e.g., adjusted to 4096 32768 8388608) to prevent TCP write buffers from occupying too much memory.",
     "range": [
       "4096 16384 4194304",
       "4096 32768 8388608",
@@ -939,7 +939,7 @@
     "get": "sysctl -n net.ipv4.tcp_wmem"
   },
   "net.ipv4.tcp_fastopen": {
-    "desc": "1. 当服务器主要处理大量短连接请求（如HTTP API服务）且需要降低TCP握手延迟时，建议启用该参数（值为3同时支持客户端和服务器端）;2. 当服务器处于严格安全环境或处理敏感数据时，建议禁用该参数（值为0）以避免潜在的安全风险",
+    "desc": "1. When the server primarily handles a large number of short connection requests (e.g., HTTP API services) and needs to reduce TCP handshake latency, it is recommended to enable this parameter (value 3 supports both client and server sides); 2. When the server is in a strict security environment or handles sensitive data, it is recommended to disable this parameter (value 0) to avoid potential security risks.",
     "range": [
       "1",
       "2",
@@ -951,7 +951,7 @@
     "get": "sysctl -n net.ipv4.tcp_fastopen"
   },
   "net.ipv4.tcp_synack_retries": {
-    "desc": "1. 当服务器处于高并发连接场景且出现大量SYN_RECV状态连接时，若网络延迟较高，可适当增加该值（默认5）至7-10次，确保在拥塞环境下完成三次握手;2. 若服务器遭受SYN Flood攻击或处于高负载状态，可降低该值至2-3次以快速释放半连接资源，减少SYN队列占用时间",
+    "desc": "1. When the server is in a high-concurrency connection scenario and has many SYN_RECV state connections, if network latency is high, this value (default 5) can be appropriately increased to 7-10 times to ensure the three-way handshake completes in congested environments; 2. If the server is under SYN Flood attack or high load, this value can be decreased to 2-3 times to quickly release half-open connection resources and reduce SYN queue occupation time.",
     "type": "continuous",
     "range": [
       3,
@@ -962,7 +962,7 @@
     "get": "sysctl -n net.ipv4.tcp_synack_retries"
   },
   "net.ipv4.tcp_syn_retries": {
-    "desc": "1. 在延迟较高或不稳定的网络环境中（如跨国网络或移动网络），建议将默认值6适当增加到8-10，以应对可能出现的SYN丢包情况，但需注意这会延长连接建立失败时的等待时间;2. 对于内网或低延迟高可靠网络环境，建议降低到3-4以减少连接建立超时等待时间，提高应用响应速度",
+    "desc": "1. In high-latency or unstable network environments (e.g., cross-border networks or mobile networks), it is recommended to appropriately increase the default value of 6 to 8-10 to handle possible SYN packet loss, but note this will extend the wait time when connection establishment fails; 2. For internal networks or low-latency, high-reliability network environments, it is recommended to decrease it to 3-4 to reduce connection establishment timeout wait time and improve application response speed.",
     "type": "continuous",
     "range": [
       3,
@@ -973,7 +973,7 @@
     "get": "sysctl -n net.ipv4.tcp_syn_retries"
   },
   "net.ipv4.tcp_moderate_rcvbuf": {
-    "desc": "1. 当应用需要处理大量突发流量时，建议启用该参数（设置为1），系统会自动调整接收缓冲区大小以适应流量变化;2. 在内存资源受限的环境中，建议禁用该参数（设置为0），避免系统自动扩大接收缓冲区导致内存压力增加",
+    "desc": "1. When the application needs to handle a large amount of burst traffic, it is recommended to enable this parameter (set to 1). The system will automatically adjust the receive buffer size to adapt to traffic changes; 2. In memory-constrained environments, it is recommended to disable this parameter (set to 0) to prevent the system from automatically expanding the receive buffer and increasing memory pressure.",
     "range": [
       "0",
       "1"
@@ -984,7 +984,7 @@
     "get": "sysctl -n net.ipv4.tcp_moderate_rcvbuf"
   },
   "net.ipv4.tcp_timestamps": {
-    "desc": "1. 在存在NAT设备或负载均衡器的网络环境中，建议禁用该参数(设置为0)，以避免可能的时间戳冲突导致的连接问题;2. 在高速低延迟的内网环境中，建议启用该参数(设置为1)，以获得更精确的RTT计算和更好的TCP性能",
+    "desc": "1. In network environments with NAT devices or load balancers, it is recommended to disable this parameter (set to 0) to avoid potential connection issues caused by timestamp conflicts; 2. In high-speed, low-latency internal network environments, it is recommended to enable this parameter (set to 1) to obtain more accurate RTT calculations and better TCP performance.",
     "range": [
       "0",
       "1"
@@ -995,7 +995,7 @@
     "get": "sysctl -n net.ipv4.tcp_timestamps"
   },
   "net.ipv4.tcp_dsack": {
-    "desc": "1. 在延迟敏感型应用环境中(如高频交易系统)，建议设置为0(禁用)以减少不必要的ACK确认包带来的网络开销;2. 在常规Web服务或文件传输场景下保持默认值1(启用)，可帮助处理网络丢包情况下的数据重传效率",
+    "desc": "1. In latency-sensitive application environments (e.g., high-frequency trading systems), it is recommended to set to 0 (disabled) to reduce unnecessary ACK confirmation packet network overhead; 2. In常规Web services or file transfer scenarios, keep the default value of 1 (enabled) to help handle data retransmission efficiency in case of network packet loss.",
     "range": [
       "0",
       "1"
@@ -1006,7 +1006,7 @@
     "get": "sysctl -n net.ipv4.tcp_dsack"
   },
   "net.ipv4.tcp_fack": {
-    "desc": "1. 在存在高延迟或高丢包率的网络环境中，建议启用该参数以改善TCP重传性能，通过选择性确认减少不必要的重传;2. 当服务器作为高性能网络应用（如视频流、大文件传输）的接收端时，建议保持启用状态以优化TCP拥塞控制机制",
+    "desc": "1. In network environments with high latency or high packet loss rates, it is recommended to enable this parameter to improve TCP retransmission performance by reducing unnecessary retransmissions through selective acknowledgment; 2. When the server acts as the receiving end for high-performance network applications (e.g., video streaming, large file transfers), it is recommended to keep it enabled to optimize the TCP congestion control mechanism.",
     "range": [
       "0",
       "1"
@@ -1017,7 +1017,7 @@
     "get": "sysctl -n net.ipv4.tcp_fack"
   },
   "net.ipv4.tcp_sack": {
-    "desc": "1. 在广域网(WAN)通信环境下应保持启用(1)，可显著改善高延迟或丢包网络中的TCP传输性能，即使会略微增加CPU负载;2. 在低延迟、高带宽的局域网(LAN)环境中可考虑禁用(0)，特别是当系统CPU资源已高度饱和且网络质量极佳时",
+    "desc": "1. In wide area network (WAN) communication environments, it should remain enabled (1), which can significantly improve TCP transmission performance in high-latency or packet loss networks, even if it slightly increases CPU load; 2. In low-latency, high-bandwidth local area network (LAN) environments, consider disabling (0), especially when the system CPU resources are highly saturated and network quality is excellent.",
     "range": [
       "0",
       "1"
@@ -1028,7 +1028,7 @@
     "get": "sysctl -n net.ipv4.tcp_sack"
   },
   "net.ipv4.tcp_low_latency": {
-    "desc": "在高吞吐量且对延迟敏感的集群环境（如Beowulf集群）中应启用（设置为1）  , 在普通网络环境下保持禁用（设置为0）以避免不必要的开销",
+    "desc": "Should be enabled (set to 1) in high-throughput and latency-sensitive cluster environments (such as Beowulf clusters). Should remain disabled (set to 0) in ordinary network environments to avoid unnecessary overhead.",
     "range": [
       "0",
       "1"
@@ -1039,7 +1039,7 @@
     "get": "sysctl -n net.ipv4.tcp_low_latency"
   },
   "net.ipv4.tcp_adv_win_scale": {
-    "desc": "1. 当应用需要处理大量小包网络流量时，若观察到TCP接收窗口利用率不足，可考虑增大该值（如设为2或3），以减少缓冲区开销比例，提升小包传输效率;2. 在内存资源紧张的服务器环境中，若发现TCP内存消耗过高导致系统频繁OOM，可适当降低该值（如设为1或0），增加缓冲区开销比例以降低内存使用量",
+    "desc": "1. When the application needs to handle a large amount of small packet network traffic and observes insufficient TCP receive window utilization, consider increasing this value (e.g., set to 2 or 3) to reduce the buffer overhead ratio and improve small packet transmission efficiency; 2. In server environments with tight memory resources, if high TCP memory consumption is found causing frequent system OOM, this value can be appropriately decreased (e.g., set to 1 or 0) to increase the buffer overhead ratio and reduce memory usage.",
     "type": "continuous",
     "range": [
       0,
@@ -1050,7 +1050,7 @@
     "get": "sysctl -n net.ipv4.tcp_adv_win_scale"
   },
   "net.ipv4.route.max_size": {
-    "desc": "1. 当服务器频繁处理大量网络连接或作为路由器转发大量数据包时，若观察到路由缓存频繁刷新导致性能下降，可适当增加该值（默认值4096可逐步倍增测试）;2. 在高内存压力环境下，若路由表占用内存过高影响其他服务，且实际活跃路由条目远低于当前设置值，可适当降低该值以释放内存",
+    "desc": "1. When the server frequently handles a large number of network connections or acts as a router forwarding a large number of data packets, and observes performance degradation due to frequent routing cache refreshes, this value can be appropriately increased (the default value of 4096 can be gradually doubled for testing); 2. In high memory pressure environments, if the routing table occupies too much memory affecting other services, and the actual active routing entries are far below the current setting, this value can be appropriately decreased to free up memory.",
     "type": "continuous",
     "range": [
       67108864,
@@ -1061,7 +1061,7 @@
     "get": "sysctl -n net.ipv4.route.max_size"
   },
   "net.ipv4.tcp_max_tw_buckets": {
-    "desc": "1. 当服务器出现大量TIME_WAIT状态的TCP连接导致端口耗尽或性能下降时，建议将net.ipv4.tcp_max_tw_buckets从默认值2048调整为360000。;2. 在高并发短连接场景下，若监控发现TIME_WAIT连接数频繁达到上限，可适当增大该值至360000以提升连接处理能力。",
+    "desc": "1. When the server has a large number of TIME_WAIT state TCP connections causing port exhaustion or performance degradation, it is recommended to adjust net.ipv4.tcp_max_tw_buckets from the default value of 2048 to 360000.; 2. In high-concurrency short-connection scenarios, if monitoring finds that the number of TIME_WAIT connections frequently reaches the upper limit, this value can be appropriately increased to 360000 to improve connection processing capability.",
     "type": "continuous",
     "range": [
       32768,
@@ -1072,7 +1072,7 @@
     "get": "sysctl -n net.ipv4.tcp_max_tw_buckets"
   },
   "net.ipv4.tcp_max_syn_backlog": {
-    "desc": "1. 当服务器频繁处理大量新连接请求且出现 SYN 包丢弃时，应考虑增大该值至 8192 或更高;2. 在高并发短连接场景下，若监控发现 SYN_RECV 状态连接数常接近默认值 2048，应调整该参数以避免连接建立延迟",
+    "desc": "1. When the server frequently handles a large number of new connection requests and experiences SYN packet drops, consider increasing this value to 8192 or higher; 2. In high-concurrency short-connection scenarios, if monitoring finds that the number of SYN_RECV state connections often approaches the default value of 2048, this parameter should be adjusted to avoid connection establishment delays.",
     "type": "continuous",
     "range": [
       1024,
@@ -1083,7 +1083,7 @@
     "get": "sysctl -n net.ipv4.tcp_max_syn_backlog"
   },
   "net.ipv4.tcp_max_orphans": {
-    "desc": "1. 当服务器频繁出现\"Out of socket memory\"错误或日志中出现大量orphaned sockets警告时，需要增加该值。建议根据当前系统内存容量调整，通常设置为内存容量的1/4对应的socket数量（每个orphan约占用64KB内存）;2. 对于高并发短连接服务（如HTTP服务器、负载均衡器），若观察到tcp_max_orphans限制成为性能瓶颈（通过监控/proc/net/sockstat中orphan数量接近上限），应适当调高该值至并发连接数的1.2-1.5倍",
+    "desc": "1. When the server frequently encounters 'Out of socket memory' errors or logs show many orphaned sockets warnings, this value needs to be increased. It is recommended to adjust based on the current system memory capacity, usually set to the number of sockets corresponding to 1/4 of the memory capacity (each orphan occupies about 64KB of memory); 2. For high-concurrency short-connection services (e.g., HTTP servers, load balancers), if observing that the tcp_max_orphans limit becomes a performance bottleneck (by monitoring /proc/net/sockstat, the number of orphans is close to the upper limit), this value should be appropriately increased to 1.2-1.5 times the number of concurrent connections.",
     "type": "continuous",
     "range": [
       65536,
@@ -1094,7 +1094,7 @@
     "get": "sysctl -n net.ipv4.tcp_max_orphans"
   },
   "net.ipv4.tcp_ecn": {
-    "desc": "1. 当网络中存在不支持ECN的老旧网络设备时，建议保持默认值0（禁用），以避免潜在的数据包丢弃问题;2. 在确认网络设备完全支持ECN且需要降低TCP重传率的环境中，建议设置为1（启用）以获得更好的拥塞控制性能",
+    "desc": "1. When there are outdated network devices in the network that do not support ECN, it is recommended to keep the default value of 0 (disabled) to avoid potential packet drop issues; 2. In environments where network devices fully support ECN and there is a need to reduce TCP retransmission rates, it is recommended to set it to 1 (enabled) to obtain better congestion control performance.",
     "range": [
       "0",
       "1",
@@ -1106,7 +1106,7 @@
     "get": "sysctl -n net.ipv4.tcp_ecn"
   },
   "net.ipv4.ip_forward": {
-    "desc": "- 当服务器需要作为路由器或VPN网关时，应设置为1以启用IPv4转发功能, - 当服务器仅作为终端主机使用时，应保持默认值0以禁用转发功能，减少潜在安全风险",
+    "desc": "- When the server needs to act as a router or VPN gateway, it should be set to 1 to enable IPv4 forwarding function. - When the server is only used as an end host, it should keep the default value of 0 to disable forwarding function and reduce potential security risks.",
     "range": [
       "0",
       "1"
@@ -1117,7 +1117,7 @@
     "get": "sysctl -n net.ipv4.ip_forward"
   },
   "net.ipv4.conf.default.rp_filter": {
-    "desc": "1. 当服务器作为路由器或需要处理多路径网络流量时，建议将rp_filter设置为2（宽松模式），以避免严格的反向路径验证导致合法流量被丢弃;2. 在单网卡服务器且网络环境可信的情况下，可以设置为0（关闭验证）以减少内核处理开销，但需确保网络环境无IP欺骗风险",
+    "desc": "1. When the server acts as a router or needs to handle multi-path network traffic, it is recommended to set rp_filter to 2 (loose mode) to avoid legitimate traffic being dropped due to strict reverse path verification; 2. On single-NIC servers in trusted network environments, it can be set to 0 (turn off verification) to reduce kernel processing overhead, but ensure there is no IP spoofing risk in the network environment.",
     "range": [
       "0",
       "1"
@@ -1128,7 +1128,7 @@
     "get": "sysctl -n net.ipv4.conf.default.rp_filter"
   },
   "net.ipv4.tcp_no_metrics_save": {
-    "desc": "1. 在高并发短连接场景下，建议设置为1以禁用TCP连接参数保存，避免因大量无效参数缓存导致内存浪费和性能下降;2. 在需要保持长连接稳定性的场景下，建议保持默认值0，允许重用之前连接的有效参数来优化新连接建立性能",
+    "desc": "1. In high-concurrency short-connection scenarios, it is recommended to set to 1 to disable TCP connection parameter saving, avoiding memory waste and performance degradation caused by a large number of invalid parameter caches; 2. In scenarios requiring long-connection stability, it is recommended to keep the default value of 0, allowing reuse of effective parameters from previous connections to optimize new connection establishment performance.",
     "range": [
       "0",
       "1"
@@ -1139,7 +1139,7 @@
     "get": "sysctl -n net.ipv4.tcp_no_metrics_save"
   },
   "net.ipv4.ip_default_ttl": {
-    "desc": "1. 当网络中存在多层NAT或复杂路由环境时，若出现数据包提前被丢弃的情况，可考虑将TTL值提高到128，确保数据包能到达更远的网络节点;2. 对于需要限制数据包传播范围的场景（如内部测试网络），可降低TTL值至32以下，防止数据包在网络中过度传播",
+    "desc": "1. When there are multiple layers of NAT or complex routing environments in the network, if data packets are discarded prematurely, consider increasing the TTL value to 128 to ensure data packets can reach more distant network nodes; 2. For scenarios that need to limit the propagation range of data packets (e.g., internal test networks), the TTL value can be reduced to 32 or below to prevent excessive propagation of data packets in the network.",
     "type": "continuous",
     "range": [
       8,
@@ -1150,7 +1150,7 @@
     "get": "sysctl -n net.ipv4.ip_default_ttl"
   },
   "net.ipv4.ip_no_pmtu_disc": {
-    "desc": "1. 当网络中存在路径MTU发现(PMTUD)问题导致连接超时或性能下降时，建议将该参数设为1以禁用PMTUD，避免因ICMP黑洞或防火墙丢弃数据包导致的连接问题;2. 在高速网络环境(如10Gbps以上)且网络设备可靠支持PMTUD时，建议保持默认值0以启用PMTUD，确保TCP能动态发现最优MTU值提升吞吐量",
+    "desc": "1. When there are Path MTU Discovery (PMTUD) issues in the network causing connection timeouts or performance degradation, it is recommended to set this parameter to 1 to disable PMTUD, avoiding connection problems caused by ICMP black holes or firewall packet drops; 2. In high-speed network environments (e.g., 10Gbps and above) where network devices reliably support PMTUD, it is recommended to keep the default value of 0 to enable PMTUD, ensuring TCP can dynamically discover the optimal MTU value to improve throughput.",
     "range": [
       "0",
       "1"
@@ -1161,7 +1161,7 @@
     "get": "sysctl -n net.ipv4.ip_no_pmtu_disc"
   },
   "net.ipv4.tcp_retries2": {
-    "desc": "1. 对于高延迟或不稳定网络环境中的服务器，可考虑将值降低到5-8，减少因网络临时故障导致的连接长时间挂起问题;2. 对于需要快速检测连接失效的金融交易类服务器，建议设置为3-5，确保能更快释放失效连接资源",
+    "desc": "1. For servers in high-latency or unstable network environments, consider reducing the value to 5-8 to reduce the problem of connections hanging for long periods due to temporary network failures; 2. For financial transaction servers that need to quickly detect connection failures, it is recommended to set it to 3-5 to ensure faster release of failed connection resources.",
     "type": "continuous",
     "range": [
       3,
@@ -1172,7 +1172,7 @@
     "get": "sysctl -n net.ipv4.tcp_retries2"
   },
   "net.ipv4.tcp_orphan_retries": {
-    "desc": "1. 当服务器面临大量半连接（orphaned sockets）导致资源占用过高时，可适当降低该值（如3-5），加速释放资源，但需注意过低可能导致正常长延迟网络下的连接被过早丢弃;2. 若服务器主要处理本地或低延迟网络通信，且出现过多重试浪费资源的情况，可降至2-3次以减少不必要的等待时间",
+    "desc": "1. When the server faces a large number of half-open connections (orphaned sockets) causing high resource occupation, this value can be appropriately decreased (e.g., 3-5) to accelerate resource release, but note that too low may cause normal long-latency network connections to be prematurely discarded; 2. If the server primarily handles local or low-latency network communication and experiences excessive retries wasting resources, it can be reduced to 2-3 times to reduce unnecessary waiting time.",
     "type": "continuous",
     "range": [
       0,
@@ -1183,7 +1183,7 @@
     "get": "sysctl -n net.ipv4.tcp_orphan_retries"
   },
   "net.ipv4.tcp_syncookies": {
-    "desc": "1. 当服务器频繁遭受SYN flood攻击时，应启用该参数(设置为1)，以保护系统资源不被耗尽;2. 在正常网络环境下且未遭受攻击时，建议保持默认值(通常为1)，因为启用syncookies可能导致TCP连接性能略微下降",
+    "desc": "1. When the server is frequently under SYN flood attacks, this parameter should be enabled (set to 1) to protect system resources from being exhausted; 2. In normal network environments without attacks, it is recommended to keep the default value (usually 1), because enabling syncookies may slightly decrease TCP connection performance.",
     "range": [
       "0",
       "1"
@@ -1194,7 +1194,7 @@
     "get": "sysctl -n net.ipv4.tcp_syncookies"
   },
   "net.ipv4.tcp_reordering": {
-    "desc": "1. 当网络路径存在较高丢包率或频繁重排序时，若观察到TCP重传率明显上升且吞吐量下降，应考虑适当增大该值（默认3可尝试调整为9-12），以容忍更多乱序数据包而非错误触发快速重传;2. 在低延迟网络环境（如数据中心内部）且使用TSO/GRO等卸载技术时，若内核日志频繁出现\"TCP: too many of order packets\"警告，可将该值适度降低（如调整为6-8），减少乱序队列内存占用",
+    "desc": "1. When the network path has high packet loss rates or frequent reordering, and a significant increase in TCP retransmission rate and throughput decrease are observed, consider appropriately increasing this value (default 3 can be tried to adjust to 9-12) to tolerate more out-of-order packets rather than incorrectly triggering fast retransmission; 2. In low-latency network environments (e.g., inside data centers) using TSO/GRO and other offload technologies, if kernel logs frequently show 'TCP: too many of order packets' warnings, this value can be moderately decreased (e.g., adjusted to 6-8) to reduce out-of-order queue memory usage.",
     "type": "continuous",
     "range": [
       2,
@@ -1205,7 +1205,7 @@
     "get": "sysctl -n net.ipv4.tcp_reordering"
   },
   "net.ipv4.tcp_retrans_collapse": {
-    "desc": "1. 在Linux服务器环境中，若确认无老旧打印机设备需要兼容，建议禁用此参数以优化TCP重传性能;2. 当网络吞吐量出现异常下降且排查其他因素无果时，可尝试禁用此参数观察是否由打印机兼容性功能引起",
+    "desc": "1. In Linux server environments, if it is confirmed that there are no old printer devices requiring compatibility, it is recommended to disable this parameter to optimize TCP retransmission performance; 2. When network throughput abnormally decreases and other factors are ruled out, try disabling this parameter to observe if it is caused by printer compatibility features.",
     "range": [
       "0",
       "1"
@@ -1216,7 +1216,7 @@
     "get": "sysctl -n net.ipv4.tcp_retrans_collapse"
   },
   "net.ipv4.tcp_congestion_control": {
-    "desc": "1. 在高带宽、高延迟网络环境下（如跨数据中心通信），建议将默认的\"cubic\"算法切换为\"bbr\"，可更充分利用带宽并减少排队延迟;2. 在无线网络或移动网络环境中，若出现频繁丢包，建议使用\"vegas\"或\"westwood\"算法，这些算法对丢包区分更准确，能避免误判拥塞",
+    "desc": "1. In high-bandwidth, high-latency network environments (e.g., cross-data center communication), it is recommended to switch the default 'cubic' algorithm to 'bbr', which can better utilize bandwidth and reduce queuing delay; 2. In wireless or mobile network environments, if frequent packet loss occurs, it is recommended to use 'vegas' or 'westwood' algorithms, as these algorithms more accurately distinguish packet loss and can avoid misjudging congestion.",
     "range": [
       "cubic",
       "reno",
@@ -1228,7 +1228,7 @@
     "get": "sysctl -n net.ipv4.tcp_congestion_control"
   },
   "net.ipv4.conf.default.promote_secondaries": {
-    "desc": "1. 当服务器需要保持高可用性且依赖多个IP地址时，建议设置为1，确保主IP被移除时次IP能自动提升为主IP，避免服务中断;2. 在安全性要求严格的环境中建议设置为0，确保主IP被移除时所有关联IP都被清除，防止潜在的安全风险",
+    "desc": "1. When the server needs to maintain high availability and relies on multiple IP addresses, it is recommended to set it to 1 to ensure that when the primary IP is removed, the secondary IP can be automatically promoted to primary IP to avoid service interruption; 2. In environments with strict security requirements, it is recommended to set it to 0 to ensure that when the primary IP is removed, all associated IPs are cleared to prevent potential security risks.",
     "range": [
       "0",
       "1"
@@ -1239,7 +1239,7 @@
     "get": "sysctl -n net.ipv4.conf.default.promote_secondaries"
   },
   "net.ipv4.conf.all.promote_secondaries": {
-    "desc": "1. 当服务器需要保持高可用性且依赖多个IP地址时，建议设置为1，以确保主IP被移除时次IP能自动提升为主IP，避免服务中断;2. 当服务器IP地址管理需要严格遵循变更控制流程时，建议保持默认值0，以确保任何IP地址变更都需要明确操作，防止意外配置变更",
+    "desc": "1. When the server needs to maintain high availability and relies on multiple IP addresses, it is recommended to set it to 1 to ensure that when the primary IP is removed, the secondary IP can be automatically promoted to primary IP to avoid service interruption; 2. When the server's IP address management needs to strictly follow change control processes, it is recommended to keep the default value of 0 to ensure any IP address changes require explicit operations, preventing accidental configuration changes.",
     "range": [
       "0",
       "1"
@@ -1250,7 +1250,7 @@
     "get": "sysctl -n net.ipv4.conf.all.promote_secondaries"
   },
   "net.ipv4.conf.all.accept_redirects": {
-    "desc": "1. 对于作为网关或路由器的Linux服务器，建议设置为0以禁用ICMP重定向消息，防止潜在的网络拓扑欺骗攻击;2. 对于普通主机服务器，若网络环境可信且需要ICMP重定向功能优化路由，可保持默认值1；否则建议设置为0增强安全性",
+    "desc": "1. For Linux servers used as gateways or routers, it is recommended to set it to 0 to disable ICMP redirect messages and prevent potential network topology spoofing attacks; 2. For ordinary host servers, if the network environment is trusted and the ICMP redirect function is needed to optimize routing, the default value of 1 can be kept; otherwise, it is recommended to set it to 0 to enhance security.",
     "range": [
       "0",
       "1"
@@ -1261,7 +1261,7 @@
     "get": "sysctl -n net.ipv4.conf.all.accept_redirects"
   },
   "net.ipv4.conf.default.accept_redirects": {
-    "desc": "1. 在作为路由器使用时，建议设置为0以禁用ICMP重定向消息，防止潜在的网络拓扑混淆和安全风险;2. 在作为终端主机使用时，可保持默认值1以接受重定向消息，但若网络环境安全要求较高，建议同样设置为0",
+    "desc": "1. When used as a router, it is recommended to set it to 0 to disable ICMP redirect messages and prevent potential network topology confusion and security risks; 2. When used as an end host, the default value of 1 can be kept to accept redirect messages, but if the network environment has high security requirements, it is recommended to also set it to 0.",
     "range": [
       "0",
       "1"
@@ -1272,7 +1272,7 @@
     "get": "sysctl -n net.ipv4.conf.default.accept_redirects"
   },
   "net.ipv4.conf.all.secure_redirects": {
-    "desc": "- 在安全要求较高的生产环境中，建议设置为0禁用，避免潜在的安全风险, - 若网络环境需要接收特定ICMP重定向且信任网关，可设置为1但需配合其他安全措施",
+    "desc": "- In production environments with high security requirements, it is recommended to set to 0 to disable and avoid potential security risks. - If the network environment requires receiving specific ICMP redirects and the gateway is trusted, it can be set to 1 but must be combined with other security measures.",
     "range": [
       "0",
       "1"
@@ -1283,7 +1283,7 @@
     "get": "sysctl -n net.ipv4.conf.all.secure_redirects"
   },
   "net.ipv4.conf.default.secure_redirects": {
-    "desc": "1. 在安全要求较高的生产环境中建议设置为0，防止潜在的网络重定向攻击;2. 如果服务器需要接收来自可信网关的ICMP重定向消息以优化路由，可设置为1",
+    "desc": "1. In production environments with high security requirements, it is recommended to set to 0 to prevent potential network redirect attacks; 2. If the server needs to receive ICMP redirect messages from trusted gateways to optimize routing, it can be set to 1.",
     "range": [
       "0",
       "1"
@@ -1294,7 +1294,7 @@
     "get": "sysctl -n net.ipv4.conf.default.secure_redirects"
   },
   "net.ipv4.icmp_echo_ignore_broadcasts": {
-    "desc": "1. 如果服务器处于可能遭受ICMP广播风暴攻击的网络环境（如公开网络或DMZ区域），建议设置为1以避免资源耗尽;2. 如果服务器位于受保护的内网且需要接收ICMP广播（如网络设备发现等场景），建议设置为0以保持功能正常",
+    "desc": "1. If the server is in a network environment that may suffer ICMP broadcast storm attacks (such as public networks or DMZ zones), it is recommended to set to 1 to avoid resource exhaustion; 2. If the server is located in a protected internal network and needs to receive ICMP broadcasts (such as network device discovery scenarios), it is recommended to set to 0 to maintain normal functionality.",
     "range": [
       "0",
       "1"
@@ -1305,7 +1305,7 @@
     "get": "sysctl -n net.ipv4.icmp_echo_ignore_broadcasts"
   },
   "net.nf_conntrack_max": {
-    "desc": "1. 当服务器处理大量网络连接（如高并发代理、NAT网关或防火墙）且频繁出现\"nf_conntrack: table full\"日志时，需要增加该值以避免连接跟踪表溢出;2. 当系统内存不足且连接跟踪表利用率持续低于50%时，可适当降低该值以释放内存资源",
+    "desc": "1. When the server handles a large number of network connections (e.g., high-concurrency proxies, NAT gateways, or firewalls) and frequently encounters 'nf_conntrack: table full' logs, this value needs to be increased to avoid connection tracking table overflow; 2. When the system memory is insufficient and the connection tracking table utilization is consistently below 50%, this value can be appropriately decreased to free up memory resources.",
     "type": "continuous",
     "range": [
       65536,
@@ -1316,7 +1316,7 @@
     "get": "sysctl -n net.nf_conntrack_max"
   },
   "net.netfilter.nf_conntrack_tcp_timeout_established": {
-    "desc": "1. 当服务器处理大量持久TCP连接(如长连接服务、代理服务器等)且观察到nf_conntrack表频繁满导致丢包时，可适当增大该值(默认43200秒/12小时)，但需确保不超过客户端实际连接保持时间，避免无效连接占用资源;2. 对于短连接为主的Web服务器环境，若系统内存压力较大且连接跟踪表占用过高，可适当降低该值(但不应小于1800秒)，以加速连接表项回收",
+    "desc": "1. When the server handles a large number of persistent TCP connections (e.g., long-connection services, proxy servers, etc.) and observes frequent nf_conntrack table full conditions leading to packet loss, this value can be appropriately increased (default 43200 seconds/12 hours), but ensure it does not exceed the client's actual connection hold time to avoid invalid connections occupying resources; 2. For Web server environments primarily handling short connections, if system memory pressure is high and connection tracking table usage is excessive, this value can be appropriately decreased (but should not be less than 1800 seconds) to accelerate connection entry recycling.",
     "type": "continuous",
     "range": [
       108000,
@@ -1327,7 +1327,7 @@
     "get": "sysctl -n net.netfilter.nf_conntrack_tcp_timeout_established"
   },
   "net.netfilter.nf_conntrack_tcp_timeout_close_wait": {
-    "desc": "1. 当服务器处理大量短连接且频繁出现close_wait状态时，若该值过大(默认240秒)会导致连接资源长时间占用，可适当降低至60-120秒范围;2. 对于长连接为主的服务器环境，若发现连接异常断开导致资源泄漏，可考虑增大该值至300-600秒范围",
+    "desc": "1. When the server handles a large number of short connections and frequently encounters close_wait states, if this value is too large (default 240 seconds), it will cause connection resources to be occupied for a long time and can be appropriately decreased to the range of 60-120 seconds; 2. For server environments primarily handling long connections, if abnormal connection disconnections cause resource leaks, consider increasing this value to the range of 300-600 seconds.",
     "type": "continuous",
     "range": [
       15,
@@ -1338,7 +1338,7 @@
     "get": "sysctl -n net.netfilter.nf_conntrack_tcp_timeout_close_wait"
   },
   "net.netfilter.nf_conntrack_tcp_timeout_fin_wait": {
-    "desc": "1. 当服务器处理大量短连接且频繁出现FIN_WAIT状态连接堆积时，若系统日志显示nf_conntrack表频繁满导致丢包，可适当减少该值至30-60秒范围以加速连接回收;2. 若服务器主要处理长连接且并发连接数远低于nf_conntrack_max的80%，出现FIN_WAIT状态连接过早超时导致异常断开时，可增大该值至120-300秒范围确保正常连接终止流程完成",
+    "desc": "1. When the server handles a large number of short connections and frequently encounters FIN_WAIT state connection backlog, if system logs show frequent nf_conntrack table full conditions leading to packet loss, this value can be appropriately reduced to the range of 30-60 seconds to accelerate connection recycling; 2. If the server primarily handles long connections and the number of concurrent connections is far below 80% of nf_conntrack_max, and FIN_WAIT state connections timeout prematurely causing abnormal disconnections, this value can be increased to the range of 120-300 seconds to ensure normal connection termination processes complete.",
     "type": "continuous",
     "range": [
       30,
@@ -1349,7 +1349,7 @@
     "get": "sysctl -n net.netfilter.nf_conntrack_tcp_timeout_fin_wait"
   },
   "net.netfilter.nf_conntrack_tcp_timeout_time_wait": {
-    "desc": "1. 当服务器处理大量短连接且出现大量TIME_WAIT状态连接导致nf_conntrack表满时，可适当降低该值（默认120秒），建议调整为30-60秒以更快释放连接跟踪条目;2. 若服务器作为反向代理或负载均衡器且出现端口耗尽问题，在确认无重传包风险后可考虑将该值降至15-30秒，但需确保大于TCP的2MSL时间",
+    "desc": "1. When the server handles a large number of short connections and encounters many TIME_WAIT state connections causing the nf_conntrack table to fill up, this value (default 120 seconds) can be appropriately decreased. It is recommended to adjust to 30-60 seconds to release connection tracking entries faster; 2. If the server acts as a reverse proxy or load balancer and encounters port exhaustion issues, and after confirming there is no risk of retransmission packets, consider decreasing this value to 15-30 seconds, but ensure it is greater than TCP's 2MSL time.",
     "type": "continuous",
     "range": [
       30,
@@ -1360,7 +1360,7 @@
     "get": "sysctl -n net.netfilter.nf_conntrack_tcp_timeout_time_wait"
   },
   "net.ipv4.conf.default.forwarding": {
-    "desc": "1. 当服务器需要作为路由器或网关转发IPv4流量时，应将该参数设置为1，否则保持默认值0以关闭转发功能提升安全性;2. 在容器或虚拟化环境中，若宿主机需要为虚拟机/容器提供网络转发功能，则需启用该参数",
+    "desc": "1. When the server needs to act as a router or gateway to forward IPv4 traffic, this parameter should be set to 1; otherwise, keep the default value of 0 to turn off the forwarding function and improve security; 2. In container or virtualization environments, if the host machine needs to provide network forwarding functionality for virtual machines/containers, this parameter needs to be enabled.",
     "range": [
       "0",
       "1"
@@ -1371,7 +1371,7 @@
     "get": "sysctl -n net.ipv4.conf.default.forwarding"
   },
   "net.core.rps_sock_flow_entries": {
-    "desc": "1. 当服务器处理大量网络连接且RPS/RFS功能开启时，若出现CPU缓存命中率下降或网络延迟增加，应考虑增加该值（通常建议设置为32768或65536）;2. 在高吞吐量网络环境下（如10Gbps以上），若网络性能未达预期且/proc/net/softnet_stat显示drop计数增长，应将该值调整为至少等于或大于预期并发连接数",
+    "desc": "1. When the server handles a large number of network connections and the RPS/RFS function is enabled, if CPU cache hit rates decrease or network latency increases, consider increasing this value (usually recommended to set to 32768 or 65536); 2. In high-throughput network environments (e.g., 10Gbps and above), if network performance does not meet expectations and /proc/net/softnet_stat shows increasing drop counts, this value should be adjusted to at least equal to or greater than the expected number of concurrent connections.",
     "type": "continuous",
     "range": [
       0,
@@ -1382,7 +1382,7 @@
     "get": "sysctl -n net.core.rps_sock_flow_entries"
   },
   "net.ipv4.tcp_min_tso_segs": {
-    "desc": "1. 当服务器主要处理大量小数据包（如小于1460字节）且TSO利用率低时，可适当降低该值（默认2）以减少延迟，但需确保不低于1以避免性能下降;2. 对于高速网络（10Gbps+）且处理大数据传输的场景，若观察到TSO分段不足导致CPU利用率过高，可适当增大该值（建议不超过8）以提升吞吐量",
+    "desc": "1. When the server primarily handles a large number of small data packets (e.g., less than 1460 bytes) and TSO utilization is low, this value (default 2) can be appropriately decreased to reduce latency, but ensure it is not lower than 1 to avoid performance degradation; 2. For high-speed networks (10Gbps+) and large data transfer scenarios, if insufficient TSO segmentation is observed causing high CPU utilization, this value can be appropriately increased (recommended not to exceed 8) to improve throughput.",
     "type": "continuous",
     "range": [
       1,

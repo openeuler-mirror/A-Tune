@@ -1,6 +1,7 @@
 import logging
 import pandas as pd
 from io import StringIO
+from src.utils.common import translate
 from src.utils.collector.metric_collector import (
     period_task,
     snapshot_task,
@@ -14,7 +15,7 @@ GAUSS_INTERVAL = 60
     # cmd='gsql -p 17777 -d tpcc1000w_ustore  -A -F , -c "SELECT * FROM pg_stat_bgwriter;"',
     cmd='source ~/.bashrc && gsql -d tpcc -p 11111 -c "SELECT * FROM pg_stat_bgwriter;"',
     collect_mode=CollectMode.ASYNC,
-    tag="GaussDB后台写入与检查点",
+    tag=translate("GaussDB后台写入与检查点", "GaussDB Background Writing and Checkpointing"),
     delay=0,
     sample_count=2,
     interval=GAUSS_INTERVAL,
@@ -29,16 +30,16 @@ def gauss_bgwriter_parser(output: list[str]) -> dict:
 
     r1, r2 = df1.iloc[0].to_dict(), df2.iloc[0].to_dict()
     mapping = {
-        "checkpoints_timed": "定时检查点",
-        "checkpoints_req": "请求检查点",
-        "checkpoint_write_time": "检查点写入耗时(ms)",
-        "checkpoint_sync_time": "检查点同步耗时(ms)",
-        "buffers_checkpoint": "检查点写出页数",
-        "buffers_clean": "后台清理写出页数",
-        "maxwritten_clean": "后台清理超限次数",
-        "buffers_backend": "后端写出页数",
-        "buffers_backend_fsync": "后端 fsync 次数",
-        "buffers_alloc": "分配新缓冲区页数",
+        "checkpoints_timed": "scheduled_checkpoints",
+        "checkpoints_req": "requested_checkpoints",
+        "checkpoint_write_time": "checkpoint_write_time_ms",
+        "checkpoint_sync_time": "checkpoint_sync_time_ms",
+        "buffers_checkpoint": "checkpoint_pages_written",
+        "buffers_clean": "background_clean_pages",
+        "maxwritten_clean": "background_clean_overflows",
+        "buffers_backend": "backend_write_pages",
+        "buffers_backend_fsync": "backend_fsync_count",
+        "buffers_alloc": "new_buffer_pages_allocated"
     }
     result = {}
     for key, label in mapping.items():
@@ -99,19 +100,18 @@ def gauss_dbstat_parser(output: list[str]) -> dict:
     cmd='''source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "
 SELECT datname, state, waiting, enqueue
 FROM pg_stat_activity;"''',
-    collect_mode=CollectMode.ASYNC,
-    tag="GaussDB会话信息",
+    tag=translate("GaussDB会话信息", "GaussDB Session Information"),
 )
 def gauss_activity_parser(output: str) -> dict:
     df = pd.read_csv(StringIO(output))
     mapping = {
-        "datname": "数据库名",
-        "state": "连接状态",
-        "waiting": "是否等待",
-        "enqueue": "排队/锁信息",
+        "datname": "database_name",
+        "state": "connection_state",
+        "waiting": "is_waiting",
+        "enqueue": "enqueue_lock_info"
     }
     return {
-        "会话信息": [
+        "session_information": [
             {mapping.get(k, k): v for k, v in row.items()}
             for _, row in df.iterrows()
         ]
@@ -122,13 +122,17 @@ def gauss_activity_parser(output: str) -> dict:
 @snapshot_task(
     cmd='source ~/.bashrc && gsql -p 11111 -d tpcc  -A -F , -c "SELECT mode, granted, COUNT(*) AS count FROM pg_locks GROUP BY mode, granted;"',
     collect_mode=CollectMode.ASYNC,
-    tag="GaussDB锁信息",
+    tag=translate("GaussDB锁信息", "GaussDB Lock Information",)
 )
 def gauss_locks_parser(output: str) -> dict:
     df = pd.read_csv(StringIO(output))
-    mapping = {"mode": "锁模式", "granted": "是否已授予", "count": "锁数量"}
+    mapping = {
+        "mode": "lock_mode",
+        "granted": "is_granted",
+        "count": "lock_count"
+    }
     return {
-        "锁信息": [
+        "lock_infomation": [
             {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
         ]
     }
@@ -140,21 +144,21 @@ def gauss_locks_parser(output: str) -> dict:
         blks_read, blks_hit, pg_database_size(datname) AS db_size_bytes
         FROM pg_stat_database WHERE datname NOT IN ('template0', 'template1');"''',
     collect_mode=CollectMode.ASYNC,
-    tag="GaussDB数据库级指标",
+    tag=translate("GaussDB数据库级指标", "GaussDB Database-Level Metrics"),
 )
 def gauss_database_snapshot_parser(output: str) -> dict:
     df = pd.read_csv(StringIO(output))
     mapping = {
-        "datname": "数据库名",
-        "numbackends": "连接数",
-        "xact_commit": "提交事务数",
-        "xact_rollback": "回滚事务数",
-        "blks_read": "磁盘读块数",
-        "blks_hit": "缓冲命中块数",
-        "db_size_bytes": "数据库大小(Bytes)",
+        "datname": "database_name",
+        "numbackends": "connection_count",
+        "xact_commit": "committed_transactions",
+        "xact_rollback": "rolled_back_transactions",
+        "blks_read": "disk_blocks_read",
+        "blks_hit": "buffer_hit_blocks",
+        "db_size_bytes": "database_size_bytes"
     }
     return {
-        "数据库统计": [
+        "database_statistics": [
             {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
         ]
     }
@@ -169,17 +173,17 @@ def gauss_database_snapshot_parser(output: str) -> dict:
             MAX(usedsize) AS dynamic_peak_memory_bytes
         FROM gs_session_memory_detail;"''',
     collect_mode=CollectMode.ASYNC,
-    tag="GaussDB内存使用",
+    tag=translate("GaussDB内存使用", "GaussDB Memory Usage"),
 )
 def gauss_memory_parser(output: str) -> dict:
     df = pd.read_csv(StringIO(output))
     mapping = {
-        "node_name": "节点名",
-        "dynamic_used_memory": "已使用动态内存(MB)",
-        "dynamic_peak_memory": "动态内存峰值(MB)",
+        "node_name": "node_name",
+        "dynamic_used_memory": "dynamic_used_memory",
+        "dynamic_peak_memory": "dynamic_peak_memory",
     }
     return {
-        "内存信息": [
+        "memory_infomation": [
             {mapping.get(k, k): v for k, v in row.items()} for _, row in df.iterrows()
         ]
     }

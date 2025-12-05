@@ -6,6 +6,7 @@ from typing import Any, Optional, Dict, List, Union
 from pathlib import Path
 
 from src.utils.constant import CONFIG_PATH, KNOWLEDGE_PATH
+from src.utils.common import language
 
 
 class EnvironConfig:
@@ -129,6 +130,8 @@ def init():
                 choosen_param_version = param_version
             break
         choosen_param_version = param_version
+    if language() == "zh":
+        choosen_param_version += "_" + language()
     logging.info(f"use {env_app_name} param knowledge version: {choosen_param_version}")
     # param_config中仅保留最终选择版本
     param_config._configs[env_app_name] = param_config._configs[env_app_name][choosen_param_version]

@@ -1,6 +1,6 @@
 {
     "active-defrag-cycle-max": {
-        "desc": "最大努力进行碎片整理的CPU百分比，当达到上限阈值时使用。增大该值可以提高碎片整理的效率，但会增加CPU的使用，适用于缓解CPU瓶颈。",
+        "desc": "Maximum CPU percentage for defragmentation effort, used when upper threshold is reached. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -10,7 +10,7 @@
         "default_value": 25
     },
     "active-defrag-cycle-min": {
-        "desc": "该参数用于设置主动碎片整理的最小努力程度，以CPU百分比表示。当达到下限阈值时，将使用此设置。减小该值可以提高碎片整理的频率，但可能会增加CPU的使用，适用于缓解CPU瓶颈。",
+        "desc": "Minimum CPU percentage for active defragmentation effort. When lower threshold is reached, this setting is used. Decreasing this value increases defragmentation frequency but may increase CPU usage, suitable for alleviating CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -20,7 +20,7 @@
         "default_value": 1
     },
     "active-defrag-max-scan-fields": {
-        "desc": "在主动碎片整理过程中，最多扫描的字段数量。增大该值可以提高碎片整理的效率，但会增加CPU的使用，适用于缓解CPU瓶颈。",
+        "desc": "Maximum number of fields to scan during active defragmentation. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -30,7 +30,7 @@
         "default_value": 1000
     },
     "active-defrag-threshold-lower": {
-        "desc": "主动碎片整理的下限阈值，低于该值时不会进行整理。适当设置可以避免不必要的CPU消耗，适用于内存瓶颈。",
+        "desc": "Lower threshold for active defragmentation; no defragmentation occurs below this value. Proper setting avoids unnecessary CPU consumption, suitable for memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -40,7 +40,7 @@
         "default_value": 10
     },
     "active-defrag-threshold-upper": {
-        "desc": "最大内存碎片率百分比，当内存碎片率高于该值时，Redis将开始进行最大努力的碎片整理，以缓解内存瓶颈。",
+        "desc": "Maximum memory fragmentation percentage; when memory fragmentation rate exceeds this value, Redis begins maximum effort defragmentation to alleviate memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -50,7 +50,7 @@
         "default_value": 100
     },
     "activedefrag": {
-        "desc": "启用或禁用主动碎片整理。启用后，Redis会在空闲时自动整理内存，适用于内存碎片严重的场景，可以缓解内存瓶颈。",
+        "desc": "Enable or disable active defragmentation. When enabled, Redis automatically defragments memory during idle time, suitable for scenarios with severe memory fragmentation, can alleviate memory bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -60,7 +60,7 @@
         "default_value": "no"
     },
     "activerehashing": {
-        "desc": "启用主动rehashing后，Redis会在后台自动调整哈希表的大小，以提高性能。该功能每秒进行十次rehash操作，每次操作消耗1毫秒的CPU时间，适用于缓解CPU瓶颈。",
+        "desc": "When active rehashing is enabled, Redis automatically adjusts hash table size in background to improve performance. This function performs rehash operations ten times per second, each consuming 1ms CPU time, suitable for alleviating CPU bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -70,7 +70,7 @@
         "default_value": "yes"
     },
     "aof-rewrite-incremental-fsync": {
-        "desc": "该参数决定在AOF重写时是否使用增量fsync。启用增量fsync可以减少写入延迟，适合高写入负载的场景，能够缓解磁盘IO瓶颈。取值为'yes'表示启用，'no'表示不启用。",
+        "desc": "This parameter determines whether to use incremental fsync during AOF rewrite. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -80,7 +80,7 @@
         "default_value": "yes"
     },
     "dynamic-hz": {
-        "desc": "启用动态事件循环频率调整，Redis会根据连接的客户端数量动态调整事件循环频率，以提高性能，适用于缓解CPU瓶颈。",
+        "desc": "Enable dynamic event loop frequency adjustment; Redis dynamically adjusts event loop frequency based on number of connected clients to improve performance, suitable for alleviating CPU bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -90,7 +90,7 @@
         "default_value": "yes"
     },
     "hz": {
-        "desc": "Redis的事件循环频率，单位为赫兹。该参数决定了Redis处理事件的频率，增大该值可以提高事件处理的响应速度，但会增加CPU的使用率，适用于缓解CPU瓶颈。",
+        "desc": "Redis event loop frequency in Hertz. This parameter determines how frequently Redis processes events. Increasing this value improves event processing response speed but increases CPU usage, suitable for alleviating CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -100,7 +100,7 @@
         "default_value": 10
     },
     "lazyfree-lazy-eviction": {
-        "desc": "控制DEL命令的默认行为，使其像UNLINK一样工作。启用惰性删除后，Redis会在后台异步删除过期键，适用于高并发场景，可以缓解内存瓶颈。",
+        "desc": "Controls default behavior of DEL command to work like UNLINK. When lazy deletion is enabled, Redis asynchronously deletes expired keys in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -110,7 +110,7 @@
         "default_value": "no"
     },
     "lazyfree-lazy-expire": {
-        "desc": "控制过期键的默认行为，使其像UNLINK一样异步处理。启用惰性过期后，Redis将在后台异步处理过期键，适用于高并发场景，可以缓解内存瓶颈。",
+        "desc": "Controls default behavior of expired keys to be processed asynchronously like UNLINK. When lazy expiration is enabled, Redis processes expired keys asynchronously in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -120,7 +120,7 @@
         "default_value": "no"
     },
     "lazyfree-lazy-server-del": {
-        "desc": "控制服务器端删除的行为，使其像UNLINK一样工作。启用后，Redis会在后台异步删除服务器，适用于高并发场景，可以缓解内存瓶颈。",
+        "desc": "Controls server-side deletion behavior to work like UNLINK. When enabled, Redis asynchronously deletes servers in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -130,7 +130,7 @@
         "default_value": "no"
     },
     "lfu-decay-time": {
-        "desc": "LFU算法的衰减时间，单位为分钟。增大该值可以延长频率统计的有效期，但会增加内存使用，适用于缓解内存瓶颈。",
+        "desc": "LFU algorithm decay time in minutes. Increasing this value extends frequency statistics validity period but increases memory usage, suitable for alleviating memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -140,7 +140,7 @@
         "default_value": 1
     },
     "lfu-log-factor": {
-        "desc": "LFU（Least Frequently Used）算法的日志因子，决定了LFU算法的灵敏度。增大该值可以提高LFU算法的准确性，但会增加内存使用。适用于缓解内存瓶颈。",
+        "desc": "LFU (Least Frequently Used) algorithm log factor, determines LFU algorithm sensitivity. Increasing this value improves LFU algorithm accuracy but increases memory usage. Suitable for alleviating memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -150,7 +150,7 @@
         "default_value": 10
     },
     "list-compress-depth": {
-        "desc": "压缩深度是指在使用压缩列表时，从列表两侧排除的快速列表 ziplist 节点的数量。增大该值可以减少内存使用，但可能会影响性能，适用于缓解内存瓶颈。",
+        "desc": "Compression depth refers to number of quicklist ziplist nodes excluded from both ends of list when using compressed lists. Increasing this value reduces memory usage but may affect performance, suitable for alleviating memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -160,7 +160,7 @@
         "default_value": 0
     },
     "lua-time-limit": {
-        "desc": "Lua脚本的最大执行时间，单位为毫秒。超出该时间将被强制终止，适用于高并发场景，可以缓解CPU瓶颈。",
+        "desc": "Maximum execution time for Lua scripts in milliseconds. Scripts exceeding this time will be forcibly terminated, suitable for high concurrency scenarios, can alleviate CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -170,7 +170,7 @@
         "default_value": 5000
     },
     "maxmemory-samples": {
-        "desc": "在执行内存回收时，Redis会随机抽样的键的数量。该参数表示用于最少使用（LRU）和生存时间（TTL）计算的样本大小。增大该值可以提高内存回收的效率，但会增加CPU的使用，适用于缓解CPU瓶颈。",
+        "desc": "Number of keys randomly sampled during memory reclamation. This parameter represents sample size used for LRU (Least Recently Used) and TTL (Time To Live) calculations. Increasing this value improves memory reclamation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -180,7 +180,7 @@
         "default_value": 3
     },
     "maxmemory": {
-        "desc": "设置Redis实例可以使用的最大内存量。通过限制Redis使用的内存，可以防止系统内存耗尽，适用于缓解内存瓶颈。该参数可以设置为具体的字节数或使用单位（如kb, mb, gb）。",
+        "desc": "Sets maximum memory amount Redis instance can use. By limiting Redis memory usage, prevents system memory exhaustion, suitable for alleviating memory bottlenecks. This parameter can be set to specific byte count or using units (e.g., kb, mb, gb).",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -190,7 +190,7 @@
         "default_value": 0
     },
     "proto-max-bulk-len": {
-        "desc": "该参数定义了Redis协议中最大允许的单个数据包的字节数。它的作用是限制客户端发送给Redis的最大数据量，防止过大的数据包导致内存消耗过高，从而缓解内存瓶颈。增大该值可以允许更大的数据包，但可能会增加内存使用和处理时间；减小该值则会限制数据包大小，可能导致客户端发送失败。",
+        "desc": "This parameter defines maximum allowed single packet size in bytes in Redis protocol. Its purpose is to limit maximum data amount clients can send to Redis, preventing excessive memory consumption from oversized packets, thereby alleviating memory bottlenecks. Increasing this value allows larger packets but may increase memory usage and processing time; decreasing it limits packet size, potentially causing client send failures.",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -200,7 +200,7 @@
         "default_value": "512mb"
     },
     "rdb-save-incremental-fsync": {
-        "desc": "该参数决定在RDB文件保存时是否使用增量fsync。启用增量fsync可以减少写入延迟，适合高写入负载的场景，并能缓解磁盘IO瓶颈。取值为'yes'表示启用，'no'表示不启用。启用时，Redis会在写入RDB文件时进行增量fsync，减少IO压力。",
+        "desc": "This parameter determines whether to use incremental fsync during RDB file saving. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, and can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, Redis performs incremental fsync while writing RDB files, reducing I/O pressure.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -210,7 +210,7 @@
         "default_value": "yes"
     },
     "rdbchecksum": {
-        "desc": "该参数用于设置RDB文件的校验和算法。启用CRC64校验和可以在加载RDB文件时验证数据的完整性，防止数据损坏，从而提高数据安全性。虽然启用校验和会增加一些CPU开销，但可以缓解磁盘IO瓶颈。",
+        "desc": "This parameter sets checksum algorithm for RDB files. Enabling CRC64 checksum verifies data integrity when loading RDB files, preventing data corruption, thereby improving data security. Although enabling checksum adds some CPU overhead, it can alleviate disk I/O bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -220,7 +220,7 @@
         "default_value": "crc64"
     },
     "rdbcompression": {
-        "desc": "该参数决定在备份RDB文件时是否使用LZF算法压缩字符串。启用压缩可以减少磁盘IO和内存使用，适合存储大量数据的场景。取值为'yes'表示启用压缩，'no'表示不启用。启用压缩会增加CPU负担，但可以显著减少磁盘空间的使用。",
+        "desc": "This parameter determines whether to use LZF algorithm to compress strings when backing up RDB files. Enabling compression reduces disk I/O and memory usage, suitable for scenarios storing large amounts of data. Value 'yes' enables compression, 'no' disables. Enabling compression increases CPU burden but significantly reduces disk space usage.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -230,7 +230,7 @@
         "default_value": "yes"
     },
     "replica-lazy-flush": {
-        "desc": "控制从节点数据的刷新行为。启用惰性刷新后，Redis会在后台异步刷新从节点数据，适用于高并发场景，可以缓解磁盘IO瓶颈。",
+        "desc": "Controls replica data flushing behavior. When lazy flushing is enabled, Redis asynchronously flushes replica data in background, suitable for high concurrency scenarios, can alleviate disk I/O bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -240,7 +240,7 @@
         "default_value": "no"
     },
     "replica-serve-stale-data": {
-        "desc": "该参数决定从节点是否可以提供过期数据。启用后，从节点在主节点不可用时仍可继续提供服务，适用于高可用场景，有助于缓解网络瓶颈。",
+        "desc": "This parameter determines whether replicas can serve stale data. When enabled, replicas continue serving when master is unavailable, suitable for high availability scenarios, helps alleviate network bottlenecks.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -250,7 +250,7 @@
         "default_value": "yes"
     },
     "set-max-intset-entries": {
-        "desc": "该参数定义了Redis中整数集合（intset）允许的最大元素数量。当集合的元素数量超过该值时，Redis会将其转换为更高效的数据结构。增大该值可以允许更多的整数元素，但会增加内存使用；减小该值则会导致更早地转换数据结构，从而缓解内存瓶颈。",
+        "desc": "This parameter defines maximum number of elements allowed in Redis integer set (intset). When set element count exceeds this value, Redis converts it to more efficient data structure. Increasing this value allows more integer elements but increases memory usage; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -260,7 +260,7 @@
         "default_value": 512
     },
     "slowlog-log-slower-than": {
-        "desc": "该参数用于设置记录慢查询的阈值，单位为微秒。超过该时间的命令将被记录到慢日志中，便于后续分析。可以缓解CPU瓶颈。增大该值可以减少记录的慢查询数量，减小该值则会记录更多的慢查询，有助于性能调优。",
+        "desc": "This parameter sets threshold for recording slow queries in microseconds. Commands exceeding this time will be recorded in slow log for subsequent analysis. Can alleviate CPU bottlenecks. Increasing this value reduces number of recorded slow queries; decreasing it records more slow queries, helpful for performance tuning.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -270,7 +270,7 @@
         "default_value": 10000
     },
     "slowlog-max-len": {
-        "desc": "该参数定义了慢日志的最大长度，即最多记录的慢查询条目数。增大该值可以记录更多的慢查询，减小该值则会限制记录的数量，可能导致重要的慢查询被覆盖。此参数有助于缓解内存瓶颈。",
+        "desc": "This parameter defines maximum length of slow log, i.e., maximum number of slow query entries recorded. Increasing this value records more slow queries; decreasing it limits number of records, potentially causing important slow queries to be overwritten. This parameter helps alleviate memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -280,7 +280,7 @@
         "default_value": 128
     },
     "stop-writes-on-bgsave-error": {
-        "desc": "该参数决定在后台保存（bgsave）出现错误时是否停止写入操作。启用该选项可以防止数据丢失，但可能影响可用性。可以缓解磁盘IO瓶颈。取值为'yes'表示启用，'no'表示不启用。启用时，如果bgsave失败，写入操作将被停止，直到问题解决。",
+        "desc": "This parameter determines whether to stop write operations when background save (bgsave) encounters errors. Enabling this option prevents data loss but may affect availability. Can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, if bgsave fails, write operations are stopped until problem is resolved.",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -290,7 +290,7 @@
         "default_value": "yes"
     },
     "stream-node-max-bytes": {
-        "desc": "该参数定义了每个流节点允许的最大字节数。如果设置为0，则节点大小无限制。超过该值的节点将被拆分，增大该值可以允许更大的节点，减小该值则会导致更频繁的节点拆分，可能影响性能。此参数可以帮助缓解内存瓶颈。",
+        "desc": "This parameter defines maximum bytes allowed per stream node. If set to 0, node size is unlimited. Nodes exceeding this value will be split. Increasing this value allows larger nodes; decreasing it causes more frequent node splitting, potentially affecting performance. This parameter helps alleviate memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -300,7 +300,7 @@
         "default_value": 4096
     },
     "stream-node-max-entries": {
-        "desc": "该参数定义了每个流节点允许的最大条目数。超过该值的节点将被拆分，能够缓解内存瓶颈。增大该值可以允许更多的条目，减小该值则会导致更频繁的节点拆分，可能影响性能。",
+        "desc": "This parameter defines maximum number of entries allowed per stream node. Nodes exceeding this value will be split, can alleviate memory bottlenecks. Increasing this value allows more entries; decreasing it causes more frequent node splitting, potentially affecting performance.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -310,7 +310,7 @@
         "default_value": 100
     },
     "zset-max-ziplist-entries": {
-        "desc": "该参数定义了有序集合（zset）使用ziplist数据结构的最大条目数。超过该值时，zset将转换为更高效的数据结构，从而缓解内存瓶颈。增大该值可以允许更多的条目使用ziplist，减小该值则会导致更早地转换数据结构。",
+        "desc": "This parameter defines maximum number of entries for sorted sets (zset) using ziplist data structure. When this value is exceeded, zset converts to more efficient data structure, thereby alleviating memory bottlenecks. Increasing this value allows more entries to use ziplist; decreasing it causes earlier data structure conversion.",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -320,7 +320,7 @@
         "default_value": 128
     },
     "zset-max-ziplist-value": {
-        "desc": "该参数定义了有序集合（zset）使用ziplist数据结构的最大值大小（字节）。当有序集合中的元素大小小于该值时，将使用一种特殊编码来节省内存。超过该值时，有序集合将转换为更高效的数据结构。增大该值可以允许更大的值使用ziplist，减小该值则会导致更早地转换数据结构，从而缓解内存瓶颈。",
+        "desc": "This parameter defines maximum value size (bytes) for sorted sets (zset) using ziplist data structure. When sorted set element size is less than this value, special encoding is used to save memory. When exceeded, sorted set converts to more efficient data structure. Increasing this value allows larger values to use ziplist; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks.",
         "type": "continuous",
         "dtype": "int",
         "range": [

@@ -180,9 +180,9 @@ class ParamOptimizer:
             baseline = self.benchmark()
         # 保存每轮调优的结果，反思调优目标是否达到
         historys = {
-            "历史最佳结果": {},
-            "历史最差结果": {},
-            "上一轮调优结果": {}
+            "best_result": {},
+            "worst_result": {},
+            "previous_result": {}
         }
         best_result = baseline
         worst_result = baseline
@@ -204,7 +204,7 @@ class ParamOptimizer:
                 restart_success = self.restart_application()
                 if not restart_success:
                     logging.warning(f"[{i + 1}/{self.max_iterations}] application restart failed due to invalid parameters, reverting to round {i} configuration...")
-                    historys["上一轮调优结果"] = {"上一轮性能": "应用重启失败，参数不合法", "参数推荐": recommend_params}
+                    historys["previous_result"] = {"previous_performance": "application restart, because param is invalid", "recommend_param": recommend_params}
                     self.apply_params(self.current_params)
                     restart_success = self.restart_application()
                     logging.warning(f"round {i} configuration recovery {'succeeded' if restart_success else 'failed'}")
@@ -220,7 +220,7 @@ class ParamOptimizer:
                 self.save_restart_params_to_script(recommend_params, script_path, i + 1)
                 self.recover_cluster()
             if performance_result is None:
-                historys["上一轮调优结果"] = {"上一轮性能": "benchmark失败，参数不合理", "参数推荐": recommend_params}
+                historys["previous_result"] = {"previous_performance": "benchmark failed, because param is invalid.", "recommend_param": recommend_params}
                 self.apply_params(self.current_params)
                 restart_success = True
                 if self.need_restart_application:
@@ -239,22 +239,21 @@ class ParamOptimizer:
             if performance_result * symbol > best_result * symbol:
                 best_result = performance_result
                 best_recommend_params = dict(curr_recommend_params)
-                best_history = {"最佳性能": performance_result, "参数推荐": recommend_params}
-                historys["历史最佳结果"] = best_history
+                best_history = {"best_performance": performance_result, "recommend_param": recommend_params}
+                historys["best_result"] = best_history
                 self.save_best_params(recommend_params)
 
             if performance_result * symbol < worst_result * symbol:
                 worst_result = performance_result
-                worst_history = {"最差性能": performance_result, "参数推荐": recommend_params}
-                historys["历史最差结果"] = worst_history
+                worst_history = {"worst_performance": performance_result, "recommend_param": recommend_params}
+                historys["worst_result"] = worst_history
 
-            historys["上一轮调优结果"] = {"上一轮性能": performance_result, "参数推荐": recommend_params}
+            historys["previous_result"] = {"previous_performance": performance_result, "recommend_param": recommend_params}
 
             ratio = self.calc_improve_rate(baseline, performance_result, symbol)
 
             logging.info(
-                f"[{i + 1}/{self.max_iterations}] performance baseline is {baseline}, best result: {best_result}, \
-                this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
+                f"[{i + 1}/{self.max_iterations}] performance baseline is {baseline}, best result: {best_result}, this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
             )
 
             # 达到预期效果，则退出循环

@@ -3,6 +3,7 @@ import json5
 import logging
 from typing import Dict
 from src.utils.llm import get_llm_response
+from src.utils.common import translate
 
 # TO implement more gernel repair: todo
 def json_pair(
@@ -30,7 +31,8 @@ def json_repair(
     json_data = json_pair(json_str)
     if json_data != {}:
         return json_data
-    prompt = f'''
+    prompt = translate(
+        f'''
 请检查并修复以下内容，使其成为合法、纯净的 JSON 对象。
 
 要求：
@@ -43,7 +45,21 @@ def json_repair(
 <raw_input>
 {json_str}
 </raw_input>
-'''
+''',
+        f'''
+Please check and fix the following content to make it a valid, clean JSON object.
+
+Requirements:
+Remove all non-JSON content.
+Fix syntax errors, including bracket matching, quote closure, comma usage, and string and number formatting.
+Delete fields with empty or missing values.
+When encountering duplicate keys, retain the first key-value pair and ignore subsequent ones with the same key.
+Output only one JSON object that can be directly parsed by json.loads; do not include any explanations, comments, Markdown code blocks, or additional text.
+
+<raw_input>
+{json_str}
+</raw_input>
+''')
 
     result = get_llm_response(prompt)
     return json_pair(result)

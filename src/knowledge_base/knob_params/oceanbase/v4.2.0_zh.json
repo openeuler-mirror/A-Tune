@@ -1,6 +1,6 @@
 {
     "workers_per_cpu_quota": {
-        "desc": "This parameter * tenant max_cpu = maximum number of threads that can be allocated to the tenant. This maximum thread count is allocated and available for use, not the maximum number of threads running simultaneously. This parameter generally does not require adjustment.",
+        "desc": "此参数 * 租户 max_cpu = 租户能分配的最大线程数。这里的最大线程数是分配出来的，可以使用的，并不是同时运行的最大线程数。此参数一般不做调整。",
         "type": "discrete",
         "dtype": "int",
         "range": [2, 20],
@@ -8,7 +8,7 @@
         "edit_level": "dynamic"
     },
     "net_thread_count": {
-        "desc": "Number of network threads for receiving client requests. Requires restart to take effect. Check MySQLIO thread usage efficiency via top -H: if usage rate > 90%, receiving threads may become a bottleneck, recommend increasing this parameter; if all threads < 50%, recommend decreasing this parameter to reduce thread switching overhead.",
+        "desc": "接收客户端请求的网络线程数。重启生效。通过 top -H 查看 MySQLIO 线程的使用效率：若使用率大于 90%，说明接收请求的线程可能成为瓶颈，建议提高该参数；若所有线程都小于 50%，建议减小该参数以减少线程切换开销。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 64],
@@ -16,7 +16,7 @@
         "edit_level": "dynamic"
     },
     "enable_early_lock_release": {
-        "desc": "Enable early row lock release. Recommended to enable for hotspot row scenarios.",
+        "desc": "开启提前解行锁。热点行场景建议开启。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -24,7 +24,7 @@
         "edit_level": "dynamic"
     },
     "enable_monotonic_weak_read": {
-        "desc": "Enable monotonic read. Recommended to disable for performance scenarios.",
+        "desc": "开启单调读。性能场景建议关闭。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -32,7 +32,7 @@
         "edit_level": "dynamic"
     },
     "enable_perf_event": {
-        "desc": "Enable information collection. Must be enabled in production environment, can be disabled as appropriate in performance testing scenarios.",
+        "desc": "开启信息采集。生产环境必须开启，性能测试场景可以酌情关闭。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -40,7 +40,7 @@
         "edit_level": "dynamic"
     },
     "enable_record_trace_log": {
-        "desc": "Enable Trace Log function. In production environment with Perf Event and SQL Audit enabled, this parameter can be disabled.",
+        "desc": "开启 Trace Log 功能。生产环境在开启 Perf Event 和 SQL Audit 功能的情况下，此参数可以关闭。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -48,7 +48,7 @@
         "edit_level": "dynamic"
     },
     "syslog_level": {
-        "desc": "Log level for system logs. Recommended to set to PERF in performance scenarios to reduce non-critical log output.",
+        "desc": "系统日志的日志级别。性能场景下建议设置为 PERF，以减少非关键日志输出。",
         "type": "discrete",
         "dtype": "string",
         "range": ["DEBUG", "INFO", "WARN", "ERROR", "PERF"],
@@ -56,7 +56,7 @@
         "edit_level": "dynamic"
     },
     "clog_sync_time_warn_threshold": {
-        "desc": "Print warning logs when log synchronization time exceeds a certain threshold, adjustable via this configuration item. Recommended to increase, but note it may affect troubleshooting of slow Clog synchronization issues.",
+        "desc": "日志同步耗时超过一定阈值时打印报警日志，阈值可通过该配置项调整。建议调大，但需注意可能影响 Clog 同步慢问题的排查。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 1000],
@@ -65,7 +65,7 @@
         "edit_level": "dynamic"
     },
     "builtin_db_data_verify_cycle": {
-        "desc": "Macro block inspection cycle parameter. When set to 0, inspection is disabled. Recommended to set to 0 in performance-related scenarios to reduce system overhead.",
+        "desc": "宏块巡检周期参数。当设置为 0 时关闭巡检。性能相关场景建议设置为 0 以减少系统开销。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 360],
@@ -73,7 +73,7 @@
         "edit_level": "dynamic"
     },
     "disk_io_thread_count": {
-        "desc": "Disk I/O thread count, must be an even number. Can be adjusted appropriately according to I/O pressure.",
+        "desc": "磁盘 I/O 线程数，须为偶数。可根据 I/O 压力适当调整该参数。",
         "type": "discrete",
         "dtype": "int",
         "range": [2, 32],
@@ -81,7 +81,7 @@
         "edit_level": "dynamic"
     },
     "enable_async_syslog": {
-        "desc": "Enable asynchronous log output. Recommended to set to True in performance scenarios to reduce performance impact of log printing.",
+        "desc": "开启异步日志输出。性能场景建议设置为 True，以降低日志打印对性能的影响。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -89,7 +89,7 @@
         "edit_level": "dynamic"
     },
     "fuse_row_cache_priority": {
-        "desc": "Priority of fused row cache in KV cache. Recommended to set greater than 1 to avoid premature cache replacement and improve query performance.",
+        "desc": "融合行缓存在 KV cache 中的优先级。建议设置为大于 1，以避免缓存过早被替换，提升查询性能。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, null],
@@ -97,7 +97,7 @@
         "edit_level": "dynamic"
     },
     "micro_block_merge_verify_level": {
-        "desc": "Macro block verification level, 0 means no verification. Can be set to 0 in performance scenarios, but not recommended to modify in production systems.",
+        "desc": "宏块验证级别，0 表示不做任何校验。性能场景可设置为 0，但生产系统不建议修改。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 1, 2],
@@ -105,7 +105,7 @@
         "edit_level": "dynamic"
     },
     "compaction_low_thread_score": {
-        "desc": "Concurrent thread count for low priority Compaction (mainly for Major SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge speed.",
+        "desc": "低优先级 Compaction 的并发线程数（主要针对 Major SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提高合并速度。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 100],
@@ -113,7 +113,7 @@
         "edit_level": "dynamic"
     },
     "compaction_mid_thread_score": {
-        "desc": "Concurrent thread count for medium priority Compaction (mainly for Minor SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge efficiency.",
+        "desc": "中优先级 Compaction 的并发线程数（主要针对 Minor SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提升合并效率。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 100],
@@ -121,7 +121,7 @@
         "edit_level": "dynamic"
     },
     "compaction_high_thread_score": {
-        "desc": "Concurrent thread count for high priority Compaction (mainly for Mini SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to system pressure.",
+        "desc": "高优先级 Compaction 的并发线程数（主要针对 Mini SSTable）。默认为 0 表示 6 个并发线程，可根据系统压力适当调大。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 100],
@@ -129,7 +129,7 @@
         "edit_level": "dynamic"
     },
     "ob_proxy_readonly_transaction_routing_policy": {
-        "desc": "Controls whether Proxy routing for transactions is affected by read-only statements. Recommended to set to False, meaning based on the first actual transaction-opening statement.",
+        "desc": "控制 Proxy 对于事务的路由是否受只读语句影响。建议设置为 False，表示以第一条实际开启事务的语句为准。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -137,7 +137,7 @@
         "edit_level": "dynamic"
     },
     "work_thread_num": {
-        "desc": "Number of worker threads for OBProxy, significantly affects CPU usage, default value is 128. Can be dynamically adjusted according to CPU count, requires restart after change.",
+        "desc": "OBProxy 的工作线程数，对 CPU 占用影响较大，默认值为 128。可根据 CPU 数量动态调整，更改后需重启。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 128],
@@ -145,7 +145,7 @@
         "edit_level": "dynamic"
     },
     "task_thread_num": {
-        "desc": "Number of background task threads for OBProxy (such as pulling rslist), default value is 2. Recommended to keep default value.",
+        "desc": "OBProxy 后台任务线程数（如拉取 rslist），默认值为 2。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 4],
@@ -153,7 +153,7 @@
         "edit_level": "dynamic"
     },
     "block_thread_num": {
-        "desc": "Number of block threads for OBProxy, default value is 1. Recommended to keep default value.",
+        "desc": "OBProxy 的 block 线程数，默认值为 1。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 4],
@@ -161,7 +161,7 @@
         "edit_level": "dynamic"
     },
     "grpc_thread_num": {
-        "desc": "Number of gRPC threads for OBProxy, default value is 8. Recommended to keep default value.",
+        "desc": "OBProxy 的 gRPC 线程数，默认值为 8。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [4, 32],
@@ -169,7 +169,7 @@
         "edit_level": "dynamic"
     },
     "net_accept_threads": {
-        "desc": "Number of threads executing accept, default value is 2. Recommended to keep default value.",
+        "desc": "执行 accept 的线程数，默认值为 2。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [8, 16],
@@ -177,7 +177,7 @@
         "edit_level": "dynamic"
     },
     "automatic_match_work_thread": {
-        "desc": "Whether to automatically adjust worker thread count based on CPU count. When true, upper limit is work_thread_num, suitable for mixed deployment; when false, uses fixed value, suitable for exclusive deployment.",
+        "desc": "是否根据 CPU 数自动调整工作线程数。true 时上限为 work_thread_num，适用于混合部署；false 时使用固定值，适用于独占部署。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -185,7 +185,7 @@
         "edit_level": "dynamic"
     },
     "enable_compression_protocol": {
-        "desc": "Whether to enable compression protocol to reduce OBProxy CPU usage. Recommended to configure as False. Note: This parameter has been deprecated since V4.3.4.",
+        "desc": "是否启用压缩协议以降低 OBProxy 的 CPU 占用。建议配置为 False。说明：自 V4.3.4 版本起该参数已废弃。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -193,7 +193,7 @@
         "edit_level": "dynamic"
     },
     "server_tcp_user_timeout": {
-        "desc": "TCP user timeout for connections between OBProxy and OBServer (unit: seconds). Default value is 0, recommended to keep default value.",
+        "desc": "OBProxy 与 OBServer 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 20],
@@ -202,7 +202,7 @@
         "edit_level": "dynamic"
     },
     "client_tcp_user_timeout": {
-        "desc": "TCP user timeout for connections between OBProxy and Client (unit: seconds). Default value is 0, recommended to keep default value.",
+        "desc": "OBProxy 与 Client 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 20],
@@ -211,7 +211,7 @@
         "edit_level": "dynamic"
     },
     "client_max_connections": {
-        "desc": "Maximum client connections accepted by OBProxy, default value is 8192. Recommended to keep default value.",
+        "desc": "OBProxy 可接受的最大客户端连接数，默认值为 8192。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, null],
@@ -219,7 +219,7 @@
         "edit_level": "dynamic"
     },
     "connect_observer_max_retries": {
-        "desc": "Maximum retry count for OBProxy reconnecting to OBServer, default value is 3. Recommended to keep default value.",
+        "desc": "OBProxy 重连 OBServer 的最大重试次数，默认值为 3。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [2, 5],
@@ -227,7 +227,7 @@
         "edit_level": "dynamic"
     },
     "observer_query_timeout_delta": {
-        "desc": "Network transmission delay compensation, additional time added to OBServer's ob_query_timeout (unit: seconds). Default value is 20, range [1,39]. Recommended to keep default value.",
+        "desc": "网络传输延时补偿，给 OBServer 的 ob_query_timeout 增加的时间（单位：秒）。默认值为 20，取值范围 [1,39]。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 30],
@@ -236,7 +236,7 @@
         "edit_level": "dynamic"
     },
     "sock_option_flag_out": {
-        "desc": "TCP parameters between OBProxy and OBServer (bit control for no_delay, keepalive, linger_on). Default values vary by version: V1.8.x recommended 3, V3.x recommended to keep default value.",
+        "desc": "OBProxy 与 OBServer 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。不同版本默认值不同：V1.8.x 建议为 3，V3.x 建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 7],
@@ -244,7 +244,7 @@
         "edit_level": "dynamic"
     },
     "server_tcp_keepidle": {
-        "desc": "TCP idle time before starting keepalive between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "OBProxy 与 OBServer 的 TCP 启动 keepalive 前的 idle 时间（秒）。默认值为 5，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 7200],
@@ -252,7 +252,7 @@
         "edit_level": "dynamic"
     },
     "server_tcp_keepintvl": {
-        "desc": "TCP keepalive probe interval between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "OBProxy 与 OBServer 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 75],
@@ -260,7 +260,7 @@
         "edit_level": "dynamic"
     },
     "server_tcp_keepcnt": {
-        "desc": "Maximum number of keepalive packets sent for TCP between OBProxy and OBServer, default value is 5. Recommended to keep default value.",
+        "desc": "OBProxy 与 OBServer 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 9],
@@ -268,7 +268,7 @@
         "edit_level": "dynamic"
     },
     "client_sock_option_flag_out": {
-        "desc": "TCP parameters between client and OBProxy (bit control for no_delay, keepalive, linger_on). V1.8.x default 0, V3.x default 2, recommended to set to 3 to enable no_delay and linger_on.",
+        "desc": "客户端与 OBProxy 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。V1.8.x 默认值为 0，V3.x 为 2，建议设置为 3 启用 no_delay 和 linger_on。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 3],
@@ -276,7 +276,7 @@
         "effection_mode": "dynamic"
     },
     "client_tcp_keepidle": {
-        "desc": "TCP idle time before starting keepalive between client and OBProxy (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "客户端与 OBProxy 的 TCP 启动 keepalive 前 idle 时间（秒）。默认值为 5，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [1, 7200],
@@ -284,7 +284,7 @@
         "edit_level": "dynamic"
     },
     "client_tcp_keepintvl": {
-        "desc": "TCP keepalive probe interval between client and OBProxy (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "客户端与 OBProxy 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, 75],
@@ -292,7 +292,7 @@
         "edit_level": "dynamic"
     },
     "client_tcp_keepcnt": {
-        "desc": "Maximum number of keepalive packets sent for TCP between client and OBProxy, default value is 5. Recommended to keep default value.",
+        "desc": "客户端与 OBProxy 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值。",
         "type": "discrete",
         "dtype": "int",
         "range": [0, null],
@@ -300,7 +300,7 @@
         "edit_level": "dynamic"
     },
     "enable_index_route": {
-        "desc": "Whether to enable global index table routing based on global index keys. Default True, recommended to keep default value.",
+        "desc": "是否开启基于全局索引键的全局索引表路由。默认 True，建议保持默认值。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -308,7 +308,7 @@
         "edit_level": "dynamic"
     },
     "enable_pl_route": {
-        "desc": "Whether to enable PL routing. Default True, recommended to disable (False) in performance scenarios.",
+        "desc": "是否开启 PL 路由。默认 True，性能场景建议关闭（False）。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -316,7 +316,7 @@
         "edit_level": "dynamic"
     },
     "enable_reroute": {
-        "desc": "Whether to enable secondary routing. Takes effect after enabling OceanBase 2.0 protocol (enable_ob_protocol_v2). Default False, recommended to keep default value.",
+        "desc": "是否开启二次路由。需开启 OceanBase 2.0 协议（enable_ob_protocol_v2）后生效。默认 False，建议保持默认值。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -324,7 +324,7 @@
         "edit_level": "dynamic"
     },
     "enable_partition_table_route": {
-        "desc": "Whether to enable partition table routing. Default True, recommended to keep default value.",
+        "desc": "是否开启分区表路由。默认 True，建议保持默认值。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -332,7 +332,7 @@
         "edit_level": "dynamic"
     },
     "server_routing_mode": {
-        "desc": "OBProxy routing mode. Includes oceanbase (default), random, mock, mysql, etc. Recommended to keep default value.",
+        "desc": "OBProxy 路由模式。包括 oceanbase（默认）、random、mock、mysql 等。建议保持默认值。",
         "type": "discrete",
         "dtype": "string",
         "range": ["oceanbase", "random", "mock", "mysql"],
@@ -340,7 +340,7 @@
         "edit_level": "dynamic"
     },
     "enable_ob_protocol_v2": {
-        "desc": "Whether to enable OceanBase 2.0 protocol between OBProxy and OBServer (based on MySQL compression protocol). Default False, recommended to keep default value.",
+        "desc": "是否开启 OBProxy 与 OBServer 之间的 OceanBase 2.0 协议（基于 MySQL 压缩协议）。默认 False，建议保持默认值。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],
@@ -348,7 +348,7 @@
         "edit_level": "dynamic"
     },
     "routing_cache_mem_limited": {
-        "desc": "Sets memory limit for OBProxy routing cache (table cache, address cache, etc.). Default value 128 MB, range [1KB, 100G], recommended to keep default value.",
+        "desc": "设置 OBProxy 路由缓存（表缓存、地址缓存等）的内存上限。默认值为 128 MB，取值范围 [1KB, 100G]，建议保持默认值。",
         "type": "discrete",
         "dtype": "string",
         "range": ["1KB", "100G"],
@@ -356,7 +356,7 @@
         "edit_level": "dynamic"
     },
     "enable_bad_route_reject": {
-        "desc": "Whether to reject unroutable requests. Default False, recommended to keep default value.",
+        "desc": "是否拒绝无法路由的请求。默认 False，建议保持默认值。",
         "type": "discrete",
         "dtype": "boolean",
         "range": ["true", "false"],

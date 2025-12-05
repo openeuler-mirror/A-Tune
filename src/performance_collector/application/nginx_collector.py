@@ -2,6 +2,7 @@ import logging
 import re
 
 from src.config import config
+from src.utils.common import translate
 from src.utils.collector.metric_collector import (
     period_task,
     CollectMode,
@@ -41,7 +42,7 @@ def parse_stub_status_text(text: str) -> dict:
 
 @period_task(
     cmd=f"curl -s http://{NINGX_HOST}:{NINGX_PORT}/status",
-    tag="nginx_status指标",
+    tag=translate("nginx_status指标", "nginx_status metric"),
     delay=0,
     sample_count=SAMPLE_COUNT,
     interval=NGINX_SAMPLE_INTERVAL,
@@ -78,10 +79,10 @@ def parse_nginx_status(output: list[str]) -> dict:
         accepts_delta = handled_delta = requests_delta = avg_qps = 0
 
     result = {
-        f"{DURATION}s内请求总数增长": requests_delta,
-        f"{DURATION}s内接收连接数增长(accepts)": accepts_delta,
-        f"{DURATION}s内处理连接数增长(handled)": handled_delta,
-        f"{DURATION}s内平均QPS": avg_qps,
+        f"requests_growth_in_{DURATION}s": requests_delta,
+        f"accepts_growth_in_{DURATION}s": accepts_delta,
+        f"handled_growth_in_{DURATION}s": handled_delta,
+        f"avg_qps_in_{DURATION}s": avg_qps,
     }
     result.update(avg_conns)
     return {"curl -s http://127.0.0.1:10000/status": result}
