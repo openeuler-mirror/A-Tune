@@ -1,9 +1,8 @@
 module gitee.com/openeuler/A-Tune
 
-go 1.14
+go 1.21
 
 require (
-	github.com/antlr/antlr4 v0.0.0-20190726171924-e4737db19f4f // indirect
 	github.com/bndr/gotabulate v1.1.2
 	github.com/caibirdme/yql v0.0.0-20190801103415-238f3c90b514
 	github.com/coreos/go-systemd v0.0.0-20190719114852-fd7a80b32e1f
@@ -13,11 +12,24 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/newm4n/grool v1.0.2
-	github.com/sirupsen/logrus v1.4.2
-	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
+	github.com/sirupsen/logrus v1.8.3
 	github.com/urfave/cli v1.20.0
-	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
+	golang.org/x/net v0.7.0
 	google.golang.org/grpc v1.22.0
+	gopkg.in/yaml.v2 v2.4.0
+)
+
+require (
+	github.com/antlr/antlr4 v0.0.0-20190726171924-e4737db19f4f // indirect
+	github.com/golang-collections/collections v0.0.0-20130729185459-604e922904d3 // indirect
+	github.com/juju/errors v1.0.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
+	github.com/smartystreets/goconvey v0.0.0-20190731233626-505e41936337 // indirect
+	golang.org/x/crypto v0.3.0 // indirect
+	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/text v0.7.0 // indirect
+	google.golang.org/genproto v0.0.0-20190404172233-64821d5d2107 // indirect
 	gopkg.in/ini.v1 v1.48.0 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	xorm.io/builder v0.3.5 // indirect
+	xorm.io/core v0.6.3 // indirect
 )
