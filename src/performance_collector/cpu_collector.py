@@ -278,7 +278,7 @@ class CpuCollector(BaseCollector):
 
         # 确保内核态执行时的CPU利用率不为0
         cpu_process_result["kernel_mode_utilization"] = max(
-            0.01, cpu_process_result["kernel_mode_utilization"]
+            0.005, cpu_process_result["kernel_mode_utilization"]
         )
 
         # 判断计算密集型或IO密集型
