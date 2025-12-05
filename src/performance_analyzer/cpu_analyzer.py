@@ -94,7 +94,8 @@ class CpuAnalyzer(BaseAnalyzer):
 
         # 构建基本信息报告
         cpu_info_analysis_report += (
-            translate(f"当前系统中, 用户态CPU利用率: {usr}%, 内核态CPU利用率: {sys}%, 硬中断占比: {irq}%, 软中断占比: {soft}%, CPU总体利用率: {util}%\n", f"In the current system, user-mode CPU utilization: {usr}%, kernel-mode CPU utilization: {sys}%, hard interrupt ratio: {irq}%, soft interrupt ratio: {soft}%, overall CPU utilization: {util}%\n")
+            translate(f"当前系统中, 用户态CPU利用率: {usr*100}%, 内核态CPU利用率: {sys*100}%, 硬中断占比: {irq*100}%, 软中断占比: {soft*100}%, CPU总体利用率: {util*100}%\n", 
+                f"In the current system, user-mode CPU utilization: {usr*100}%, kernel-mode CPU utilization: {sys*100}%, hard interrupt ratio: {irq*100}%, soft interrupt ratio: {soft*100}%, overall CPU utilization: {util*100}%\n")
         )
 
         # 根据条件生成其他报告行
@@ -119,7 +120,7 @@ class CpuAnalyzer(BaseAnalyzer):
             cpu_info_analysis_report += self.generate_report_line(condition, message)
 
         # 添加阻塞进程报告
-        cpu_info_analysis_report += translate(f"处于阻塞状态的进程占比是{block_process}%\n", f"The percentage of processes in a blocked state is {block_process}%\n")
+        cpu_info_analysis_report += translate(f"处于阻塞状态的进程占比是{block_process*100}%\n", f"The percentage of processes in a blocked state is {block_process*100}%\n")
 
         return cpu_info_analysis_report
     
