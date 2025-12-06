@@ -37,6 +37,7 @@ delay = config["servers"][0]["delay"]
 slo_goal = config["feature"][0]["slo_goal"]
 tune_system_param = config["feature"][0]["tune_system_param"]
 tune_app_param = config["feature"][0]["tune_app_param"]
+pressure_test_mode = config["feature"][0]["pressure_test_mode"]
 
 
 # ================= Collector 接口 ===================
@@ -66,11 +67,12 @@ def run_collector():
     )
     static_profile = static_collector.run()
 
+    run_pressure_test_if_needed(config["servers"][0], ssh_client, pressure_test_mode)
     # 2. 动态指标
     metric_collector = MetricCollector(
         ssh_client=ssh_client,
         app=app_name,
-        pressure_test_mode=False,
+        pressure_test_mode=pressure_test_mode,
     )
     metrics = metric_collector.run()
 
