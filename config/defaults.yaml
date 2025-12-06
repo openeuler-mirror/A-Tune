@@ -66,7 +66,6 @@ common: &common
         {params_set_str}
         Please answer in JSON format, key is the adjustable parameter name, please provide adjustable parameters based on the above environment configuration information. If parameters are irrelevant, do not include them.
         value is the recommended value for the adjustable parameter, please provide reasonable specific values based on the above environment configuration information, carefully confirm whether each value can be used, avoid application startup failures after setting.
-        Remember that the value of value should not contain any expressions. If there is an expression involving multiplication of two numbers, please calculate their result.
         Do not provide any response other than JSON, avoid adding comments. Please output in English.
     recommender_negative:
       value: |
