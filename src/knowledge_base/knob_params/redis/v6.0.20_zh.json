@@ -214,10 +214,10 @@
         "type": "discrete",
         "dtype": "string",
         "range": [
-            "crc64",
-            "none"
+            "yes",
+            "no"
         ],
-        "default_value": "crc64"
+        "default_value": "yes"
     },
     "rdbcompression": {
         "desc": "该参数决定在备份RDB文件时是否使用LZF算法压缩字符串。启用压缩可以减少磁盘IO和内存使用，适合存储大量数据的场景。取值为'yes'表示启用压缩，'no'表示不启用。启用压缩会增加CPU负担，但可以显著减少磁盘空间的使用。",

@@ -214,10 +214,10 @@
         "type": "discrete",
         "dtype": "string",
         "range": [
-            "crc64",
-            "none"
+            "yes",
+            "no"
         ],
-        "default_value": "crc64"
+        "default_value": "yes"
     },
     "rdbcompression": {
         "desc": "This parameter determines whether to use LZF algorithm to compress strings when backing up RDB files. Enabling compression reduces disk I/O and memory usage, suitable for scenarios storing large amounts of data. Value 'yes' enables compression, 'no' disables. Enabling compression increases CPU burden but significantly reduces disk space usage.",
