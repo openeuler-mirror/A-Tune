@@ -250,18 +250,6 @@
         "dtype": "int",
         "default_value": 4
     },
-    "innodb_default_row_format": {
-        "desc": "该参数定义了InnoDB表和用户创建的临时表的默认行格式。选择合适的行格式可以优化存储和性能，帮助缓解磁盘IO瓶颈。可选的行格式包括DYNAMIC、COMPRESSED、REDUNDANT和COMPACT。",
-        "type": "discrete",
-        "range": [
-            "REDUNDANT",
-            "COMPACT",
-            "DYNAMIC",
-            "COMPRESSED"
-        ],
-        "dtype": "enumeration",
-        "default_value": "DYNAMIC"
-    },
     "innodb_disable_sort_file_cache": {
         "desc": "该参数用于禁用操作系统文件系统缓存，以便在进行合并排序的临时文件时提高性能。启用该参数（值为ON）可以帮助缓解磁盘IO瓶颈，而禁用缓存（值为OFF）可能会导致性能下降。",
         "type": "discrete",

@@ -230,18 +230,6 @@
         "dtype": "int",
         "default_value": 5000
     },
-    "innodb_default_row_format": {
-        "desc": "This parameter defines the default row format for InnoDB tables and user-created temporary tables. Choosing the appropriate row format can optimize storage and performance, helping to alleviate disk I/O bottlenecks. Optional row formats include DYNAMIC, COMPRESSED, REDUNDANT, and COMPACT.",
-        "type": "discrete",
-        "range": [
-            "REDUNDANT",
-            "COMPACT",
-            "DYNAMIC",
-            "COMPRESSED"
-        ],
-        "dtype": "enumeration",
-        "default_value": "DYNAMIC"
-    },
     "innodb_disable_sort_file_cache": {
         "desc": "This parameter is used to disable the operating system file system cache for temporary files during merge sorts to improve performance. Enabling this parameter (value ON) can help alleviate disk I/O bottlenecks, while disabling the cache (value OFF) may lead to performance degradation.",
         "type": "discrete",
