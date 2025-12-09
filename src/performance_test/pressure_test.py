@@ -55,6 +55,7 @@ class PressureTest(threading.Thread):
             _pressure_test_result.output = pressure_test_result.output
             _pressure_test_result.err_msg = pressure_test_result.err_msg
             return
+
         try:
             _pressure_test_running.set()
             execute_result = self.app_interface.benchmark()
@@ -62,12 +63,16 @@ class PressureTest(threading.Thread):
                 _pressure_test_result.status_code = execute_result.status_code
                 _pressure_test_result.output = execute_result.output
                 _pressure_test_result.err_msg = execute_result.err_msg
-                save_snapshot(_pressure_test_result.__dict__, "pressure_test_result")
+            else:
+                _pressure_test_result.status_code = -1
+                _pressure_test_result.err_msg = "benchmark cmd not provided in config"
         except Exception as e:
             _pressure_test_result.status_code = -1
-            _pressure_test_result.err_msg = (
-                f"pressure test failed: {str(e)}\n{traceback.format_exc()}"
-            )
-        finally:
-            self.running = False
-            _pressure_test_running.clear()
+            _pressure_test_result.err_msg = traceback.format_exc()
+
+        self.running = False
+        _pressure_test_running.clear()
+        if _pressure_test_result.status_code != 0:
+            raise RuntimeError(f"pressure test failed: {execute_result.err_msg}")
+        else:
+            save_snapshot(_pressure_test_result.__dict__, "pressure_test_result")

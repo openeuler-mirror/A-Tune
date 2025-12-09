@@ -29,9 +29,9 @@ class StrategyOptimizer(BaseOptimizer):
             with open(file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except FileNotFoundError:
-            raise FileNotFoundError(f"知识库文件 {file_path} 未找到")
+            raise FileNotFoundError(f"knowledge file {file_path} not found")
         except json.JSONDecodeError:
-            raise ValueError(f"知识库文件 {file_path} 不是有效的JSON格式")
+            raise ValueError(f"knowledge file {file_path} is not valid JSON format")
 
     def _filter_strategies(self, bottleneck: str) -> List[Dict]:
         """
@@ -164,7 +164,7 @@ class StrategyOptimizer(BaseOptimizer):
             recommendations = self.recommend_strategies(
                 bottleneck=self.args.bottle_neck,
                 top_k=1,
-                business_context="高并发Web服务，CPU负载主要集中在用户态处理"
+                business_context=""
             )
             logging.info(f">>> number of matching strategies: {len(recommendations)}")
             cmd_list = []
