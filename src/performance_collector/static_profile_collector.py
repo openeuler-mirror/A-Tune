@@ -34,7 +34,7 @@ def lscpu_parser(output: str) -> dict:
                     bytes_val = num * 1024**3
                 else:
                     bytes_val = num
-                metrics[translate("L3 缓存容量（字节）", "L3 cache capacity (bytes)")] = int(v)
+                metrics[translate("L3 缓存容量（字节）", "L3 cache capacity (bytes)")] = bytes_val
         elif k == "NUMA node(s)":
             metrics[translate("NUMA 节点数量", "number of NUMA nodes")] = int(v)
         elif k.startswith("NUMA node") and "CPU(s)" in k:
