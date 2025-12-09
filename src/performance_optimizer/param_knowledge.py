@@ -65,7 +65,7 @@ class ParamKnowledge:
             # 2.当前环境取值
             param_result = app.get_param(param_name=param_name)
             param_env_value = (
-                param_result.output if param_result.status_code == 0 else "default"
+                param_result.output if param_result.status_code == 0 else item.get("default_value", "default")
             )
             params_describe_list.append(
                 f"{param_name}:{item['desc']}, param type is: {item['dtype']}, param range is: {param_range}, current value is: {param_env_value}"

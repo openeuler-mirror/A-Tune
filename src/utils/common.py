@@ -130,7 +130,7 @@ def display_metrics(
         raise TypeError(f"display metric_data only support dict data now!")
 
     table_str = cn_tabulate(
-        preview_data(metric_data),
+        preview_data(metric_data, preview_nums),
         headers=headers,
         tablefmt="grid",
     )
