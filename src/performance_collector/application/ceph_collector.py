@@ -19,17 +19,17 @@ def parse_ceph_s(output: str) -> dict:
     # degraded objects
     degraded_match = re.search(r"(\d+)\s+degraded objects", output)
     if degraded_match:
-        result["降级对象数"] = int(degraded_match.group(1))
+        result["degraded_object_count"] = int(degraded_match.group(1))
 
     # recovery speed
     recovery_match = re.search(r"recovery io.*?([\d\.]+)\s*([KMGT]?B)/s", output)
     if recovery_match:
-        result["恢复速度"] = recovery_match.group(1) + recovery_match.group(2)
+        result["recovery_speed"] = recovery_match.group(1) + recovery_match.group(2)
 
     # slow ops
     slow_ops_match = re.search(r"(\d+)\s+slow ops", output)
     if slow_ops_match:
-        result["慢请求数"] = int(slow_ops_match.group(1))
+        result["slow_request_count"] = int(slow_ops_match.group(1))
 
     return {"ceph -s": result}
 
@@ -41,12 +41,12 @@ def parse_ceph_s(output: str) -> dict:
 )
 def parse_ceph_df_output(text: str) -> dict:
     result = {
-        "总容量": None,
-        "已用容量": None,
-        "可用容量": None,
-        "使用率(%)": None,
-        "存储类型": [],
-        "存储池": []
+        "total_capacity": None,
+        "used_capacity": None,
+        "available_capacity": None,
+        "utilization(%)": None,
+        "storage_type": [],
+        "storage_pool": []
     }
 
     lines = text.strip().splitlines()
@@ -67,33 +67,33 @@ def parse_ceph_df_output(text: str) -> dict:
 
         if section == 'raw' and len(parts) >= 6:
             storage = {
-                "类型": parts[0],
-                "总容量": parts[1],
-                "可用容量": parts[2],
-                "已用容量": parts[3],
-                "原始已用容量": parts[4],
-                "原始使用率(%)": float(parts[5])
+                "type": parts[0],
+                "total_capacity": parts[1],
+                "available_capacity": parts[2],
+                "used_capacity": parts[3],
+                "raw_used_capacity": parts[4],
+                "raw_utilization(%)": float(parts[5])
             }
-            result["存储类型"].append(storage)
+            result["storage_type"].append(storage)
 
             if parts[0] == "TOTAL":
-                result["总容量"] = parts[1]
-                result["可用容量"] = parts[2]
-                result["已用容量"] = parts[3]
-                result["使用率(%)"] = float(parts[5])
+                result["total_capacity"] = parts[1]
+                result["available_capacity"] = parts[2]
+                result["used_capacity"] = parts[3]
+                result["utilization(%)"] = float(parts[5])
 
         elif section == 'pools' and len(parts) >= 7:
             pool = {
-                "名称": parts[0],
-                "ID": int(parts[1]),
-                "PG数量": int(parts[2]),
-                "存储量": parts[3],
-                "对象数": int(parts[4]),
-                "已用容量": parts[5],
-                "使用率(%)": float(parts[6]),
-                "最大可用容量": parts[7] if len(parts) > 7 else None
+                "name": parts[0],
+                "id": int(parts[1]),
+                "pg_count": int(parts[2]),
+                "stored_count": parts[3],
+                "objects_count": int(parts[4]),
+                "used_capacity": parts[5],
+                "utilization(%)": float(parts[6]),
+                "max_available_capacity": parts[7] if len(parts) > 7 else None
             }
-            result["存储池"].append(pool)
+            result["storage_pool"].append(pool)
 
     return {"ceph df": result}
 
@@ -107,7 +107,7 @@ def parse_ceph_pg_stat(output: str) -> dict:
     result = {}
     pg_match = re.search(r"(\d+)\s+active.+", output)
     if pg_match:
-        result["PG 总数"] = int(pg_match.group(1))
+        result["pg_count"] = int(pg_match.group(1))
     return {"ceph pg stat": result}
 
 
@@ -129,17 +129,17 @@ def parse_perf_dump_str(raw_str: str) -> dict:
         return cur
 
     path_map = {
-        "osd.op_r": "读请求数",
-        "osd.op_w": "写请求数",
-        "osd.op_latency.avgcount": "总体请求数",
-        "osd.op_latency.avgtime": "平均请求延迟(s)",
-        "osd.op_r.avgtime": "平均读延迟(s)",
-        "osd.op_w.avgtime": "平均写延迟(s)",
-        "bluefs.db_write_bytes": "BlueFS写入字节数",
-        "bluefs.wal_write_bytes": "BlueFS WAL写入字节数",
-        "filestore.journal_latency.avgcount": "Journal请求数",
-        "filestore.journal_latency.avgtime": "Journal延迟平均(s)",
-        "bluestore.kv_commit_lat.avgtime": "KV提交延迟(s)"
+        "osd.op_r": "read_ops",
+        "osd.op_w": "write_ops",
+        "osd.op_latency.avgcount": "total_ops",
+        "osd.op_latency.avgtime": "avg_request_latency(s)",
+        "osd.op_r.avgtime": "avg_read_latency(s)",
+        "osd.op_w.avgtime": "avg_write_latency(s)",
+        "bluefs.db_write_bytes": "bluefs_db_write_bytes",
+        "bluefs.wal_write_bytes": "bluefs_wal_write_bytes",
+        "filestore.journal_latency.avgcount": "journal_ops",
+        "filestore.journal_latency.avgtime": "avg_journal_latency(s)",
+        "bluestore.kv_commit_lat.avgtime": "kv_commit_latency(s)"
     }
 
     # 解析多osd json字符串
