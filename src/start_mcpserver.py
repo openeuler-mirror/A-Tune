@@ -18,7 +18,7 @@ from src.performance_optimizer.strategy_optimizer import StrategyOptimizer
 from src.performance_optimizer.param_knowledge import ParamKnowledge
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
-from src.start_tune import run_param_optimization, run_strategy_optimization
+from src.start_tune import run_param_optimization, run_strategy_optimization, run_pressure_test_if_needed
 from src.utils.common import translate
 
 # ================= 全局配置与缓存 ===================
@@ -32,8 +32,6 @@ host_port = config["servers"][0]["port"]
 host_user = config["servers"][0]["host_user"]
 host_password = config["servers"][0]["password"]
 app_name = config["servers"][0]["app"]
-max_retries = config["servers"][0]["max_retries"]
-delay = config["servers"][0]["delay"]
 slo_goal = config["feature"][0]["slo_goal"]
 tune_system_param = config["feature"][0]["tune_system_param"]
 tune_app_param = config["feature"][0]["tune_app_param"]
@@ -181,26 +179,8 @@ def run_optimizer():
     }
     param_opt_result = param_recommender.run(history_result)
 
-    # --- 策略优化 ---
-    strategy_opt = StrategyOptimizer(
-        application=app_name,
-        bottle_neck=cache[host_ip]["bottleneck"],  # fallback
-        host_ip=host_ip,
-        host_port=host_port,
-        host_user=host_user,
-        host_password=host_password,
-        system_report=cache[host_ip]["report"],
-        target_config_path="",
-    )
-    recommendations = strategy_opt.get_recommendations_json(
-        bottleneck=cache[host_ip]["bottleneck"],
-        top_k=1,
-        business_context="High-concurrency web services, with CPU load primarily concentrated on user-mode processing",
-    )
-
     return {
         "param_optimization": param_opt_result,
-        "strategy_recommendation": recommendations,
     }
 
 
@@ -229,7 +209,8 @@ def tune():
         server_cfg["app"], report, static_profile_info, ssh_client,
         feature_cfg["need_restart_application"], feature_cfg["pressure_test_mode"],
         feature_cfg["tune_system_param"], feature_cfg["tune_app_param"], feature_cfg["need_recover_cluster"],
-        feature_cfg["benchmark_timeout"], feature_cfg["max_iterations"], feature_cfg["slo_goal"]
+        feature_cfg["benchmark_timeout"], feature_cfg["max_iterations"], feature_cfg["slo_goal"],
+        feature_cfg["best_param_save_path"]
     )
     if feature_cfg["strategy_optimization"]:
         run_strategy_optimization(ssh_client, server_cfg["app"], bottleneck, server_cfg, report)

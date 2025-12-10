@@ -8,6 +8,7 @@ OceanBase 性能指标采集模块
 from typing import Dict
 from src.utils.collector.metric_collector import snapshot_task, CollectMode
 from src.utils.config.global_config import env_config
+from src.utils.common import translate
 
 
 # 从配置中读取 OceanBase 登录信息
@@ -45,7 +46,7 @@ def _ob_parse(stdout: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'connections';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase 当前连接数"
+    tag=translate("OceanBase 当前连接数", "Current number of OceanBase connections")
 )
 def parse_ob_connections(output: str) -> Dict:
     return {"connections": _ob_parse(output)}
@@ -54,7 +55,7 @@ def parse_ob_connections(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'uptime';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase 运行时间（秒）"
+    tag=translate("OceanBase 运行时间（秒）, OceanBase Runtime (seconds)")
 )
 def parse_ob_uptime(output: str) -> Dict:
     return {"uptime": _ob_parse(output)}
@@ -63,7 +64,7 @@ def parse_ob_uptime(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'com_select';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase SELECT 执行次数"
+    tag=translate("OceanBase SELECT 执行次数", "OceanBase SELECT Execution Count")
 )
 def parse_ob_com_select(output: str) -> Dict:
     return {"com_select": _ob_parse(output)}
@@ -72,7 +73,7 @@ def parse_ob_com_select(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'com_insert';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase INSERT 执行次数"
+    tag=translate("OceanBase INSERT 执行次数", "OceanBase INSERT Execution Count")
 )
 def parse_ob_com_insert(output: str) -> Dict:
     return {"com_insert": _ob_parse(output)}
@@ -81,7 +82,7 @@ def parse_ob_com_insert(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'com_update';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase UPDATE 执行次数"
+    tag=translate("OceanBase UPDATE 执行次数", "OceanBase SELUPDATEECT Execution Count")
 )
 def parse_ob_com_update(output: str) -> Dict:
     return {"com_update": _ob_parse(output)}
@@ -90,7 +91,7 @@ def parse_ob_com_update(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'com_delete';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase DELETE 执行次数"
+    tag=translate("OceanBase DELETE 执行次数", "OceanBase DELETE Execution Count")
 )
 def parse_ob_com_delete(output: str) -> Dict:
     return {"com_delete": _ob_parse(output)}
@@ -99,7 +100,7 @@ def parse_ob_com_delete(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'slow_queries';"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase 慢查询次数"
+    tag=translate("OceanBase 慢查询次数", "OceanBase Slow Query Count")
 )
 def parse_ob_slow_queries(output: str) -> Dict:
     return {"slow_queries": _ob_parse(output)}
@@ -108,7 +109,7 @@ def parse_ob_slow_queries(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show processlist;"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase 当前进程列表"
+    tag=translate("OceanBase 当前进程列表", "OceanBase Current Process List")
 )
 def parse_ob_processlist(output: str) -> Dict:
     return {"processlist": output}
@@ -117,7 +118,7 @@ def parse_ob_processlist(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show parameters;"),
     collect_mode=CollectMode.ASYNC,
-    tag="OceanBase 系统参数"
+    tag=translate("OceanBase 系统参数", "OceanBase System Parameters")
 )
 def parse_ob_parameters(output: str) -> Dict:
     """

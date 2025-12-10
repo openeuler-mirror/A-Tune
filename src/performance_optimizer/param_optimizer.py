@@ -78,7 +78,7 @@ class ParamOptimizer:
         return False
 
     def benchmark(self):
-        logging.info("🔄 start to verify benchmark performance...")
+        logging.info(f"🔄 start to verify benchmark performance of {self.service_name}...")
         result = self.app_interface.benchmark()
         if result.status_code == 0 and result.output:
             try:
@@ -104,7 +104,7 @@ class ParamOptimizer:
                 logging.info(f"set param {param_name} failed, reason: {apply_result.err_msg}")
 
     def restart_application(self):
-        logging.info("🔄 restarting the application ...")
+        logging.info(f"🔄 restarting the application of {self.service_name} ...")
         stop_result = self.app_interface.stop_workload()
         if stop_result.status_code != 0:
             logging.warning(f"failed to stop application because {stop_result.err_msg}")
@@ -139,7 +139,7 @@ class ParamOptimizer:
             return
 
         # 构建要追加的内容
-        batch_header = f"\n# 批次 {batch_id} - 重启后生效参数\n"
+        batch_header = f"\n# Batch {batch_id} - Parameters effective after restart\n"
         content = batch_header + '\n'.join(commands)
 
         if self.first_restart_save:
@@ -191,7 +191,7 @@ class ParamOptimizer:
         is_positive = True
         symbol = self.app_interface.get_calculate_type()
         logging.info(
-            f"[{0}/{self.max_iterations}] performance baseline is: {baseline}"
+            f"[{0}/{self.max_iterations}] performance baseline of {self.service_name} is: {baseline}"
         )
 
         for i in range(self.max_iterations):
@@ -253,7 +253,7 @@ class ParamOptimizer:
             ratio = self.calc_improve_rate(baseline, performance_result, symbol)
 
             logging.info(
-                f"[{i + 1}/{self.max_iterations}] performance baseline is {baseline}, best result: {best_result}, this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
+                f"[{i + 1}/{self.max_iterations}] performance baseline of {self.service_name} is {baseline}, best result: {best_result}, this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
             )
 
             # 达到预期效果，则退出循环

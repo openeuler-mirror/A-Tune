@@ -134,14 +134,14 @@ def spark_executor_info(output: list[str]) -> dict:
             if metrics2["executor_count"] > 0 else 0
         )
         result = {
-            f"{DURATION}s内任务总量": metrics1["total_tasks"] + metrics2["total_tasks"],
-            f"{DURATION}s内GC总耗时(ms)": metrics1["total_gc_time"] + metrics2["total_gc_time"],
-            f"{DURATION}s内任务增长量": delta_tasks,
-            f"{DURATION}s内GC总耗时增长量(ms)": delta_gc,
-            "Executor数": metrics2["executor_count"],
-            "总核数": metrics2["total_cores"],
-            "失败任务数": metrics2["failed_tasks"],
-            f"{DURATION}s内平均每Executor任务增长数": avg_tasks_per_executor
+            f"total_tasks_within_{DURATION}s": metrics1["total_tasks"] + metrics2["total_tasks"],
+            f"total_GC_time_within_{DURATION}s_(ms)": metrics1["total_gc_time"] + metrics2["total_gc_time"],
+            f"task_increment_within_{DURATION}s": delta_tasks,
+            f"GC_time_increment_within_{DURATION}s_(ms)": delta_gc,
+            "number_of_Executors": metrics2["executor_count"],
+            "total_cores": metrics2["total_cores"],
+            "number_of_failed_tasks": metrics2["failed_tasks"],
+            f"average_task_increment_per_Executor_within_{DURATION}s": avg_tasks_per_executor
         }
         return {cmd: result}
     except Exception as e:
