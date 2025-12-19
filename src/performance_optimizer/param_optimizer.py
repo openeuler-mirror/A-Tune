@@ -77,6 +77,19 @@ class ParamOptimizer:
             return True
         return False
 
+    def pressure_test(self):
+        logging.info(f"[ParamOptimizer] waiting for pressure test finished ...")
+        pressure_test_result = wait_for_pressure_test(timeout=self.benchmark_timeout)
+        if pressure_test_result.status_code != 0:
+            raise RuntimeError(
+                f"[ParamOptimizer] failed to run pressure test, err msg is {pressure_test_result.err_msg}"
+            )
+        baseline = float(pressure_test_result.output)
+        logging.info(
+            f"[ParamOptimizer] pressure test finished, baseline is {baseline}"
+        )
+        return baseline
+
     def benchmark(self):
         logging.info(f"🔄 start to verify benchmark performance of {self.service_name}...")
         result = self.app_interface.benchmark()
@@ -164,18 +177,7 @@ class ParamOptimizer:
     def run(self):
         # 运行benchmark，摸底参数性能指标
         if self.pressure_test_mode:
-            logging.info(f"[ParamOptimizer] waiting for pressure test finished ...")
-            pressure_test_result = wait_for_pressure_test(timeout=self.benchmark_timeout)
-
-            if pressure_test_result.status_code != 0:
-                raise RuntimeError(
-                    f"[ParamOptimizer] failed to run pressure test, err msg is {pressure_test_result.err_msg}"
-                )
-
-            baseline = float(pressure_test_result.output)
-            logging.info(
-                f"[ParamOptimizer] pressure test finished, baseline is {baseline}"
-            )
+            baseline = self.pressure_test()
         else:
             baseline = self.benchmark()
         # 保存每轮调优的结果，反思调优目标是否达到
