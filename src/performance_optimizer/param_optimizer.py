@@ -8,6 +8,7 @@ from src.performance_test.pressure_test import wait_for_pressure_test
 from src.utils.config.app_config import AppInterface
 from src.utils.shell_execute import SshClient
 from src.utils.snapshot import load_snapshot, save_snapshot
+from src.memory.h_mem import HierarchicalMemory
 
 class ParamOptimizer:
 
@@ -77,7 +78,7 @@ class ParamOptimizer:
             return True
         return False
 
-    def pressure_test(self):
+    def get_pressure_test_result(self):
         logging.info(f"[ParamOptimizer] waiting for pressure test finished ...")
         pressure_test_result = wait_for_pressure_test(timeout=self.benchmark_timeout)
         if pressure_test_result.status_code != 0:
@@ -177,15 +178,10 @@ class ParamOptimizer:
     def run(self):
         # 运行benchmark，摸底参数性能指标
         if self.pressure_test_mode:
-            baseline = self.pressure_test()
+            baseline = self.get_pressure_test_result()
         else:
             baseline = self.benchmark()
-        # 保存每轮调优的结果，反思调优目标是否达到
-        historys = {
-            "best_result": {},
-            "worst_result": {},
-            "previous_result": {}
-        }
+
         best_result = baseline
         worst_result = baseline
         curr_recommend_params = {}
@@ -196,9 +192,30 @@ class ParamOptimizer:
             f"[{0}/{self.max_iterations}] performance baseline of {self.service_name} is: {baseline}"
         )
 
+        # normal模式，通过history保存每轮调优的结果，反思调优目标是否达到
+        historys = {
+            "best_result": {},
+            "worst_result": {},
+            "previous_result": {}
+        }
+
+        # slow模式，通过mem机制来记忆调优过程，以期达到更优的调优结果
+        mem = HierarchicalMemory(self.service_name)
+        mem.update(
+            f"**Task Objective**: Optimize {self.service_name} performance by tuning memory-related parameters to increase throughput and reduce latency.\n"
+            f"**Progress Status**：Baseline performance: {baseline}"
+        )
+
         for i in range(self.max_iterations):
+            current_mem = mem.get()
+    
             # 未达成目标的情况下，根据调优结果与历史最优的参数，执行参数调优推荐，给出参数名和参数值
-            recommend_params = self.param_recommender.run(history_result=historys, is_positive=is_positive)
+            recommend_params = self.param_recommender.run(
+                long_mem = current_mem["long"],
+                short_mem = current_mem["short"], 
+                history_result = historys, 
+                is_positive = is_positive
+            )
 
             # 设置参数生效
             self.apply_params(recommend_params)
@@ -221,6 +238,7 @@ class ParamOptimizer:
                 script_path = '/tmp/euler-copilot-params.sh'
                 self.save_restart_params_to_script(recommend_params, script_path, i + 1)
                 self.recover_cluster()
+
             if performance_result is None:
                 historys["previous_result"] = {"previous_performance": "benchmark failed, because param is invalid.", "recommend_param": recommend_params}
                 self.apply_params(self.current_params)
@@ -253,6 +271,13 @@ class ParamOptimizer:
             historys["previous_result"] = {"previous_performance": performance_result, "recommend_param": recommend_params}
 
             ratio = self.calc_improve_rate(baseline, performance_result, symbol)
+
+            # mem更新
+            performance_test_result = (
+                f"Iteration: {i},This iteration performance result: {performance_result}, "
+                f"improvment: {ratio:.2%}, param change: {recommend_params}"
+            )
+            mem.update(performance_test_result)
 
             logging.info(
                 f"[{i + 1}/{self.max_iterations}] performance baseline of {self.service_name} is {baseline}, best result: {best_result}, this round result: {performance_result if performance_result is not None else '-'}, performance improvement: {ratio:.2%}"
