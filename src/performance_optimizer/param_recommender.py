@@ -85,41 +85,44 @@ class ParamRecommender:
         ]
         return filtered_history
 
-    def _process_chunk(self, history_result, cur_params_set, is_positive):
+    def _process_chunk(self, long_mem, short_mem, history_result, cur_params_set, is_positive):
         history_result = self._get_histort(history_result, cur_params_set)
+        
+        allowed_set = {
+            "service_name": self.service_name,
+            "performance_metric.name": self.performance_metric.name,
+            "performance_metric.value": self.performance_metric.value,
+            "slo_goal": self.slo_goal,
+            "static_profile": self.static_profile,
+            "performance_analysis_report": self.performance_analysis_report,
+            "params_set_str": ",".join(cur_params_set)
+        }
 
-        params_set_str = ",".join(cur_params_set)
-        allowed_set = set([
-            "self.service_name",
-            "self.performance_metric.name",
-            "self.performance_metric.value",
-            "self.slo_goal",
-            "self.static_profile",
-            "history_result",
-            "self.performance_analysis_report",
-            "params_set_str",
-        ])
         prompt_mode = prompt_manager.get_mode(self.service_name)
         if prompt_mode == "fast":
-            recommend_prompt_format = prompt_manager.get(self.service_name, prompt_mode, 'recommender')['value']
-            recommend_prompt, extras = prompt_manager.render_by_parse(recommend_prompt_format, allowed_set)
-            if len(extras) != 0:
-                logging.warn(f"param not in custom offered param {extras}")
-            recommended_params = get_llm_response(recommend_prompt)
-        elif prompt_mode == "normal":
-            idea_prompt_format = prompt_manager.get(self.service_name, prompt_mode, 'idea')['value']
-            idea_prompt, extras = prompt_manager.render_by_parse(idea_prompt_format, allowed_set)
-            optimization_idea = get_llm_response(idea_prompt)
-            allowed_set.add("optimization_idea")
-            recommend_prompt_format = prompt_manager.get(self.service_name, prompt_mode,
-                'recommender_positive' if is_positive else 'recommender_negative')['value']
-            recommend_prompt, extras = prompt_manager.render_by_parse(recommend_prompt_format, allowed_set)
-            recommended_params = get_llm_response(recommend_prompt)
-        else:
-            # todo for slow prompt
-            recommended_params = get_llm_response(recommend_prompt)
+            allowed_set["history_result"] = history_result
 
-        recommended_params_set = json_repair(recommended_params)
+            fast_prompt = prompt_manager.format_prompt(self.service_name, "fast", "recommender", allowed_set)
+            llm_opt_result = get_llm_response(fast_prompt)
+            recommended_params_set = json_repair(llm_opt_result)
+        elif prompt_mode == "slow":
+            allowed_set["long_mem"] = long_mem
+            allowed_set["short_mem"] = short_mem
+
+            slow_prompt = prompt_manager.format_prompt(self.service_name, "slow", "recommender", allowed_set)
+            llm_opt_result = get_llm_response(slow_prompt)
+            recommended_params_set = json_repair(llm_opt_result)["PARAM"]
+        else:
+            idea_prompt = prompt_manager.format_prompt(self.service_name, "normal", "idea", allowed_set)
+            optimization_idea = get_llm_response(idea_prompt)
+
+            allowed_set["optimization_idea"] = optimization_idea
+            allowed_set["history_result"] = history_result
+            recommender_type = 'recommender_positive' if is_positive else 'recommender_negative'
+
+            normal_prompt = prompt_manager.format_prompt(self.service_name, "normal", recommender_type, allowed_set)
+            llm_opt_result = get_llm_response(normal_prompt)
+            recommended_params_set = json_repair(llm_opt_result)
 
         result = {}
         for param_name, param_value in recommended_params_set.items():
@@ -127,14 +130,19 @@ class ParamRecommender:
                 result[param_name] = param_value
         return result
 
-    def run(self, history_result, is_positive=True):
+    def run(self, long_mem=None, short_mem=None, history_result=None, is_positive=True):
         resultset = {}
 
         for i in range(0, len(self.params_set), self.chunk_size):
             cur_params_set = self.params_set[i: i + self.chunk_size]
             # 提交任务给线程池，返回 future-like 对象（你线程池需要支持这个）
             thread_pool_manager.add_task(
-                self._process_chunk, history_result, cur_params_set, is_positive
+                self._process_chunk,
+                long_mem,
+                short_mem,
+                history_result,
+                cur_params_set,
+                is_positive
             )
 
         thread_pool_manager.run_all_tasks()

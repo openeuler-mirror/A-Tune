@@ -15,14 +15,14 @@ common: &common
     recommender:
       value: |
         # CONTEXT #
-        [{self.service_name} Category] The goal of this performance optimization is:
-        Performance metric is {self.performance_metric.name}, which means: {self.performance_metric.value}, target is to improve by {self.slo_goal:.2%}.
+        [{service_name} Category] The goal of this performance optimization is:
+        Performance metric is {performance_metric.name}, which means: {performance_metric.value}, target is to improve by {slo_goal:.2%}.
         Current environment configuration:
-        {self.static_profile}
+        {static_profile}
         Historical tuning information (reference for improvements):
         {history_result}
         Current system load and performance analysis:
-        {self.performance_analysis_report}
+        {performance_analysis_report}
         Adjustable parameter set:
         {params_set_str}
         # OBJECTIVE #
@@ -41,9 +41,9 @@ common: &common
       value: |
         # CONTEXT # 
         The goal of this performance optimization is:
-        Performance metric is {self.performance_metric.name}, which means: {self.performance_metric.value}, target is to improve by {self.slo_goal:.2%}
+        Performance metric is {performance_metric.name}, which means: {performance_metric.value}, target is to improve by {slo_goal:.2%}
         Performance analysis report:
-        {self.performance_analysis_report}
+        {performance_analysis_report}
         Parameters you can analyze:
         {params_set_str}
         # OBJECTIVE #
@@ -54,10 +54,10 @@ common: &common
         Your answer will be an important reference for other system operations experts, please provide your answer after careful consideration. Please output in English.
     recommender_positive:
       value: |
-        [{self.service_name} Category] You are a professional system operations expert. Current performance metrics do not meet expectations. Please select adjustable parameter values based on the following tuning ideas, current environment configuration, and adjustable parameters.
+        [{service_name} Category] You are a professional system operations expert. Current performance metrics do not meet expectations. Please select adjustable parameter values based on the following tuning ideas, current environment configuration, and adjustable parameters.
         Please keep descriptions concise, focus on the key adjustment directions that need output, no need to summarize viewpoints, and do not output anything that has no impact on performance.
         Current environment configuration:
-        {self.static_profile}
+        {static_profile}
         Historical tuning information, historical tuning modified the following parameters, you can refer to this historical information to reflect on potential improvement points: 
         {history_result}
         Tuning ideas are:
@@ -69,10 +69,10 @@ common: &common
         Do not provide any response other than JSON, avoid adding comments. Please output in English.
     recommender_negative:
       value: |
-        [{self.service_name} Category] You are a professional system operations expert. Current performance metrics do not meet expectations. Please select adjustable parameter values based on the following tuning ideas, current environment configuration, and adjustable parameters.
+        [{service_name} Category] You are a professional system operations expert. Current performance metrics do not meet expectations. Please select adjustable parameter values based on the following tuning ideas, current environment configuration, and adjustable parameters.
         Please keep descriptions concise, focus on the key adjustment directions that need output, no need to summarize viewpoints, and do not output anything that has no impact on performance.
         Current environment configuration:
-        {self.static_profile}
+        {static_profile}
         Historical tuning information, historical tuning modified the following parameters, you can refer to this historical information to reflect on potential improvement points: 
         {history_result}
         Tuning ideas are:
@@ -83,8 +83,63 @@ common: &common
         value is the recommended value for the adjustable parameter, please provide reasonable specific values based on the above environment configuration information, carefully confirm whether each value can be used, avoid application startup failures after setting.
         Do not provide any response other than JSON, avoid adding comments. Please output in English.
   slow:
+    mem:
+      value: |
+        You are a memory summarization system, responsible for recording and preserving the complete interaction history between humans and the AI tuning expert. You will receive the expert’s tuning ideas and actual execution feedback from the past N steps. Your task is to generate a comprehensive summary of the tuning process, covering the expert’s tuning concepts and corresponding feedback details, ensuring there is no ambiguity. **The expert’s tuning ideas do not need to be fully preserved; only the most important core concepts and key feedback should be summarized.**
+        ### Overall Structure:
+        - **Overview (global metadata):**
+          - **Task Objective: The tuning goal the expert is working to achieve.
+          - **Progress Status: Current completion percentage, along with a summary of completed milestones or steps.
+        - **Tuning Operation Sequence (numbered steps): Record only once per iteration.
+        1. **Iteration i:**
+            - Tuning Concept:
+                The main idea of this tuning iteration, including bottleneck analysis, underutilized resources, etc. Must record highly specific optimization strategies for the given scenario.
+            - Core Parameters:
+                Core parameters related to the tuning concept. Record the parameters modified during tuning and their specific values.
+            - Operation Result:
+                The performance result of this iteration.
+            - Key Findings:
+                Important conclusions drawn from feedback, including parameter effectiveness and reflections on the tuning method. For discrete parameters, if their importance is confirmed, they should be fixed in the key findings; for continuous parameters, the direction of adjustment should be recorded.
+        ### Example Template:
+        ```
+        ## Expert Tuning History Summary
+        **Task Objective**: Increase MySQL QPS by 10% in the current environment.   
+        **Progress Status**: 70% completed — achieved a 7% performance improvement.
+        1.  **Iteration 1:**
+            - Tuning Concept: Memory usage is far from the upper limit; adjust memory-related parameters to improve utilization.
+            - Core Parameters: {{memory=50GB, xx=true}}
+            - Operation Result: Performance result of this iteration is 60, improvement: 20.00%
+            - Key Findings: Increasing memory settings was correct; further increasing memory-related parameters is beneficial.
+        2. **Iteration 2:**
+            - Tuning Concept: Increase shared_buffers to reduce memory cache misses.
+            - Core Parameters: {{shared_buffers=20GB, maintenance_work_mem=2GB}}
+            - Operation Result: Performance result of this iteration is 65, improvement: 30.00%
+            - Key Findings: Increasing `shared_buffers` improved performance, but memory bottleneck has not yet been reached.
+        ... (subsequent iterations continue to be recorded by number)
+        ```
     recommender:
-      value: ""
+      value: |
+        You are a system application optimization expert. Your task is to leverage your extensive experience in optimization to provide relevant recommendations.
+        ### Overall Target:
+        - The performance metric for the scenario is **{performance_metric.name}**, which signifies: {performance_metric.value}. The goal of tuning optimization is to achieve {slo_goal:.2%}.
+        - The system performance analysis report is as follows:{performance_analysis_report}
+        - The related parameters available for analysis and their descriptions are: {params_set_str}
+        """ + "{long_mem}"  + "{short_mem}" + """
+        ### Guidelines:
+        - "Clear": Ensure that the answers are clear, concise, and directly address the question.
+        - **Cautious, Lazy-Type Modification**: Only output parameter changes expected to yield good results; for continuous parameters, the adjustment range should be between 0~50%, and for discrete/enumerated parameters, avoid extreme adjustment spans; do not adjust parameters that are analyzed in the context as having "no impact" on performance.
+        - **Logical**: Parameter adjustments should align with the tuning strategy, with each adjustment having a corresponding logic, and rigorously adjust mutually exclusive parameters simultaneously.
+        - "Strict Formatting": Must meet type and unit requirements; the default unit for numerical values is "bytes". If a unit follows the numerical value, it should be represented as a string (e.g., "512MB"). Parameter output must be in **JSON format**.
+        ### Example Template:
+        ```
+            {{
+                "tuning_concept": "The main bottleneck in the current scenario is IO, but the system's memory usage is only about 30% of the current capacity. The current memory parameter is set at 20G, which is advisable to appropriately increase to enhance memory resource utilization and thereby accelerate performance ... (Additional tuning_concept)",
+                "PARAM": {{
+                "memory": "30GB",
+                ... (Additional params)
+                }}
+            }}
+        ```
       meta: {lang: en, version: 1}    
 # ==================================================== nginx =====================================================
 nginx:
@@ -102,14 +157,14 @@ nginx:
     recommender:
       value: |
         # CONTEXT #
-        [{self.service_name} Category] The goal of this performance optimization is:  
-        Performance metric is {self.performance_metric.name}, which means: {self.performance_metric.value}, target is to improve by {self.slo_goal:.2%}.
+        [{service_name} Category] The goal of this performance optimization is:  
+        Performance metric is {performance_metric.name}, which means: {performance_metric.value}, target is to improve by {slo_goal:.2%}.
         Current environment configuration:  
-        {self.static_profile}  
+        {static_profile}  
         Historical tuning information (reference for improvements):  
         {history_result}
         Current system load and performance analysis:
-        {self.performance_analysis_report}
+        {performance_analysis_report}
         **Adjustable parameter set with value ranges and functional information**:
         {params_set_str}
         # REQUIREMENTS #
@@ -137,9 +192,9 @@ nginx:
       value: |
         # CONTEXT # 
         The goal of this performance optimization is:
-        Performance metric is {self.performance_metric.name}, which means: {self.performance_metric.value}, target is to improve by {self.slo_goal:.2%}
+        Performance metric is {performance_metric.name}, which means: {performance_metric.value}, target is to improve by {slo_goal:.2%}
         Performance analysis report:
-        {self.performance_analysis_report}
+        {performance_analysis_report}
         Parameters you can analyze:
         {params_set_str}
         # OBJECTIVE #
@@ -157,7 +212,7 @@ nginx:
         Goal: Based on the following information, while maintaining the effective direction from the previous round, summarize parameter adjustment experience, further fine-tune parameters (moderately increase intensity within safe boundaries), only provide parameters that need changes and their recommended new values.
 
         Current environment configuration:
-        {self.static_profile}
+        {static_profile}
 
         Historical tuning information (including modified parameters and results):
         {history_result}
@@ -188,7 +243,7 @@ nginx:
         Goal: Based on the following information, summarize baseline, best tuning results, worst tuning results, and previous round tuning results and parameter values from historical tuning experience, reversely fine-tune parameters that may have caused degradation in the previous round, and select more conservative and safe values; only provide parameters that need changes and their recommended new values.
 
         Current environment configuration:
-        {self.static_profile}
+        {static_profile}
 
         Historical tuning information (including modified parameters and results):
         {history_result}
@@ -212,8 +267,60 @@ nginx:
         - Only output one JSON object, key is "adjustable parameter name", value is "recommended value".
         - Do not output any extra text, explanations, examples, code fences, or comments.
   slow:
+    mem:
+      value: |
+        - **Overview (Global Metadata):**
+          - **Task Objective**: The specific performance goal for {application} (e.g., increase QPS, reduce latency, improve concurrency handling).
+          - **Progress Status**: Current completion percentage, achieved improvements, and milestones reached.
+        - **Sequential Tuning Actions (Numbered Steps):** Each iteration only record once.
+        i. **Iteration i**:
+            - Tuning Concept: 
+                The main concept behind the tuning action, including identified bottlenecks (e.g., connection limits, CPU saturation, keep-alive inefficiency), underutilized resources, or scenario-specific strategies (e.g., static file serving, reverse proxy buffering).
+            - Core Params:
+                The key {application} configuration parameters modified in this round. ONLY the parameters that were actually changed in this iteration. Include exact parameter names and values (e.g., for nginx：worker_processes, worker_connections, keepalive_timeout, sendfile, tcp_nopush).
+            - Operation Result:
+                Quantitative performance outcome: e.g., QPS, P99 latency, error rate, CPU/memory usage before and after.
+            - Key Findings:
+                Insights derived from the results. For discrete parameters (e.g., on/off), fix their optimal value if confirmed. For continuous ones (e.g., buffer sizes), indicate the adjustment direction (increase/decrease). Note any side effects (e.g., higher memory usage).
+        ### Example Template(Key Format Reference Only):
+        ```
+        ## Summary of the expert's tuning history
+        **Task Objective**: Increase Nginx QPS by 20% under high concurrent load.
+        **Progress Status**: 70% completed - 7% improvement achieved.
+        0.  **Iteration 0**:
+            - Tuning Concept: Not yet executed - initial baseline established
+            - Core Params: No changes made
+            - Operation Result: Baseline metric recorded at xxx
+            - Key Finding: No tuning actions taken; initial performance benchmark established for future comparison
+        1.  **Iteration 1**:
+            - Tuning Concept: The memory usage rate is far from reaching its limit, and parameters related to memory utilization can be adjusted to increase it.
+            - Core Params: {{memory=50GB, xx=true}}
+            - Operation Result: QPS increased from 70507.0 to 129443.0 (+83.59% vs baseline, +83.59% vs prev).
+            - Key Finding: Increasing the memory setting was correct, make memory params larger is better.
+        ... (Additional numbered steps for subsequent actions)
     recommender:
-      value: ""
+      value: |
+        You are a system application optimization expert. Your task is to leverage your extensive experience in optimization to provide relevant recommendations.
+        ### Overall Target:
+        - The performance metric for the scenario is **{performance_metric.name}**, which signifies: {performance_metric.value}. The goal of tuning optimization is to achieve {slo_goal:.2%}.
+        - The system performance analysis report is as follows:{performance_analysis_report}
+        - The related parameters available for analysis and their descriptions are: {params_set_str}
+        """ + "{long_mem}"  + "{short_mem}" + """
+        ### Guidelines:
+        - "Clear": Ensure that the answers are clear, concise, and directly address the question.
+        - **Cautious, Lazy-Type Modification**: Only output parameter changes expected to yield good results; for continuous parameters, the adjustment range should be between 0~50%, and for discrete/enumerated parameters, avoid extreme adjustment spans; do not adjust parameters that are analyzed in the context as having "no impact" on performance.
+        - **Logical**: Parameter adjustments should align with the tuning strategy, with each adjustment having a corresponding logic, and rigorously adjust mutually exclusive parameters simultaneously.
+        - "Strict Formatting": Must meet type and unit requirements; the default unit for numerical values is "bytes". If a unit follows the numerical value, it should be represented as a string (e.g., "512MB"). Parameter output must be in **JSON format**.
+        ### Example Template:
+        ```
+            {{
+                "tuning_concept": "The main bottleneck in the current scenario is IO, but the system's memory usage is only about 30% of the current capacity. The current memory parameter is set at 20G, which is advisable to appropriately increase to enhance memory resource utilization and thereby accelerate performance ... (Additional tuning_concept)",
+                "PARAM": {{
+                "memory": "30GB",
+                ... (Additional params)
+                }}
+            }}
+        ```
       meta: {lang: en, version: 1}
 # ==================================================== mysql =====================================================
 mysql:

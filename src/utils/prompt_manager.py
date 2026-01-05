@@ -23,13 +23,13 @@ import tempfile
 import threading
 from typing import Any, Dict, List, Optional
 import string, inspect
-
 import yaml
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
-
+from src.utils.common import language
+import logging
 
 # -----------------------------
 # Pydantic 请求/响应模型
@@ -198,59 +198,56 @@ class StringRepository:
             self._save()
     
     @staticmethod
-    def render_by_parse(tpl: str, allowed: set, default: str = "未知"):
+    def render_by_parse(tpl: str, data: dict, default: str = None) -> str:
         """
-            tpl: 模板字符串，含 {field[:fmt][!conv]}
-            allowed: 允许替换的字段全集（如 {'self.service_name','self.performance_metric.name',...}）
-            default: 不在 allowed 或取值失败时的占位
-            返回: (渲染后字符串, 额外占位符列表)
+        通用字符串替换函数
+        tpl: 模板字符串，含 {key} 占位符
+        data: 字典，提供替换值
+        default: 缺失字段时的默认值
+        返回: 渲染后的字符串
         """
+        default = default or ("未知" if language() == "zh" else "unknown")
         fmt = string.Formatter()
-        f = inspect.currentframe().f_back
-        # 记录上一个调用栈的所有变量信息
-        scope = {**f.f_globals, **f.f_locals}
-
-        def resolve(field: str):
-            parts = field.split('.')
-            cur = scope.get(parts[0], None)
-            for p in parts[1:]:
-                if cur is None: return None
-                cur = (cur.get(p) if isinstance(cur, dict) else getattr(cur, p, None))
-            return cur
-
-        out, extras = [], []
+        out = []
+        missing = []
+    
         for literal, field, format_spec, conversion in fmt.parse(tpl):
             out.append(literal)
             if not field:
                 continue
-            # 需要的变量不再提供的可用变量里面，直接改值为 “未知”，同时记录这个额外的 “需求变量”
-            if field not in allowed:
-                out.append(default)
-                extras.append(field)
-                continue
-            val = resolve(field)
-            if val is None:
-                out.append(default)
-                extras.append(field)
-                continue
-            # 格式化/转换
+            # 从字典取值
+            if field not in data or data[field] is None:
+                val = default
+                missing.append(field)
+            else:
+                val = data[field]
+            # 格式化
             try:
                 val = format(val, format_spec) if format_spec else str(val)
             except Exception:
                 val = str(val)
+            # 转换符
             if conversion == 'r':
                 val = repr(val)
             elif conversion == 'a':
                 val = ascii(val)
             out.append(str(val))
-        # extras 去重保序
-        seen, uniq = set(), []
-        for e in extras:
-            if e not in seen:
-                seen.add(e)
-                uniq.append(e)
-        return ''.join(out), uniq
+    
+        return ''.join(out), missing
 
+    def format_prompt(self, service_name, prompt_mode, prompt_type, allowed_set):
+        prompt_format = self.get(
+            service_name, 
+            prompt_mode, 
+            prompt_type
+        )['value']
+
+        opt_result, extras = self.render_by_parse(prompt_format, allowed_set)
+        # pay attention to this error message to avoid incorrect escaping when adding or modifying prompts, 
+        if len(extras) != 0:
+            logging.warn(f"error parm in default.yaml: {service_name}->{prompt_mode}->{prompt_type}. param not in custom offered param {extras}")
+
+        return opt_result
 
 # ----------------------------------------------------------
 # FastAPI（对前端/其他服务）
