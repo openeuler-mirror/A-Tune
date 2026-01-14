@@ -55,7 +55,7 @@ def parse_ob_connections(output: str) -> Dict:
 @snapshot_task(
     cmd=_obclient_base("show global status like 'uptime';"),
     collect_mode=CollectMode.ASYNC,
-    tag=translate("OceanBase 运行时间（秒）, OceanBase Runtime (seconds)")
+    tag=translate("OceanBase 运行时间（秒）", "OceanBase Runtime (seconds)")
 )
 def parse_ob_uptime(output: str) -> Dict:
     return {"uptime": _ob_parse(output)}
