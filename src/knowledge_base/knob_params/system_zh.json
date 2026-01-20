@@ -1391,5 +1391,98 @@
       "dtype": "int",
       "set": "sysctl -w net.ipv4.tcp_min_tso_segs=$param_value",
       "get": "sysctl -n net.ipv4.tcp_min_tso_segs"
+    },
+    "net.ipv4.conf.all.send_redirects": {
+      "desc": "1. 对于普通主机服务器，建议值为 0，若不开启数据包转发功能，无需开启此功能;2. 对于作为路由器使用的服务器，建议设置为1以启用ICMP重定向消息，帮助主机优化路由选择",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv4.conf.all.send_redirects=$param_value",
+      "get": "sysctl -n net.ipv4.conf.all.send_redirects"
+    },
+    "net.ipv4.conf.default.send_redirects": {
+      "desc": "1. 此内核参数用于控制是否接受 ICMP 重定向消息，与参数 net.ipv4.conf.all.send_redirects 相比，此参数针对默认出口网络接口。建议值为 0，防止外部人员更新系统的路由表，用于网络攻击和欺骗;2. 对于作为路由器使用的服务器，建议设置为1以启用ICMP重定向消息，帮助主机优化路由选择",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv4.conf.default.send_redirects=$param_value",
+      "get": "sysctl -n net.ipv4.conf.default.send_redirects"
+    },
+    "net.ipv4.icmp_ignore_bogus_error_responses": {
+      "desc": "1. 此内核参数用于控制是否忽略虚假的 ICMP 错误响应。建议值为 1，以提高系统安全性，防止攻击者利用虚假错误信息进行网络攻击;2. 只有在极少数调试场景下才临时设为 0，并且事后要改回来",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=$param_value",
+      "get": "sysctl -n net.ipv4.icmp_ignore_bogus_error_responses"
+    },
+    "net.ipv4.conf.all.rp_filter": {
+      "desc": "1. 此内核参数用于控制是否开启 IP 反向路径过滤。建议值为 1，以增强网络的安全性。启用逆向路径过滤有助于防止一些常见的网络攻击，特别是那些利用 IP 地址伪装的攻击;2. 只有在极少数调试场景下才临时设为 0，并且事后要改回来",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv4.conf.all.rp_filter=$param_value",
+      "get": "sysctl -n net.ipv4.conf.all.rp_filter"
+    },
+    "net.ipv6.conf.all.accept_redirects": {
+      "desc": "1. 此内核参数用于控制是否接受 IPv6 重定向消息。建议值为 0，以增强系统安全性。禁用 IPv6 重定向可防止攻击者通过伪造重定向消息实施中间人攻击或流量劫持；2. 仅在受控的实验或特殊网络调试环境中才临时设为 1，并应在使用后恢复为 0",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv6.conf.all.accept_redirects=$param_value",
+      "get": "sysctl -n net.ipv6.conf.all.accept_redirects"
+    },
+    "net.ipv6.conf.default.accept_redirects": {
+      "desc": "1. 此内核参数用于控制是否接受 IPv6 重定向消息，建议值为 0，以增强系统安全性。与参数net.ipv6.conf.all.accept_redirects相比，此参数针对默认出口网络接口；2. 仅在受控的实验或特殊网络调试环境中才临时设为 1，并应在使用后恢复为 0",
+      "range": [
+        "0",
+        "1"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv6.conf.default.accept_redirects=$param_value",
+      "get": "sysctl -n net.ipv6.conf.default.accept_redirects"
+    },
+    "net.ipv4.ip_local_port_range": {
+      "desc": "1. 此内核参数用于定义本地临时端口的可用范围，格式为 '起始端口 结束端口'。建议值为 '30000 65500'，以支持高并发连接场景；2. 在出现 'Cannot assign requested address' 或端口耗尽问题时，可适当扩大该范围，但需确保起始端口不低于1024且结束端口不超过65535",
+      "range": [
+        "1024",
+        "65535"
+      ],
+      "type": "discrete",
+      "dtype": "string",
+      "set": "sysctl -w net.ipv4.ip_local_port_range='$param_value'",
+      "get": "sysctl -n net.ipv4.ip_local_port_range"
+    },
+    "net.ipv4.udp_rmem_min": {
+      "desc": "1. 此内核参数用于设置每个 UDP socket 接收缓冲区的最小大小（字节）。内核会确保即使应用程序未显式设置 SO_RCVBUF，其接收缓冲区也不低于此值。在高吞吐或高并发 UDP 场景下，适当增大该值（如 65536）可减少丢包；但不宜过大（如超过 256KB），以免造成内存浪费或 OOM。默认值通常为 8192。",
+      "type": "continuous",
+      "range": [8192, 262144],
+      "dtype": "int",
+      "set": "sysctl -w net.ipv4.udp_rmem_min=$param_value",
+      "get": "sysctl -n net.ipv4.udp_rmem_min"
+    },
+    "net.ipv4.udp_wmem_min": {
+      "desc": "1. 此内核参数用于设置每个 UDP socket 发送缓冲区的最小大小（字节）。若应用程序未显式通过 setsockopt(SO_SNDBUF) 设置发送缓冲区大小，内核将确保其不低于 udp_wmem_min。在高吞吐或高并发 UDP 场景下，适当增大该值（如 65536）可提升发送性能；但不建议设得过大（如 16MB），否则可能导致内存过度预留，尤其在大量并发 socket 时易引发内存压力或 OOM。默认值通常为 4096 或 8192。",
+      "type": "continuous",
+      "range": [8192, 262144],
+      "dtype": "int",
+      "set": "sysctl -w net.ipv4.udp_wmem_min=$param_value",
+      "get": "sysctl -n net.ipv4.udp_wmem_min"
     }
   }

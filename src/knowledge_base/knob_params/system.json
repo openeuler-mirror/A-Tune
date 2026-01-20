@@ -1391,5 +1391,98 @@
     "dtype": "int",
     "set": "sysctl -w net.ipv4.tcp_min_tso_segs=$param_value",
     "get": "sysctl -n net.ipv4.tcp_min_tso_segs"
+  },
+  "net.ipv4.conf.all.send_redirects": {
+    "desc": "1. For general-purpose host servers, the recommended value is 0; if packet forwarding is not enabled, this feature should remain disabled. 2. For servers acting as routers, it is recommended to set this to 1 to enable ICMP redirect messages, helping hosts optimize routing decisions.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv4.conf.all.send_redirects=$param_value",
+    "get": "sysctl -n net.ipv4.conf.all.send_redirects"
+  },
+  "net.ipv4.conf.default.send_redirects": {
+    "desc": "1. This kernel parameter controls whether ICMP redirect messages are sent for the default outgoing network interface. Compared to net.ipv4.conf.all.send_redirects, this setting applies specifically to newly created interfaces. The recommended value is 0 to prevent external entities from modifying the system's routing table, which could be exploited for network attacks or spoofing. 2. For servers functioning as routers, it is recommended to set this to 1 to enable ICMP redirect messages, helping hosts optimize routing decisions.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv4.conf.default.send_redirects=$param_value",
+    "get": "sysctl -n net.ipv4.conf.default.send_redirects"
+  },
+  "net.ipv4.icmp_ignore_bogus_error_responses": {
+    "desc": "1. This kernel parameter controls whether bogus ICMP error responses are ignored. The recommended value is 1 to improve system security and prevent attackers from exploiting forged error messages for network-based attacks. 2. It should only be temporarily set to 0 in rare debugging scenarios, and must be reverted afterward.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=$param_value",
+    "get": "sysctl -n net.ipv4.icmp_ignore_bogus_error_responses"
+  },
+  "net.ipv4.conf.all.rp_filter": {
+    "desc": "1. This kernel parameter controls whether IP reverse path filtering is enabled. The recommended value is 1 to enhance network security. Enabling reverse path filtering helps mitigate common network attacks, especially those involving IP address spoofing. 2. It should only be temporarily set to 0 in rare debugging scenarios, and must be reverted afterward.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv4.conf.all.rp_filter=$param_value",
+    "get": "sysctl -n net.ipv4.conf.all.rp_filter"
+  },
+  "net.ipv6.conf.all.accept_redirects": {
+    "desc": "1. This kernel parameter controls whether IPv6 redirect messages are accepted. The recommended value is 0 to enhance system security. Disabling IPv6 redirects prevents attackers from performing man-in-the-middle attacks or traffic hijacking via forged redirect messages. 2. It should only be temporarily set to 1 in controlled experimental or specialized network debugging environments, and must be reverted to 0 afterward.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv6.conf.all.accept_redirects=$param_value",
+    "get": "sysctl -n net.ipv6.conf.all.accept_redirects"
+  },
+  "net.ipv6.conf.default.accept_redirects": {
+    "desc": "1. This kernel parameter controls whether IPv6 redirect messages are accepted for the default network interface. Compared to net.ipv6.conf.all.accept_redirects, this setting applies specifically to newly created interfaces. The recommended value is 0 to enhance system security. 2. It should only be temporarily set to 1 in controlled experimental or specialized network debugging environments, and must be reverted to 0 afterward.",
+    "range": [
+      "0",
+      "1"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv6.conf.default.accept_redirects=$param_value",
+    "get": "sysctl -n net.ipv6.conf.default.accept_redirects"
+  },
+  "net.ipv4.ip_local_port_range": {
+    "desc": "1. This kernel parameter defines the range of local ephemeral ports available for outgoing connections, formatted as 'start_port end_port'. The recommended value is '30000 65500' to support high-concurrency connection scenarios. 2. If encountering 'Cannot assign requested address' or port exhaustion issues, the range can be expanded, but the start port must be no lower than 1024 and the end port no higher than 65535.",
+    "range": [
+      "1024",
+      "65535"
+    ],
+    "type": "discrete",
+    "dtype": "string",
+    "set": "sysctl -w net.ipv4.ip_local_port_range='$param_value'",
+    "get": "sysctl -n net.ipv4.ip_local_port_range"
+  },
+  "net.ipv4.udp_rmem_min": {
+    "desc": "1. This kernel parameter sets the minimum size (in bytes) of the receive buffer for each UDP socket. The kernel ensures that even if an application does not explicitly set SO_RCVBUF, the receive buffer will not fall below this value. In high-throughput or high-concurrency UDP scenarios, moderately increasing this value (e.g., to 65536) can reduce packet loss; however, it should not be set too large (e.g., over 256KB), as this may waste memory or lead to OOM conditions. The default value is typically 8192.",
+    "type": "continuous",
+    "range": [8192, 262144],
+    "dtype": "int",
+    "set": "sysctl -w net.ipv4.udp_rmem_min=$param_value",
+    "get": "sysctl -n net.ipv4.udp_rmem_min"
+  },
+  "net.ipv4.udp_wmem_min": {
+    "desc": "1. This kernel parameter sets the minimum size (in bytes) of the send buffer for each UDP socket. If an application does not explicitly set the send buffer size via setsockopt(SO_SNDBUF), the kernel ensures it is at least udp_wmem_min. In high-throughput or high-concurrency UDP scenarios, moderately increasing this value (e.g., to 65536) can improve sending performance; however, setting it excessively large (e.g., 16MB) is discouraged, as it may cause excessive memory reservation and lead to memory pressure or OOM, especially with many concurrent sockets. The default value is typically 4096 or 8192.",
+    "type": "continuous",
+    "range": [8192, 262144],
+    "dtype": "int",
+    "set": "sysctl -w net.ipv4.udp_wmem_min=$param_value",
+    "get": "sysctl -n net.ipv4.udp_wmem_min"
   }
 }
