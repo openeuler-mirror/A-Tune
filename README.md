@@ -418,7 +418,11 @@ docker tag *image_id* llama.cpp_arm64:b6602（*image_id* 替换成 docker images
 #### 拉起领域模型
 上传领域模型的9个文件至/root/models（也可以自定义路径，后续命令中-v参数相应调整），执行：
 ```BASH
-docker run -d -p 11434:11434 -v /root/models:/models llama.cpp_arm64:b6602 -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434
+docker run -d -p 11434:11434 -v /root/models:/models llama.cpp_arm64:b6602 -s -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434
+```
+920机器推理性能优化参数：（需32核、6GB内存）
+```BASH
+docker run -d -p 11434:11434 -v /root/models:/models llama.cpp_arm64:b6602 -s -m /models/openEuler-Intelligence-OS_model-IQ4_NL-00001-of-00009.gguf --host 0.0.0.0 --port 11434 -np 4 -t 32 --numa distribute --cpu-strict 1 --prio 2 --swa-full --cache-type-k q4_1 --log-disable --ctx-size 10240
 ```
 PS：若容器拉起时遇到报错 operation not permitted，可以在 docker run 命令后增加参数 --security-opt seccomp=unconfined 解决。
 
@@ -434,7 +438,10 @@ curl 'http://127.0.0.1:11434/v1/chat/completions' \
     "stream": false
   }'
 ```
-
+输出示例：
+```
+{"choices":[{"finish_reason":"stop","index":0,"message":{"role":"assistant","content":"你好！有什么问题我可以帮助你吗？😊"}}],"created":1768872866,"model":"openEuler-Intelligence-OS_model","system_fingerprint":"b0-unknown","object":"chat.completion","usage":{"completion_tokens":11,"prompt_tokens":9,"total_tokens":20},"id":"chatcmpl-mZP5NbcmQjvZudnYovlQORru3E1EBRTV","timings":{"cache_n":0,"prompt_n":9,"prompt_ms":776.921,"prompt_per_token_ms":86.32455555555556,"prompt_per_second":11.584189383476568,"predicted_n":11,"predicted_ms":5233.48,"predicted_per_token_ms":475.7709090909091,"predicted_per_second":2.101851922621277}}
+```
 
 ## 常见问题解决
 
