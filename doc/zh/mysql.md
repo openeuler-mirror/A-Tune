@@ -1,9 +1,61 @@
 # MySQL 安装与配置
 ## 1. 安装 MySQL 数据库
 
-### yum安装
+### yum安装（推荐）
 ```bash
 yum install -y mysql mysql-server
+```
+
+### 源码编译
+```bash
+VERSION="8.0.22"
+DIR="/usr/local/mysql"
+DATA="/data/mysql"
+
+# 安装依赖
+dnf install -y cmake3 gcc-c++ ncurses-devel openssl-devel bison wget tar make libtirpc-devel rpcgen
+
+# 下载源码
+cd /tmp
+wget -O mysql-boost.tar.gz "https://downloads.mysql.com/archives/get/p/23/file/mysql-boost-${VERSION}.tar.gz"
+
+# 创建用户和目录
+groupadd mysql 2>/dev/null || true
+useradd -r -g mysql -s /bin/false mysql 2>/dev/null || true
+mkdir -p ${DIR} ${DATA}
+chown -R mysql:mysql ${DIR} ${DATA}
+
+# 解压和编译
+tar -xzf mysql-boost.tar.gz
+cd mysql-${VERSION}
+mkdir build && cd build
+cmake3 .. -DCMAKE_INSTALL_PREFIX=${DIR} -DMYSQL_DATADIR=${DATA} -DWITH_BOOST=../boost -DWITH_SSL=system
+make -j$(nproc) && make install
+chown -R mysql:mysql ${DIR} ${DATA}
+
+# 初始化
+cd ${DIR}
+bin/mysqld --initialize-insecure --user=mysql --basedir=${DIR} --datadir=${DATA}
+
+# 创建服务
+cat > /etc/systemd/system/mysqld.service <<EOF
+[Unit]
+Description=MySQL Server
+After=network.target
+[Service]
+User=mysql
+ExecStart=${DIR}/bin/mysqld --daemonize
+ExecStop=${DIR}/bin/mysqladmin shutdown
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 启动服务
+systemctl daemon-reload
+systemctl start mysqld
+
+# 设置密码
+# ${DIR}/bin/mysqladmin -u root password "123456"
 ```
 
 ## 2. 启动 MySQL
@@ -12,7 +64,7 @@ yum install -y mysql mysql-server
 systemctl start mysqld
 ```
 
-## 3. 数据库账号设置
+## 3. 账号设置 & 创建数据库
 
 ```bash
 mysql -uroot << EOF
