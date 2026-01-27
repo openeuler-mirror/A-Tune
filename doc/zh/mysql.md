@@ -1,50 +1,20 @@
 # MySQL 安装与配置
 ## 1. 安装 MySQL 数据库
 
-```
-yum install -y mysql mysql-devel mysql-server
-```
-## 2. 创建运行目录
-
-```
-mkdir -p /usr/local/mysql/{data,tmp,run,log}
+### yum安装
+```bash
+yum install -y mysql mysql-server
 ```
 
-## 3. 修改目录属组
+## 2. 启动 MySQL
 
-```
-chown -R mysql:mysql /usr/local/mysql
-```
-
-## 4. 清理数据
-
-```
-rm -rf /usr/local/mysql/data/*
-```
-
-## 5. 将可执行文件目录加入到 PATH
-
-```
-export PATH=`echo $PATH`:/usr/local/mysql/bin
-```
-
-## 6. 初始化 MySQL 数据库
-
-```
-mysqld --user=root --initialize-insecure
-```
-
-## 7. 启动 MySQL
-
-```
-chown -R mysql:mysql /var/lib/mysql
-chown -R mysql:mysql /run/mysqld/
+```bash
 systemctl start mysqld
 ```
 
-## 8. 数据库配置修改
+## 3. 数据库账号设置
 
-```
+```bash
 mysql -uroot << EOF
 alter user 'root'@'localhost' identified by '123456';
 flush privileges;
@@ -56,110 +26,57 @@ quit
 EOF
 ```
 
-## 9. 重载配置参数
-
-```
-systemctl daemon-reload
-```
-
 # Sysbench 安装与基线测试
-## 1. 源码下载编译安装
+## 1. 安装
 
+### yum安装（推荐）
+```BASH
+yum install -y sysbench
 ```
-yum install -y git
+
+### 源码编译安装
+
+```bash
+yum install -y git mysql-devel automake libtool
 git clone --depth=1 https://github.com/akopytov/sysbench.git
 cd sysbench
-yum install -y automake libtool
 ./autogen.sh
 ./configure
 make -j
 make install
 ```
 
-## 2. 查看版本
+## 2. 基线测试命令
 
-```
-sysbench --version
-```
-
-## 3. 基线测试命令
-
-```
-sh -x benchmark.sh 127.0.0.1 3306 root 123456
+```bash
+sh benchmark.sh
 ```
 
-benchmark.sh 内容
+benchmark.sh 内容:
 
-```
-# 1.prepare 阶段
+```bash
+host=127.0.0.1
+port=3306
+user=root
+passwd=123456
 
-echo "sysbench prepare"
-sysbench \
-    --db-driver=mysql \
-    --mysql-host=$1 \
-    --mysql-port=$2 \
-    --mysql-user=$3 \
-    --mysql-password=$4 \
-    --mysql-db=sbtest \
-    --table_size=10000 \
-    --tables=10 \
-    --time=180 \
-    --threads=96 \
-    --report-interval=10 \
-    oltp_read_write \
-    prepare
+[[ -n "$1" ]] && host=$1
+[[ -n "$2" ]] && port=$2
+[[ -n "$3" ]] && user=$3
+[[ -n "$4" ]] && passwd=$4
 
-
-# 2.copilot调优信号发送
-echo "发送调优信号1"
+# cleanup
+sysbench --db-driver=mysql --mysql-host=$host --mysql-port=$port --mysql-user=$user --mysql-password=$passwd --mysql-db=sbtest --table_size=10000 --tables=10 --time=180 --threads=16 --report-interval=5 oltp_read_write cleanup
+# prepare
+sysbench --db-driver=mysql --mysql-host=$host --mysql-port=$port --mysql-user=$user --mysql-password=$passwd --mysql-db=sbtest --table_size=10000 --tables=10 --time=180 --threads=16 --report-interval=5 oltp_read_write prepare
+# send start signal to copilot
 echo 1 > /tmp/euler-copilot-fifo
-
-
-# 3.sysbench压测开始
-echo "压测开始"
-rm -rf benchmark.log
-
-sysbench \
-    --mysql-host=$1 \
-    --mysql-port=$2 \
-    --mysql-user=$3 \
-    --mysql-password=$4 \
-    --mysql-db=sbtest \
-    --mysql-storage-engine=innodb \
-    --mysql-ignore-errors=1062,1213,1205,1020 \
-    --table-size=10000 \
-    --tables=10 \
-    --time=180 \
-    --events=0 \
-    --report-interval=1 \
-    --rand-type=uniform \
-    --rand-seed=100 \
-    --db-driver=mysql \
-    --percentile=95 \
-    --forced-shutdown=off \
-    --db-ps-mode=disable \
-    --threads=128 \
-    oltp_write_only \
-    run 2>&1 | tee benchmark.log
-
-# 4.sysbench清理工作
-echo "开始清理工作"
-sysbench \
-    --db-driver=mysql \
-    --mysql-host=$1 \
-    --mysql-port=$2 \
-    --mysql-user=$3 \
-    --mysql-password=$4 \
-    --mysql-db=sbtest \
-    --table_size=10000 \
-    --tables=10 \
-    --time=180 \
-    --threads=96 \
-    --report-interval=10 \
-    oltp_read_write \
-    cleanup
-
+# run
+sysbench --db-driver=mysql --mysql-host=$host --mysql-port=$port --mysql-user=$user --mysql-password=$passwd --mysql-db=sbtest --table-size=10000 --tables=10 --time=180 --threads=16 --report-interval=5 oltp_write_only --events=0 --mysql-storage-engine=innodb --mysql-ignore-errors=1062,1213,1205,1020 --rand-type=uniform --percentile=95 --forced-shutdown=off --db-ps-mode=disable run
+# cleanup
+sysbench --db-driver=mysql --mysql-host=$host --mysql-port=$port --mysql-user=$user --mysql-password=$passwd --mysql-db=sbtest --table_size=10000 --tables=10 --time=180 --threads=16 --report-interval=5 oltp_read_write cleanup
 ```
+
 # 部署 copilot
 * 详细安装方法参见[EulerCopilot Tune 安装使用指南](../../README.md)
 
