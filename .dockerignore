@@ -1,0 +1,71 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.cursor/
+
+# Documentation
+doc/
+*.md
+!README.md
+FAQ.md
+OPTIMIZATION_SUGGESTIONS.md
+PR_DESCRIPTION_EXCEPTIONS.md
+QUICK_FIXES_EXAMPLE.md
+
+# Test files
+tests/
+src/tests/
+src/check_tests/
+*.test.py
+*_test.py
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+.drone.yml
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't copy into container)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Environment files (should be mounted or set via env vars)
+.env
+.env.*
+*.env
+
+# License and legal files
+LICENSE
+
+# Unnecessary files
+*.orig
+*.rej
