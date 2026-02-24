@@ -2,9 +2,8 @@ label: A-Tune用户指南
 isManual: true
 description: 利用人工智能技术，实现对 openEuler 系统性能的智能化、自动化调优
 sections:
-  - label: A-Tune用户指南
-    href: ./a_tune.md
-    sections:
+   - label: A-Tune用户指南
+     sections:
       - label: 认识A-Tune
         href: ./getting_to_know_a_tune.md
       - label: 安装与部署

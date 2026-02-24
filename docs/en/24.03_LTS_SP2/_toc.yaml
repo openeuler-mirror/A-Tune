@@ -2,9 +2,8 @@ label: A-Tune User Guide
 isManual: true
 description: Optimized openEuler performance through AI-powered, automated tuning
 sections:
-  - label: A-Tune User Guide
-    href: ./a_tune.md
-    sections:
+   - label: A-Tune User Guide	  
+     sections:
       - label: Getting to Know A-Tune
         href: ./getting_to_know_a_tune.md
       - label: Installation and Deployment
