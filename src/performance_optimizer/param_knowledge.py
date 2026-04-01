@@ -7,6 +7,7 @@ from tqdm import tqdm
 from src.utils.config.app_config import AppInterface
 from src.utils.config.global_config import param_config
 from src.utils.shell_execute import SshClient
+from src.utils.common import language
 
 
 class ParamKnowledge:
@@ -42,7 +43,8 @@ class ParamKnowledge:
     def describe_param_background_knob(self, app_name: str, params: Iterable):
         logging.info(f"[ParamKnowledge] building param knowledge base ...")
         params_describe_list = []
-        params_default_info = {}
+        params_info = {}
+        is_zh = (language() == "zh")
         app_params = self.param_config.get(app_name.lower())
         system_params = self.param_config.get("system")
         app = AppInterface(self.ssh_client).get(app_name)
@@ -57,22 +59,34 @@ class ParamKnowledge:
             # 1.描述参数范围
             if item["range"]:
                 if item["type"] == "discrete":
-                    param_range = "、".join(list(map(str, item["range"])))
+                    if is_zh:
+                        param_range = "、".join(list(map(str, item["range"])))
+                        param_range = f"参数只允许配置为（{param_range}）里的其中一个"
+                    else:
+                        param_range = ",".join(list(map(str, item["range"])))
+                        param_range = f"the parameter can be set to only one of ({param_range})"
                 else:
-                    param_range = f"from {item['range'][0]} to {item['range'][1]}"
+                    if is_zh:
+                        param_range = f"参数可配置的范围为 {item['range'][0]} 到 {item['range'][1]}（{item['range'][0]} 和 {item['range'][1]} 均可配置）"
+                    else:
+                        param_range = f"the parameter can be set within the range from {item['range'][0]} to {item['range'][1]} ({item['range'][0]} and {item['range'][1]} can both be set)"
             else:
-                param_range = None
+                logging.warning(f"The \"range\" is not configured for param {param_name}")
+                continue
             # 2.当前环境取值
             param_result = app.get_param(param_name=param_name)
             param_env_value = (
-                param_result.output if param_result.status_code == 0 else item.get("default_value", "default")
+                param_result.output if param_result.status_code == 0 else item.get("default_value", "the default value of the application")
             )
-            params_describe_list.append(
-                f"{param_name}:{item['desc']}, param type is: {item['dtype']}, param range is: {param_range}, current value is: {param_env_value}"
-            )
-            params_default_info[param_name] = param_env_value
+            param_prompt = ""
+            if is_zh:
+                param_prompt = f"{param_name}:{item['desc']}, 参数类型为 {item['dtype']} 类型, {param_range}, 当前 {param_name} = {param_env_value}。"
+            else:
+                param_prompt = f"{param_name}:{item['desc']}, the parameter type is \"{item['dtype']}\", {param_range}, current {param_name} = {param_env_value}."
+            params_describe_list.append(param_prompt)
+            params_info[param_name] = param_env_value
         logging.info(f"[ParamKnowledge] initialize param knowledge base finished!")
-        return params_describe_list, params_default_info
+        return params_describe_list, params_info
 
 
 if __name__ == "__main__":

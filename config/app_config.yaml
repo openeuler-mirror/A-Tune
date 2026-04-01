@@ -1,3 +1,4 @@
+# NOTES: The return value of the command configured in get_param_template must be correct. Otherwise, the prompt will be affected.
 mysql:
   version: "v5.7"
   user: "root"
@@ -5,7 +6,7 @@ mysql:
   config_file: "/etc/my.cnf"
   port: 3306
   set_param_template: 'grep -q "^$param_name\\s*=" "$config_file" && sed -i "s/^$param_name\\s*=.*/$param_name = $param_value/" "$config_file" || sed -i "/\\[mysqld\\]/a $param_name = $param_value" "$config_file"'
-  get_param_template: 'grep -E "^$param_name\s*=" $config_file | cut -d= -f2- | xargs'
+  get_param_template: 'sh /path/to/get_param.sh $param_name $config_file'
   stop_workload: "systemctl stop mysqld"
   start_workload: "systemctl start mysqld"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/mysql/parse_benchmark.sh $host_ip $port $user $password"
@@ -45,7 +46,7 @@ nginx:
   port: 10000
   config_file: "/usr/local/nginx/conf/nginx.conf"
   set_param_template: 'grep -q "^\\s*$param_name\\s\\+" "$config_file" && sed -i "s|^\\s*$param_name\\s\\+.*|    $param_name $param_value;|" "$config_file" || sed -i "/http\\s*{/a\    $param_name $param_value;" "$config_file"'
-  get_param_template: 'grep -E "^\\s*$param_name\\s+" $config_file | head -1 | sed -E "s/^\\s*$param_name\\s+(.*);/\\1/"'
+  get_param_template: 'sh /path/to/get_param.sh $param_name $config_file'
   stop_workload: "/usr/local/nginx/sbin/nginx -s reload"
   start_workload: "/usr/local/nginx/sbin/nginx -s reload"
   benchmark: "$EXECUTE_MODE:local sh $SCRIPTS_DIR/nginx/parse_benchmark.sh $host_ip $port"
@@ -66,7 +67,7 @@ gaussdb:
   config_file: "/path/of/config_file"
   port: 5432
   set_param_template: 'gs_guc set -Z datanode  -N all -I all -c "${param_name}=${param_value}"'
-  get_param_template: 'gs_guc check -Z datanode -N all -I all -c "${param_name}" | awk -F= "/${param_name}=/"\ {print\ \$2}'
+  get_param_template: 'sh /path/to/get_param.sh $param_name'
   stop_workload: "cm_ctl stop -m i"
   start_workload: "cm_ctl start"
   recover_workload: "$EXECUTE_MODE:local sh /path/of/gaussdb_cluster_recover.sh"
