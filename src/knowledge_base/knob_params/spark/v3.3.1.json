@@ -1,6 +1,6 @@
 {
     "spark.default.parallelism": {
-        "desc": "Default number of partitions in RDDs returned by transformations like 'join', 'reduceByKey', and 'parallelize' when not set by user. For distributed shuffle operations (like reduceByKey and join), it depends on the maximum number of partitions in parent RDDs. For parallelize operations without parent RDDs, default value depends on cluster manager. For example, in local mode, default value is number of cores on local machine. Generally recommended to set this value to 2-4 times total cluster cores to improve CPU utilization and alleviate CPU bottlenecks.",
+        "desc": "Default number of partitions in RDDs returned by transformations like 'join', 'reduceByKey', and 'parallelize' when not set by user. For distributed shuffle operations (like reduceByKey and join), it depends on the maximum number of partitions in parent RDDs. For parallelize operations without parent RDDs, default value depends on cluster manager. For example, in local mode, default value is number of cores on local machine. Generally recommended to set this value to 2-4 times total cluster cores to improve CPU utilization and alleviate CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -10,7 +10,7 @@
         "default_value": 128
     },
     "spark.driver.memory": {
-        "desc": "Amount of memory to use for driver process, affecting driver performance and stability. Increasing this value alleviates memory bottlenecks, especially when driver needs to process large amounts of data. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). Values typically like 1g, 2g, etc., should be adjusted according to cluster resources and task requirements.",
+        "desc": "Amount of memory to use for driver process, affecting driver performance and stability. Increasing this value alleviates memory bottlenecks, especially when driver needs to process large amounts of data. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). Values typically like 1g, 2g, etc., should be adjusted according to cluster resources and task requirements",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -20,7 +20,7 @@
         "default_value": "4g"
     },
     "spark.driver.memoryOverhead": {
-        "desc": "In cluster mode, amount of non-heap memory to allocate for each driver process, used for storing non-JVM memory overhead such as network and filesystem buffers. Appropriately increasing this value alleviates performance issues caused by insufficient memory, especially when processing large datasets. Unit is MiB, default value is driverMemory * spark.driver.memoryOverheadFactor.",
+        "desc": "In cluster mode, amount of non-heap memory to allocate for each driver process, used for storing non-JVM memory overhead such as network and filesystem buffers. Appropriately increasing this value alleviates performance issues caused by insufficient memory, especially when processing large datasets. Unit is MiB, default value is driverMemory * spark.driver.memoryOverheadFactor",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -30,7 +30,7 @@
         "default_value": 3276
     },
     "spark.executor.memory": {
-        "desc": "Amount of memory to use per executor process, format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). Typically specified in bytes (like 1g, 2g, etc.). Increasing this value alleviates memory bottlenecks, especially when processing large datasets. Specific values should be adjusted according to cluster resources and task requirements.",
+        "desc": "Amount of memory to use per executor process, format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). Typically specified in bytes (like 1g, 2g, etc.). Increasing this value alleviates memory bottlenecks, especially when processing large datasets. Specific values should be adjusted according to cluster resources and task requirements",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -40,7 +40,7 @@
         "default_value": "4g"
     },
     "spark.executor.memoryOverhead": {
-        "desc": "Amount of additional memory to allocate per executor process in MiB, mainly used for storing non-JVM memory overhead including VM overhead, internal strings, and other native overhead. Typically recommended value is 6-10% of executor memory. Increasing this value alleviates memory bottlenecks, especially when using external libraries. Specific values should be adjusted according to task requirements.",
+        "desc": "Amount of additional memory to allocate per executor process in MiB, mainly used for storing non-JVM memory overhead including VM overhead, internal strings, and other native overhead. Typically recommended value is 6-10% of executor memory. Increasing this value alleviates memory bottlenecks, especially when using external libraries. Specific values should be adjusted according to task requirements",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -50,7 +50,7 @@
         "default_value": 384
     },
     "spark.kryo.referenceTracking": {
-        "desc": "Enable or disable reference tracking for Kryo serialization. Enabling reference tracking reduces memory usage and serialization time, especially when processing many duplicate objects. This is necessary when object graphs have cycles and useful for efficiency if they contain multiple copies of same object. If you know this is not the case, can disable to improve performance.",
+        "desc": "Enable or disable reference tracking for Kryo serialization. Enabling reference tracking reduces memory usage and serialization time, especially when processing many duplicate objects. This is necessary when object graphs have cycles and useful for efficiency if they contain multiple copies of same object. If you know this is not the case, can disable to improve performance",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -60,7 +60,7 @@
         "default_value": "true"
     },
     "spark.locality.wait": {
-        "desc": "When scheduling tasks, Spark waits for data locality time to improve task execution efficiency. This parameter defines how long Spark waits before giving up and scheduling task to less local node. Wait time gradually traverses multiple locality levels (process local, node local, rack local, etc.). If task execution time is long and locality effect is poor, consider increasing this setting, but default value usually meets most scenario requirements. Proper adjustment of this parameter balances CPU and network bottlenecks.",
+        "desc": "When scheduling tasks, Spark waits for data locality time to improve task execution efficiency. This parameter defines how long Spark waits before giving up and scheduling task to less local node. Wait time gradually traverses multiple locality levels (process local, node local, rack local, etc.). If task execution time is long and locality effect is poor, consider increasing this setting, but default value usually meets most scenario requirements. Proper adjustment of this parameter balances CPU and network bottlenecks",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -70,7 +70,7 @@
         "default_value": "3s"
     },
     "spark.memory.fraction": {
-        "desc": "spark.memory.fraction parameter specifies memory fraction used for execution and storage, calculated as portion of (heap space - 300MB). Lower this value, higher frequency of spill and cached data eviction. Increasing this value improves memory utilization and alleviates memory bottlenecks. Recommended to adjust according to specific task characteristics, default value is 0.6.",
+        "desc": "spark.memory.fraction parameter specifies memory fraction used for execution and storage, calculated as portion of (heap space - 300MB). Lower this value, higher frequency of spill and cached data eviction. Increasing this value improves memory utilization and alleviates memory bottlenecks. Recommended to adjust according to specific task characteristics, default value is 0.6",
         "type": "continuous",
         "dtype": "double",
         "range": [
@@ -80,7 +80,7 @@
         "default_value": "0.6"
     },
     "spark.memory.offHeap.enabled": {
-        "desc": "Enable off-heap memory management, allowing Spark to use memory outside JVM. Enabling alleviates memory bottlenecks, especially when processing large datasets. If enabling off-heap memory usage, must set spark.memory.offHeap.size to positive value.",
+        "desc": "Enable off-heap memory management, allowing Spark to use memory outside JVM. Enabling alleviates memory bottlenecks, especially when processing large datasets. If enabling off-heap memory usage, must set spark.memory.offHeap.size to positive value",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -90,7 +90,7 @@
         "default_value": "true"
     },
     "spark.memory.offHeap.size": {
-        "desc": "Absolute amount of memory in bytes for off-heap allocation. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). This setting does not affect heap memory usage, so if your executor total memory consumption must fit within hard limit, be sure to shrink JVM heap size accordingly. When spark.memory.offHeap.enabled=true, this value must be set to positive value. Increasing this value improves memory utilization and alleviates memory bottlenecks. Values typically like 512m, 1g, etc., should be adjusted according to cluster resources and task requirements.",
+        "desc": "Absolute amount of memory in bytes for off-heap allocation. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). This setting does not affect heap memory usage, so if your executor total memory consumption must fit within hard limit, be sure to shrink JVM heap size accordingly. When spark.memory.offHeap.enabled=true, this value must be set to positive value. Increasing this value improves memory utilization and alleviates memory bottlenecks. Values typically like 512m, 1g, etc., should be adjusted according to cluster resources and task requirements",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -100,7 +100,7 @@
         "default_value": "35g"
     },
     "spark.reducer.maxSizeInFlight": {
-        "desc": "Maximum size of map outputs to fetch simultaneously for each reduce task in MiB. This parameter affects shuffle performance. Increasing this value improves network utilization and alleviates network bottlenecks. Recommended to adjust according to network bandwidth and task characteristics, typically values like 48m, 64m, etc. To avoid fixed memory overhead per reduce task, recommended to set this value relatively small.",
+        "desc": "Maximum size of map outputs to fetch simultaneously for each reduce task in MiB. This parameter affects shuffle performance. Increasing this value improves network utilization and alleviates network bottlenecks. Recommended to adjust according to network bandwidth and task characteristics, typically values like 48m, 64m, etc. To avoid fixed memory overhead per reduce task, recommended to set this value relatively small",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -110,7 +110,7 @@
         "default_value": 48
     },
     "spark.shuffle.compress": {
-        "desc": "Enable shuffle data compression to reduce network transmission and disk I/O overhead. Generally recommended to enable this feature to alleviate disk I/O and network bottlenecks. When enabling, note additional CPU overhead. Values are true or false.",
+        "desc": "Enable shuffle data compression to reduce network transmission and disk I/O overhead. Generally recommended to enable this feature to alleviate disk I/O and network bottlenecks. When enabling, note additional CPU overhead. Values are true or false",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -120,7 +120,7 @@
         "default_value": "true"
     },
     "spark.shuffle.file.buffer": {
-        "desc": "Size of memory buffer for each shuffle file output stream in KiB. These buffers reduce disk seeks and system calls when creating intermediate shuffle files, thus improving performance. Increasing this value improves disk I/O performance and alleviates disk I/O bottlenecks. Values typically like 32, 64, etc., should be adjusted according to task characteristics.",
+        "desc": "Size of memory buffer for each shuffle file output stream in KiB. These buffers reduce disk seeks and system calls when creating intermediate shuffle files, thus improving performance. Increasing this value improves disk I/O performance and alleviates disk I/O bottlenecks. Values typically like 32, 64, etc., should be adjusted according to task characteristics",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -130,7 +130,7 @@
         "default_value": 32
     },
     "spark.speculation": {
-        "desc": "Enable or disable task speculation. Speculation can launch additional copies when some tasks run slowly to reduce overall job execution time. This parameter alleviates performance issues caused by CPU or memory bottlenecks in some tasks. Value 'true' enables speculation, 'false' disables.",
+        "desc": "Enable or disable task speculation. Speculation can launch additional copies when some tasks run slowly to reduce overall job execution time. This parameter alleviates performance issues caused by CPU or memory bottlenecks in some tasks. Value 'true' enables speculation, 'false' disables",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -140,7 +140,7 @@
         "default_value": "false"
     },
     "spark.sql.adaptive.maxNumPostShufflePartitions": {
-        "desc": "Sets maximum number of partitions after shuffle in Spark SQL adaptive query execution. This parameter helps optimize data distribution after shuffle. Proper adjustment alleviates memory and CPU bottlenecks. Increasing this value improves parallelism; decreasing it reduces number of partitions. Recommended to adjust according to specific job requirements to achieve optimal performance.",
+        "desc": "Sets maximum number of partitions after shuffle in Spark SQL adaptive query execution. This parameter helps optimize data distribution after shuffle. Proper adjustment alleviates memory and CPU bottlenecks. Increasing this value improves parallelism; decreasing it reduces number of partitions. Recommended to adjust according to specific job requirements to achieve optimal performance",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -150,7 +150,7 @@
         "default_value": 500
     },
     "spark.sql.files.maxPartitionBytes": {
-        "desc": "Sets maximum number of bytes to pack into single partition when reading files in Spark SQL. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). This configuration only takes effect when using file-based sources (like Parquet, JSON and ORC). Increasing this value reduces number of partitions but may cause memory bottlenecks; decreasing it increases number of partitions, improving parallelism, thus affecting task parallelism and memory usage. Default value of this parameter is 128MB.",
+        "desc": "Sets maximum number of bytes to pack into single partition when reading files in Spark SQL. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). This configuration only takes effect when using file-based sources (like Parquet, JSON and ORC). Increasing this value reduces number of partitions but may cause memory bottlenecks; decreasing it increases number of partitions, improving parallelism, thus affecting task parallelism and memory usage. Default value of this parameter is 128MB",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -160,7 +160,7 @@
         "default_value": "128m"
     },
     "spark.task.maxFailures": {
-        "desc": "Number of consecutive failures of any particular task before job is abandoned. This parameter helps retry when tasks fail, improving job success rate. Appropriately increasing this value alleviates task failures due to temporary faults, but excessively high values may cause resource waste.",
+        "desc": "Number of consecutive failures of any particular task before job is abandoned. This parameter helps retry when tasks fail, improving job success rate. Appropriately increasing this value alleviates task failures due to temporary faults, but excessively high values may cause resource waste",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -170,7 +170,7 @@
         "default_value": 1000
     },
     "spark.sql.shuffle.partitions": {
-        "desc": "Default number of partitions to use when shuffling data for joins or aggregations. Number of partitions affects parallelism, task scheduling overhead, and data volume processed per task. Note: For structured streaming, this configuration cannot be changed between restarts of query from same checkpoint location.",
+        "desc": "Default number of partitions to use when shuffling data for joins or aggregations. Number of partitions affects parallelism, task scheduling overhead, and data volume processed per task. Note: For structured streaming, this configuration cannot be changed between restarts of query from same checkpoint location",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -180,7 +180,7 @@
         "default_value": 400
     },
     "spark.sql.sources.parallelPartitionDiscovery.parallelism": {
-        "desc": "This parameter controls parallelism (i.e., number of concurrent tasks) for parallel scanning of partition paths when discovering data source directory partitions. Higher parallelism speeds up metadata discovery for large-scale partition directories, especially when number of partitions is very large (like tens of thousands of partitions). Generally kept consistent with spark.sql.shuffle.partitions parameter.",
+        "desc": "This parameter controls parallelism (i.e., number of concurrent tasks) for parallel scanning of partition paths when discovering data source directory partitions. Higher parallelism speeds up metadata discovery for large-scale partition directories, especially when number of partitions is very large (like tens of thousands of partitions). Generally kept consistent with spark.sql.shuffle.partitions parameter",
         "type": "continuous",
         "dtype": "int",
         "range": [

@@ -1,190 +1,190 @@
 {
-  "execution.checkpointing.interval": {
-      "desc": "Sets the time interval for execution checkpoints in milliseconds. This parameter is used to enable and control the frequency of state snapshots, which can alleviate disk IO bottlenecks during system state recovery. Increasing this value reduces checkpoint frequency, thereby lowering system load, but may increase recovery time; decreasing this value improves data consistency but increases system load. To enable checkpoints, this value must be set to a positive integer greater than 0.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 10000
-  },
-  "execution.checkpointing.max-concurrent-checkpoints": {
-      "desc": "Sets the maximum number of concurrent checkpoints to control the number of simultaneous checkpoints. Increasing this value improves system concurrency but may cause resource competition; decreasing this value reduces system load but may affect data consistency. This parameter can alleviate potential disk IO bottlenecks during the checkpoint process.",
-      "type": "discrete",
-      "range": [
-          1,
-          10
-      ],
-      "dtype": "int",
-      "default_value": 1
-  },
-  "execution.checkpointing.min-pause": {
-      "desc": "Sets the minimum pause time between two consecutive checkpoints in milliseconds. This parameter controls the interval between checkpoints and can alleviate potential CPU bottlenecks during the checkpoint process. Increasing this value reduces checkpoint frequency and lowers system load; decreasing this value increases checkpoint frequency but may cause system resource competition.",
-      "type": "continuous",
-      "range": [
-          0,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "0 ms"
-  },
-  "execution.checkpointing.timeout": {
-      "desc": "Sets the timeout for checkpoints in milliseconds; used to control the maximum execution time of checkpoints, which can alleviate potential memory bottlenecks during the checkpoint process. Increasing this value tolerates longer checkpoint times but may increase system resource usage; decreasing this value speeds up failure detection but may cause frequent checkpoint failures.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 60000
-  },
-  "jobmanager.memory.jvm-overhead.max": {
-      "desc": "Sets the maximum overhead memory for JobManager JVM to ensure sufficient memory for JVM under high load. Increasing this value can alleviate memory bottlenecks and improve system stability. This parameter specifies non-heap memory reserved for JVM overhead, such as thread stack space, compilation cache, etc.",
-      "type": "discrete",
-      "range": [
-          null,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "1 gb"
-  },
-  "jobmanager.memory.jvm-overhead.min": {
-      "desc": "Sets the minimum overhead memory for JobManager JVM to ensure sufficient memory for JVM operation. This parameter reserves non-heap memory overhead for JVM, including thread stack space, compilation cache, etc. Increasing this value can alleviate memory bottlenecks and avoid frequent garbage collection by JVM.",
-      "type": "discrete",
-      "range": [
-          null,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "192 mb"
-  },
-  "parallelism.default": {
-      "desc": "Sets the default parallelism for Flink jobs; if parallelism is not specified, this value is used. Increasing this value can alleviate CPU bottlenecks and improve job execution efficiency. Default value is 1, maximum value is 128.",
-      "type": "discrete",
-      "range": [
-          null,
-          null
-      ],
-      "dtype": "int",
-      "default_value": "1"
-  },
-  "restart-strategy.fixed-delay.attempts": {
-      "desc": "Sets the number of restart attempts for fixed delay restart strategy; used to control the number of restarts when tasks fail, which can alleviate CPU bottlenecks during system failure recovery. Increasing this value improves task recovery capability but may increase resource usage; decreasing this value speeds up failure detection but may cause task loss.",
-      "type": "discrete",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 1
-  },
-  "restart-strategy.fixed-delay.delay": {
-      "desc": "This parameter sets the restart delay time for fixed delay restart strategy in milliseconds. It controls the restart wait time after task failure and can alleviate network bottlenecks during system failure recovery. Increasing this value reduces restart frequency and lowers system load; decreasing this value speeds up restart but may cause resource competition.",
-      "type": "continuous",
-      "range": [
-          0,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 10000
-  },
-  "restart-strategy": {
-      "desc": "Defines the restart strategy when tasks fail to alleviate memory bottlenecks during system failure recovery. Optional values include: 'none' (no restart), 'fixed-delay' (fixed delay restart), 'failure-rate' (failure rate based restart), 'exponential-delay' (exponential delay restart).",
-      "type": "discrete",
-      "range": null,
-      "dtype": "string",
-      "default_value": "none"
-  },
-  "state.backend.incremental": {
-      "desc": "This parameter sets whether to enable incremental snapshots, controlling the storage method of state snapshots. Enabling incremental snapshots reduces storage space usage and alleviates disk IO bottlenecks during state management, but may increase recovery time.",
-      "type": "discrete",
-      "range": null,
-      "dtype": "boolean",
-      "default_value": "false"
-  },
-  "state.backend": {
-      "desc": "Sets the state backend type; defines how Flink stores state, which can alleviate disk IO bottlenecks during state management. Optional values include 'memory', 'filesystem', and 'rocksdb'.",
-      "type": "discrete",
-      "range": null,
-      "dtype": "string",
-      "default_value": "memory"
-  },
-  "state.backend.rocksdb.block.cache-size": {
-      "desc": "Sets the block cache size for RocksDB in bytes. This parameter controls the number of data blocks cached in memory by RocksDB, thereby improving read performance.",
-      "type": "continuous",
-      "range": [
-          0,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "8 mb"
-  },
-  "state.backend.rocksdb.checkpoint.transfer.thread.num": {
-      "desc": "This parameter sets the number of threads per stateful operator used for transferring (downloading and uploading) RocksDBStateBackend files.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 4
-  },
-  "state.backend.rocksdb.compaction.level.max-size-level-base": {
-      "desc": "Sets the maximum compaction level base size for RocksDB in bytes. This parameter optimizes storage performance and can alleviate disk I/O bottlenecks during state management.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "256 mb"
-  },
-  "state.backend.rocksdb.thread.num": {
-      "desc": "This parameter sets the maximum number of concurrent background flush and compaction jobs for RocksDB (per stateful operator).",
-      "type": "discrete",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 2
-  },
-  "state.backend.rocksdb.use-bloom-filter": {
-      "desc": "This parameter sets whether to enable Bloom Filter to optimize RocksDB query performance.",
-      "type": "discrete",
-      "range": null,
-      "dtype": "boolean",
-      "default_value": "false"
-  },
-  "state.backend.rocksdb.write-batch-size": {
-      "desc": "Sets the write batch size for RocksDB in bytes. This parameter optimizes write performance.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "string",
-      "default_value": "2 mb"
-  },
-  "state.backend.rocksdb.writebuffer.count": {
-      "desc": "Sets the number of write buffers for RocksDB to optimize write performance.",
-      "type": "continuous",
-      "range": [
-          1,
-          null
-      ],
-      "dtype": "int",
-      "default_value": 2
-  },
-  "taskmanager.numberOfTaskSlots": {
-      "desc": "This parameter sets the number of task slots for TaskManager, determining the number of tasks that a single TaskManager can process in parallel.",
-      "type": "discrete",
-      "range": [
-          1,
-          128
-      ],
-      "dtype": "int",
-      "default_value": 1
-  }
+    "execution.checkpointing.interval": {
+        "desc": "Sets the time interval for execution checkpoints in milliseconds. This parameter is used to enable and control the frequency of state snapshots, which can alleviate disk IO bottlenecks during system state recovery. Increasing this value reduces checkpoint frequency, thereby lowering system load, but may increase recovery time; decreasing this value improves data consistency but increases system load. To enable checkpoints, this value must be set to a positive integer greater than 0",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "execution.checkpointing.max-concurrent-checkpoints": {
+        "desc": "Sets the maximum number of concurrent checkpoints to control the number of simultaneous checkpoints. Increasing this value improves system concurrency but may cause resource competition; decreasing this value reduces system load but may affect data consistency. This parameter can alleviate potential disk IO bottlenecks during the checkpoint process",
+        "type": "discrete",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "execution.checkpointing.min-pause": {
+        "desc": "Sets the minimum pause time between two consecutive checkpoints in milliseconds. This parameter controls the interval between checkpoints and can alleviate potential CPU bottlenecks during the checkpoint process. Increasing this value reduces checkpoint frequency and lowers system load; decreasing this value increases checkpoint frequency but may cause system resource competition",
+        "type": "continuous",
+        "range": [
+            0,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "0 ms"
+    },
+    "execution.checkpointing.timeout": {
+        "desc": "Sets the timeout for checkpoints in milliseconds; used to control the maximum execution time of checkpoints, which can alleviate potential memory bottlenecks during the checkpoint process. Increasing this value tolerates longer checkpoint times but may increase system resource usage; decreasing this value speeds up failure detection but may cause frequent checkpoint failures",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 60000
+    },
+    "jobmanager.memory.jvm-overhead.max": {
+        "desc": "Sets the maximum overhead memory for JobManager JVM to ensure sufficient memory for JVM under high load. Increasing this value can alleviate memory bottlenecks and improve system stability. This parameter specifies non-heap memory reserved for JVM overhead, such as thread stack space, compilation cache, etc",
+        "type": "discrete",
+        "range": [
+            null,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "1 gb"
+    },
+    "jobmanager.memory.jvm-overhead.min": {
+        "desc": "Sets the minimum overhead memory for JobManager JVM to ensure sufficient memory for JVM operation. This parameter reserves non-heap memory overhead for JVM, including thread stack space, compilation cache, etc. Increasing this value can alleviate memory bottlenecks and avoid frequent garbage collection by JVM",
+        "type": "discrete",
+        "range": [
+            null,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "192 mb"
+    },
+    "parallelism.default": {
+        "desc": "Sets the default parallelism for Flink jobs; if parallelism is not specified, this value is used. Increasing this value can alleviate CPU bottlenecks and improve job execution efficiency. Default value is 1, maximum value is 128",
+        "type": "discrete",
+        "range": [
+            null,
+            null
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "restart-strategy.fixed-delay.attempts": {
+        "desc": "Sets the number of restart attempts for fixed delay restart strategy; used to control the number of restarts when tasks fail, which can alleviate CPU bottlenecks during system failure recovery. Increasing this value improves task recovery capability but may increase resource usage; decreasing this value speeds up failure detection but may cause task loss",
+        "type": "discrete",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "restart-strategy.fixed-delay.delay": {
+        "desc": "This parameter sets the restart delay time for fixed delay restart strategy in milliseconds. It controls the restart wait time after task failure and can alleviate network bottlenecks during system failure recovery. Increasing this value reduces restart frequency and lowers system load; decreasing this value speeds up restart but may cause resource competition",
+        "type": "continuous",
+        "range": [
+            0,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "restart-strategy": {
+        "desc": "Defines the restart strategy when tasks fail to alleviate memory bottlenecks during system failure recovery. Optional values include: 'none' (no restart), 'fixed-delay' (fixed delay restart), 'failure-rate' (failure rate based restart), 'exponential-delay' (exponential delay restart)",
+        "type": "discrete",
+        "range": null,
+        "dtype": "string",
+        "default_value": "none"
+    },
+    "state.backend.incremental": {
+        "desc": "This parameter sets whether to enable incremental snapshots, controlling the storage method of state snapshots. Enabling incremental snapshots reduces storage space usage and alleviates disk IO bottlenecks during state management, but may increase recovery time",
+        "type": "discrete",
+        "range": null,
+        "dtype": "boolean",
+        "default_value": "false"
+    },
+    "state.backend": {
+        "desc": "Sets the state backend type; defines how Flink stores state, which can alleviate disk IO bottlenecks during state management. Optional values include 'memory', 'filesystem', and 'rocksdb'",
+        "type": "discrete",
+        "range": null,
+        "dtype": "string",
+        "default_value": "memory"
+    },
+    "state.backend.rocksdb.block.cache-size": {
+        "desc": "Sets the block cache size for RocksDB in bytes. This parameter controls the number of data blocks cached in memory by RocksDB, thereby improving read performance",
+        "type": "continuous",
+        "range": [
+            0,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "8 mb"
+    },
+    "state.backend.rocksdb.checkpoint.transfer.thread.num": {
+        "desc": "This parameter sets the number of threads per stateful operator used for transferring (downloading and uploading) RocksDBStateBackend files",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "state.backend.rocksdb.compaction.level.max-size-level-base": {
+        "desc": "Sets the maximum compaction level base size for RocksDB in bytes. This parameter optimizes storage performance and can alleviate disk I/O bottlenecks during state management",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "256 mb"
+    },
+    "state.backend.rocksdb.thread.num": {
+        "desc": "This parameter sets the maximum number of concurrent background flush and compaction jobs for RocksDB (per stateful operator)",
+        "type": "discrete",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "state.backend.rocksdb.use-bloom-filter": {
+        "desc": "This parameter sets whether to enable Bloom Filter to optimize RocksDB query performance",
+        "type": "discrete",
+        "range": null,
+        "dtype": "boolean",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.write-batch-size": {
+        "desc": "Sets the write batch size for RocksDB in bytes. This parameter optimizes write performance",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "string",
+        "default_value": "2 mb"
+    },
+    "state.backend.rocksdb.writebuffer.count": {
+        "desc": "Sets the number of write buffers for RocksDB to optimize write performance",
+        "type": "continuous",
+        "range": [
+            1,
+            null
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "taskmanager.numberOfTaskSlots": {
+        "desc": "This parameter sets the number of task slots for TaskManager, determining the number of tasks that a single TaskManager can process in parallel",
+        "type": "discrete",
+        "range": [
+            1,
+            128
+        ],
+        "dtype": "int",
+        "default_value": 1
+    }
 }

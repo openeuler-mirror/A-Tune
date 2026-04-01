@@ -1,382 +1,382 @@
 {
-  "work_mem": {
-      "desc": "Sets the memory size used for internal sort operations and hash tables before starting to write to temporary disk files. ORDER BY, DISTINCT, and merge joins all use sort operations. Hash tables are used in hash joins, hash-based aggregations, and hash-based IN subquery processing. It is recommended to set this parameter value larger than the maximum memory occupied during operator execution, otherwise it may trigger disk spilling.",
-      "type": "continuous",
-      "range": [
-          64,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 65536
-  },
-  "max_connections": {
-      "desc": "Sets the maximum number of concurrent connections allowed to the database. This parameter affects the database's concurrency capability. Setting this parameter too small will reduce the actual available connections. Setting it too large may cause DN startup failure or runtime exceptions due to insufficient memory.",
-      "type": "continuous",
-      "range": [
-          10,
-          40000
-      ],
-      "dtype": "Integer",
-      "default_value": 40000
-  },
-  "checkpoint_segments": {
-      "desc": "Sets the maximum number of WAL log files retained during the checkpoint_timeout period. Each log file size is 16MB. Increasing this parameter can speed up large data import but needs to be considered together with checkpoint_timeout and shared_buffers parameters. Setting this parameter too small will cause frequent checkpoint triggers; setting it too large may increase RTO and cause more WAL log files to be retained, occupying more disk space.",
-      "type": "continuous",
-      "range": [
-          1,
-          2147483646
-      ],
-      "dtype": "Integer",
-      "default_value": 1024
-  },
-  "checkpoint_timeout": {
-      "desc": "Sets the maximum time between automatic checkpoints. When increasing checkpoint_segments to speed up large data import, this parameter needs to be increased accordingly. Increasing both parameters will increase the burden on shared_buffers and requires comprehensive consideration.",
-      "type": "continuous",
-      "range": [
-          30,
-          3600
-      ],
-      "dtype": "Integer",
-      "default_value": 900
-  },
-  "max_files_per_process": {
-      "desc": "Sets the maximum number of files that each database thread can open simultaneously.",
-      "type": "continuous",
-      "range": [
-          25,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 1024
-  },
-  "max_prepared_transactions": {
-      "desc": "Sets the maximum number of transactions that can be in 'prepared' state simultaneously. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. Generally recommended 200 (for 196-core CPU/1536G memory, 128-core CPU/1024G memory, 104-core CPU/1024G memory, 96-core CPU/1024G memory, 96-core CPU/768G memory, 80-core CPU/640G memory, 64-core CPU/512G memory, 60-core CPU/480G memory, 32-core CPU/256G memory, 16-core CPU/128G memory, 8-core CPU/64G memory, 4-core CPU/32G memory); 0 (for 4-core CPU/16G memory).",
-      "type": "continuous",
-      "range": [
-          0,
-          262143
-      ],
-      "dtype": "Integer",
-      "default_value": 200
-  },
-  "shared_buffers": {
-      "desc": "Sets the shared memory size used by GaussDB Kernel. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. It is recommended to set shared_buffers value within 40% of memory. If setting larger shared_buffers, checkpoint_segments value needs to be increased simultaneously because writing large amounts of new data and modified data requires more time cycles.",
-      "type": "continuous",
-      "range": [
-          16,
-          1073741823
-      ],
-      "dtype": "Integer",
-      "default_value": 35389440
-  },
-  "use_workload_manager": {
-      "desc": "Sets whether to enable resource management function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "wal_buffers": {
-      "desc": "Sets the size of shared memory space used to store WAL data, which can be expressed in XLOG_BLCKSZ quantities or actual size. XLOG_BLCKSZ is the XLOG block size, generally defaulting to 8kB. Value 2048 means wal_buffers is 2048 * 8kB; value 20480kB means wal_buffers is 20480kB. If values need units, they must be kB, MB, GB, and must be set to multiples of 8kB.",
-      "type": "continuous",
-      "range": [
-          -1,
-          262144
-      ],
-      "dtype": "Integer",
-      "default_value": 131072
-  },
-  "maintenance_work_mem": {
-      "desc": "Specifies the maximum amount of memory used in maintenance operations. The parameter value must be greater than the memory required for data sampling during vector index construction. For gsivfflat index, the sampling memory is estimated as max(nlist, nlist2) * dim * 0.2kB. For gsdiskann index with pq enabled, the sampling memory is dim * 80kB. Setting this parameter too small will cause index creation to fail, and other operations requiring large memory will also fail.",
-      "type": "continuous",
-      "range": [
-          1024,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 65536
-  },
-  "vacuum_cost_limit": {
-      "desc": "Sets the cost limit for vacuum thread sleep. When the cost executed by vacuum thread reaches vacuum_cost_limit, the thread sleeps once for vacuum_cost_delay time. The larger this value, the smaller the I/O frequency limit for Vacuum, the less likely it is to enter sleep state, the higher the Vacuum efficiency, and the greater the impact on business I/O.",
-      "type": "continuous",
-      "range": [
-          1,
-          10000
-      ],
-      "dtype": "Integer",
-      "default_value": 1000
-  },
-  "autovacuum_max_workers": {
-      "desc": "Sets the maximum number of autovacuum worker threads that can run simultaneously. The upper limit of this parameter is related to GUC parameters max_connections and job_queue_processes. Setting this parameter larger creates more threads for autovacuum function, occupying more system CPU and memory resources, so it is not recommended to set it too large to avoid memory allocation failure or excessive CPU resource occupation causing database startup errors or business impact. Setting this parameter too low may cause autovacuum threads unable to clean and reclaim unused tablespace in time, leading to database bloat and performance degradation.",
-      "type": "continuous",
-      "range": [
-          0,
-          262143
-      ],
-      "dtype": "Integer",
-      "default_value": 3
-  },
-  "autovacuum_naptime": {
-      "desc": "Sets the time interval between two autovacuum operations. For example, value 600 without unit means autovacuum_naptime is 600s; value 10min with unit means autovacuum_naptime is 10min. If values need units, they must be s, min, h, d. Default value is recommended when using only Ustore tables. For Astore tables, the setting value depends on the user's database environment and application load. If there are大量表的更新或删除操作 in the database environment, it is recommended to set this parameter to a shorter time interval to ensure timely cleaning of useless data and avoid database space shortage. If there are fewer update or delete operations in the database environment, this parameter can be set to a longer time interval to reduce autovacuum thread overhead. Setting autovacuum_naptime too short may cause excessive autovacuum thread overhead, affecting database performance. Setting autovacuum_naptime too long may cause useless data accumulation, occupying database space and affecting database performance.",
-      "type": "continuous",
-      "range": [
-          1,
-          2147483
-      ],
-      "dtype": "Integer",
-      "default_value": 600
-  },
-  "autovacuum_vacuum_cost_delay": {
-      "desc": "Sets the cost delay value used in automatic VACUUM operations. -1 means using regular vacuum_cost_delay.",
-      "type": "continuous",
-      "range": [
-          -1,
-          100
-      ],
-      "dtype": "Integer",
-      "default_value": 20
-  },
-  "autovacuum_vacuum_scale_factor": {
-      "desc": "Table scale factor for VACUUM, used to calculate the threshold for triggering VACUUM. VACUUM trigger threshold = autovacuum_vacuum_threshold + reltuples (number of tuples on the table) * autovacuum_vacuum_scale_factor. VACUUM operation is performed on this table only when the number of deleted or updated records on the table exceeds the threshold.",
-      "type": "continuous",
-      "range": [
-          "0.0",
-          "100.0"
-      ],
-      "dtype": "float",
-      "default_value": 0.2
-  },
-  "autovacuum_analyze_scale_factor": {
-      "desc": "Table scale factor for ANALYZE, used to calculate the threshold for triggering ANALYZE. ANALYZE trigger threshold = autovacuum_analyze_threshold + reltuples (number of tuples on the table) * autovacuum_analyze_scale_factor. ANALYZE operation is performed on this table only when the number of deleted, inserted or updated records on the table exceeds the threshold.",
-      "type": "continuous",
-      "range": [
-          "0.0",
-          "100.0"
-      ],
-      "dtype": "float",
-      "default_value": 0.1
-  },
-  "enable_thread_pool": {
-      "desc": "Controls whether to use thread pool function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled. In low-concurrency long-connection performance-sensitive scenarios, it is recommended to disable this parameter; in other scenarios, it is recommended to enable this parameter.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "off"
-  },
-  "session_timeout": {
-      "desc": "Indicates the maximum time without any operation after establishing connection with the server. When this parameter value is not 0, if the user does not perform any operation for longer than this parameter value, the connection with the server will be disconnected. 0 means timeout setting is disabled. Positive number means the maximum time without any operation after establishing connection with the server. When exceeding the set value, the connection with the server will be disconnected.",
-      "type": "continuous",
-      "range": [
-          0,
-          86400
-      ],
-      "dtype": "Integer",
-      "default_value": 600
-  },
-  "enable_beta_opfusion": {
-      "desc": "When enable_opfusion parameter is enabled, if this parameter is enabled, it can support acceleration execution of aggregate functions and sorting SQL statements that appear in TPCC, improving SQL execution performance. This parameter can be set at PDB level.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "off"
-  },
-  "bgwriter_flush_after": {
-      "desc": "Sets when the number of dirty pages flushed by background writer thread exceeds the set threshold, notify the operating system to asynchronously flush data pages in file cache to disk. In GaussDB Kernel, disk page size is 8kB.",
-      "type": "continuous",
-      "range": [
-          0,
-          256
-      ],
-      "dtype": "continuous",
-      "default_value": 64
-  },
-  "wal_keep_segments": {
-      "desc": "Number of Xlog log files, sets the minimum number of log files retained in 'pg_xlog' directory. Standby performs stream replication by obtaining Xlog logs from primary. When server enables log archiving or recovers from checkpoint, the number of retained log files may be greater than the value set by wal_keep_segments. When dual-machine uses asynchronous transmission, importing more than 4G data continuously in COPY mode requires increasing wal_keep_segments configuration. Taking T6000 single board as example, if imported data volume is 50G, it is recommended to adjust parameter to 1000. This parameter setting can be dynamically restored after import completion and log synchronization is normal. If synchronous_commit level is less than LOCAL_FLUSH, when rebuilding standby, it is recommended to increase this parameter to 1000 to avoid rebuild failure caused by primary log recycling during rebuild process. If set too large, it may cause pg_xlog folder to occupy too much disk space. If set too small, when standby requests transaction log, this transaction log may have been overwritten by newly generated transaction logs, causing request failure and primary-standby relationship disconnection.",
-      "type": "continuous",
-      "range": [
-          2,
-          2147483647
-      ],
-      "dtype": "continuous",
-      "default_value": 128
-  },
-  "bgwriter_delay": {
-      "desc": "Time interval for regular cyclic block-by-block buffer scanning and dirty page flushing. In full checkpoint mode, the amount written each time is controlled by bgwriter_lru_maxpages parameter, then sleeps for bgwriter_delay milliseconds before starting again; in incremental checkpoint mode, when candidate buffer pages are insufficient, scan 10GB buffer pages every bgwriter_delay milliseconds, when encountering dirty pages, flush dirty pages to disk before putting them into candidate list, when encountering clean pages directly put them into candidate list. On many systems, the effective resolution of sleep delay is 10 milliseconds. Therefore, setting a value that is not a multiple of 10 has the same effect as setting it to a multiple of 10.",
-      "type": "continuous",
-      "range": [
-          10,
-          10000
-      ],
-      "dtype": "continuous",
-      "default_value": 2000
-  },
-  "incremental_checkpoint_timeout": {
-      "desc": "After enabling incremental checkpoint switch (enable_incremental_checkpoint), sets the maximum time between automatic checkpoints.",
-      "type": "continuous",
-      "range": [
-          1,
-          3600
-      ],
-      "dtype": "continuous",
-      "default_value": 60
-  },
-  "walwriter_sleep_threshold": {
-      "desc": "Number of idle xlog flushes before xlogflusher enters sleep, will sleep when threshold is reached.",
-      "type": "continuous",
-      "range": [
-          1,
-          50000
-      ],
-      "dtype": "continuous",
-      "default_value": 50
-  },
-  "reserve_space_for_nullable_atts": {
-      "desc": "Specifies whether to reserve space for nullable attributes of Ustore tables. This parameter can be set at PDB level.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "enable_default_ustore_table": {
-      "desc": "Specifies whether to use Ustore storage engine by default. This parameter setting is effective only when enable_ustore parameter is enabled. When this parameter is on, created tables are Ustore tables by default; when this parameter is off, created tables are Astore tables by default. This parameter can be set at PDB level. In upgrade scenarios, the default value of this parameter will prioritize compatibility, meaning the default value after upgrade is consistent with the old version value. It is particularly important to note that when using Ustore tables, track_counts and track_activities parameters must be enabled, otherwise it will cause space bloat.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "max_redo_log_size": {
-      "desc": "For standby DN, represents the expected log volume between the latest log replay point and the latest checkpoint position; for primary DN, represents the expected log volume between the latest log insertion point and the latest checkpoint position. This parameter is used to participate in controlling checkpoint page flushing speed.",
-      "type": "continuous",
-      "range": [
-          163840,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 1048576
-  },
-  "recovery_time_target": {
-      "desc": "Flow control threshold for standby to complete log writing and replay. When standby's replay completion expected time exceeds this parameter, primary will trigger log flow control, reducing the rate at which primary sends logs to standby. Setting too small will affect primary performance; setting too large will lose flow control effect. After disabling flow control, RTO/RPO may increase.",
-      "type": "continuous",
-      "range": [
-          0,
-          3600
-      ],
-      "dtype": "Integer",
-      "default_value": 60
-  },
-  "lockwait_timeout": {
-      "desc": "Controls the maximum waiting time for a single lock. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting too large will cause longer blocking time due to lock conflicts; setting too small may cause more lock timeout errors.",
-      "type": "continuous",
-      "range": [
-          1,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 120000
-  },
-  "update_lockwait_timeout": {
-      "desc": "When business allows concurrent updates, this parameter controls the maximum waiting time for a single lock when concurrently updating the same row. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting value mainly depends on the workload of transactions concurrently updating the same row. Setting too large will cause longer blocking time due to lock conflicts when concurrently updating the same row; setting too small may cause more lock timeout errors.",
-      "type": "continuous",
-      "range": [
-          1,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 120000
-  },
-  "recovery_parse_workers": {
-      "desc": "Number of ParseRedoRecord threads in极致RTO feature. 1. Needs to be used with recovery_redo_workers. If recovery_parse_workers or recovery_redo_workers is greater than 1, then极致RTO is enabled. If极致RTO is not expected to be enabled, please keep recovery_parse_workers at default value 1; 2. When enabling极致RTO, ensure parameter replication_type is 1; 3. If both极致RTO and parallel replay are enabled, then极致RTO feature takes effect, parallel replay feature becomes invalid; 4.极致RTO does not support flow control, flow control is uniformly controlled by recovery_time_target parameter.",
-      "type": "continuous",
-      "range": [
-          1,
-          16
-      ],
-      "dtype": "Integer",
-      "default_value": 1
-  },
-  "recovery_max_workers": {
-      "desc": "Sets the maximum number of parallel replay threads. This parameter takes effect only when recovery_parse_workers and recovery_redo_workers are both 1, i.e.,极致RTO is not enabled.",
-      "type": "continuous",
-      "range": [
-          0,
-          20
-      ],
-      "dtype": "Integer",
-      "default_value": 4
-  },
-  "track_counts": {
-      "desc": "Controls whether to collect statistics on database activity. This parameter can be set at PDB level. When AutoVacuum automatic cleanup thread selects database to clean, database statistics are needed, so default value is set to on.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "enable_pbe_optimization": {
-      "desc": "Sets whether the optimizer optimizes query plans for statements executed in PBE (Parse Bind Execute) form. The optimization principle is to make FQS choose gplan plan. This parameter can be set at PDB level.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "off"
-  },
-  "check_disconnect_query": {
-      "desc": "This parameter controls whether GaussDB server-side statements terminate execution after client abnormal disconnection (such as JDBC triggering socketTimeout, libpq triggering rwtimeout and closing connection, client process termination during business operation, etc.).",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "enable_cached_context": {
-      "desc": "Controls the number of cached memory contexts. In multi-tenant scenarios, this parameter can be set at PDB level.",
-      "type": "continuous",
-      "range": [
-          0,
-          1024
-      ],
-      "dtype": "Integer",
-      "default_value": "128"
-  },
-  "enable_cached_operator": {
-      "desc": "Controls the switch for operator execution state caching feature.",
-      "type": "discrete",
-      "range": [
-          "on",
-          "off"
-      ],
-      "dtype": "boolean",
-      "default_value": "on"
-  },
-  "max_process_memory": {
-      "desc": "Sets the maximum physical memory available for a database node. This parameter is used to prevent database memory usage from exceeding system capacity and avoid node OOM. Recommended value is within 66.5% of physical memory (considering reserved operating system memory). Restart instance required after modification.",
-      "type": "continuous",
-      "range": [
-          2097152,
-          2147483647
-      ],
-      "dtype": "Integer",
-      "default_value": 696320000
-  }
+    "work_mem": {
+        "desc": "Sets the memory size used for internal sort operations and hash tables before starting to write to temporary disk files. ORDER BY, DISTINCT, and merge joins all use sort operations. Hash tables are used in hash joins, hash-based aggregations, and hash-based IN subquery processing. It is recommended to set this parameter value larger than the maximum memory occupied during operator execution, otherwise it may trigger disk spilling",
+        "type": "continuous",
+        "range": [
+            64,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 65536
+    },
+    "max_connections": {
+        "desc": "Sets the maximum number of concurrent connections allowed to the database. This parameter affects the database's concurrency capability. Setting this parameter too small will reduce the actual available connections. Setting it too large may cause DN startup failure or runtime exceptions due to insufficient memory",
+        "type": "continuous",
+        "range": [
+            10,
+            40000
+        ],
+        "dtype": "Integer",
+        "default_value": 40000
+    },
+    "checkpoint_segments": {
+        "desc": "Sets the maximum number of WAL log files retained during the checkpoint_timeout period. Each log file size is 16MB. Increasing this parameter can speed up large data import but needs to be considered together with checkpoint_timeout and shared_buffers parameters. Setting this parameter too small will cause frequent checkpoint triggers; setting it too large may increase RTO and cause more WAL log files to be retained, occupying more disk space",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483646
+        ],
+        "dtype": "Integer",
+        "default_value": 1024
+    },
+    "checkpoint_timeout": {
+        "desc": "Sets the maximum time between automatic checkpoints. When increasing checkpoint_segments to speed up large data import, this parameter needs to be increased accordingly. Increasing both parameters will increase the burden on shared_buffers and requires comprehensive consideration",
+        "type": "continuous",
+        "range": [
+            30,
+            3600
+        ],
+        "dtype": "Integer",
+        "default_value": 900
+    },
+    "max_files_per_process": {
+        "desc": "Sets the maximum number of files that each database thread can open simultaneously",
+        "type": "continuous",
+        "range": [
+            25,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 1024
+    },
+    "max_prepared_transactions": {
+        "desc": "Sets the maximum number of transactions that can be in 'prepared' state simultaneously. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. Generally recommended 200 (for 196-core CPU/1536G memory, 128-core CPU/1024G memory, 104-core CPU/1024G memory, 96-core CPU/1024G memory, 96-core CPU/768G memory, 80-core CPU/640G memory, 64-core CPU/512G memory, 60-core CPU/480G memory, 32-core CPU/256G memory, 16-core CPU/128G memory, 8-core CPU/64G memory, 4-core CPU/32G memory); 0 (for 4-core CPU/16G memory)",
+        "type": "continuous",
+        "range": [
+            0,
+            262143
+        ],
+        "dtype": "Integer",
+        "default_value": 200
+    },
+    "shared_buffers": {
+        "desc": "Sets the shared memory size used by GaussDB Kernel. Increasing this parameter requires GaussDB Kernel to use more System V shared memory than the system default settings. It is recommended to set shared_buffers value within 40% of memory. If setting larger shared_buffers, checkpoint_segments value needs to be increased simultaneously because writing large amounts of new data and modified data requires more time cycles",
+        "type": "continuous",
+        "range": [
+            16,
+            1073741823
+        ],
+        "dtype": "Integer",
+        "default_value": 35389440
+    },
+    "use_workload_manager": {
+        "desc": "Sets whether to enable resource management function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "wal_buffers": {
+        "desc": "Sets the size of shared memory space used to store WAL data, which can be expressed in XLOG_BLCKSZ quantities or actual size. XLOG_BLCKSZ is the XLOG block size, generally defaulting to 8kB. Value 2048 means wal_buffers is 2048 * 8kB; value 20480kB means wal_buffers is 20480kB. If values need units, they must be kB, MB, GB, and must be set to multiples of 8kB",
+        "type": "continuous",
+        "range": [
+            -1,
+            262144
+        ],
+        "dtype": "Integer",
+        "default_value": 131072
+    },
+    "maintenance_work_mem": {
+        "desc": "Specifies the maximum amount of memory used in maintenance operations. The parameter value must be greater than the memory required for data sampling during vector index construction. For gsivfflat index, the sampling memory is estimated as max(nlist, nlist2) * dim * 0.2kB. For gsdiskann index with pq enabled, the sampling memory is dim * 80kB. Setting this parameter too small will cause index creation to fail, and other operations requiring large memory will also fail",
+        "type": "continuous",
+        "range": [
+            1024,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 65536
+    },
+    "vacuum_cost_limit": {
+        "desc": "Sets the cost limit for vacuum thread sleep. When the cost executed by vacuum thread reaches vacuum_cost_limit, the thread sleeps once for vacuum_cost_delay time. The larger this value, the smaller the I/O frequency limit for Vacuum, the less likely it is to enter sleep state, the higher the Vacuum efficiency, and the greater the impact on business I/O",
+        "type": "continuous",
+        "range": [
+            1,
+            10000
+        ],
+        "dtype": "Integer",
+        "default_value": 1000
+    },
+    "autovacuum_max_workers": {
+        "desc": "Sets the maximum number of autovacuum worker threads that can run simultaneously. The upper limit of this parameter is related to GUC parameters max_connections and job_queue_processes. Setting this parameter larger creates more threads for autovacuum function, occupying more system CPU and memory resources, so it is not recommended to set it too large to avoid memory allocation failure or excessive CPU resource occupation causing database startup errors or business impact. Setting this parameter too low may cause autovacuum threads unable to clean and reclaim unused tablespace in time, leading to database bloat and performance degradation",
+        "type": "continuous",
+        "range": [
+            0,
+            262143
+        ],
+        "dtype": "Integer",
+        "default_value": 3
+    },
+    "autovacuum_naptime": {
+        "desc": "Sets the time interval between two autovacuum operations. For example, value 600 without unit means autovacuum_naptime is 600s; value 10min with unit means autovacuum_naptime is 10min. If values need units, they must be s, min, h, d. Default value is recommended when using only Ustore tables. For Astore tables, the setting value depends on the user's database environment and application load. If there are大量表的更新或删除操作 in the database environment, it is recommended to set this parameter to a shorter time interval to ensure timely cleaning of useless data and avoid database space shortage. If there are fewer update or delete operations in the database environment, this parameter can be set to a longer time interval to reduce autovacuum thread overhead. Setting autovacuum_naptime too short may cause excessive autovacuum thread overhead, affecting database performance. Setting autovacuum_naptime too long may cause useless data accumulation, occupying database space and affecting database performance",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483
+        ],
+        "dtype": "Integer",
+        "default_value": 600
+    },
+    "autovacuum_vacuum_cost_delay": {
+        "desc": "Sets the cost delay value used in automatic VACUUM operations. -1 means using regular vacuum_cost_delay",
+        "type": "continuous",
+        "range": [
+            -1,
+            100
+        ],
+        "dtype": "Integer",
+        "default_value": 20
+    },
+    "autovacuum_vacuum_scale_factor": {
+        "desc": "Table scale factor for VACUUM, used to calculate the threshold for triggering VACUUM. VACUUM trigger threshold = autovacuum_vacuum_threshold + reltuples (number of tuples on the table) * autovacuum_vacuum_scale_factor. VACUUM operation is performed on this table only when the number of deleted or updated records on the table exceeds the threshold",
+        "type": "continuous",
+        "range": [
+            "0.0",
+            "100.0"
+        ],
+        "dtype": "float",
+        "default_value": 0.2
+    },
+    "autovacuum_analyze_scale_factor": {
+        "desc": "Table scale factor for ANALYZE, used to calculate the threshold for triggering ANALYZE. ANALYZE trigger threshold = autovacuum_analyze_threshold + reltuples (number of tuples on the table) * autovacuum_analyze_scale_factor. ANALYZE operation is performed on this table only when the number of deleted, inserted or updated records on the table exceeds the threshold",
+        "type": "continuous",
+        "range": [
+            "0.0",
+            "100.0"
+        ],
+        "dtype": "float",
+        "default_value": 0.1
+    },
+    "enable_thread_pool": {
+        "desc": "Controls whether to use thread pool function. Multi-tenant database feature (enable_mtd) requires this parameter to be enabled. In low-concurrency long-connection performance-sensitive scenarios, it is recommended to disable this parameter; in other scenarios, it is recommended to enable this parameter",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "session_timeout": {
+        "desc": "Indicates the maximum time without any operation after establishing connection with the server. When this parameter value is not 0, if the user does not perform any operation for longer than this parameter value, the connection with the server will be disconnected. 0 means timeout setting is disabled. Positive number means the maximum time without any operation after establishing connection with the server. When exceeding the set value, the connection with the server will be disconnected",
+        "type": "continuous",
+        "range": [
+            0,
+            86400
+        ],
+        "dtype": "Integer",
+        "default_value": 600
+    },
+    "enable_beta_opfusion": {
+        "desc": "When enable_opfusion parameter is enabled, if this parameter is enabled, it can support acceleration execution of aggregate functions and sorting SQL statements that appear in TPCC, improving SQL execution performance. This parameter can be set at PDB level",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "bgwriter_flush_after": {
+        "desc": "Sets when the number of dirty pages flushed by background writer thread exceeds the set threshold, notify the operating system to asynchronously flush data pages in file cache to disk. In GaussDB Kernel, disk page size is 8kB",
+        "type": "continuous",
+        "range": [
+            0,
+            256
+        ],
+        "dtype": "continuous",
+        "default_value": 64
+    },
+    "wal_keep_segments": {
+        "desc": "Number of Xlog log files, sets the minimum number of log files retained in 'pg_xlog' directory. Standby performs stream replication by obtaining Xlog logs from primary. When server enables log archiving or recovers from checkpoint, the number of retained log files may be greater than the value set by wal_keep_segments. When dual-machine uses asynchronous transmission, importing more than 4G data continuously in COPY mode requires increasing wal_keep_segments configuration. Taking T6000 single board as example, if imported data volume is 50G, it is recommended to adjust parameter to 1000. This parameter setting can be dynamically restored after import completion and log synchronization is normal. If synchronous_commit level is less than LOCAL_FLUSH, when rebuilding standby, it is recommended to increase this parameter to 1000 to avoid rebuild failure caused by primary log recycling during rebuild process. If set too large, it may cause pg_xlog folder to occupy too much disk space. If set too small, when standby requests transaction log, this transaction log may have been overwritten by newly generated transaction logs, causing request failure and primary-standby relationship disconnection",
+        "type": "continuous",
+        "range": [
+            2,
+            2147483647
+        ],
+        "dtype": "continuous",
+        "default_value": 128
+    },
+    "bgwriter_delay": {
+        "desc": "Time interval for regular cyclic block-by-block buffer scanning and dirty page flushing. In full checkpoint mode, the amount written each time is controlled by bgwriter_lru_maxpages parameter, then sleeps for bgwriter_delay milliseconds before starting again; in incremental checkpoint mode, when candidate buffer pages are insufficient, scan 10GB buffer pages every bgwriter_delay milliseconds, when encountering dirty pages, flush dirty pages to disk before putting them into candidate list, when encountering clean pages directly put them into candidate list. On many systems, the effective resolution of sleep delay is 10 milliseconds. Therefore, setting a value that is not a multiple of 10 has the same effect as setting it to a multiple of 10",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "continuous",
+        "default_value": 2000
+    },
+    "incremental_checkpoint_timeout": {
+        "desc": "After enabling incremental checkpoint switch (enable_incremental_checkpoint), sets the maximum time between automatic checkpoints",
+        "type": "continuous",
+        "range": [
+            1,
+            3600
+        ],
+        "dtype": "continuous",
+        "default_value": 60
+    },
+    "walwriter_sleep_threshold": {
+        "desc": "Number of idle xlog flushes before xlogflusher enters sleep, will sleep when threshold is reached",
+        "type": "continuous",
+        "range": [
+            1,
+            50000
+        ],
+        "dtype": "continuous",
+        "default_value": 50
+    },
+    "reserve_space_for_nullable_atts": {
+        "desc": "Specifies whether to reserve space for nullable attributes of Ustore tables. This parameter can be set at PDB level",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_default_ustore_table": {
+        "desc": "Specifies whether to use Ustore storage engine by default. This parameter setting is effective only when enable_ustore parameter is enabled. When this parameter is on, created tables are Ustore tables by default; when this parameter is off, created tables are Astore tables by default. This parameter can be set at PDB level. In upgrade scenarios, the default value of this parameter will prioritize compatibility, meaning the default value after upgrade is consistent with the old version value. It is particularly important to note that when using Ustore tables, track_counts and track_activities parameters must be enabled, otherwise it will cause space bloat",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "max_redo_log_size": {
+        "desc": "For standby DN, represents the expected log volume between the latest log replay point and the latest checkpoint position; for primary DN, represents the expected log volume between the latest log insertion point and the latest checkpoint position. This parameter is used to participate in controlling checkpoint page flushing speed",
+        "type": "continuous",
+        "range": [
+            163840,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 1048576
+    },
+    "recovery_time_target": {
+        "desc": "Flow control threshold for standby to complete log writing and replay. When standby's replay completion expected time exceeds this parameter, primary will trigger log flow control, reducing the rate at which primary sends logs to standby. Setting too small will affect primary performance; setting too large will lose flow control effect. After disabling flow control, RTO/RPO may increase",
+        "type": "continuous",
+        "range": [
+            0,
+            3600
+        ],
+        "dtype": "Integer",
+        "default_value": 60
+    },
+    "lockwait_timeout": {
+        "desc": "Controls the maximum waiting time for a single lock. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting too large will cause longer blocking time due to lock conflicts; setting too small may cause more lock timeout errors",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 120000
+    },
+    "update_lockwait_timeout": {
+        "desc": "When business allows concurrent updates, this parameter controls the maximum waiting time for a single lock when concurrently updating the same row. When the applied lock waiting time exceeds the set value, the system will report an error. This parameter only takes effect for常规锁. This parameter can be set at PDB level. Setting value mainly depends on the workload of transactions concurrently updating the same row. Setting too large will cause longer blocking time due to lock conflicts when concurrently updating the same row; setting too small may cause more lock timeout errors",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 120000
+    },
+    "recovery_parse_workers": {
+        "desc": "Number of ParseRedoRecord threads in极致RTO feature. 1. Needs to be used with recovery_redo_workers. If recovery_parse_workers or recovery_redo_workers is greater than 1, then极致RTO is enabled. If极致RTO is not expected to be enabled, please keep recovery_parse_workers at default value 1; 2. When enabling极致RTO, ensure parameter replication_type is 1; 3. If both极致RTO and parallel replay are enabled, then极致RTO feature takes effect, parallel replay feature becomes invalid; 4.极致RTO does not support flow control, flow control is uniformly controlled by recovery_time_target parameter",
+        "type": "continuous",
+        "range": [
+            1,
+            16
+        ],
+        "dtype": "Integer",
+        "default_value": 1
+    },
+    "recovery_max_workers": {
+        "desc": "Sets the maximum number of parallel replay threads. This parameter takes effect only when recovery_parse_workers and recovery_redo_workers are both 1, i.e.,极致RTO is not enabled",
+        "type": "continuous",
+        "range": [
+            0,
+            20
+        ],
+        "dtype": "Integer",
+        "default_value": 4
+    },
+    "track_counts": {
+        "desc": "Controls whether to collect statistics on database activity. This parameter can be set at PDB level. When AutoVacuum automatic cleanup thread selects database to clean, database statistics are needed, so default value is set to on",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_pbe_optimization": {
+        "desc": "Sets whether the optimizer optimizes query plans for statements executed in PBE (Parse Bind Execute) form. The optimization principle is to make FQS choose gplan plan. This parameter can be set at PDB level",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "off"
+    },
+    "check_disconnect_query": {
+        "desc": "This parameter controls whether GaussDB server-side statements terminate execution after client abnormal disconnection (such as JDBC triggering socketTimeout, libpq triggering rwtimeout and closing connection, client process termination during business operation, etc.)",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "enable_cached_context": {
+        "desc": "Controls the number of cached memory contexts. In multi-tenant scenarios, this parameter can be set at PDB level",
+        "type": "continuous",
+        "range": [
+            0,
+            1024
+        ],
+        "dtype": "Integer",
+        "default_value": "128"
+    },
+    "enable_cached_operator": {
+        "desc": "Controls the switch for operator execution state caching feature",
+        "type": "discrete",
+        "range": [
+            "on",
+            "off"
+        ],
+        "dtype": "boolean",
+        "default_value": "on"
+    },
+    "max_process_memory": {
+        "desc": "Sets the maximum physical memory available for a database node. This parameter is used to prevent database memory usage from exceeding system capacity and avoid node OOM. Recommended value is within 66.5% of physical memory (considering reserved operating system memory). Restart instance required after modification",
+        "type": "continuous",
+        "range": [
+            2097152,
+            2147483647
+        ],
+        "dtype": "Integer",
+        "default_value": 696320000
+    }
 }

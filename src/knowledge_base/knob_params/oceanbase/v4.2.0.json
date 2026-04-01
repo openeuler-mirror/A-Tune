@@ -1,365 +1,506 @@
 {
     "workers_per_cpu_quota": {
-        "desc": "This parameter * tenant max_cpu = maximum number of threads that can be allocated to the tenant. This maximum thread count is allocated and available for use, not the maximum number of threads running simultaneously. This parameter generally does not require adjustment.",
+        "desc": "This parameter * tenant max_cpu = maximum number of threads that can be allocated to the tenant. This maximum thread count is allocated and available for use, not the maximum number of threads running simultaneously. This parameter generally does not require adjustment",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 20],
+        "range": [
+            2,
+            20
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "net_thread_count": {
-        "desc": "Number of network threads for receiving client requests. Requires restart to take effect. Check MySQLIO thread usage efficiency via top -H: if usage rate > 90%, receiving threads may become a bottleneck, recommend increasing this parameter; if all threads < 50%, recommend decreasing this parameter to reduce thread switching overhead.",
+        "desc": "Number of network threads for receiving client requests. Requires restart to take effect. Check MySQLIO thread usage efficiency via top -H: if usage rate > 90%, receiving threads may become a bottleneck, recommend increasing this parameter; if all threads < 50%, recommend decreasing this parameter to reduce thread switching overhead",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 64],
+        "range": [
+            0,
+            64
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_early_lock_release": {
-        "desc": "Enable early row lock release. Recommended to enable for hotspot row scenarios.",
+        "desc": "Enable early row lock release. Recommended to enable for hotspot row scenarios",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_monotonic_weak_read": {
-        "desc": "Enable monotonic read. Recommended to disable for performance scenarios.",
+        "desc": "Enable monotonic read. Recommended to disable for performance scenarios",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_perf_event": {
-        "desc": "Enable information collection. Must be enabled in production environment, can be disabled as appropriate in performance testing scenarios.",
+        "desc": "Enable information collection. Must be enabled in production environment, can be disabled as appropriate in performance testing scenarios",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_record_trace_log": {
-        "desc": "Enable Trace Log function. In production environment with Perf Event and SQL Audit enabled, this parameter can be disabled.",
+        "desc": "Enable Trace Log function. In production environment with Perf Event and SQL Audit enabled, this parameter can be disabled",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "syslog_level": {
-        "desc": "Log level for system logs. Recommended to set to PERF in performance scenarios to reduce non-critical log output.",
+        "desc": "Log level for system logs. Recommended to set to PERF in performance scenarios to reduce non-critical log output",
         "type": "discrete",
         "dtype": "string",
-        "range": ["DEBUG", "INFO", "WARN", "ERROR", "PERF"],
+        "range": [
+            "DEBUG",
+            "INFO",
+            "WARN",
+            "ERROR",
+            "PERF"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "clog_sync_time_warn_threshold": {
-        "desc": "Print warning logs when log synchronization time exceeds a certain threshold, adjustable via this configuration item. Recommended to increase, but note it may affect troubleshooting of slow Clog synchronization issues.",
+        "desc": "Print warning logs when log synchronization time exceeds a certain threshold, adjustable via this configuration item. Recommended to increase, but note it may affect troubleshooting of slow Clog synchronization issues",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 1000],
+        "range": [
+            1,
+            1000
+        ],
         "unit": "ms",
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "builtin_db_data_verify_cycle": {
-        "desc": "Macro block inspection cycle parameter. When set to 0, inspection is disabled. Recommended to set to 0 in performance-related scenarios to reduce system overhead.",
+        "desc": "Macro block inspection cycle parameter. When set to 0, inspection is disabled. Recommended to set to 0 in performance-related scenarios to reduce system overhead",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 360],
+        "range": [
+            0,
+            360
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "disk_io_thread_count": {
-        "desc": "Disk I/O thread count, must be an even number. Can be adjusted appropriately according to I/O pressure.",
+        "desc": "Disk I/O thread count, must be an even number. Can be adjusted appropriately according to I/O pressure",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 32],
+        "range": [
+            2,
+            32
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_async_syslog": {
-        "desc": "Enable asynchronous log output. Recommended to set to True in performance scenarios to reduce performance impact of log printing.",
+        "desc": "Enable asynchronous log output. Recommended to set to True in performance scenarios to reduce performance impact of log printing",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "fuse_row_cache_priority": {
-        "desc": "Priority of fused row cache in KV cache. Recommended to set greater than 1 to avoid premature cache replacement and improve query performance.",
+        "desc": "Priority of fused row cache in KV cache. Recommended to set greater than 1 to avoid premature cache replacement and improve query performance",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, null],
+        "range": [
+            1,
+            null
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "micro_block_merge_verify_level": {
-        "desc": "Macro block verification level, 0 means no verification. Can be set to 0 in performance scenarios, but not recommended to modify in production systems.",
+        "desc": "Macro block verification level, 0 means no verification. Can be set to 0 in performance scenarios, but not recommended to modify in production systems",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 1, 2],
+        "range": [
+            0,
+            1,
+            2
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_low_thread_score": {
-        "desc": "Concurrent thread count for low priority Compaction (mainly for Major SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge speed.",
+        "desc": "Concurrent thread count for low priority Compaction (mainly for Major SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge speed",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_mid_thread_score": {
-        "desc": "Concurrent thread count for medium priority Compaction (mainly for Minor SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge efficiency.",
+        "desc": "Concurrent thread count for medium priority Compaction (mainly for Minor SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to load to improve merge efficiency",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_high_thread_score": {
-        "desc": "Concurrent thread count for high priority Compaction (mainly for Mini SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to system pressure.",
+        "desc": "Concurrent thread count for high priority Compaction (mainly for Mini SSTable). Default 0 means 6 concurrent threads, can be increased appropriately according to system pressure",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "ob_proxy_readonly_transaction_routing_policy": {
-        "desc": "Controls whether Proxy routing for transactions is affected by read-only statements. Recommended to set to False, meaning based on the first actual transaction-opening statement.",
+        "desc": "Controls whether Proxy routing for transactions is affected by read-only statements. Recommended to set to False, meaning based on the first actual transaction-opening statement",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "work_thread_num": {
-        "desc": "Number of worker threads for OBProxy, significantly affects CPU usage, default value is 128. Can be dynamically adjusted according to CPU count, requires restart after change.",
+        "desc": "Number of worker threads for OBProxy, significantly affects CPU usage, default value is 128. Can be dynamically adjusted according to CPU count, requires restart after change",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 128],
+        "range": [
+            1,
+            128
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "task_thread_num": {
-        "desc": "Number of background task threads for OBProxy (such as pulling rslist), default value is 2. Recommended to keep default value.",
+        "desc": "Number of background task threads for OBProxy (such as pulling rslist), default value is 2. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 4],
+        "range": [
+            1,
+            4
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "block_thread_num": {
-        "desc": "Number of block threads for OBProxy, default value is 1. Recommended to keep default value.",
+        "desc": "Number of block threads for OBProxy, default value is 1. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 4],
+        "range": [
+            1,
+            4
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "grpc_thread_num": {
-        "desc": "Number of gRPC threads for OBProxy, default value is 8. Recommended to keep default value.",
+        "desc": "Number of gRPC threads for OBProxy, default value is 8. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [4, 32],
+        "range": [
+            4,
+            32
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "net_accept_threads": {
-        "desc": "Number of threads executing accept, default value is 2. Recommended to keep default value.",
+        "desc": "Number of threads executing accept, default value is 2. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [8, 16],
+        "range": [
+            8,
+            16
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "automatic_match_work_thread": {
-        "desc": "Whether to automatically adjust worker thread count based on CPU count. When true, upper limit is work_thread_num, suitable for mixed deployment; when false, uses fixed value, suitable for exclusive deployment.",
+        "desc": "Whether to automatically adjust worker thread count based on CPU count. When true, upper limit is work_thread_num, suitable for mixed deployment; when false, uses fixed value, suitable for exclusive deployment",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_compression_protocol": {
-        "desc": "Whether to enable compression protocol to reduce OBProxy CPU usage. Recommended to configure as False. Note: This parameter has been deprecated since V4.3.4.",
+        "desc": "Whether to enable compression protocol to reduce OBProxy CPU usage. Recommended to configure as False. Note: This parameter has been deprecated since V4.3.4",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_user_timeout": {
-        "desc": "TCP user timeout for connections between OBProxy and OBServer (unit: seconds). Default value is 0, recommended to keep default value.",
+        "desc": "TCP user timeout for connections between OBProxy and OBServer (unit: seconds). Default value is 0, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 20],
+        "range": [
+            0,
+            20
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_user_timeout": {
-        "desc": "TCP user timeout for connections between OBProxy and Client (unit: seconds). Default value is 0, recommended to keep default value.",
+        "desc": "TCP user timeout for connections between OBProxy and Client (unit: seconds). Default value is 0, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 20],
+        "range": [
+            0,
+            20
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_max_connections": {
-        "desc": "Maximum client connections accepted by OBProxy, default value is 8192. Recommended to keep default value.",
+        "desc": "Maximum client connections accepted by OBProxy, default value is 8192. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, null],
+        "range": [
+            0,
+            null
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "connect_observer_max_retries": {
-        "desc": "Maximum retry count for OBProxy reconnecting to OBServer, default value is 3. Recommended to keep default value.",
+        "desc": "Maximum retry count for OBProxy reconnecting to OBServer, default value is 3. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 5],
+        "range": [
+            2,
+            5
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "observer_query_timeout_delta": {
-        "desc": "Network transmission delay compensation, additional time added to OBServer's ob_query_timeout (unit: seconds). Default value is 20, range [1,39]. Recommended to keep default value.",
+        "desc": "Network transmission delay compensation, additional time added to OBServer's ob_query_timeout (unit: seconds). Default value is 20, range [1,39]. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 30],
+        "range": [
+            1,
+            30
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "sock_option_flag_out": {
-        "desc": "TCP parameters between OBProxy and OBServer (bit control for no_delay, keepalive, linger_on). Default values vary by version: V1.8.x recommended 3, V3.x recommended to keep default value.",
+        "desc": "TCP parameters between OBProxy and OBServer (bit control for no_delay, keepalive, linger_on). Default values vary by version: V1.8.x recommended 3, V3.x recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 7],
+        "range": [
+            0,
+            7
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepidle": {
-        "desc": "TCP idle time before starting keepalive between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "TCP idle time before starting keepalive between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 7200],
+        "range": [
+            0,
+            7200
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepintvl": {
-        "desc": "TCP keepalive probe interval between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "TCP keepalive probe interval between OBProxy and OBServer (seconds). Default value is 5, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 75],
+        "range": [
+            0,
+            75
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepcnt": {
-        "desc": "Maximum number of keepalive packets sent for TCP between OBProxy and OBServer, default value is 5. Recommended to keep default value.",
+        "desc": "Maximum number of keepalive packets sent for TCP between OBProxy and OBServer, default value is 5. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 9],
+        "range": [
+            0,
+            9
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_sock_option_flag_out": {
-        "desc": "TCP parameters between client and OBProxy (bit control for no_delay, keepalive, linger_on). V1.8.x default 0, V3.x default 2, recommended to set to 3 to enable no_delay and linger_on.",
+        "desc": "TCP parameters between client and OBProxy (bit control for no_delay, keepalive, linger_on). V1.8.x default 0, V3.x default 2, recommended to set to 3 to enable no_delay and linger_on",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 3],
+        "range": [
+            0,
+            3
+        ],
         "scope": "obproxy",
         "effection_mode": "dynamic"
     },
     "client_tcp_keepidle": {
-        "desc": "TCP idle time before starting keepalive between client and OBProxy (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "TCP idle time before starting keepalive between client and OBProxy (seconds). Default value is 5, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 7200],
+        "range": [
+            1,
+            7200
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_keepintvl": {
-        "desc": "TCP keepalive probe interval between client and OBProxy (seconds). Default value is 5, recommended to keep default value.",
+        "desc": "TCP keepalive probe interval between client and OBProxy (seconds). Default value is 5, recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 75],
+        "range": [
+            0,
+            75
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_keepcnt": {
-        "desc": "Maximum number of keepalive packets sent for TCP between client and OBProxy, default value is 5. Recommended to keep default value.",
+        "desc": "Maximum number of keepalive packets sent for TCP between client and OBProxy, default value is 5. Recommended to keep default value",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, null],
+        "range": [
+            0,
+            null
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_index_route": {
-        "desc": "Whether to enable global index table routing based on global index keys. Default True, recommended to keep default value.",
+        "desc": "Whether to enable global index table routing based on global index keys. Default True, recommended to keep default value",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_pl_route": {
-        "desc": "Whether to enable PL routing. Default True, recommended to disable (False) in performance scenarios.",
+        "desc": "Whether to enable PL routing. Default True, recommended to disable (False) in performance scenarios",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_reroute": {
-        "desc": "Whether to enable secondary routing. Takes effect after enabling OceanBase 2.0 protocol (enable_ob_protocol_v2). Default False, recommended to keep default value.",
+        "desc": "Whether to enable secondary routing. Takes effect after enabling OceanBase 2.0 protocol (enable_ob_protocol_v2). Default False, recommended to keep default value",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_partition_table_route": {
-        "desc": "Whether to enable partition table routing. Default True, recommended to keep default value.",
+        "desc": "Whether to enable partition table routing. Default True, recommended to keep default value",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_routing_mode": {
-        "desc": "OBProxy routing mode. Includes oceanbase (default), random, mock, mysql, etc. Recommended to keep default value.",
+        "desc": "OBProxy routing mode. Includes oceanbase (default), random, mock, mysql, etc. Recommended to keep default value",
         "type": "discrete",
         "dtype": "string",
-        "range": ["oceanbase", "random", "mock", "mysql"],
+        "range": [
+            "oceanbase",
+            "random",
+            "mock",
+            "mysql"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_ob_protocol_v2": {
-        "desc": "Whether to enable OceanBase 2.0 protocol between OBProxy and OBServer (based on MySQL compression protocol). Default False, recommended to keep default value.",
+        "desc": "Whether to enable OceanBase 2.0 protocol between OBProxy and OBServer (based on MySQL compression protocol). Default False, recommended to keep default value",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "routing_cache_mem_limited": {
-        "desc": "Sets memory limit for OBProxy routing cache (table cache, address cache, etc.). Default value 128 MB, range [1KB, 100G], recommended to keep default value.",
+        "desc": "Sets memory limit for OBProxy routing cache (table cache, address cache, etc.). Default value 128 MB, range [1KB, 100G], recommended to keep default value",
         "type": "discrete",
         "dtype": "string",
-        "range": ["1KB", "100G"],
+        "range": [
+            "1KB",
+            "100G"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_bad_route_reject": {
-        "desc": "Whether to reject unroutable requests. Default False, recommended to keep default value.",
+        "desc": "Whether to reject unroutable requests. Default False, recommended to keep default value",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     }

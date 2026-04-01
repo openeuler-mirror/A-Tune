@@ -1,6 +1,6 @@
 {
     "active-defrag-cycle-max": {
-        "desc": "Maximum CPU percentage for defragmentation effort, used when upper threshold is reached. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
+        "desc": "Maximum CPU percentage for defragmentation effort, used when upper threshold is reached. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -10,7 +10,7 @@
         "default_value": 25
     },
     "active-defrag-cycle-min": {
-        "desc": "Minimum CPU percentage for active defragmentation effort. When lower threshold is reached, this setting is used. Decreasing this value increases defragmentation frequency but may increase CPU usage, suitable for alleviating CPU bottlenecks.",
+        "desc": "Minimum CPU percentage for active defragmentation effort. When lower threshold is reached, this setting is used. Decreasing this value increases defragmentation frequency but may increase CPU usage, suitable for alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -20,7 +20,7 @@
         "default_value": 1
     },
     "active-defrag-max-scan-fields": {
-        "desc": "Maximum number of fields to scan during active defragmentation. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
+        "desc": "Maximum number of fields to scan during active defragmentation. Increasing this value improves defragmentation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -30,7 +30,7 @@
         "default_value": 1000
     },
     "active-defrag-threshold-lower": {
-        "desc": "Lower threshold for active defragmentation; no defragmentation occurs below this value. Proper setting avoids unnecessary CPU consumption, suitable for memory bottlenecks.",
+        "desc": "Lower threshold for active defragmentation; no defragmentation occurs below this value. Proper setting avoids unnecessary CPU consumption, suitable for memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -40,7 +40,7 @@
         "default_value": 10
     },
     "active-defrag-threshold-upper": {
-        "desc": "Maximum memory fragmentation percentage; when memory fragmentation rate exceeds this value, Redis begins maximum effort defragmentation to alleviate memory bottlenecks.",
+        "desc": "Maximum memory fragmentation percentage; when memory fragmentation rate exceeds this value, Redis begins maximum effort defragmentation to alleviate memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -50,7 +50,7 @@
         "default_value": 100
     },
     "activedefrag": {
-        "desc": "Enable or disable active defragmentation. When enabled, Redis automatically defragments memory during idle time, suitable for scenarios with severe memory fragmentation, can alleviate memory bottlenecks.",
+        "desc": "Enable or disable active defragmentation. When enabled, Redis automatically defragments memory during idle time, suitable for scenarios with severe memory fragmentation, can alleviate memory bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -60,7 +60,7 @@
         "default_value": "no"
     },
     "activerehashing": {
-        "desc": "When active rehashing is enabled, Redis automatically adjusts hash table size in background to improve performance. This function performs rehash operations ten times per second, each consuming 1ms CPU time, suitable for alleviating CPU bottlenecks.",
+        "desc": "When active rehashing is enabled, Redis automatically adjusts hash table size in background to improve performance. This function performs rehash operations ten times per second, each consuming 1ms CPU time, suitable for alleviating CPU bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -70,7 +70,7 @@
         "default_value": "yes"
     },
     "aof-rewrite-incremental-fsync": {
-        "desc": "This parameter determines whether to use incremental fsync during AOF rewrite. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables.",
+        "desc": "This parameter determines whether to use incremental fsync during AOF rewrite. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -80,7 +80,7 @@
         "default_value": "yes"
     },
     "dynamic-hz": {
-        "desc": "Enable dynamic event loop frequency adjustment; Redis dynamically adjusts event loop frequency based on number of connected clients to improve performance, suitable for alleviating CPU bottlenecks.",
+        "desc": "Enable dynamic event loop frequency adjustment; Redis dynamically adjusts event loop frequency based on number of connected clients to improve performance, suitable for alleviating CPU bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -90,7 +90,7 @@
         "default_value": "yes"
     },
     "hz": {
-        "desc": "Redis event loop frequency in Hertz. This parameter determines how frequently Redis processes events. Increasing this value improves event processing response speed but increases CPU usage, suitable for alleviating CPU bottlenecks.",
+        "desc": "Redis event loop frequency in Hertz. This parameter determines how frequently Redis processes events. Increasing this value improves event processing response speed but increases CPU usage, suitable for alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -100,7 +100,7 @@
         "default_value": 10
     },
     "lazyfree-lazy-eviction": {
-        "desc": "Controls default behavior of DEL command to work like UNLINK. When lazy deletion is enabled, Redis asynchronously deletes expired keys in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
+        "desc": "Controls default behavior of DEL command to work like UNLINK. When lazy deletion is enabled, Redis asynchronously deletes expired keys in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -110,7 +110,7 @@
         "default_value": "no"
     },
     "lazyfree-lazy-expire": {
-        "desc": "Controls default behavior of expired keys to be processed asynchronously like UNLINK. When lazy expiration is enabled, Redis processes expired keys asynchronously in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
+        "desc": "Controls default behavior of expired keys to be processed asynchronously like UNLINK. When lazy expiration is enabled, Redis processes expired keys asynchronously in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -120,7 +120,7 @@
         "default_value": "no"
     },
     "lazyfree-lazy-server-del": {
-        "desc": "Controls server-side deletion behavior to work like UNLINK. When enabled, Redis asynchronously deletes servers in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks.",
+        "desc": "Controls server-side deletion behavior to work like UNLINK. When enabled, Redis asynchronously deletes servers in background, suitable for high concurrency scenarios, can alleviate memory bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -130,7 +130,7 @@
         "default_value": "no"
     },
     "lfu-decay-time": {
-        "desc": "LFU algorithm decay time in minutes. Increasing this value extends frequency statistics validity period but increases memory usage, suitable for alleviating memory bottlenecks.",
+        "desc": "LFU algorithm decay time in minutes. Increasing this value extends frequency statistics validity period but increases memory usage, suitable for alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -140,7 +140,7 @@
         "default_value": 1
     },
     "lfu-log-factor": {
-        "desc": "LFU (Least Frequently Used) algorithm log factor, determines LFU algorithm sensitivity. Increasing this value improves LFU algorithm accuracy but increases memory usage. Suitable for alleviating memory bottlenecks.",
+        "desc": "LFU (Least Frequently Used) algorithm log factor, determines LFU algorithm sensitivity. Increasing this value improves LFU algorithm accuracy but increases memory usage. Suitable for alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -150,7 +150,7 @@
         "default_value": 10
     },
     "list-compress-depth": {
-        "desc": "Compression depth refers to number of quicklist ziplist nodes excluded from both ends of list when using compressed lists. Increasing this value reduces memory usage but may affect performance, suitable for alleviating memory bottlenecks.",
+        "desc": "Compression depth refers to number of quicklist ziplist nodes excluded from both ends of list when using compressed lists. Increasing this value reduces memory usage but may affect performance, suitable for alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -160,7 +160,7 @@
         "default_value": 0
     },
     "lua-time-limit": {
-        "desc": "Maximum execution time for Lua scripts in milliseconds. Scripts exceeding this time will be forcibly terminated, suitable for high concurrency scenarios, can alleviate CPU bottlenecks.",
+        "desc": "Maximum execution time for Lua scripts in milliseconds. Scripts exceeding this time will be forcibly terminated, suitable for high concurrency scenarios, can alleviate CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -170,7 +170,7 @@
         "default_value": 5000
     },
     "maxmemory-samples": {
-        "desc": "Number of keys randomly sampled during memory reclamation. This parameter represents sample size used for LRU (Least Recently Used) and TTL (Time To Live) calculations. Increasing this value improves memory reclamation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks.",
+        "desc": "Number of keys randomly sampled during memory reclamation. This parameter represents sample size used for LRU (Least Recently Used) and TTL (Time To Live) calculations. Increasing this value improves memory reclamation efficiency but increases CPU usage, suitable for alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -180,7 +180,7 @@
         "default_value": 3
     },
     "maxmemory": {
-        "desc": "Sets maximum memory amount Redis instance can use. By limiting Redis memory usage, prevents system memory exhaustion, suitable for alleviating memory bottlenecks. This parameter can be set to specific byte count or using units (e.g., kb, mb, gb).",
+        "desc": "Sets maximum memory amount Redis instance can use. By limiting Redis memory usage, prevents system memory exhaustion, suitable for alleviating memory bottlenecks. This parameter can be set to specific byte count or using units (e.g., kb, mb, gb)",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -190,7 +190,7 @@
         "default_value": 0
     },
     "proto-max-bulk-len": {
-        "desc": "This parameter defines maximum allowed single packet size in bytes in Redis protocol. Its purpose is to limit maximum data amount clients can send to Redis, preventing excessive memory consumption from oversized packets, thereby alleviating memory bottlenecks. Increasing this value allows larger packets but may increase memory usage and processing time; decreasing it limits packet size, potentially causing client send failures.",
+        "desc": "This parameter defines maximum allowed single packet size in bytes in Redis protocol. Its purpose is to limit maximum data amount clients can send to Redis, preventing excessive memory consumption from oversized packets, thereby alleviating memory bottlenecks. Increasing this value allows larger packets but may increase memory usage and processing time; decreasing it limits packet size, potentially causing client send failures",
         "type": "continuous",
         "dtype": "string",
         "range": [
@@ -200,7 +200,7 @@
         "default_value": "512mb"
     },
     "rdb-save-incremental-fsync": {
-        "desc": "This parameter determines whether to use incremental fsync during RDB file saving. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, and can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, Redis performs incremental fsync while writing RDB files, reducing I/O pressure.",
+        "desc": "This parameter determines whether to use incremental fsync during RDB file saving. Enabling incremental fsync reduces write latency, suitable for high write load scenarios, and can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, Redis performs incremental fsync while writing RDB files, reducing I/O pressure",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -210,7 +210,7 @@
         "default_value": "yes"
     },
     "rdbchecksum": {
-        "desc": "This parameter sets checksum algorithm for RDB files. Enabling CRC64 checksum verifies data integrity when loading RDB files, preventing data corruption, thereby improving data security. Although enabling checksum adds some CPU overhead, it can alleviate disk I/O bottlenecks.",
+        "desc": "This parameter sets checksum algorithm for RDB files. Enabling CRC64 checksum verifies data integrity when loading RDB files, preventing data corruption, thereby improving data security. Although enabling checksum adds some CPU overhead, it can alleviate disk I/O bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -220,7 +220,7 @@
         "default_value": "yes"
     },
     "rdbcompression": {
-        "desc": "This parameter determines whether to use LZF algorithm to compress strings when backing up RDB files. Enabling compression reduces disk I/O and memory usage, suitable for scenarios storing large amounts of data. Value 'yes' enables compression, 'no' disables. Enabling compression increases CPU burden but significantly reduces disk space usage.",
+        "desc": "This parameter determines whether to use LZF algorithm to compress strings when backing up RDB files. Enabling compression reduces disk I/O and memory usage, suitable for scenarios storing large amounts of data. Value 'yes' enables compression, 'no' disables. Enabling compression increases CPU burden but significantly reduces disk space usage",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -230,7 +230,7 @@
         "default_value": "yes"
     },
     "replica-lazy-flush": {
-        "desc": "Controls replica data flushing behavior. When lazy flushing is enabled, Redis asynchronously flushes replica data in background, suitable for high concurrency scenarios, can alleviate disk I/O bottlenecks.",
+        "desc": "Controls replica data flushing behavior. When lazy flushing is enabled, Redis asynchronously flushes replica data in background, suitable for high concurrency scenarios, can alleviate disk I/O bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -240,7 +240,7 @@
         "default_value": "no"
     },
     "replica-serve-stale-data": {
-        "desc": "This parameter determines whether replicas can serve stale data. When enabled, replicas continue serving when master is unavailable, suitable for high availability scenarios, helps alleviate network bottlenecks.",
+        "desc": "This parameter determines whether replicas can serve stale data. When enabled, replicas continue serving when master is unavailable, suitable for high availability scenarios, helps alleviate network bottlenecks",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -250,7 +250,7 @@
         "default_value": "yes"
     },
     "set-max-intset-entries": {
-        "desc": "This parameter defines maximum number of elements allowed in Redis integer set (intset). When set element count exceeds this value, Redis converts it to more efficient data structure. Increasing this value allows more integer elements but increases memory usage; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks.",
+        "desc": "This parameter defines maximum number of elements allowed in Redis integer set (intset). When set element count exceeds this value, Redis converts it to more efficient data structure. Increasing this value allows more integer elements but increases memory usage; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -260,7 +260,7 @@
         "default_value": 512
     },
     "slowlog-log-slower-than": {
-        "desc": "This parameter sets threshold for recording slow queries in microseconds. Commands exceeding this time will be recorded in slow log for subsequent analysis. Can alleviate CPU bottlenecks. Increasing this value reduces number of recorded slow queries; decreasing it records more slow queries, helpful for performance tuning.",
+        "desc": "This parameter sets threshold for recording slow queries in microseconds. Commands exceeding this time will be recorded in slow log for subsequent analysis. Can alleviate CPU bottlenecks. Increasing this value reduces number of recorded slow queries; decreasing it records more slow queries, helpful for performance tuning",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -270,7 +270,7 @@
         "default_value": 10000
     },
     "slowlog-max-len": {
-        "desc": "This parameter defines maximum length of slow log, i.e., maximum number of slow query entries recorded. Increasing this value records more slow queries; decreasing it limits number of records, potentially causing important slow queries to be overwritten. This parameter helps alleviate memory bottlenecks.",
+        "desc": "This parameter defines maximum length of slow log, i.e., maximum number of slow query entries recorded. Increasing this value records more slow queries; decreasing it limits number of records, potentially causing important slow queries to be overwritten. This parameter helps alleviate memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -280,7 +280,7 @@
         "default_value": 128
     },
     "stop-writes-on-bgsave-error": {
-        "desc": "This parameter determines whether to stop write operations when background save (bgsave) encounters errors. Enabling this option prevents data loss but may affect availability. Can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, if bgsave fails, write operations are stopped until problem is resolved.",
+        "desc": "This parameter determines whether to stop write operations when background save (bgsave) encounters errors. Enabling this option prevents data loss but may affect availability. Can alleviate disk I/O bottlenecks. Value 'yes' enables, 'no' disables. When enabled, if bgsave fails, write operations are stopped until problem is resolved",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -290,7 +290,7 @@
         "default_value": "yes"
     },
     "stream-node-max-bytes": {
-        "desc": "This parameter defines maximum bytes allowed per stream node. If set to 0, node size is unlimited. Nodes exceeding this value will be split. Increasing this value allows larger nodes; decreasing it causes more frequent node splitting, potentially affecting performance. This parameter helps alleviate memory bottlenecks.",
+        "desc": "This parameter defines maximum bytes allowed per stream node. If set to 0, node size is unlimited. Nodes exceeding this value will be split. Increasing this value allows larger nodes; decreasing it causes more frequent node splitting, potentially affecting performance. This parameter helps alleviate memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -300,7 +300,7 @@
         "default_value": 4096
     },
     "stream-node-max-entries": {
-        "desc": "This parameter defines maximum number of entries allowed per stream node. Nodes exceeding this value will be split, can alleviate memory bottlenecks. Increasing this value allows more entries; decreasing it causes more frequent node splitting, potentially affecting performance.",
+        "desc": "This parameter defines maximum number of entries allowed per stream node. Nodes exceeding this value will be split, can alleviate memory bottlenecks. Increasing this value allows more entries; decreasing it causes more frequent node splitting, potentially affecting performance",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -310,7 +310,7 @@
         "default_value": 100
     },
     "zset-max-ziplist-entries": {
-        "desc": "This parameter defines maximum number of entries for sorted sets (zset) using ziplist data structure. When this value is exceeded, zset converts to more efficient data structure, thereby alleviating memory bottlenecks. Increasing this value allows more entries to use ziplist; decreasing it causes earlier data structure conversion.",
+        "desc": "This parameter defines maximum number of entries for sorted sets (zset) using ziplist data structure. When this value is exceeded, zset converts to more efficient data structure, thereby alleviating memory bottlenecks. Increasing this value allows more entries to use ziplist; decreasing it causes earlier data structure conversion",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -320,7 +320,7 @@
         "default_value": 128
     },
     "zset-max-ziplist-value": {
-        "desc": "This parameter defines maximum value size (bytes) for sorted sets (zset) using ziplist data structure. When sorted set element size is less than this value, special encoding is used to save memory. When exceeded, sorted set converts to more efficient data structure. Increasing this value allows larger values to use ziplist; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks.",
+        "desc": "This parameter defines maximum value size (bytes) for sorted sets (zset) using ziplist data structure. When sorted set element size is less than this value, special encoding is used to save memory. When exceeded, sorted set converts to more efficient data structure. Increasing this value allows larger values to use ziplist; decreasing it causes earlier data structure conversion, thereby alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
