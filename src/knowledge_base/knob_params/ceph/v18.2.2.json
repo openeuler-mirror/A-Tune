@@ -1,6 +1,6 @@
 {
     "bluestore_throttle_bytes": {
-        "desc": "This parameter controls the write rate limit for Bluestore in bytes. Can alleviate disk IO bottlenecks. Increasing this value can improve write performance, while decreasing it can reduce write rate to protect other operations.",
+        "desc": "This parameter controls the write rate limit for Bluestore in bytes. Can alleviate disk IO bottlenecks. Increasing this value can improve write performance, while decreasing it can reduce write rate to protect other operations",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -11,7 +11,7 @@
         "related_param": []
     },
     "bluestore_throttle_deferred_bytes": {
-        "desc": "This parameter controls the limit of deferred bytes during Bluestore writes. Can alleviate disk IO bottlenecks. Increasing this value allows more deferred writes, while decreasing it reduces the number of deferred writes.",
+        "desc": "This parameter controls the limit of deferred bytes during Bluestore writes. Can alleviate disk IO bottlenecks. Increasing this value allows more deferred writes, while decreasing it reduces the number of deferred writes",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -22,7 +22,7 @@
         "related_param": []
     },
     "journal_max_write_bytes": {
-        "desc": "This parameter defines the maximum number of bytes written to the journal at once. Increasing this value can improve journal write performance and alleviate disk IO bottlenecks, while decreasing it may cause journal write delays.",
+        "desc": "This parameter defines the maximum number of bytes written to the journal at once. Increasing this value can improve journal write performance and alleviate disk IO bottlenecks, while decreasing it may cause journal write delays",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -33,7 +33,7 @@
         "related_param": []
     },
     "journal_max_write_entries": {
-        "desc": "This parameter defines the maximum number of journal write entries. Increasing this value can improve journal write performance, while decreasing it may cause journal write delays. This parameter can alleviate disk IO bottlenecks.",
+        "desc": "This parameter defines the maximum number of journal write entries. Increasing this value can improve journal write performance, while decreasing it may cause journal write delays. This parameter can alleviate disk IO bottlenecks",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -44,7 +44,7 @@
         "related_param": []
     },
     "osd_client_message_size_cap": {
-        "desc": "Maximum size of OSD client messages in bytes. This parameter controls the maximum client data message size allowed to be processed in memory. Setting this parameter can prevent oversized messages from causing network bottlenecks, and appropriate values can improve network performance.",
+        "desc": "Maximum size of OSD client messages in bytes. This parameter controls the maximum client data message size allowed to be processed in memory. Setting this parameter can prevent oversized messages from causing network bottlenecks, and appropriate values can improve network performance",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -55,7 +55,7 @@
         "related_param": []
     },
     "osd_map_cache_size": {
-        "desc": "Sets the size of OSD map cache in bytes. Increasing this value can improve OSD map access speed but increases memory usage. The default value for this parameter is 50, recommended to adjust based on actual requirements.",
+        "desc": "Sets the size of OSD map cache in bytes. Increasing this value can improve OSD map access speed but increases memory usage. The default value for this parameter is 50, recommended to adjust based on actual requirements",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -66,7 +66,7 @@
         "related_param": []
     },
     "osd_max_backfills": {
-        "desc": "The osd_max_backfills parameter sets the maximum number of concurrent backfill operations allowed per OSD. Increasing this value can improve data recovery speed but may cause disk IO bottlenecks. This parameter applies to both read and write operations.",
+        "desc": "The osd_max_backfills parameter sets the maximum number of concurrent backfill operations allowed per OSD. Increasing this value can improve data recovery speed but may cause disk IO bottlenecks. This parameter applies to both read and write operations",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -79,7 +79,7 @@
         ]
     },
     "osd_max_pgls": {
-        "desc": "Sets the maximum number of PG logs allowed per OSD. Increasing this value can improve log processing capability but may increase memory usage. Proper configuration of this parameter is crucial for Ceph cluster performance.",
+        "desc": "Sets the maximum number of PG logs allowed per OSD. Increasing this value can improve log processing capability but may increase memory usage. Proper configuration of this parameter is crucial for Ceph cluster performance",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -90,7 +90,7 @@
         "related_param": []
     },
     "osd_max_pg_log_entries": {
-        "desc": "This parameter sets the maximum number of entries per Placement Group (PG) log. Increasing this value can improve log processing capability but may increase memory usage. The maximum number of PGLog entries retained during PGLog trimming is this value. Proper configuration of this parameter is crucial for Ceph cluster performance and stability.",
+        "desc": "This parameter sets the maximum number of entries per Placement Group (PG) log. Increasing this value can improve log processing capability but may increase memory usage. The maximum number of PGLog entries retained during PGLog trimming is this value. Proper configuration of this parameter is crucial for Ceph cluster performance and stability",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -105,7 +105,7 @@
         ]
     },
     "osd_max_pg_per_osd_hard_ratio": {
-        "desc": "This parameter sets the ratio of maximum PGs allowed per OSD to the number of OSDs. Increasing this value can improve storage scalability but may increase memory and CPU usage. When this ratio is reached, OSDs will refuse to create new PGs.",
+        "desc": "This parameter sets the ratio of maximum PGs allowed per OSD to the number of OSDs. Increasing this value can improve storage scalability but may increase memory and CPU usage. When this ratio is reached, OSDs will refuse to create new PGs",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -118,7 +118,7 @@
         ]
     },
     "osd_max_scrubs": {
-        "desc": "Sets the maximum number of concurrent scrubbing operations per OSD. Increasing this value can improve scrubbing concurrency but may cause CPU and disk IO bottlenecks.",
+        "desc": "Sets the maximum number of concurrent scrubbing operations per OSD. Increasing this value can improve scrubbing concurrency but may cause CPU and disk IO bottlenecks",
         "type": "discrete",
         "dtype": "int",
         "range": [
@@ -129,7 +129,7 @@
         "related_param": []
     },
     "osd_max_write_size": {
-        "desc": "Maximum write size allowed by OSD in bytes. Increasing this value can improve write performance but may increase memory usage, thus affecting CPU and memory bottlenecks. The maximum write size ranges from 4096 bytes to 1048576 bytes, with a default value of 4194304 bytes.",
+        "desc": "Maximum write size allowed by OSD in bytes. Increasing this value can improve write performance but may increase memory usage, thus affecting CPU and memory bottlenecks. The maximum write size ranges from 4096 bytes to 1048576 bytes, with a default value of 4194304 bytes",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -140,7 +140,7 @@
         "related_param": []
     },
     "osd_mclock_iops_capacity_threshold_hdd": {
-        "desc": "This parameter defines the IOPS capacity threshold for HDDs (in 4KiB block size units). When exceeded, OSD benchmark results are ignored and fall back to the last valid or default IOPS capacity defined by osd_mclock_max_capacity_iops_hdd. Increasing this value can improve HDD utilization efficiency, thereby alleviating disk IO bottlenecks.",
+        "desc": "This parameter defines the IOPS capacity threshold for HDDs (in 4KiB block size units). When exceeded, OSD benchmark results are ignored and fall back to the last valid or default IOPS capacity defined by osd_mclock_max_capacity_iops_hdd. Increasing this value can improve HDD utilization efficiency, thereby alleviating disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -153,7 +153,7 @@
         ]
     },
     "osd_mclock_iops_capacity_threshold_ssd": {
-        "desc": "This parameter defines the IOPS capacity threshold for SSDs (in 4KiB block size units). When exceeded, OSD benchmark results are ignored and fall back to the last valid or default IOPS capacity defined by osd_mclock_max_capacity_iops_ssd. Increasing this value can improve SSD utilization efficiency, thereby alleviating disk IO bottlenecks.",
+        "desc": "This parameter defines the IOPS capacity threshold for SSDs (in 4KiB block size units). When exceeded, OSD benchmark results are ignored and fall back to the last valid or default IOPS capacity defined by osd_mclock_max_capacity_iops_ssd. Increasing this value can improve SSD utilization efficiency, thereby alleviating disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -166,7 +166,7 @@
         ]
     },
     "osd_mclock_max_capacity_iops_hdd": {
-        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for rotational media). Setting this parameter can help optimize HDD usage and alleviate disk IO bottlenecks.",
+        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for rotational media). Setting this parameter can help optimize HDD usage and alleviate disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -177,7 +177,7 @@
         "related_param": []
     },
     "osd_mclock_max_capacity_iops_ssd": {
-        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for solid state media). Setting this parameter can help optimize SSD usage and alleviate disk IO bottlenecks.",
+        "desc": "Max random write IOPS capacity (at 4 KiB block size) to consider per OSD (for solid state media). Setting this parameter can help optimize SSD usage and alleviate disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -188,7 +188,7 @@
         "related_param": []
     },
     "osd_mclock_max_sequential_bandwidth_hdd": {
-        "desc": "This parameter defines the maximum sequential bandwidth (in bytes per second) considered per OSD when using rotational media. Setting this parameter can help optimize HDD sequential IO performance and alleviate disk IO bottlenecks.",
+        "desc": "This parameter defines the maximum sequential bandwidth (in bytes per second) considered per OSD when using rotational media. Setting this parameter can help optimize HDD sequential IO performance and alleviate disk IO bottlenecks",
         "type": "continuous",
         "dtype": "size",
         "range": [
@@ -199,7 +199,7 @@
         "related_param": []
     },
     "osd_mclock_max_sequential_bandwidth_ssd": {
-        "desc": "This parameter is used to set the maximum sequential bandwidth (in bytes per second) for OSDs on solid-state media, which can help optimize SSD sequential IO performance and alleviate disk IO bottlenecks.",
+        "desc": "This parameter is used to set the maximum sequential bandwidth (in bytes per second) for OSDs on solid-state media, which can help optimize SSD sequential IO performance and alleviate disk IO bottlenecks",
         "type": "continuous",
         "dtype": "size",
         "range": [
@@ -210,17 +210,20 @@
         "related_param": []
     },
     "osd_mclock_profile": {
-        "desc": "Controls the multi-clock profile for OSDs. Choosing the appropriate profile can optimize IO performance and alleviate disk IO bottlenecks. Optional profiles include high recovery operations, low latency operations, and high client operations.",
+        "desc": "Controls the multi-clock profile for OSDs. Choosing the appropriate profile can optimize IO performance and alleviate disk IO bottlenecks. Optional profiles include high recovery operations, low latency operations, and high client operations",
         "type": "discrete",
         "dtype": "string",
         "range": [
-            "balanced", "high_recovery_ops", "high_client_ops", "custom"
+            "balanced",
+            "high_recovery_ops",
+            "high_client_ops",
+            "custom"
         ],
         "default_value": "high_recovery_ops",
         "related_param": []
     },
     "osd_mclock_scheduler_background_best_effort_lim": {
-        "desc": "This parameter controls the IO limit for background best-effort scheduler, affecting the number of concurrent best-effort recovery operations. Increasing this value allows more concurrent best-effort recovery requests, thereby alleviating disk IO bottlenecks.",
+        "desc": "This parameter controls the IO limit for background best-effort scheduler, affecting the number of concurrent best-effort recovery operations. Increasing this value allows more concurrent best-effort recovery requests, thereby alleviating disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -231,7 +234,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_background_best_effort_res": {
-        "desc": "This parameter controls resource allocation for background best-effort scheduler, affecting resource usage of best-effort recovery operations. Increasing this value can improve resource allocation, thereby alleviating disk IO bottlenecks. Default value is 0.0, range is 0 to 1.0.",
+        "desc": "This parameter controls resource allocation for background best-effort scheduler, affecting resource usage of best-effort recovery operations. Increasing this value can improve resource allocation, thereby alleviating disk IO bottlenecks. Default value is 0.0, range is 0 to 1.0",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -242,7 +245,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_background_best_effort_wgt": {
-        "desc": "This parameter controls the IO share weight for each background best-effort scheduling, affecting the priority of best-effort recovery operations. Increasing this value can improve the priority of best-effort recovery operations, thereby alleviating disk IO bottlenecks.",
+        "desc": "This parameter controls the IO share weight for each background best-effort scheduling, affecting the priority of best-effort recovery operations. Increasing this value can improve the priority of best-effort recovery operations, thereby alleviating disk IO bottlenecks",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -253,7 +256,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_background_recovery_lim": {
-        "desc": "This parameter controls the IO limit for background recovery scheduler, limiting the number of concurrent recovery operations. Increasing this value allows more concurrent recovery requests, thereby alleviating disk IO bottlenecks. Specifically, it defines the IO limit for background recovery, suitable for scenarios requiring optimized recovery performance.",
+        "desc": "This parameter controls the IO limit for background recovery scheduler, limiting the number of concurrent recovery operations. Increasing this value allows more concurrent recovery requests, thereby alleviating disk IO bottlenecks. Specifically, it defines the IO limit for background recovery, suitable for scenarios requiring optimized recovery performance",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -264,7 +267,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_background_recovery_res": {
-        "desc": "IO ratio reserved for background recovery (default). This parameter controls resource allocation for background recovery scheduler. Increasing this value can improve resource allocation, thereby alleviating disk IO bottlenecks.",
+        "desc": "IO ratio reserved for background recovery (default). This parameter controls resource allocation for background recovery scheduler. Increasing this value can improve resource allocation, thereby alleviating disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -275,7 +278,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_background_recovery_wgt": {
-        "desc": "IO share for each background recovery over reservation. This parameter controls the priority of background recovery operations. Increasing this value can improve the priority of recovery operations, thereby alleviating disk IO bottlenecks.",
+        "desc": "IO share for each background recovery over reservation. This parameter controls the priority of background recovery operations. Increasing this value can improve the priority of recovery operations, thereby alleviating disk IO bottlenecks",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -286,7 +289,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_client_lim": {
-        "desc": "IO limit for each client (default) over reservation. This parameter controls the number of concurrent client requests. Increasing this value allows more concurrent requests, thereby alleviating CPU bottlenecks.",
+        "desc": "IO limit for each client (default) over reservation. This parameter controls the number of concurrent client requests. Increasing this value allows more concurrent requests, thereby alleviating CPU bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -297,7 +300,7 @@
         "related_param": []
     },
     "osd_mclock_scheduler_client_res": {
-        "desc": "IO ratio reserved for each client. Increasing this value can improve resource allocation, thereby alleviating CPU bottlenecks. Default value is 0.0.",
+        "desc": "IO ratio reserved for each client. Increasing this value can improve resource allocation, thereby alleviating CPU bottlenecks. Default value is 0.0",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -310,7 +313,7 @@
         ]
     },
     "osd_mclock_scheduler_client_wgt": {
-        "desc": "IO share for each client (default) over reservation. The weight of client scheduler, used to control the scheduling priority of client requests. Increasing this value can improve the processing priority of client requests, thereby alleviating CPU bottlenecks.",
+        "desc": "IO share for each client (default) over reservation. The weight of client scheduler, used to control the scheduling priority of client requests. Increasing this value can improve the processing priority of client requests, thereby alleviating CPU bottlenecks",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -321,7 +324,7 @@
         "related_param": []
     },
     "osd_memory_target": {
-        "desc": "This option sets the memory size that each OSD process can request, in bytes. Properly setting this parameter can help alleviate memory bottlenecks, ensuring OSD processes maintain performance under high load conditions.",
+        "desc": "This option sets the memory size that each OSD process can request, in bytes. Properly setting this parameter can help alleviate memory bottlenecks, ensuring OSD processes maintain performance under high load conditions",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -332,7 +335,7 @@
         "related_param": []
     },
     "osd_min_pg_log_entries": {
-        "desc": "This parameter sets the minimum number of entries per Placement Group (PG) log. Increasing this value can improve log reliability but may increase memory usage. The minimum number of PGLog entries retained during PGLog trimming. Proper configuration of this parameter helps optimize Ceph cluster performance and stability.",
+        "desc": "This parameter sets the minimum number of entries per Placement Group (PG) log. Increasing this value can improve log reliability but may increase memory usage. The minimum number of PGLog entries retained during PGLog trimming. Proper configuration of this parameter helps optimize Ceph cluster performance and stability",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -347,7 +350,7 @@
         ]
     },
     "osd_op_num_shards": {
-        "desc": "This parameter defines the number of operation shards allocated for specific OSDs. Increasing this value can improve concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage. Recommended to adjust in high-performance requirement environments.",
+        "desc": "This parameter defines the number of operation shards allocated for specific OSDs. Increasing this value can improve concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage. Recommended to adjust in high-performance requirement environments",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -358,7 +361,7 @@
         "related_param": []
     },
     "osd_op_num_shards_ssd": {
-        "desc": "This parameter defines the number of shards allocated for specific OSDs (for solid-state storage media). Increasing this value can improve SSD concurrent processing capability and alleviate CPU bottlenecks.",
+        "desc": "This parameter defines the number of shards allocated for specific OSDs (for solid-state storage media). Increasing this value can improve SSD concurrent processing capability and alleviate CPU bottlenecks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -371,7 +374,7 @@
         ]
     },
     "osd_op_num_threads_per_shard": {
-        "desc": "Number of worker threads per OSD shard. Increasing this value can improve concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage. Recommended to adjust based on actual load conditions.",
+        "desc": "Number of worker threads per OSD shard. Increasing this value can improve concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage. Recommended to adjust based on actual load conditions",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -382,7 +385,7 @@
         "related_param": []
     },
     "osd_op_num_threads_per_shard_ssd": {
-        "desc": "Number of worker threads generated per OSD shard for given OSDs (for solid-state media). Increasing this value can improve SSD concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage.",
+        "desc": "Number of worker threads generated per OSD shard for given OSDs (for solid-state media). Increasing this value can improve SSD concurrent processing capability and alleviate CPU bottlenecks, but may increase memory usage",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -395,7 +398,7 @@
         ]
     },
     "osd_pool_default_crush_rule": {
-        "desc": "Sets the default CRUSH rule for newly created pools. This parameter determines the CRUSH rule used when creating replicated pools. Default value is -1, meaning select the rule with the lowest ID. Different CRUSH rules affect data distribution and redundancy strategies.",
+        "desc": "Sets the default CRUSH rule for newly created pools. This parameter determines the CRUSH rule used when creating replicated pools. Default value is -1, meaning select the rule with the lowest ID. Different CRUSH rules affect data distribution and redundancy strategies",
         "type": "discrete",
         "dtype": "int",
         "range": [
@@ -406,7 +409,7 @@
         "related_param": []
     },
     "osd_pool_default_min_size": {
-        "desc": "Sets the default minimum replica count for newly created pools. Increasing this value can improve data availability but increases storage overhead. This parameter ensures that during degraded mode operation, the minimum replica count is met to avoid data loss. Default value is 0, meaning no specific minimum. If set to 0, the minimum value is size - (size / 2).",
+        "desc": "Sets the default minimum replica count for newly created pools. Increasing this value can improve data availability but increases storage overhead. This parameter ensures that during degraded mode operation, the minimum replica count is met to avoid data loss. Default value is 0, meaning no specific minimum. If set to 0, the minimum value is size - (size / 2)",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -419,7 +422,7 @@
         ]
     },
     "osd_pool_default_pgp_num": {
-        "desc": "This parameter sets the default PG replica count for newly created pools. Increasing this value can improve data redundancy but increases storage overhead. Default value is 64, minimum value is 1.",
+        "desc": "This parameter sets the default PG replica count for newly created pools. Increasing this value can improve data redundancy but increases storage overhead. Default value is 64, minimum value is 1",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -433,7 +436,7 @@
         ]
     },
     "osd_pool_default_pg_num": {
-        "desc": "Sets the default PG count for newly created pools. Increasing this value can improve data parallelism but may increase memory and CPU usage. Recommended to adjust based on actual load and hardware resources.",
+        "desc": "Sets the default PG count for newly created pools. Increasing this value can improve data parallelism but may increase memory and CPU usage. Recommended to adjust based on actual load and hardware resources",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -446,7 +449,7 @@
         ]
     },
     "osd_pool_default_size": {
-        "desc": "By default, Ceph creates three replicas for RADOS objects. If you want to maintain four replicas (one primary and three backups), you can achieve this by setting the 'osd_pool_default_size' parameter. Increasing this value can improve data redundancy but increases storage overhead.",
+        "desc": "By default, Ceph creates three replicas for RADOS objects. If you want to maintain four replicas (one primary and three backups), you can achieve this by setting the 'osd_pool_default_size' parameter. Increasing this value can improve data redundancy but increases storage overhead",
         "type": "discrete",
         "dtype": "int",
         "range": [
@@ -457,7 +460,7 @@
         "related_param": []
     },
     "osd_recovery_max_active": {
-        "desc": "Maximum concurrent operations allowed during OSD recovery. Increasing this value can speed up recovery but may cause disk IO and network bottlenecks. Recommended to adjust based on cluster load conditions.",
+        "desc": "Maximum concurrent operations allowed during OSD recovery. Increasing this value can speed up recovery but may cause disk IO and network bottlenecks. Recommended to adjust based on cluster load conditions",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -472,7 +475,7 @@
         ]
     },
     "osd_recovery_op_priority": {
-        "desc": "The osd_recovery_op_priority parameter sets the priority of recovery operations relative to client operations. Higher priority can speed up recovery but may affect normal operation performance, causing CPU and disk IO bottlenecks. The parameter value range is 1-63, with higher values consuming more resources.",
+        "desc": "The osd_recovery_op_priority parameter sets the priority of recovery operations relative to client operations. Higher priority can speed up recovery but may affect normal operation performance, causing CPU and disk IO bottlenecks. The parameter value range is 1-63, with higher values consuming more resources",
         "type": "discrete",
         "dtype": "integer",
         "range": [
@@ -483,7 +486,7 @@
         "related_param": []
     },
     "osd_scrub_auto_repair": {
-        "desc": "Enabling this parameter will automatically repair errors found during scrubbing or deep-scrubbing processes, thereby reducing manual intervention and improving system reliability. This feature helps ensure data integrity and availability.",
+        "desc": "Enabling this parameter will automatically repair errors found during scrubbing or deep-scrubbing processes, thereby reducing manual intervention and improving system reliability. This feature helps ensure data integrity and availability",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -496,7 +499,7 @@
         ]
     },
     "osd_scrub_auto_repair_num_errors": {
-        "desc": "Maximum number of errors allowed for automatic repair during scrubbing. If the number of errors found exceeds this value, automatic repair will not be performed. Increasing this value can improve repair capability but may increase CPU and disk IO burden.",
+        "desc": "Maximum number of errors allowed for automatic repair during scrubbing. If the number of errors found exceeds this value, automatic repair will not be performed. Increasing this value can improve repair capability but may increase CPU and disk IO burden",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -509,7 +512,7 @@
         ]
     },
     "osd_scrub_load_threshold": {
-        "desc": "Sets the maximum load threshold allowed for OSD during scrubbing. Increasing this value allows OSD to perform scrubbing even under high load conditions, which may worsen CPU and disk IO bottlenecks.",
+        "desc": "Sets the maximum load threshold allowed for OSD during scrubbing. Increasing this value allows OSD to perform scrubbing even under high load conditions, which may worsen CPU and disk IO bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -520,7 +523,7 @@
         "related_param": []
     },
     "osd_scrub_max_interval": {
-        "desc": "This parameter defines the maximum interval time for data scrubbing operations per PG, in seconds. Increasing this value can reduce the frequency of scrubbing operations, thereby alleviating CPU and disk IO bottlenecks. Default value is 7 days (604800 seconds).",
+        "desc": "This parameter defines the maximum interval time for data scrubbing operations per PG, in seconds. Increasing this value can reduce the frequency of scrubbing operations, thereby alleviating CPU and disk IO bottlenecks. Default value is 7 days (604800 seconds)",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -533,7 +536,7 @@
         ]
     },
     "osd_scrub_min_interval": {
-        "desc": "Sets the minimum time interval for OSD scrubbing operations, in seconds. Increasing this value can reduce the impact of scrubbing on system performance, especially under high load conditions, alleviating CPU and disk IO bottlenecks. Default value is 1 day (86400 seconds).",
+        "desc": "Sets the minimum time interval for OSD scrubbing operations, in seconds. Increasing this value can reduce the impact of scrubbing on system performance, especially under high load conditions, alleviating CPU and disk IO bottlenecks. Default value is 1 day (86400 seconds)",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -546,7 +549,7 @@
         ]
     },
     "osd_scrub_priority": {
-        "desc": "The osd_scrub_priority parameter controls the default priority of data scrubbing operations in Ceph cluster. When pools do not specify scrub_priority value, this parameter's value is used. Increasing this value can improve the priority of scrubbing operations, thereby alleviating disk IO bottlenecks, ensuring that when scrubbing operations block client operations, it can be elevated to the osd_client_op_priority value.",
+        "desc": "The osd_scrub_priority parameter controls the default priority of data scrubbing operations in Ceph cluster. When pools do not specify scrub_priority value, this parameter's value is used. Increasing this value can improve the priority of scrubbing operations, thereby alleviating disk IO bottlenecks, ensuring that when scrubbing operations block client operations, it can be elevated to the osd_client_op_priority value",
         "type": "discrete",
         "dtype": "uint",
         "range": [
@@ -557,7 +560,7 @@
         "related_param": []
     },
     "rbd_cache": {
-        "desc": "This parameter controls RBD cache functionality. Enabling cache can alleviate disk IO and network bottlenecks and improve performance. When set to 'false', cache is disabled; when set to 'true', cache is enabled.",
+        "desc": "This parameter controls RBD cache functionality. Enabling cache can alleviate disk IO and network bottlenecks and improve performance. When set to 'false', cache is disabled; when set to 'true', cache is enabled",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -568,7 +571,7 @@
         "related_param": []
     },
     "rbd_cache_max_dirty": {
-        "desc": "This parameter defines the maximum dirty data bytes allowed in RBD cache. When cache mode is write-back, increasing this value allows more dirty data, thereby alleviating memory bottlenecks; while setting to 0 uses write-through mode, which may affect performance. Note that increasing this value may increase data loss risk.",
+        "desc": "This parameter defines the maximum dirty data bytes allowed in RBD cache. When cache mode is write-back, increasing this value allows more dirty data, thereby alleviating memory bottlenecks; while setting to 0 uses write-through mode, which may affect performance. Note that increasing this value may increase data loss risk",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -579,7 +582,7 @@
         "related_param": []
     },
     "rbd_cache_max_dirty_age": {
-        "desc": "This parameter defines the maximum existence time of dirty data in RBD cache, in seconds. The time dirty data can exist in cache before being flushed to storage disk. Increasing this value allows dirty data to exist longer, thereby alleviating memory bottlenecks, but may cause data updates to be delayed. Default value is 60 seconds, maximum value is 86400 seconds.",
+        "desc": "This parameter defines the maximum existence time of dirty data in RBD cache, in seconds. The time dirty data can exist in cache before being flushed to storage disk. Increasing this value allows dirty data to exist longer, thereby alleviating memory bottlenecks, but may cause data updates to be delayed. Default value is 60 seconds, maximum value is 86400 seconds",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -590,7 +593,7 @@
         "related_param": []
     },
     "rbd_cache_size": {
-        "desc": "This parameter defines the size of RBD cache in bytes. Increasing this value can improve cache hit rate, while decreasing it may cause insufficient cache, thereby alleviating memory bottlenecks.",
+        "desc": "This parameter defines the size of RBD cache in bytes. Increasing this value can improve cache hit rate, while decreasing it may cause insufficient cache, thereby alleviating memory bottlenecks",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -601,7 +604,7 @@
         "related_param": []
     },
     "rbd_cache_writethrough_until_flush": {
-        "desc": "This parameter controls whether to use write-through cache during writes until data is flushed. This option is for compatibility with virtio drivers before linux-2.6.32, to avoid data not being written back due to not sending flush requests. Enabling this parameter can alleviate disk IO bottlenecks. When set to 'true', it is enabled; when set to 'false', it is disabled.",
+        "desc": "This parameter controls whether to use write-through cache during writes until data is flushed. This option is for compatibility with virtio drivers before linux-2.6.32, to avoid data not being written back due to not sending flush requests. Enabling this parameter can alleviate disk IO bottlenecks. When set to 'true', it is enabled; when set to 'false', it is disabled",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -612,4 +615,3 @@
         "related_param": []
     }
 }
-

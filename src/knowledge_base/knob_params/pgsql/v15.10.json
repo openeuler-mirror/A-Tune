@@ -1,6 +1,6 @@
 {
     "archive_mode": {
-        "desc": "Enable or disable archive mode. When archive_mode is enabled, completed WAL segments are sent to archive storage. When set to 'on', WAL logs will be archived, suitable for scenarios requiring data recovery. Enabling archive mode increases disk I/O but improves data security.",
+        "desc": "Enable or disable archive mode. When archive_mode is enabled, completed WAL segments are sent to archive storage. When set to 'on', WAL logs will be archived, suitable for scenarios requiring data recovery. Enabling archive mode increases disk I/O but improves data security",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -11,7 +11,7 @@
         "default_value": "off"
     },
     "autovacuum_analyze_scale_factor": {
-        "desc": "This parameter controls the ratio of rows that need to be updated to the total number of rows in the table when autovacuum performs analyze operations. Increasing this value reduces the frequency of automatic analysis, lowering CPU and I/O burden, but may lead to inaccurate statistics. Decreasing this value increases the frequency of automatic analysis, helping to keep query optimizer statistics updated and alleviate memory bottlenecks.",
+        "desc": "This parameter controls the ratio of rows that need to be updated to the total number of rows in the table when autovacuum performs analyze operations. Increasing this value reduces the frequency of automatic analysis, lowering CPU and I/O burden, but may lead to inaccurate statistics. Decreasing this value increases the frequency of automatic analysis, helping to keep query optimizer statistics updated and alleviate memory bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -21,7 +21,7 @@
         "default_value": 0.1
     },
     "autovacuum_max_workers": {
-        "desc": "Sets the maximum number of worker threads for autovacuum processes. Increasing this value improves database autovacuum capability, alleviating disk I/O bottlenecks caused by dead tuples. Value range is 0 to 1024, where 0 disables autovacuum.",
+        "desc": "Sets the maximum number of worker threads for autovacuum processes. Increasing this value improves database autovacuum capability, alleviating disk I/O bottlenecks caused by dead tuples. Value range is 0 to 1024, where 0 disables autovacuum",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -31,7 +31,7 @@
         "default_value": 3
     },
     "autovacuum_vacuum_scale_factor": {
-        "desc": "This parameter controls the ratio of rows that need to be deleted to the total number of rows in the table when autovacuum performs cleanup operations. Increasing this value reduces the frequency of automatic cleanup, thereby lowering CPU and I/O burden, but may cause table bloat. Decreasing this value increases the frequency of automatic cleanup, helping to release space promptly and alleviate disk I/O bottlenecks.",
+        "desc": "This parameter controls the ratio of rows that need to be deleted to the total number of rows in the table when autovacuum performs cleanup operations. Increasing this value reduces the frequency of automatic cleanup, thereby lowering CPU and I/O burden, but may cause table bloat. Decreasing this value increases the frequency of automatic cleanup, helping to release space promptly and alleviate disk I/O bottlenecks",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -41,7 +41,7 @@
         "default_value": 0.2
     },
     "autovacuum_work_mem": {
-        "desc": "Specifies the maximum amount of memory that can be used by each autovacuum worker process. Unit is kilobytes (KB), range is 64-1073741823. Increasing this value improves autovacuum efficiency and alleviates memory bottlenecks, especially during autovacuum of large tables. Recommended to adjust according to table size and system resources.",
+        "desc": "Specifies the maximum amount of memory that can be used by each autovacuum worker process. Unit is kilobytes (KB), range is 64-1073741823. Increasing this value improves autovacuum efficiency and alleviates memory bottlenecks, especially during autovacuum of large tables. Recommended to adjust according to table size and system resources",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -51,7 +51,7 @@
         "default_value": -1
     },
     "bgwriter_delay": {
-        "desc": "Sets the delay time between background writer activity rounds. Increasing this value reduces disk I/O frequency, suitable for I/O-intensive workloads. Default value is 200 milliseconds, unit is milliseconds, range is 0 to 1000.",
+        "desc": "Sets the delay time between background writer activity rounds. Increasing this value reduces disk I/O frequency, suitable for I/O-intensive workloads. Default value is 200 milliseconds, unit is milliseconds, range is 0 to 1000",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -61,7 +61,7 @@
         "default_value": 200
     },
     "bgwriter_flush_after": {
-        "desc": "The bgwriter_flush_after parameter sets the threshold after which the background writer attempts to force the operating system to send these write operations to the underlying storage. Increasing this value reduces disk I/O frequency, suitable for I/O-intensive workloads. Unit is 8 kilobytes (8KB), default value is 64 (512KB), range is 0 to 256 (1GB).",
+        "desc": "The bgwriter_flush_after parameter sets the threshold after which the background writer attempts to force the operating system to send these write operations to the underlying storage. Increasing this value reduces disk I/O frequency, suitable for I/O-intensive workloads. Unit is 8 kilobytes (8KB), default value is 64 (512KB), range is 0 to 256 (1GB)",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -71,7 +71,7 @@
         "default_value": 64
     },
     "bgwriter_lru_maxpages": {
-        "desc": "Sets the maximum number of pages written by the background writer per round. In each round, the background writer writes no more than this number of buffers. Increasing this value improves write performance, suitable for systems with sufficient memory. Range is 0 to 10000, where 0 disables this function.",
+        "desc": "Sets the maximum number of pages written by the background writer per round. In each round, the background writer writes no more than this number of buffers. Increasing this value improves write performance, suitable for systems with sufficient memory. Range is 0 to 10000, where 0 disables this function",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -81,7 +81,7 @@
         "default_value": 100
     },
     "checkpoint_completion_target": {
-        "desc": "Sets the target completion time ratio for checkpoints, as a fraction of total time between checkpoints. Increasing this value makes the checkpoint process smoother, alleviating disk I/O bottlenecks, especially under high load. Recommended to set between 0.5 and 0.9.",
+        "desc": "Sets the target completion time ratio for checkpoints, as a fraction of total time between checkpoints. Increasing this value makes the checkpoint process smoother, alleviating disk I/O bottlenecks, especially under high load. Recommended to set between 0.5 and 0.9",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -91,7 +91,7 @@
         "default_value": 0.5
     },
     "checkpoint_timeout": {
-        "desc": "Maximum time interval between automatic WAL checkpoints. Increasing this value reduces checkpoint frequency, alleviating disk I/O bottlenecks, but may increase recovery time. Recommended to adjust according to system load and performance requirements.",
+        "desc": "Maximum time interval between automatic WAL checkpoints. Increasing this value reduces checkpoint frequency, alleviating disk I/O bottlenecks, but may increase recovery time. Recommended to adjust according to system load and performance requirements",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -101,7 +101,7 @@
         "default_value": 300
     },
     "commit_siblings": {
-        "desc": "Number of concurrently open transactions that must exist before commit_delay delay is performed. This parameter affects VACUUM operation trigger frequency. Increasing this value reduces VACUUM frequency, thereby lowering CPU and disk I/O burden.",
+        "desc": "Number of concurrently open transactions that must exist before commit_delay delay is performed. This parameter affects VACUUM operation trigger frequency. Increasing this value reduces VACUUM frequency, thereby lowering CPU and disk I/O burden",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -111,7 +111,7 @@
         "default_value": 5
     },
     "cpu_index_tuple_cost": {
-        "desc": "Sets the planner's estimate of the cost of processing each index entry during an index scan. Increasing this value affects query plan selection, suitable for CPU-intensive workloads.",
+        "desc": "Sets the planner's estimate of the cost of processing each index entry during an index scan. Increasing this value affects query plan selection, suitable for CPU-intensive workloads",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -121,7 +121,7 @@
         "default_value": 0.005
     },
     "cpu_tuple_cost": {
-        "desc": "Sets the planner's estimate of the cost of processing each row during a query. Increasing this value affects query plan selection, suitable for CPU-intensive workloads.",
+        "desc": "Sets the planner's estimate of the cost of processing each row during a query. Increasing this value affects query plan selection, suitable for CPU-intensive workloads",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -131,7 +131,7 @@
         "default_value": 0.01
     },
     "deadlock_timeout": {
-        "desc": "Time to wait on a lock before checking for deadlock condition. Increasing this value may delay deadlock detection but reduces CPU consumption. Decreasing this value detects deadlocks faster.",
+        "desc": "Time to wait on a lock before checking for deadlock condition. Increasing this value may delay deadlock detection but reduces CPU consumption. Decreasing this value detects deadlocks faster",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -141,7 +141,7 @@
         "default_value": 1000
     },
     "effective_cache_size": {
-        "desc": "Sets the amount of cache memory assumed to be available by the PostgreSQL query optimizer. Unit is kilobytes (KB). Increasing this value improves query optimizer decision quality and alleviates memory bottlenecks, especially in complex queries.",
+        "desc": "Sets the amount of cache memory assumed to be available by the PostgreSQL query optimizer. Unit is kilobytes (KB). Increasing this value improves query optimizer decision quality and alleviates memory bottlenecks, especially in complex queries",
         "type": "continuous",
         "dtype": "integer",
         "range": [
@@ -151,7 +151,7 @@
         "default_value": 524288
     },
     "effective_io_concurrency": {
-        "desc": "Sets the expected number of concurrent disk I/O operations. Increasing this value improves concurrent I/O operation performance and alleviates disk I/O bottlenecks, especially in high-concurrency read/write operations. Recommended to adjust according to hardware capability - higher values yield better performance but consider system load.",
+        "desc": "Sets the expected number of concurrent disk I/O operations. Increasing this value improves concurrent I/O operation performance and alleviates disk I/O bottlenecks, especially in high-concurrency read/write operations. Recommended to adjust according to hardware capability - higher values yield better performance but consider system load",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -161,7 +161,7 @@
         "default_value": 1
     },
     "enable_bitmapscan": {
-        "desc": "Enable or disable the query planner's use of bitmap scan plan types. Enabling this option can improve query performance for large datasets. Values are 'on' or 'off'.",
+        "desc": "Enable or disable the query planner's use of bitmap scan plan types. Enabling this option can improve query performance for large datasets. Values are 'on' or 'off'",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -171,7 +171,7 @@
         "default_value": "on"
     },
     "enable_hashjoin": {
-        "desc": "Enable or disable the query planner's use of hash join plan types. Enabling this option can improve join query performance, especially suitable for join operations on large datasets.",
+        "desc": "Enable or disable the query planner's use of hash join plan types. Enabling this option can improve join query performance, especially suitable for join operations on large datasets",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -181,7 +181,7 @@
         "default_value": "on"
     },
     "enable_indexscan": {
-        "desc": "Enable or disable the query planner's use of index scan and index-only scan plan types. Enabling this option can improve query performance, suitable for tables with indexes.",
+        "desc": "Enable or disable the query planner's use of index scan and index-only scan plan types. Enabling this option can improve query performance, suitable for tables with indexes",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -191,7 +191,7 @@
         "default_value": "on"
     },
     "enable_material": {
-        "desc": "Enable or disable the query planner's use of materialization. Enabling this option can improve complex query performance, suitable for queries requiring multiple accesses to the same data.",
+        "desc": "Enable or disable the query planner's use of materialization. Enabling this option can improve complex query performance, suitable for queries requiring multiple accesses to the same data",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -201,7 +201,7 @@
         "default_value": "on"
     },
     "enable_mergejoin": {
-        "desc": "Enable or disable the query planner's use of merge join plan types. Enabling this option can improve join performance for large datasets. Values are 'on' or 'off'.",
+        "desc": "Enable or disable the query planner's use of merge join plan types. Enabling this option can improve join performance for large datasets. Values are 'on' or 'off'",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -211,7 +211,7 @@
         "default_value": "on"
     },
     "enable_nestloop": {
-        "desc": "Enable or disable the query planner's use of nested loop join plans. Enabling this option can improve join performance for small datasets. Values are 'on' or 'off'.",
+        "desc": "Enable or disable the query planner's use of nested loop join plans. Enabling this option can improve join performance for small datasets. Values are 'on' or 'off'",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -221,7 +221,7 @@
         "default_value": "on"
     },
     "enable_partition_pruning": {
-        "desc": "Enable or disable the query planner's ability to eliminate partitions of partitioned tables from query plans. Enabling this option can improve query performance for partitioned tables. Values are 'on' or 'off'.",
+        "desc": "Enable or disable the query planner's ability to eliminate partitions of partitioned tables from query plans. Enabling this option can improve query performance for partitioned tables. Values are 'on' or 'off'",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -231,7 +231,7 @@
         "default_value": "on"
     },
     "enable_seqscan": {
-        "desc": "Enable or disable the query planner's use of sequential scan plan types. Enabling this option can improve query performance, suitable for queries on small datasets.",
+        "desc": "Enable or disable the query planner's use of sequential scan plan types. Enabling this option can improve query performance, suitable for queries on small datasets",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -241,7 +241,7 @@
         "default_value": "on"
     },
     "enable_sort": {
-        "desc": "Enable or disable the query planner's use of explicit sort steps. Enabling this option can improve query performance, suitable for queries requiring sorting.",
+        "desc": "Enable or disable the query planner's use of explicit sort steps. Enabling this option can improve query performance, suitable for queries requiring sorting",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -251,7 +251,7 @@
         "default_value": "on"
     },
     "fsync": {
-        "desc": "Controls whether the database forces data to be written to disk after each write. When set to 'on', ensures data durability but increases disk I/O. Turning off fsync may improve performance but increases risk of data loss. This parameter affects forced write operations during checkpoints and bulk data writes.",
+        "desc": "Controls whether the database forces data to be written to disk after each write. When set to 'on', ensures data durability but increases disk I/O. Turning off fsync may improve performance but increases risk of data loss. This parameter affects forced write operations during checkpoints and bulk data writes",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -261,7 +261,7 @@
         "default_value": "on"
     },
     "full_page_writes": {
-        "desc": "When this parameter is enabled, PostgreSQL writes the full content of each disk page to WAL (Write-Ahead Logging) when modifying it. This ensures complete page recovery in case of crashes, suitable for scenarios requiring high data security. Enabling this option increases disk I/O.",
+        "desc": "When this parameter is enabled, PostgreSQL writes the full content of each disk page to WAL (Write-Ahead Logging) when modifying it. This ensures complete page recovery in case of crashes, suitable for scenarios requiring high data security. Enabling this option increases disk I/O",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -271,7 +271,7 @@
         "default_value": "on"
     },
     "jit": {
-        "desc": "This parameter controls whether JIT (Just-In-Time) compilation is enabled. Setting to 'on' can improve complex query performance and alleviate CPU bottlenecks. Setting to 'off' disables JIT, suitable for simple queries or scenarios with lower performance requirements.",
+        "desc": "This parameter controls whether JIT (Just-In-Time) compilation is enabled. Setting to 'on' can improve complex query performance and alleviate CPU bottlenecks. Setting to 'off' disables JIT, suitable for simple queries or scenarios with lower performance requirements",
         "type": "discrete",
         "dtype": "boolean",
         "range": [
@@ -281,7 +281,7 @@
         "default_value": "on"
     },
     "lock_timeout": {
-        "desc": "Sets the timeout for acquiring locks. Increasing this value reduces errors due to lock contention but may cause transaction delays. Decreasing this value releases locks faster but may cause business exceptions - adjust carefully.",
+        "desc": "Sets the timeout for acquiring locks. Increasing this value reduces errors due to lock contention but may cause transaction delays. Decreasing this value releases locks faster but may cause business exceptions - adjust carefully",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -291,7 +291,7 @@
         "default_value": 0
     },
     "log_min_duration_statement": {
-        "desc": "Sets the threshold for logging SQL statements whose execution time exceeds this value. Increasing this value reduces the number of log records, suitable for scenarios with high performance requirements. Decreasing this value helps identify performance issues faster.",
+        "desc": "Sets the threshold for logging SQL statements whose execution time exceeds this value. Increasing this value reduces the number of log records, suitable for scenarios with high performance requirements. Decreasing this value helps identify performance issues faster",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -301,7 +301,7 @@
         "default_value": -1
     },
     "maintenance_work_mem": {
-        "desc": "Specifies the maximum amount of memory that can be used by maintenance operations (such as VACUUM, CREATE INDEX, etc.). Unit is kilobytes (KB). Increasing this value speeds up these operations and alleviates memory bottlenecks, especially during maintenance of large tables. Recommended to adjust according to maintenance task complexity.",
+        "desc": "Specifies the maximum amount of memory that can be used by maintenance operations (such as VACUUM, CREATE INDEX, etc.). Unit is kilobytes (KB). Increasing this value speeds up these operations and alleviates memory bottlenecks, especially during maintenance of large tables. Recommended to adjust according to maintenance task complexity",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -311,7 +311,7 @@
         "default_value": 65536
     },
     "max_connections": {
-        "desc": "Determines the maximum number of concurrent connections to the database server. Increasing this value supports more concurrent users and alleviates memory bottlenecks, but also increases system resource consumption. Recommended to adjust according to system resources and application requirements. Default value is typically 100 connections.",
+        "desc": "Determines the maximum number of concurrent connections to the database server. Increasing this value supports more concurrent users and alleviates memory bottlenecks, but also increases system resource consumption. Recommended to adjust according to system resources and application requirements. Default value is typically 100 connections",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -321,7 +321,7 @@
         "default_value": 100
     },
     "max_locks_per_transaction": {
-        "desc": "This parameter defines the maximum number of locks each transaction can acquire. Increasing this value supports more concurrent transactions, suitable for high-concurrency application scenarios, alleviating memory bottlenecks. Decreasing this value may cause transactions to fail due to insufficient locks.",
+        "desc": "This parameter defines the maximum number of locks each transaction can acquire. Increasing this value supports more concurrent transactions, suitable for high-concurrency application scenarios, alleviating memory bottlenecks. Decreasing this value may cause transactions to fail due to insufficient locks",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -331,7 +331,7 @@
         "default_value": 64
     },
     "max_parallel_workers": {
-        "desc": "Sets the maximum number of parallel worker processes the system can use. Increasing this value improves parallel processing capability and alleviates CPU bottlenecks, especially in high-concurrency queries. Recommended to adjust according to system resources.",
+        "desc": "Sets the maximum number of parallel worker processes the system can use. Increasing this value improves parallel processing capability and alleviates CPU bottlenecks, especially in high-concurrency queries. Recommended to adjust according to system resources",
         "type": "discrete",
         "dtype": "int",
         "range": [
@@ -341,7 +341,7 @@
         "default_value": 8
     },
     "max_parallel_workers_per_gather": {
-        "desc": "Sets the maximum number of worker processes that can be started by each Gather or Gather Merge node. Increasing this value improves query performance and alleviates CPU bottlenecks, especially in complex queries. Recommended to adjust according to query complexity and system resources.",
+        "desc": "Sets the maximum number of worker processes that can be started by each Gather or Gather Merge node. Increasing this value improves query performance and alleviates CPU bottlenecks, especially in complex queries. Recommended to adjust according to query complexity and system resources",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -351,7 +351,7 @@
         "default_value": 2
     },
     "max_prepared_transactions": {
-        "desc": "This parameter sets the maximum number of transactions that can be in 'prepared' state simultaneously. Increasing this value supports more distributed transactions, suitable for application scenarios requiring high concurrency, alleviating memory bottlenecks. Decreasing this value may cause prepared transactions to fail due to insufficient quantity.",
+        "desc": "This parameter sets the maximum number of transactions that can be in 'prepared' state simultaneously. Increasing this value supports more distributed transactions, suitable for application scenarios requiring high concurrency, alleviating memory bottlenecks. Decreasing this value may cause prepared transactions to fail due to insufficient quantity",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -361,7 +361,7 @@
         "default_value": 0
     },
     "max_wal_size": {
-        "desc": "Maximum size WAL is allowed to grow during automatic checkpoints. Increasing this value reduces checkpoint frequency, alleviating disk I/O bottlenecks, especially under high write load. Unit is megabytes (MB), default value is 1024MB (1GB), range is 2MB to 2147483647MB (2000GB). This is a soft limit; in special circumstances, WAL size may exceed this value. Recommended to adjust according to system write load.",
+        "desc": "Maximum size WAL is allowed to grow during automatic checkpoints. Increasing this value reduces checkpoint frequency, alleviating disk I/O bottlenecks, especially under high write load. Unit is megabytes (MB), default value is 1024MB (1GB), range is 2MB to 2147483647MB (2000GB). This is a soft limit; in special circumstances, WAL size may exceed this value. Recommended to adjust according to system write load",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -371,7 +371,7 @@
         "default_value": 1024
     },
     "random_page_cost": {
-        "desc": "Used to estimate the real cost of random reads, relative to the cost of sequential access. Increasing this value affects query optimizer selection, alleviating disk I/O bottlenecks, especially when choosing between SSD and HDD. Typically, SSD values can be set to 1.1, HDD values to 4.0.",
+        "desc": "Used to estimate the real cost of random reads, relative to the cost of sequential access. Increasing this value affects query optimizer selection, alleviating disk I/O bottlenecks, especially when choosing between SSD and HDD. Typically, SSD values can be set to 1.1, HDD values to 4.0",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -381,7 +381,7 @@
         "default_value": 4.0
     },
     "seq_page_cost": {
-        "desc": "Sets the planner's estimate of the cost of a disk page fetch that is part of a series of sequential fetches. Lower values make the query optimizer prefer sequential scans, potentially alleviating disk I/O bottlenecks. Increasing this value makes the optimizer prefer index scans.",
+        "desc": "Sets the planner's estimate of the cost of a disk page fetch that is part of a series of sequential fetches. Lower values make the query optimizer prefer sequential scans, potentially alleviating disk I/O bottlenecks. Increasing this value makes the optimizer prefer index scans",
         "type": "continuous",
         "dtype": "float",
         "range": [
@@ -391,7 +391,7 @@
         "default_value": 1.0
     },
     "shared_buffers": {
-        "desc": "Sets the amount of memory the database server uses for shared memory buffers. Unit is kilobytes (KB). Increasing this value improves memory usage efficiency and alleviates memory bottlenecks, especially in high-concurrency read/write operations. Typically recommended to set to 25% of total system memory.",
+        "desc": "Sets the amount of memory the database server uses for shared memory buffers. Unit is kilobytes (KB). Increasing this value improves memory usage efficiency and alleviates memory bottlenecks, especially in high-concurrency read/write operations. Typically recommended to set to 25% of total system memory",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -401,7 +401,7 @@
         "default_value": 1024
     },
     "synchronous_commit": {
-        "desc": "Specifies how much WAL processing must complete before the database server returns a success indication. Setting to 'on' ensures data security but increases latency; setting to 'off' improves performance but may lose data. Recommended to adjust according to data security and performance requirements.",
+        "desc": "Specifies how much WAL processing must complete before the database server returns a success indication. Setting to 'on' ensures data security but increases latency; setting to 'off' improves performance but may lose data. Recommended to adjust according to data security and performance requirements",
         "type": "discrete",
         "dtype": "string",
         "range": [
@@ -414,7 +414,7 @@
         "default_value": "on"
     },
     "temp_buffers": {
-        "desc": "Sets the maximum amount of memory used for temporary buffers in each database session. Increasing this value improves temporary table performance, suitable for scenarios requiring many temporary tables. Decreasing this value may degrade temporary table performance.",
+        "desc": "Sets the maximum amount of memory used for temporary buffers in each database session. Increasing this value improves temporary table performance, suitable for scenarios requiring many temporary tables. Decreasing this value may degrade temporary table performance",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -424,7 +424,7 @@
         "default_value": 1024
     },
     "temp_file_limit": {
-        "desc": "Specifies the maximum amount of disk space a process can use for temporary files. Unit is kilobytes (KB). Increasing this value allows larger temporary files, suitable for scenarios processing large datasets. Decreasing this value prevents temporary files from occupying too much disk space.",
+        "desc": "Specifies the maximum amount of disk space a process can use for temporary files. Unit is kilobytes (KB). Increasing this value allows larger temporary files, suitable for scenarios processing large datasets. Decreasing this value prevents temporary files from occupying too much disk space",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -434,7 +434,7 @@
         "default_value": -1
     },
     "vacuum_cost_limit": {
-        "desc": "This is the cost limit for VACUUM operations. Increasing this value allows VACUUM operations to use more resources, suitable for scenarios requiring frequent cleanup. Decreasing this value reduces VACUUM's impact on system performance. Default value is 200.",
+        "desc": "This is the cost limit for VACUUM operations. Increasing this value allows VACUUM operations to use more resources, suitable for scenarios requiring frequent cleanup. Decreasing this value reduces VACUUM's impact on system performance. Default value is 200",
         "type": "continuous",
         "dtype": "int",
         "range": [
@@ -444,7 +444,7 @@
         "default_value": 200
     },
     "wal_compression": {
-        "desc": "This parameter controls whether WAL (Write Ahead Log) compression is performed. Enabling WAL compression reduces disk I/O and storage space usage, suitable for I/O bottleneck scenarios. Disabling WAL compression improves write performance but increases disk space usage.",
+        "desc": "This parameter controls whether WAL (Write Ahead Log) compression is performed. Enabling WAL compression reduces disk I/O and storage space usage, suitable for I/O bottleneck scenarios. Disabling WAL compression improves write performance but increases disk space usage",
         "type": "discrete",
         "dtype": "bool",
         "range": [
@@ -454,7 +454,7 @@
         "default_value": "off"
     },
     "work_mem": {
-        "desc": "Sets the amount of memory that can be used by query operations before writing to temporary disk files. Increasing this value improves complex query performance and alleviates memory bottlenecks, especially in sorting and hash operations. Recommended to adjust according to query complexity and concurrency.",
+        "desc": "Sets the amount of memory that can be used by query operations before writing to temporary disk files. Increasing this value improves complex query performance and alleviates memory bottlenecks, especially in sorting and hash operations. Recommended to adjust according to query complexity and concurrency",
         "type": "continuous",
         "dtype": "int",
         "range": [

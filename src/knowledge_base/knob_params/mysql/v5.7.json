@@ -1,6 +1,6 @@
 {
     "innodb_adaptive_flushing": {
-        "desc": "This parameter specifies whether to dynamically adjust the flush rate of dirty pages in the InnoDB buffer pool based on workload. Enabling adaptive flushing can improve performance and alleviate disk I/O bottlenecks. When set to ON, adaptive flushing is enabled; when set to OFF, it is disabled.",
+        "desc": "This parameter specifies whether to dynamically adjust the flush rate of dirty pages in the InnoDB buffer pool based on workload. Enabling adaptive flushing can improve performance and alleviate disk I/O bottlenecks. When set to ON, adaptive flushing is enabled; when set to OFF, it is disabled",
         "type": "discrete",
         "range": [
             "OFF",
@@ -10,7 +10,7 @@
         "default_value": "ON"
     },
     "innodb_adaptive_flushing_lwm": {
-        "desc": "Defines the low watermark for adaptive flushing as a percentage of redo log capacity. Increasing this value can improve write performance but may increase recovery time, helping to alleviate disk I/O bottlenecks. Default value is 10.",
+        "desc": "Defines the low watermark for adaptive flushing as a percentage of redo log capacity. Increasing this value can improve write performance but may increase recovery time, helping to alleviate disk I/O bottlenecks. Default value is 10",
         "type": "continuous",
         "range": [
             0,
@@ -20,7 +20,7 @@
         "default_value": 10
     },
     "innodb_adaptive_hash_index": {
-        "desc": "Adaptive Hash Index is a mechanism that allows InnoDB to dynamically create hash indexes based on query patterns to accelerate queries. It can alleviate CPU bottlenecks and improve query performance. When set to ON, it is enabled; when set to OFF, it is disabled.",
+        "desc": "Adaptive Hash Index is a mechanism that allows InnoDB to dynamically create hash indexes based on query patterns to accelerate queries. It can alleviate CPU bottlenecks and improve query performance. When set to ON, it is enabled; when set to OFF, it is disabled",
         "type": "discrete",
         "range": [
             "OFF",
@@ -30,7 +30,7 @@
         "default_value": "ON"
     },
     "innodb_adaptive_hash_index_parts": {
-        "desc": "Number of partitions for InnoDB Adaptive Hash Index. Increasing this value can improve hash index performance but may increase memory usage. Can alleviate memory bottlenecks. Default value is 8, maximum is 512, minimum is 1.",
+        "desc": "Number of partitions for InnoDB Adaptive Hash Index. Increasing this value can improve hash index performance but may increase memory usage. Can alleviate memory bottlenecks. Default value is 8, maximum is 512, minimum is 1",
         "type": "continuous",
         "range": [
             1,
@@ -40,7 +40,7 @@
         "default_value": 8
     },
     "innodb_adaptive_max_sleep_delay": {
-        "desc": "This parameter allows InnoDB to automatically adjust the value of innodb_thread_sleep_delay based on current workload. It defines the maximum delay time (in microseconds) during adaptive maximum sleep delay, which can help alleviate CPU bottlenecks, especially in high concurrency scenarios. Increasing this value allows InnoDB to sleep longer when waiting for locks, thereby reducing CPU usage; decreasing this value makes InnoDB attempt to acquire locks faster.",
+        "desc": "This parameter allows InnoDB to automatically adjust the value of innodb_thread_sleep_delay based on current workload. It defines the maximum delay time (in microseconds) during adaptive maximum sleep delay, which can help alleviate CPU bottlenecks, especially in high concurrency scenarios. Increasing this value allows InnoDB to sleep longer when waiting for locks, thereby reducing CPU usage; decreasing this value makes InnoDB attempt to acquire locks faster",
         "type": "continuous",
         "range": [
             0,
@@ -50,7 +50,7 @@
         "default_value": 150000
     },
     "innodb_api_bk_commit_interval": {
-        "desc": "This parameter defines the auto-commit time interval (in seconds) for idle connections in the InnoDB memcached interface. Increasing this value reduces the frequency of commit operations, thereby helping to alleviate CPU bottlenecks; decreasing this value increases the frequency of commit operations, which may affect performance.",
+        "desc": "This parameter defines the auto-commit time interval (in seconds) for idle connections in the InnoDB memcached interface. Increasing this value reduces the frequency of commit operations, thereby helping to alleviate CPU bottlenecks; decreasing this value increases the frequency of commit operations, which may affect performance",
         "type": "continuous",
         "range": [
             1,
@@ -60,7 +60,7 @@
         "default_value": 5
     },
     "innodb_api_disable_rowlock": {
-        "desc": "This parameter is used to disable row locking for InnoDB API during DML operations. When set to ON, row locking is disabled; when set to OFF, row locking is enabled. Disabling row locking may lead to performance degradation, but in some cases can help alleviate CPU bottlenecks.",
+        "desc": "This parameter is used to disable row locking for InnoDB API during DML operations. When set to ON, row locking is disabled; when set to OFF, row locking is enabled. Disabling row locking may lead to performance degradation, but in some cases can help alleviate CPU bottlenecks",
         "type": "discrete",
         "range": [
             "OFF",
@@ -70,7 +70,7 @@
         "default_value": "OFF"
     },
     "innodb_buffer_pool_chunk_size": {
-        "desc": "This parameter defines the size of each chunk in the InnoDB buffer pool (in bytes). Increasing this value reduces the number of chunks, thereby reducing management overhead; decreasing this value increases the number of chunks, which may improve concurrency performance. This parameter is very important for alleviating memory bottlenecks.",
+        "desc": "This parameter defines the size of each chunk in the InnoDB buffer pool (in bytes). Increasing this value reduces the number of chunks, thereby reducing management overhead; decreasing this value increases the number of chunks, which may improve concurrency performance. This parameter is very important for alleviating memory bottlenecks",
         "type": "continuous",
         "range": [
             1048576,
@@ -80,7 +80,7 @@
         "default_value": 134217728
     },
     "innodb_buffer_pool_dump_at_shutdown": {
-        "desc": "Indicates whether to dump the contents of the buffer pool at shutdown. Enabling this option can improve performance at next startup. When set to ON, it is enabled; when set to OFF, it is disabled.",
+        "desc": "Indicates whether to dump the contents of the buffer pool at shutdown. Enabling this option can improve performance at next startup. When set to ON, it is enabled; when set to OFF, it is disabled",
         "type": "discrete",
         "range": [
             "ON",
@@ -90,7 +90,7 @@
         "default_value": "ON"
     },
     "innodb_buffer_pool_dump_now": {
-        "desc": "This parameter is used to immediately dump the contents of the InnoDB buffer pool to disk. It is typically used in conjunction with the parameter innodb_buffer_pool_load_now, helping to alleviate disk I/O bottlenecks, especially when quick data recovery is needed after restart. When set to ON, it means immediate dump; when set to OFF, it means no dump.",
+        "desc": "This parameter is used to immediately dump the contents of the InnoDB buffer pool to disk. It is typically used in conjunction with the parameter innodb_buffer_pool_load_now, helping to alleviate disk I/O bottlenecks, especially when quick data recovery is needed after restart. When set to ON, it means immediate dump; when set to OFF, it means no dump",
         "type": "discrete",
         "range": [
             "OFF",
@@ -100,7 +100,7 @@
         "default_value": "OFF"
     },
     "innodb_buffer_pool_dump_pct": {
-        "desc": "This parameter defines the percentage of pages to dump during buffer pool dump. It specifies the percentage of recently used pages in each buffer pool for faster data recovery at restart. Increasing this value can speed up data recovery at restart, while decreasing this value reduces the amount of dumped data, thereby helping to alleviate disk I/O bottlenecks.",
+        "desc": "This parameter defines the percentage of pages to dump during buffer pool dump. It specifies the percentage of recently used pages in each buffer pool for faster data recovery at restart. Increasing this value can speed up data recovery at restart, while decreasing this value reduces the amount of dumped data, thereby helping to alleviate disk I/O bottlenecks",
         "type": "continuous",
         "range": [
             1,
@@ -110,7 +110,7 @@
         "default_value": 25
     },
     "innodb_buffer_pool_instances": {
-        "desc": "Sets the number of buffer pool instances, allowing multiple buffer pool instances to process requests in parallel to improve performance. Can alleviate memory bottlenecks. Recommended to use multiple instances when buffer pool size is greater than 1GB.",
+        "desc": "Sets the number of buffer pool instances, allowing multiple buffer pool instances to process requests in parallel to improve performance. Can alleviate memory bottlenecks. Recommended to use multiple instances when buffer pool size is greater than 1GB",
         "type": "continuous",
         "range": [
             1,
@@ -120,7 +120,7 @@
         "default_value": 8
     },
     "innodb_buffer_pool_load_at_startup": {
-        "desc": "Indicates whether the InnoDB buffer pool automatically loads previously held pages at MySQL server startup to improve startup performance. When set to ON, it is enabled; when set to OFF, it is disabled.",
+        "desc": "Indicates whether the InnoDB buffer pool automatically loads previously held pages at MySQL server startup to improve startup performance. When set to ON, it is enabled; when set to OFF, it is disabled",
         "type": "discrete",
         "range": [
             "ON",
@@ -130,7 +130,7 @@
         "default_value": "OFF"
     },
     "innodb_buffer_pool_load_now": {
-        "desc": "This parameter is used to immediately load the contents of the InnoDB buffer pool, helping to alleviate disk I/O bottlenecks, especially when quick data recovery is needed after restart. When set to ON, it means immediate load; when set to OFF, it means no load.",
+        "desc": "This parameter is used to immediately load the contents of the InnoDB buffer pool, helping to alleviate disk I/O bottlenecks, especially when quick data recovery is needed after restart. When set to ON, it means immediate load; when set to OFF, it means no load",
         "type": "discrete",
         "range": [
             "OFF",
@@ -140,7 +140,7 @@
         "default_value": "OFF"
     },
     "innodb_buffer_pool_size": {
-        "desc": "Sets the size of the InnoDB buffer pool, which is used to cache data and indexes to improve performance. Increasing this value reduces disk I/O and improves read performance. Recommended to set to 70%-80% of system memory. This is one of the most important parameters for InnoDB, directly affecting database performance and response speed.",
+        "desc": "Sets the size of the InnoDB buffer pool, which is used to cache data and indexes to improve performance. Increasing this value reduces disk I/O and improves read performance. Recommended to set to 70%-80% of system memory. This is one of the most important parameters for InnoDB, directly affecting database performance and response speed",
         "type": "continuous",
         "range": [
             1048576,
@@ -153,7 +153,7 @@
         "default_value": 134217728
     },
     "innodb_change_buffering": {
-        "desc": "This parameter controls how InnoDB buffers changes to secondary indexes, optimizing write operations and alleviating disk I/O bottlenecks. Optional values include: none (disabled), inserts (inserts only), deletes (deletes only), changes (changes), purges (purges), and all (all).",
+        "desc": "This parameter controls how InnoDB buffers changes to secondary indexes, optimizing write operations and alleviating disk I/O bottlenecks. Optional values include: none (disabled), inserts (inserts only), deletes (deletes only), changes (changes), purges (purges), and all (all)",
         "type": "discrete",
         "range": [
             "none",
@@ -167,7 +167,7 @@
         "default_value": "all"
     },
     "innodb_change_buffer_max_size": {
-        "desc": "This parameter defines the maximum size of the InnoDB change buffer (expressed as a percentage), as a percentage of the total buffer pool size. Increasing this value can improve write performance and help alleviate disk I/O bottlenecks, while decreasing this value limits the size of the change buffer and may affect performance.",
+        "desc": "This parameter defines the maximum size of the InnoDB change buffer (expressed as a percentage), as a percentage of the total buffer pool size. Increasing this value can improve write performance and help alleviate disk I/O bottlenecks, while decreasing this value limits the size of the change buffer and may affect performance",
         "type": "continuous",
         "range": [
             0,
@@ -177,7 +177,7 @@
         "default_value": 25
     },
     "innodb_checksum_algorithm": {
-        "desc": "Specifies how to generate and verify checksums for disk blocks stored in InnoDB tablespaces to ensure data integrity. Can alleviate CPU bottlenecks. Optional values include crc32, strict_crc32, innodb, strict_innodb, none, and strict_none. Recommended to use crc32 for better performance and security.",
+        "desc": "Specifies how to generate and verify checksums for disk blocks stored in InnoDB tablespaces to ensure data integrity. Can alleviate CPU bottlenecks. Optional values include crc32, strict_crc32, innodb, strict_innodb, none, and strict_none. Recommended to use crc32 for better performance and security",
         "type": "discrete",
         "range": [
             "crc32",
@@ -191,7 +191,7 @@
         "default_value": "crc32"
     },
     "innodb_commit_concurrency": {
-        "desc": "This parameter controls the number of transactions that can commit simultaneously, allowing multiple threads to commit concurrently to improve performance. Proper adjustment of this parameter can alleviate CPU bottlenecks. Recommended to adjust based on system load, typically set to 8 or 16.",
+        "desc": "This parameter controls the number of transactions that can commit simultaneously, allowing multiple threads to commit concurrently to improve performance. Proper adjustment of this parameter can alleviate CPU bottlenecks. Recommended to adjust based on system load, typically set to 8 or 16",
         "type": "continuous",
         "range": [
             0,
@@ -201,7 +201,7 @@
         "default_value": 0
     },
     "innodb_compression_level": {
-        "desc": "Specifies the zlib compression level for InnoDB compressed tables and indexes. This parameter controls the strength of data compression and can alleviate disk I/O bottlenecks. Value range is from 0 (no compression) to 9 (maximum compression). Increasing this value increases CPU usage but reduces disk space usage.",
+        "desc": "Specifies the zlib compression level for InnoDB compressed tables and indexes. This parameter controls the strength of data compression and can alleviate disk I/O bottlenecks. Value range is from 0 (no compression) to 9 (maximum compression). Increasing this value increases CPU usage but reduces disk space usage",
         "type": "discrete",
         "range": [
             0,
@@ -211,7 +211,7 @@
         "default_value": 6
     },
     "innodb_compression_pad_pct_max": {
-        "desc": "This parameter defines the maximum percentage of padding for InnoDB compressed pages. It specifies the maximum percentage of free space that can be reserved in each compressed page. Increasing this value can improve compression efficiency, while decreasing this value may lead to reduced compression efficiency, thereby helping to alleviate disk I/O bottlenecks.",
+        "desc": "This parameter defines the maximum percentage of padding for InnoDB compressed pages. It specifies the maximum percentage of free space that can be reserved in each compressed page. Increasing this value can improve compression efficiency, while decreasing this value may lead to reduced compression efficiency, thereby helping to alleviate disk I/O bottlenecks",
         "type": "discrete",
         "range": [
             0,
@@ -221,7 +221,7 @@
         "default_value": 50
     },
     "innodb_concurrency_tickets": {
-        "desc": "This parameter defines the number of concurrency tickets for InnoDB, determining how many threads can enter InnoDB simultaneously. Increasing this value can improve concurrency performance and help alleviate CPU bottlenecks, while decreasing this value may lead to performance degradation.",
+        "desc": "This parameter defines the number of concurrency tickets for InnoDB, determining how many threads can enter InnoDB simultaneously. Increasing this value can improve concurrency performance and help alleviate CPU bottlenecks, while decreasing this value may lead to performance degradation",
         "type": "continuous",
         "range": [
             1,
@@ -231,7 +231,7 @@
         "default_value": 5000
     },
     "innodb_disable_sort_file_cache": {
-        "desc": "This parameter is used to disable the operating system file system cache for temporary files during merge sorts to improve performance. Enabling this parameter (value ON) can help alleviate disk I/O bottlenecks, while disabling the cache (value OFF) may lead to performance degradation.",
+        "desc": "This parameter is used to disable the operating system file system cache for temporary files during merge sorts to improve performance. Enabling this parameter (value ON) can help alleviate disk I/O bottlenecks, while disabling the cache (value OFF) may lead to performance degradation",
         "type": "discrete",
         "range": [
             "OFF",
@@ -241,7 +241,7 @@
         "default_value": "OFF"
     },
     "innodb_doublewrite": {
-        "desc": "Controls the doublewrite buffer mechanism to improve data security. Can alleviate disk I/O bottlenecks. MySQL 8.0.30 and later versions support multiple settings. When set to ON, it is enabled; when set to OFF, it is disabled. DETECT_AND_RECOVER and DETECT_ONLY are used for detection and recovery. Recommended to keep enabled to prevent data loss.",
+        "desc": "Controls the doublewrite buffer mechanism to improve data security. Can alleviate disk I/O bottlenecks. MySQL 8.0.30 and later versions support multiple settings. When set to ON, it is enabled; when set to OFF, it is disabled. DETECT_AND_RECOVER and DETECT_ONLY are used for detection and recovery. Recommended to keep enabled to prevent data loss",
         "type": "discrete",
         "range": [
             "ON",
@@ -253,7 +253,7 @@
         "default_value": "ON"
     },
     "innodb_fast_shutdown": {
-        "desc": "Controls InnoDB's fast shutdown behavior, affecting performance and data security during shutdown. Can alleviate disk I/O bottlenecks. Values are 0 (full shutdown), 1 (fast shutdown), 2 (minimal shutdown). Recommended to use 1 to balance performance and security.",
+        "desc": "Controls InnoDB's fast shutdown behavior, affecting performance and data security during shutdown. Can alleviate disk I/O bottlenecks. Values are 0 (full shutdown), 1 (fast shutdown), 2 (minimal shutdown). Recommended to use 1 to balance performance and security",
         "type": "discrete",
         "range": [
             0,
@@ -264,7 +264,7 @@
         "default_value": 1
     },
     "innodb_file_per_table": {
-        "desc": "Enables the use of separate tablespace files for each table to improve management flexibility and performance, alleviating disk I/O bottlenecks. When set to ON, it is enabled; when set to OFF, it is disabled.",
+        "desc": "Enables the use of separate tablespace files for each table to improve management flexibility and performance, alleviating disk I/O bottlenecks. When set to ON, it is enabled; when set to OFF, it is disabled",
         "type": "discrete",
         "range": [
             "OFF",
@@ -274,7 +274,7 @@
         "default_value": "ON"
     },
     "innodb_flushing_avg_loops": {
-        "desc": "This parameter defines the number of flush iterations InnoDB maintains in the running average. It controls how many iterations InnoDB keeps a snapshot of the previously calculated flush state, thus affecting how quickly adaptive flushing responds to changing workloads. Increasing this value reduces the frequency of flush operations, potentially helping to alleviate disk I/O bottlenecks, while decreasing this value increases the frequency of flush operations, which may affect performance.",
+        "desc": "This parameter defines the number of flush iterations InnoDB maintains in the running average. It controls how many iterations InnoDB keeps a snapshot of the previously calculated flush state, thus affecting how quickly adaptive flushing responds to changing workloads. Increasing this value reduces the frequency of flush operations, potentially helping to alleviate disk I/O bottlenecks, while decreasing this value increases the frequency of flush operations, which may affect performance",
         "type": "continuous",
         "range": [
             1,
@@ -284,7 +284,7 @@
         "default_value": 30
     },
     "innodb_flush_log_at_trx_commit": {
-        "desc": "Controls the log flushing policy at transaction commit, affecting data security and performance. Values are 0 (flush once per second), 1 (flush at each commit), 2 (write to memory at each commit). Recommended to choose based on data security requirements. Proper adjustment can alleviate disk I/O bottlenecks.",
+        "desc": "Controls the log flushing policy at transaction commit, affecting data security and performance. Values are 0 (flush once per second), 1 (flush at each commit), 2 (write to memory at each commit). Recommended to choose based on data security requirements. Proper adjustment can alleviate disk I/O bottlenecks",
         "type": "discrete",
         "range": [
             0,
@@ -295,7 +295,7 @@
         "default_value": 1
     },
     "innodb_flush_method": {
-        "desc": "Defines the method used to flush data to InnoDB data files and log files, which affects I/O throughput. Can alleviate disk I/O bottlenecks. Optional values include fsync, O_DSYNC, littlesync, nosync, O_DIRECT, O_DIRECT_NO_FSYNC, unbuffered, and normal. Recommended to choose the appropriate flush method based on storage device.",
+        "desc": "Defines the method used to flush data to InnoDB data files and log files, which affects I/O throughput. Can alleviate disk I/O bottlenecks. Optional values include fsync, O_DSYNC, littlesync, nosync, O_DIRECT, O_DIRECT_NO_FSYNC, unbuffered, and normal. Recommended to choose the appropriate flush method based on storage device",
         "type": "discrete",
         "range": [
             "fsync",
@@ -314,7 +314,7 @@
         ]
     },
     "innodb_force_recovery": {
-        "desc": "This parameter is used to set InnoDB's forced recovery mode, typically changed during serious troubleshooting situations. It can help recover data after crashes, mainly affecting disk I/O bottlenecks. Value range is from 0 to 6, where 0 represents normal mode, and 1 to 6 represent different levels of recovery mode, with higher values having more restrictions on recovery.",
+        "desc": "This parameter is used to set InnoDB's forced recovery mode, typically changed during serious troubleshooting situations. It can help recover data after crashes, mainly affecting disk I/O bottlenecks. Value range is from 0 to 6, where 0 represents normal mode, and 1 to 6 represent different levels of recovery mode, with higher values having more restrictions on recovery",
         "type": "continuous",
         "range": [
             0,
@@ -324,7 +324,7 @@
         "default_value": 0
     },
     "innodb_ft_max_token_size": {
-        "desc": "This parameter defines the maximum token size in InnoDB full-text indexes. It determines the maximum character length of words that can be indexed. Increasing this value allows longer words to be indexed, potentially helping to alleviate CPU bottlenecks, while decreasing this value limits the word length that can be indexed.",
+        "desc": "This parameter defines the maximum token size in InnoDB full-text indexes. It determines the maximum character length of words that can be indexed. Increasing this value allows longer words to be indexed, potentially helping to alleviate CPU bottlenecks, while decreasing this value limits the word length that can be indexed",
         "type": "continuous",
         "range": [
             10,
@@ -334,7 +334,7 @@
         "default_value": 84
     },
     "innodb_io_capacity": {
-        "desc": "The innodb_io_capacity variable defines the number of I/O operations per second (IOPS) available to InnoDB background tasks. This parameter affects the rate at which dirty pages are flushed from the buffer. Recommended to adjust based on storage device performance, typically set to SAS 200, SSD 5000, PCI-E 10000-50000.",
+        "desc": "The innodb_io_capacity variable defines the number of I/O operations per second (IOPS) available to InnoDB background tasks. This parameter affects the rate at which dirty pages are flushed from the buffer. Recommended to adjust based on storage device performance, typically set to SAS 200, SSD 5000, PCI-E 10000-50000",
         "type": "continuous",
         "range": [
             100,
@@ -344,7 +344,7 @@
         "default_value": 200
     },
     "innodb_io_capacity_max": {
-        "desc": "The innodb_io_capacity_max variable defines the maximum number of I/O operations per second (IOPS) for InnoDB background tasks. This parameter sets the maximum I/O capacity for InnoDB, affecting I/O rates under high load conditions, and can alleviate disk I/O bottlenecks. Recommended to adjust based on storage device performance, typically set to 1000-20000.",
+        "desc": "The innodb_io_capacity_max variable defines the maximum number of I/O operations per second (IOPS) for InnoDB background tasks. This parameter sets the maximum I/O capacity for InnoDB, affecting I/O rates under high load conditions, and can alleviate disk I/O bottlenecks. Recommended to adjust based on storage device performance, typically set to 1000-20000",
         "type": "continuous",
         "range": [
             100,
@@ -354,7 +354,7 @@
         "default_value": "2 * innodb_io_capacity, minimum 2000"
     },
     "innodb_lock_wait_timeout": {
-        "desc": "Time in seconds that an InnoDB transaction waits for a row lock before giving up. Default value is 50 seconds. This parameter affects transaction lock waiting behavior and can alleviate CPU bottlenecks. Recommended to adjust based on application requirements.",
+        "desc": "Time in seconds that an InnoDB transaction waits for a row lock before giving up. Default value is 50 seconds. This parameter affects transaction lock waiting behavior and can alleviate CPU bottlenecks. Recommended to adjust based on application requirements",
         "type": "continuous",
         "range": [
             1,
@@ -364,7 +364,7 @@
         "default_value": 50
     },
     "innodb_log_buffer_size": {
-        "desc": "Size of InnoDB log buffer in bytes. Increasing this value can improve write performance, especially under high transaction loads, and can alleviate disk I/O bottlenecks. Default value is 16MB, minimum is 1KB, maximum is 4GB.",
+        "desc": "Size of InnoDB log buffer in bytes. Increasing this value can improve write performance, especially under high transaction loads, and can alleviate disk I/O bottlenecks. Default value is 16MB, minimum is 1KB, maximum is 4GB",
         "type": "continuous",
         "range": [
             1024,
@@ -374,7 +374,7 @@
         "default_value": 16777216
     },
     "innodb_log_files_in_group": {
-        "desc": "Number of log files in the InnoDB log file group. Increasing this value can improve concurrent write performance and alleviate disk I/O bottlenecks. Default value is 2, minimum is 2, maximum is 100.",
+        "desc": "Number of log files in the InnoDB log file group. Increasing this value can improve concurrent write performance and alleviate disk I/O bottlenecks. Default value is 2, minimum is 2, maximum is 100",
         "type": "discrete",
         "range": [
             2,
@@ -384,7 +384,7 @@
         "default_value": 2
     },
     "innodb_log_file_size": {
-        "desc": "Size of each InnoDB log file. Increasing this value can improve recovery performance, especially for large transactions. Can alleviate disk I/O bottlenecks. Default value is 48MB, maximum is 512GB, minimum is 1MB.",
+        "desc": "Size of each InnoDB log file. Increasing this value can improve recovery performance, especially for large transactions. Can alleviate disk I/O bottlenecks. Default value is 48MB, maximum is 512GB, minimum is 1MB",
         "type": "continuous",
         "range": [
             1048576,
@@ -394,7 +394,7 @@
         "default_value": 50331648
     },
     "innodb_max_dirty_pages_pct": {
-        "desc": "Maximum percentage of dirty pages allowed in InnoDB. This parameter controls the proportion of dirty pages allowed in the InnoDB buffer pool, default value is 90%. Increasing this value reduces write operations but may increase recovery time. Recommended to appropriately decrease this value when excessive memory allocation causes serious Swap usage to release Swap space. Too high a value causes too many data pages to be swapped for each update, while too low a value may slow down update operations.",
+        "desc": "Maximum percentage of dirty pages allowed in InnoDB. This parameter controls the proportion of dirty pages allowed in the InnoDB buffer pool, default value is 90%. Increasing this value reduces write operations but may increase recovery time. Recommended to appropriately decrease this value when excessive memory allocation causes serious Swap usage to release Swap space. Too high a value causes too many data pages to be swapped for each update, while too low a value may slow down update operations",
         "type": "continuous",
         "range": [
             0,
@@ -404,7 +404,7 @@
         "default_value": 90
     },
     "innodb_max_dirty_pages_pct_lwm": {
-        "desc": "This parameter defines the minimum percentage of dirty pages allowed in InnoDB, representing the low watermark when enabling pre-flushing to control dirty page ratio. Increasing this value reduces the frequency of write operations, while decreasing this value increases the frequency of write operations, which may affect performance.",
+        "desc": "This parameter defines the minimum percentage of dirty pages allowed in InnoDB, representing the low watermark when enabling pre-flushing to control dirty page ratio. Increasing this value reduces the frequency of write operations, while decreasing this value increases the frequency of write operations, which may affect performance",
         "type": "continuous",
         "range": [
             0,
@@ -414,7 +414,7 @@
         "default_value": 10
     },
     "innodb_max_purge_lag": {
-        "desc": "Defines the desired maximum purge lag. If this value is exceeded, delays will be imposed on INSERT, UPDATE, and DELETE operations. Increasing this value reduces the frequency of purge operations but may increase memory usage, thereby alleviating memory bottlenecks. Default value is 0, maximum is 4294967295, minimum is 0.",
+        "desc": "Defines the desired maximum purge lag. If this value is exceeded, delays will be imposed on INSERT, UPDATE, and DELETE operations. Increasing this value reduces the frequency of purge operations but may increase memory usage, thereby alleviating memory bottlenecks. Default value is 0, maximum is 4294967295, minimum is 0",
         "type": "discrete",
         "range": [
             0,
@@ -424,7 +424,7 @@
         "default_value": 0
     },
     "innodb_old_blocks_pct": {
-        "desc": "Specifies the approximate percentage of the InnoDB buffer pool used for the old block sublist. Increasing this value can increase the use of old blocks, potentially improving query performance and alleviating memory bottlenecks. Default value is 37, maximum is 95, minimum is 5.",
+        "desc": "Specifies the approximate percentage of the InnoDB buffer pool used for the old block sublist. Increasing this value can increase the use of old blocks, potentially improving query performance and alleviating memory bottlenecks. Default value is 37, maximum is 95, minimum is 5",
         "type": "continuous",
         "range": [
             5,
@@ -434,7 +434,7 @@
         "default_value": 37
     },
     "innodb_old_blocks_time": {
-        "desc": "Specifies the time in milliseconds that a block must remain in the old sublist after being inserted, before it can be moved to the new sublist. Increasing this value can increase the retention time of old blocks, potentially improving query performance and alleviating memory bottlenecks. Default value is 1000 milliseconds.",
+        "desc": "Specifies the time in milliseconds that a block must remain in the old sublist after being inserted, before it can be moved to the new sublist. Increasing this value can increase the retention time of old blocks, potentially improving query performance and alleviating memory bottlenecks. Default value is 1000 milliseconds",
         "type": "continuous",
         "range": [
             0,
@@ -444,7 +444,7 @@
         "default_value": 1000
     },
     "innodb_open_files": {
-        "desc": "Specifies the maximum number of files InnoDB can open simultaneously. Increasing this value can improve concurrent performance, especially under high load conditions, and can alleviate memory bottlenecks. Default value is 300.",
+        "desc": "Specifies the maximum number of files InnoDB can open simultaneously. Increasing this value can improve concurrent performance, especially under high load conditions, and can alleviate memory bottlenecks. Default value is 300",
         "type": "continuous",
         "range": [
             1,
@@ -454,7 +454,7 @@
         "default_value": 300
     },
     "innodb_read_ahead_threshold": {
-        "desc": "Controls the sensitivity of linear read-ahead used by InnoDB to prefetch pages into the buffer pool. Increasing this value can improve sequential read performance but may increase random read latency, thereby alleviating disk I/O bottlenecks. Default value is 56, maximum is 64, minimum is 0.",
+        "desc": "Controls the sensitivity of linear read-ahead used by InnoDB to prefetch pages into the buffer pool. Increasing this value can improve sequential read performance but may increase random read latency, thereby alleviating disk I/O bottlenecks. Default value is 56, maximum is 64, minimum is 0",
         "type": "continuous",
         "range": [
             0,
@@ -464,7 +464,7 @@
         "default_value": 56
     },
     "innodb_read_io_threads": {
-        "desc": "Number of I/O threads for InnoDB read operations. Increasing this value can improve read performance, especially in high concurrency scenarios, and can alleviate disk I/O bottlenecks. Default value is 4, maximum is 64, minimum is 1.",
+        "desc": "Number of I/O threads for InnoDB read operations. Increasing this value can improve read performance, especially in high concurrency scenarios, and can alleviate disk I/O bottlenecks. Default value is 4, maximum is 64, minimum is 1",
         "type": "continuous",
         "range": [
             1,
@@ -474,7 +474,7 @@
         "default_value": 4
     },
     "innodb_sync_array_size": {
-        "desc": "Defines the size of the mutex/lock wait array. Increasing this value can improve thread coordination capability under high concurrent workloads, especially when there are many waiting threads. This setting must be configured at MySQL instance startup and cannot be changed afterward. Increasing this value can improve write performance, especially under high load conditions, and can alleviate disk I/O bottlenecks.",
+        "desc": "Defines the size of the mutex/lock wait array. Increasing this value can improve thread coordination capability under high concurrent workloads, especially when there are many waiting threads. This setting must be configured at MySQL instance startup and cannot be changed afterward. Increasing this value can improve write performance, especially under high load conditions, and can alleviate disk I/O bottlenecks",
         "type": "continuous",
         "range": [
             1,
@@ -484,7 +484,7 @@
         "default_value": 1
     },
     "innodb_table_locks": {
-        "desc": "If `autocommit = 0`, `InnoDB` respects `LOCK TABLES`; MySQL does not return from `LOCK TABLES ... WRITE` until all other threads have released all their locks on the table. Enables or disables InnoDB table locks. When enabled, it can improve concurrent performance and alleviate CPU bottlenecks. Values are ON/OFF, default is ON.",
+        "desc": "If `autocommit = 0`, `InnoDB` respects `LOCK TABLES`; MySQL does not return from `LOCK TABLES ... WRITE` until all other threads have released all their locks on the table. Enables or disables InnoDB table locks. When enabled, it can improve concurrent performance and alleviate CPU bottlenecks. Values are ON/OFF, default is ON",
         "type": "discrete",
         "range": [
             "OFF",
@@ -494,7 +494,7 @@
         "default_value": "ON"
     },
     "innodb_thread_concurrency": {
-        "desc": "This parameter defines the maximum number of threads allowed to enter InnoDB. A value of 0 (default) means unlimited concurrency (no upper limit). In high concurrency systems, this variable is used for performance tuning. Recommended to set to 2 times the number of server CPU cores to optimize concurrent operations. Appropriate settings can improve CPU multi-core processing capability and concurrency, but values that are too high may increase context switching, thereby affecting performance.",
+        "desc": "This parameter defines the maximum number of threads allowed to enter InnoDB. A value of 0 (default) means unlimited concurrency (no upper limit). In high concurrency systems, this variable is used for performance tuning. Recommended to set to 2 times the number of server CPU cores to optimize concurrent operations. Appropriate settings can improve CPU multi-core processing capability and concurrency, but values that are too high may increase context switching, thereby affecting performance",
         "type": "continuous",
         "range": [
             0,
@@ -504,7 +504,7 @@
         "default_value": 0
     },
     "innodb_thread_sleep_delay": {
-        "desc": "InnoDB thread sleep delay, representing the sleep time of InnoDB threads before joining the InnoDB queue, in microseconds. Increasing this value can reduce CPU usage but may affect response time, suitable for alleviating CPU bottlenecks. Default value is 10000 microseconds, maximum is 4294967295 microseconds, minimum is 0 microseconds.",
+        "desc": "InnoDB thread sleep delay, representing the sleep time of InnoDB threads before joining the InnoDB queue, in microseconds. Increasing this value can reduce CPU usage but may affect response time, suitable for alleviating CPU bottlenecks. Default value is 10000 microseconds, maximum is 4294967295 microseconds, minimum is 0 microseconds",
         "type": "continuous",
         "range": [
             0,
@@ -514,7 +514,7 @@
         "default_value": 10000
     },
     "innodb_write_io_threads": {
-        "desc": "Number of I/O threads for InnoDB write operations. Increasing this value can improve write performance, especially in high concurrency scenarios, and can alleviate disk I/O bottlenecks. Default value is 4, maximum is 64, minimum is 1.",
+        "desc": "Number of I/O threads for InnoDB write operations. Increasing this value can improve write performance, especially in high concurrency scenarios, and can alleviate disk I/O bottlenecks. Default value is 4, maximum is 64, minimum is 1",
         "type": "continuous",
         "range": [
             1,
@@ -524,7 +524,7 @@
         "default_value": 4
     },
     "max_heap_table_size": {
-        "desc": "This variable sets the maximum size to which user-created MEMORY tables are permitted to grow. It can reduce disk I/O by keeping temporary tables in memory.",
+        "desc": "This variable sets the maximum size to which user-created MEMORY tables are permitted to grow. It can reduce disk I/O by keeping temporary tables in memory",
         "type": "continuous",
         "range": [
             16384,
@@ -534,7 +534,7 @@
         "default_value": 16777216
     },
     "thread_cache_size": {
-        "desc": "The number of threads cached to handle new connections. This variable can be increased to improve performance if you have a lot of new connections. It reduces CPU overhead from thread creation/destruction. Ideally set high enough so that most new connections use cached threads, but higher values consume more memory.",
+        "desc": "The number of threads cached to handle new connections. This variable can be increased to improve performance if you have a lot of new connections. It reduces CPU overhead from thread creation/destruction. Ideally set high enough so that most new connections use cached threads, but higher values consume more memory",
         "type": "continuous",
         "range": [
             0,
@@ -544,7 +544,7 @@
         "default_value": 9
     },
     "tmp_table_size": {
-        "desc": "Defines the maximum size of internal in-memory temporary tables created by the MEMORY storage engine and, as of MySQL 8.0.28, the TempTable storage engine. If the size of a temporary table exceeds this value, it is converted to a disk-based table, which can alleviate memory and disk I/O. Higher values reduce disk usage but increase memory consumption.",
+        "desc": "Defines the maximum size of internal in-memory temporary tables created by the MEMORY storage engine and, as of MySQL 8.0.28, the TempTable storage engine. If the size of a temporary table exceeds this value, it is converted to a disk-based table, which can alleviate memory and disk I/O. Higher values reduce disk usage but increase memory consumption",
         "type": "continuous",
         "range": [
             1024,

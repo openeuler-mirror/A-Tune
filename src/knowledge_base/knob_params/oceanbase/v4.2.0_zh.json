@@ -1,365 +1,506 @@
 {
     "workers_per_cpu_quota": {
-        "desc": "此参数 * 租户 max_cpu = 租户能分配的最大线程数。这里的最大线程数是分配出来的，可以使用的，并不是同时运行的最大线程数。此参数一般不做调整。",
+        "desc": "此参数 * 租户 max_cpu = 租户能分配的最大线程数。这里的最大线程数是分配出来的，可以使用的，并不是同时运行的最大线程数。此参数一般不做调整",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 20],
+        "range": [
+            2,
+            20
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "net_thread_count": {
-        "desc": "接收客户端请求的网络线程数。重启生效。通过 top -H 查看 MySQLIO 线程的使用效率：若使用率大于 90%，说明接收请求的线程可能成为瓶颈，建议提高该参数；若所有线程都小于 50%，建议减小该参数以减少线程切换开销。",
+        "desc": "接收客户端请求的网络线程数。重启生效。通过 top -H 查看 MySQLIO 线程的使用效率：若使用率大于 90%，说明接收请求的线程可能成为瓶颈，建议提高该参数；若所有线程都小于 50%，建议减小该参数以减少线程切换开销",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 64],
+        "range": [
+            0,
+            64
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_early_lock_release": {
-        "desc": "开启提前解行锁。热点行场景建议开启。",
+        "desc": "开启提前解行锁。热点行场景建议开启",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_monotonic_weak_read": {
-        "desc": "开启单调读。性能场景建议关闭。",
+        "desc": "开启单调读。性能场景建议关闭",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_perf_event": {
-        "desc": "开启信息采集。生产环境必须开启，性能测试场景可以酌情关闭。",
+        "desc": "开启信息采集。生产环境必须开启，性能测试场景可以酌情关闭",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_record_trace_log": {
-        "desc": "开启 Trace Log 功能。生产环境在开启 Perf Event 和 SQL Audit 功能的情况下，此参数可以关闭。",
+        "desc": "开启 Trace Log 功能。生产环境在开启 Perf Event 和 SQL Audit 功能的情况下，此参数可以关闭",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "syslog_level": {
-        "desc": "系统日志的日志级别。性能场景下建议设置为 PERF，以减少非关键日志输出。",
+        "desc": "系统日志的日志级别。性能场景下建议设置为 PERF，以减少非关键日志输出",
         "type": "discrete",
         "dtype": "string",
-        "range": ["DEBUG", "INFO", "WARN", "ERROR", "PERF"],
+        "range": [
+            "DEBUG",
+            "INFO",
+            "WARN",
+            "ERROR",
+            "PERF"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "clog_sync_time_warn_threshold": {
-        "desc": "日志同步耗时超过一定阈值时打印报警日志，阈值可通过该配置项调整。建议调大，但需注意可能影响 Clog 同步慢问题的排查。",
+        "desc": "日志同步耗时超过一定阈值时打印报警日志，阈值可通过该配置项调整。建议调大，但需注意可能影响 Clog 同步慢问题的排查",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 1000],
+        "range": [
+            1,
+            1000
+        ],
         "unit": "ms",
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "builtin_db_data_verify_cycle": {
-        "desc": "宏块巡检周期参数。当设置为 0 时关闭巡检。性能相关场景建议设置为 0 以减少系统开销。",
+        "desc": "宏块巡检周期参数。当设置为 0 时关闭巡检。性能相关场景建议设置为 0 以减少系统开销",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 360],
+        "range": [
+            0,
+            360
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "disk_io_thread_count": {
-        "desc": "磁盘 I/O 线程数，须为偶数。可根据 I/O 压力适当调整该参数。",
+        "desc": "磁盘 I/O 线程数，须为偶数。可根据 I/O 压力适当调整该参数",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 32],
+        "range": [
+            2,
+            32
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "enable_async_syslog": {
-        "desc": "开启异步日志输出。性能场景建议设置为 True，以降低日志打印对性能的影响。",
+        "desc": "开启异步日志输出。性能场景建议设置为 True，以降低日志打印对性能的影响",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "fuse_row_cache_priority": {
-        "desc": "融合行缓存在 KV cache 中的优先级。建议设置为大于 1，以避免缓存过早被替换，提升查询性能。",
+        "desc": "融合行缓存在 KV cache 中的优先级。建议设置为大于 1，以避免缓存过早被替换，提升查询性能",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, null],
+        "range": [
+            1,
+            null
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "micro_block_merge_verify_level": {
-        "desc": "宏块验证级别，0 表示不做任何校验。性能场景可设置为 0，但生产系统不建议修改。",
+        "desc": "宏块验证级别，0 表示不做任何校验。性能场景可设置为 0，但生产系统不建议修改",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 1, 2],
+        "range": [
+            0,
+            1,
+            2
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_low_thread_score": {
-        "desc": "低优先级 Compaction 的并发线程数（主要针对 Major SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提高合并速度。",
+        "desc": "低优先级 Compaction 的并发线程数（主要针对 Major SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提高合并速度",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_mid_thread_score": {
-        "desc": "中优先级 Compaction 的并发线程数（主要针对 Minor SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提升合并效率。",
+        "desc": "中优先级 Compaction 的并发线程数（主要针对 Minor SSTable）。默认为 0 表示 6 个并发线程，可根据负载适当调大以提升合并效率",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "compaction_high_thread_score": {
-        "desc": "高优先级 Compaction 的并发线程数（主要针对 Mini SSTable）。默认为 0 表示 6 个并发线程，可根据系统压力适当调大。",
+        "desc": "高优先级 Compaction 的并发线程数（主要针对 Mini SSTable）。默认为 0 表示 6 个并发线程，可根据系统压力适当调大",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 100],
+        "range": [
+            0,
+            100
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "ob_proxy_readonly_transaction_routing_policy": {
-        "desc": "控制 Proxy 对于事务的路由是否受只读语句影响。建议设置为 False，表示以第一条实际开启事务的语句为准。",
+        "desc": "控制 Proxy 对于事务的路由是否受只读语句影响。建议设置为 False，表示以第一条实际开启事务的语句为准",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "observer",
         "edit_level": "dynamic"
     },
     "work_thread_num": {
-        "desc": "OBProxy 的工作线程数，对 CPU 占用影响较大，默认值为 128。可根据 CPU 数量动态调整，更改后需重启。",
+        "desc": "OBProxy 的工作线程数，对 CPU 占用影响较大，默认值为 128。可根据 CPU 数量动态调整，更改后需重启",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 128],
+        "range": [
+            1,
+            128
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "task_thread_num": {
-        "desc": "OBProxy 后台任务线程数（如拉取 rslist），默认值为 2。建议保持默认值。",
+        "desc": "OBProxy 后台任务线程数（如拉取 rslist），默认值为 2。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 4],
+        "range": [
+            1,
+            4
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "block_thread_num": {
-        "desc": "OBProxy 的 block 线程数，默认值为 1。建议保持默认值。",
+        "desc": "OBProxy 的 block 线程数，默认值为 1。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 4],
+        "range": [
+            1,
+            4
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "grpc_thread_num": {
-        "desc": "OBProxy 的 gRPC 线程数，默认值为 8。建议保持默认值。",
+        "desc": "OBProxy 的 gRPC 线程数，默认值为 8。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [4, 32],
+        "range": [
+            4,
+            32
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "net_accept_threads": {
-        "desc": "执行 accept 的线程数，默认值为 2。建议保持默认值。",
+        "desc": "执行 accept 的线程数，默认值为 2。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [8, 16],
+        "range": [
+            8,
+            16
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "automatic_match_work_thread": {
-        "desc": "是否根据 CPU 数自动调整工作线程数。true 时上限为 work_thread_num，适用于混合部署；false 时使用固定值，适用于独占部署。",
+        "desc": "是否根据 CPU 数自动调整工作线程数。true 时上限为 work_thread_num，适用于混合部署；false 时使用固定值，适用于独占部署",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_compression_protocol": {
-        "desc": "是否启用压缩协议以降低 OBProxy 的 CPU 占用。建议配置为 False。说明：自 V4.3.4 版本起该参数已废弃。",
+        "desc": "是否启用压缩协议以降低 OBProxy 的 CPU 占用。建议配置为 False。说明：自 V4.3.4 版本起该参数已废弃",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_user_timeout": {
-        "desc": "OBProxy 与 OBServer 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值。",
+        "desc": "OBProxy 与 OBServer 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 20],
+        "range": [
+            0,
+            20
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_user_timeout": {
-        "desc": "OBProxy 与 Client 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值。",
+        "desc": "OBProxy 与 Client 连接的 TCP user timeout（单位：秒）。默认值为 0，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 20],
+        "range": [
+            0,
+            20
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_max_connections": {
-        "desc": "OBProxy 可接受的最大客户端连接数，默认值为 8192。建议保持默认值。",
+        "desc": "OBProxy 可接受的最大客户端连接数，默认值为 8192。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, null],
+        "range": [
+            0,
+            null
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "connect_observer_max_retries": {
-        "desc": "OBProxy 重连 OBServer 的最大重试次数，默认值为 3。建议保持默认值。",
+        "desc": "OBProxy 重连 OBServer 的最大重试次数，默认值为 3。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [2, 5],
+        "range": [
+            2,
+            5
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "observer_query_timeout_delta": {
-        "desc": "网络传输延时补偿，给 OBServer 的 ob_query_timeout 增加的时间（单位：秒）。默认值为 20，取值范围 [1,39]。建议保持默认值。",
+        "desc": "网络传输延时补偿，给 OBServer 的 ob_query_timeout 增加的时间（单位：秒）。默认值为 20，取值范围 [1,39]。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 30],
+        "range": [
+            1,
+            30
+        ],
         "unit": "s",
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "sock_option_flag_out": {
-        "desc": "OBProxy 与 OBServer 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。不同版本默认值不同：V1.8.x 建议为 3，V3.x 建议保持默认值。",
+        "desc": "OBProxy 与 OBServer 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。不同版本默认值不同：V1.8.x 建议为 3，V3.x 建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 7],
+        "range": [
+            0,
+            7
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepidle": {
-        "desc": "OBProxy 与 OBServer 的 TCP 启动 keepalive 前的 idle 时间（秒）。默认值为 5，建议保持默认值。",
+        "desc": "OBProxy 与 OBServer 的 TCP 启动 keepalive 前的 idle 时间（秒）。默认值为 5，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 7200],
+        "range": [
+            0,
+            7200
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepintvl": {
-        "desc": "OBProxy 与 OBServer 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值。",
+        "desc": "OBProxy 与 OBServer 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 75],
+        "range": [
+            0,
+            75
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_tcp_keepcnt": {
-        "desc": "OBProxy 与 OBServer 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值。",
+        "desc": "OBProxy 与 OBServer 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 9],
+        "range": [
+            0,
+            9
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_sock_option_flag_out": {
-        "desc": "客户端与 OBProxy 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。V1.8.x 默认值为 0，V3.x 为 2，建议设置为 3 启用 no_delay 和 linger_on。",
+        "desc": "客户端与 OBProxy 之间的 TCP 参数（bit 位控制 no_delay、keepalive、linger_on）。V1.8.x 默认值为 0，V3.x 为 2，建议设置为 3 启用 no_delay 和 linger_on",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 3],
+        "range": [
+            0,
+            3
+        ],
         "scope": "obproxy",
         "effection_mode": "dynamic"
     },
     "client_tcp_keepidle": {
-        "desc": "客户端与 OBProxy 的 TCP 启动 keepalive 前 idle 时间（秒）。默认值为 5，建议保持默认值。",
+        "desc": "客户端与 OBProxy 的 TCP 启动 keepalive 前 idle 时间（秒）。默认值为 5，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [1, 7200],
+        "range": [
+            1,
+            7200
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_keepintvl": {
-        "desc": "客户端与 OBProxy 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值。",
+        "desc": "客户端与 OBProxy 的 TCP 两次 keepalive 探活间隔（秒）。默认值为 5，建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, 75],
+        "range": [
+            0,
+            75
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "client_tcp_keepcnt": {
-        "desc": "客户端与 OBProxy 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值。",
+        "desc": "客户端与 OBProxy 的 TCP 最多发送的 keepalive 包数量，默认值为 5。建议保持默认值",
         "type": "discrete",
         "dtype": "int",
-        "range": [0, null],
+        "range": [
+            0,
+            null
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_index_route": {
-        "desc": "是否开启基于全局索引键的全局索引表路由。默认 True，建议保持默认值。",
+        "desc": "是否开启基于全局索引键的全局索引表路由。默认 True，建议保持默认值",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_pl_route": {
-        "desc": "是否开启 PL 路由。默认 True，性能场景建议关闭（False）。",
+        "desc": "是否开启 PL 路由。默认 True，性能场景建议关闭（False）",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_reroute": {
-        "desc": "是否开启二次路由。需开启 OceanBase 2.0 协议（enable_ob_protocol_v2）后生效。默认 False，建议保持默认值。",
+        "desc": "是否开启二次路由。需开启 OceanBase 2.0 协议（enable_ob_protocol_v2）后生效。默认 False，建议保持默认值",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_partition_table_route": {
-        "desc": "是否开启分区表路由。默认 True，建议保持默认值。",
+        "desc": "是否开启分区表路由。默认 True，建议保持默认值",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "server_routing_mode": {
-        "desc": "OBProxy 路由模式。包括 oceanbase（默认）、random、mock、mysql 等。建议保持默认值。",
+        "desc": "OBProxy 路由模式。包括 oceanbase（默认）、random、mock、mysql 等。建议保持默认值",
         "type": "discrete",
         "dtype": "string",
-        "range": ["oceanbase", "random", "mock", "mysql"],
+        "range": [
+            "oceanbase",
+            "random",
+            "mock",
+            "mysql"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_ob_protocol_v2": {
-        "desc": "是否开启 OBProxy 与 OBServer 之间的 OceanBase 2.0 协议（基于 MySQL 压缩协议）。默认 False，建议保持默认值。",
+        "desc": "是否开启 OBProxy 与 OBServer 之间的 OceanBase 2.0 协议（基于 MySQL 压缩协议）。默认 False，建议保持默认值",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "routing_cache_mem_limited": {
-        "desc": "设置 OBProxy 路由缓存（表缓存、地址缓存等）的内存上限。默认值为 128 MB，取值范围 [1KB, 100G]，建议保持默认值。",
+        "desc": "设置 OBProxy 路由缓存（表缓存、地址缓存等）的内存上限。默认值为 128 MB，取值范围 [1KB, 100G]，建议保持默认值",
         "type": "discrete",
         "dtype": "string",
-        "range": ["1KB", "100G"],
+        "range": [
+            "1KB",
+            "100G"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     },
     "enable_bad_route_reject": {
-        "desc": "是否拒绝无法路由的请求。默认 False，建议保持默认值。",
+        "desc": "是否拒绝无法路由的请求。默认 False，建议保持默认值",
         "type": "discrete",
         "dtype": "boolean",
-        "range": ["true", "false"],
+        "range": [
+            "true",
+            "false"
+        ],
         "scope": "obproxy",
         "edit_level": "dynamic"
     }
