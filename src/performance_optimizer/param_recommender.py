@@ -95,7 +95,7 @@ class ParamRecommender:
             "slo_goal": self.slo_goal,
             "static_profile": self.static_profile,
             "performance_analysis_report": self.performance_analysis_report,
-            "params_set_str": ",".join(cur_params_set)
+            "params_set_str": "\n".join(cur_params_set)
         }
 
         prompt_mode = prompt_manager.get_mode(self.service_name)
