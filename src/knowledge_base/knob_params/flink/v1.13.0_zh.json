@@ -4,14 +4,14 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            600000
         ],
         "dtype": "int",
         "default_value": 10000
     },
     "execution.checkpointing.max-concurrent-checkpoints": {
         "desc": "设置最大并发检查点的数量，用于控制同时进行的检查点数量。增大该值可以提高系统的并发能力，但可能导致资源竞争；减小该值可以降低系统负载，但可能影响数据一致性。该参数能够缓解系统在 checkpoint 过程中可能出现的 disk IO 瓶颈",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
             10
@@ -24,7 +24,7 @@
         "type": "continuous",
         "range": [
             0,
-            null
+            3600000
         ],
         "dtype": "string",
         "default_value": "0 ms"
@@ -34,47 +34,47 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            3600000
         ],
         "dtype": "int",
         "default_value": 60000
     },
     "jobmanager.memory.jvm-overhead.max": {
         "desc": "该参数的单位应采用小写形式，数值与单位间有一个空格，数值应为整数。该值不应大于32GB。设置 JobManager JVM 的最大开销内存，确保 JVM 在高负载下有足够的内存。增加此值可以缓解内存瓶颈，提升系统的稳定性。此参数用于指定为 JVM 开销保留的非堆内存，例如线程栈空间、编译缓存等",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "1 gb"
     },
     "jobmanager.memory.jvm-overhead.min": {
         "desc": "该参数的单位应采用小写形式，数值与单位间有一个空格，数值应为整数。设置 JobManager JVM 的最小开销内存，确保 JVM 有足够的内存用于运行。此参数用于预留 JVM 的非堆内存开销，包括线程栈空间、编译缓存等。增加此值可以缓解内存瓶颈，避免 JVM 频繁进行垃圾回收",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "192 mb"
     },
     "parallelism.default": {
         "desc": "设置 Flink 作业的默认并行度，若未指定并行度则使用该值。增加此值可以缓解 CPU 瓶颈，提升作业的执行效率。默认值为1，最大值为128",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            1,
+            128
         ],
         "dtype": "int",
         "default_value": "1"
     },
     "restart-strategy.fixed-delay.attempts": {
         "desc": "设置固定延迟重启策略的重启尝试次数；用于控制在任务失败时的重启次数，能够缓解系统在故障恢复时的 CPU 瓶颈。增大该值可以提高任务的恢复能力，但可能导致资源占用增加；减小该值可以加快失败检测，但可能导致任务丢失",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
-            null
+            100
         ],
         "dtype": "int",
         "default_value": 1
@@ -84,38 +84,49 @@
         "type": "continuous",
         "range": [
             0,
-            null
+            3600000
         ],
         "dtype": "int",
-        "default_value": 10000
+        "default_value": 1000
     },
     "restart-strategy": {
         "desc": "定义在任务失败时的重启策略，以缓解系统在故障恢复时的内存瓶颈。可选值包括：'none'（不重启）、'fixed-delay'（固定延迟重启）、'failure-rate'（基于失败率的重启）、'exponential-delay'（指数延迟重启）",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "none",
+            "fixed-delay",
+            "failure-rate",
+            "exponential-delay"
+        ],
         "dtype": "string",
         "default_value": "none"
     },
     "state.backend.incremental": {
         "desc": "该参数用于设置是否启用增量快照，控制状态快照的存储方式。启用增量快照可以减少存储空间的使用，并缓解系统在状态管理时的磁盘IO瓶颈，但可能会增加恢复时间",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "true",
+            "false"
+        ],
         "dtype": "boolean",
         "default_value": "false"
     },
     "state.backend": {
         "desc": "设置状态后端类型；用于定义 Flink 如何存储状态，能够缓解系统在状态管理时的 disk IO 瓶颈。可选值包括 'memory'、'filesystem' 和 'rocksdb'",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "hashmap",
+            "rocksdb"
+        ],
         "dtype": "string",
-        "default_value": "memory"
+        "default_value": "hashmap"
     },
     "state.backend.rocksdb.block.cache-size": {
         "desc": "该参数的单位应采用小写形式，数值与单位间有一个空格，数值应为整数。设置 RocksDB 的块缓存大小，单位为字节。该参数用于控制 RocksDB 在内存中缓存的数据块数量，从而提高读取性能",
         "type": "continuous",
         "range": [
             0,
-            null
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "8 mb"
@@ -125,7 +136,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            64
         ],
         "dtype": "int",
         "default_value": 4
@@ -134,18 +145,18 @@
         "desc": "该参数的单位应采用小写形式，数值与单位间有一个空格，数值应为整数。设置 RocksDB 的最大压缩级别基础大小，单位为字节。该参数用于优化存储性能，能够缓解系统在状态管理时的磁盘 I/O 瓶颈",
         "type": "continuous",
         "range": [
-            1,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "256 mb"
     },
     "state.backend.rocksdb.thread.num": {
         "desc": "该参数设置 RocksDB 的最大并发后台刷新和压缩作业数量（每个有状态操作符）",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
-            null
+            64
         ],
         "dtype": "int",
         "default_value": 2
@@ -153,7 +164,10 @@
     "state.backend.rocksdb.use-bloom-filter": {
         "desc": "该参数用于设置是否启用 Bloom Filter，以优化 RocksDB 的查询性能",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "true",
+            "false"
+        ],
         "dtype": "boolean",
         "default_value": "false"
     },
@@ -162,7 +176,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            "200 mb"
         ],
         "dtype": "string",
         "default_value": "2 mb"
@@ -172,7 +186,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            128
         ],
         "dtype": "int",
         "default_value": 2
@@ -186,5 +200,2026 @@
         ],
         "dtype": "int",
         "default_value": 1
+    },
+    "jobmanager.memory.process.size": {
+        "desc": "JobManager进程的总内存大小。包括JVM堆内存、非堆内存（直接内存、本地内存）、JVM元空间和JVM开销。在容器化环境中，应设置为容器内存大小",
+        "type": "discrete",
+        "range": [
+            5000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "jobmanager.memory.jvm-metaspace.size": {
+        "desc": "JobManager的JVM元空间大小。默认值为256 MB",
+        "type": "continuous",
+        "range": [
+            64,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "256 mb"
+    },
+    "taskmanager.memory.process.size": {
+        "desc": "TaskManager进程的总内存大小。包括总Flink内存、JVM元空间和JVM开销。在容器化环境中，应设置为容器内存大小",
+        "type": "discrete",
+        "range": [
+            30000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "taskmanager.memory.jvm-metaspace.size": {
+        "desc": "TaskManager的JVM元空间大小。默认值为256 MB",
+        "type": "continuous",
+        "range": [
+            64,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": "256 mb"
+    },
+    "taskmanager.memory.network.fraction": {
+        "desc": "网络内存占总Flink内存的比例。网络内存是为ShuffleEnvironment（例如网络缓冲区）预留的非堆内存。默认值为0.1",
+        "type": "continuous",
+        "range": [
+            0.1,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "taskmanager.memory.network.max": {
+        "desc": "TaskManager的最大网络内存大小。网络内存是为ShuffleEnvironment（例如网络缓冲区）预留的非堆内存。默认值为1 GB",
+        "type": "continuous",
+        "range": [
+            1,
+            16
+        ],
+        "dtype": "int",
+        "default_value": "1 gb"
+    },
+    "taskmanager.network.numberOfBuffers": {
+        "desc": "TaskManager用于网络传输的缓冲区数量。该值决定了TaskManager可以使用的直接内存量，用于网络数据交换。默认值取决于TaskManager的内存设置",
+        "type": "continuous",
+        "range": [
+            28,
+            44800
+        ],
+        "dtype": "int",
+        "default_value": "2048 (取决于配置)"
+    },
+    "blob.fetch.backlog": {
+        "desc": "Blob服务中待获取的BLOB请求的最大队列大小。BLOB（Binary Large Object）用于在JobManager和TaskManager之间分发大文件（如JAR文件）",
+        "type": "continuous",
+        "range": [
+            200,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "1000"
+    },
+    "blob.fetch.num-concurrent": {
+        "desc": "Blob服务中允许并发的BLOB获取操作的最大数量",
+        "type": "continuous",
+        "range": [
+            10,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "taskmanager.network.blocking-shuffle.type": {
+        "desc": "TaskManager用于批处理作业的阻塞式Shuffle实现类型。'file'：使用文件存储shuffle数据；'mmap'：使用内存映射文件",
+        "type": "discrete",
+        "range": [
+            "file",
+            "mmap"
+        ],
+        "dtype": "string",
+        "default_value": "file"
+    },
+    "taskmanager.network.request-backoff.initial": {
+        "desc": "网络请求失败后的初始退避时间（毫秒）。当对端不可用时，TaskManager会等待此时间后重试网络请求",
+        "type": "continuous",
+        "range": [
+            10,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "taskmanager.network.request-backoff.max": {
+        "desc": "网络请求失败后的最大退避时间（毫秒）。重试间隔将以指数级增长，直到达到此最大值",
+        "type": "continuous",
+        "range": [
+            1000,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "akka.throughput": {
+        "desc": "Akka远程处理中，单个Actor处理消息的最大吞吐量。该值决定了在将控制权交给线程池之前，一个Actor可以处理的最大消息数",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "15"
+    },
+    "akka.transport.threshold": {
+        "desc": "Akka远程处理中，消息传输的阈值。用于控制是否启用消息压缩或批处理",
+        "type": "continuous",
+        "range": [
+            100,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "256"
+    },
+    "fs.overwrite-files": {
+        "desc": "当文件系统操作（如写入结果文件）遇到已存在的文件时，是否覆盖该文件。如果设置为'true'，则会覆盖；否则会抛出异常",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "fs.output.always-create-directory": {
+        "desc": "在写入输出文件时，是否始终为输出路径创建父目录。如果设置为'true'，即使输出路径是单个文件，也会创建其父目录",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.exec.mini-batch.enabled": {
+        "desc": "是否启用微批量处理（Mini-batch）优化。微批量可以聚合对状态后端的多次访问，显著提升吞吐量，但会增加延迟",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.exec.mini-batch.size": {
+        "desc": "微批处理允许的最大输入行数。当累积的行数达到此阈值或达到'mini-batch.allow-latency'时，将触发微批量处理。设置为-1表示禁用此限制",
+        "type": "continuous",
+        "range": [
+            -1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "-1"
+    },
+    "table.exec.mini-batch.allow-latency": {
+        "desc": "微批处理允许的最大延迟时间（毫秒）。即使未达到'micro-batch.size'，超过此时间也会触发微批量处理",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "table.optimizer.agg-phase-strategy": {
+        "desc": "聚合操作的优化策略。'TWO_PHASE'：使用两阶段聚合（本地+全局）；'ONE_PHASE'：使用单阶段聚合；'AUTO'：自动选择",
+        "type": "discrete",
+        "range": [
+            "TWO_PHASE",
+            "ONE_PHASE",
+            "AUTO"
+        ],
+        "dtype": "string",
+        "default_value": "AUTO"
+    },
+    "table.optimizer.distinct-agg.split.enabled": {
+        "desc": "是否启用DISTINCT聚合的拆分优化。将一个包含多个DISTINCT聚合的查询拆分为多个查询，可以提高部分场景下的性能",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.optimizer.distinct-agg.split.bucket-num": {
+        "desc": "拆分DISTINCT聚合时使用的桶数量。每个桶处理部分DISTINCT键，值越大，并行度越高，但可能带来更多开销",
+        "type": "continuous",
+        "range": [
+            128,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "1024"
+    },
+    "table.optimizer.join-reorder-enabled": {
+        "desc": "是否启用Join重排序优化。优化器会根据统计信息重新排列Join顺序，以获得更优的执行计划",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.memory.partitioned-index-filters": {
+        "desc": "是否使用分区的索引/过滤器。分区可以将索引和过滤器块分割成更小的子块，并仅在需要时加载到内存中，从而减少内存使用",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.memory.write-buffer-ratio": {
+        "desc": "用于写缓冲区（write buffers）的最大内存比例，该比例基于RocksDB管理的总共享内存。剩余内存用于块缓存（block cache）。默认值为0.5",
+        "type": "continuous",
+        "range": [
+            0.2,
+            0.8
+        ],
+        "dtype": "float",
+        "default_value": "0.5"
+    },
+    "state.backend.rocksdb.block.blocksize": {
+        "desc": "RocksDB中SST文件块的大小（以KB为单位）。较大的块可以提高顺序读取的性能，但会降低点查找的效率。默认值为4KB",
+        "type": "continuous",
+        "range": [
+            2,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "state.backend.rocksdb.block.metadata-blocksize": {
+        "desc": "RocksDB中存储元数据的块大小（以KB为单位）。默认值为4KB",
+        "type": "continuous",
+        "range": [
+            2,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "state.backend.rocksdb.bloom-filter.block-based-mode": {
+        "desc": "是否为基于块的布隆过滤器（Bloom Filter）启用特定的优化模式。布隆过滤器用于加速键的查找",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.bloom-filter.bits-per-key": {
+        "desc": "每个键在布隆过滤器（Bloom Filter）中分配的位数。该值越高，误报率越低，但会消耗更多内存。默认值为10.0",
+        "type": "continuous",
+        "range": [
+            5.0,
+            100.0
+        ],
+        "dtype": "float",
+        "default_value": "10.0"
+    },
+    "akka.framesize": {
+        "desc": "Akka远程通信中允许的最大消息帧大小（以字节为单位）。应大于最大可能传输的消息大小，例如大型状态或配置。默认约为1MB",
+        "type": "continuous",
+        "range": [
+            1048576,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "10485760 (约10MB)"
+    },
+    "akka.transport.heartbeat.interval": {
+        "desc": "Akka远程系统发送心跳的间隔时间（毫秒），用于检测对等节点是否存活",
+        "type": "continuous",
+        "range": [
+            100,
+            2000
+        ],
+        "dtype": "int",
+        "default_value": "1000"
+    },
+    "akka.log.lifecycle.events": {
+        "desc": "是否记录Akka Actor的生命周期事件（如启动、停止、重启）。这对于调试分布式系统问题很有帮助",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.runtime.hashjoin-bloom-filters": {
+        "desc": "是否在Hash Join操作中使用布隆过滤器（Bloom Filter）。布隆过滤器可以提前过滤掉不符合条件的Join键，减少处理量",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.runtime.max-fan": {
+        "desc": "批处理操作中，分区合并时的最大扇出（fan-out）数。例如，在排序合并Join中，这控制了一个分区可以合并的源分区数",
+        "type": "continuous",
+        "range": [
+            16,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "taskmanager.runtime.sort-spilling-threshold": {
+        "desc": "排序操作中，内存使用达到此阈值（相对于排序内存的比例）时，开始将排序数据溢写到磁盘。值越小，溢写越频繁，内存使用越少",
+        "type": "continuous",
+        "range": [
+            0.6,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": "0.8"
+    },
+    "security.kerberos.login.use-ticket-cache": {
+        "desc": "是否使用已存在的Kerberos票据缓存进行登录。如果为'true'，则使用`kinit`命令生成的票据；否则使用keytab文件",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "blob.service.ssl.enabled": {
+        "desc": "是否为Blob服务（用于分发JAR文件等）启用SSL加密",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.data.ssl.enabled": {
+        "desc": "是否为TaskManager之间的数据传输（数据Shuffle）启用SSL加密",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.jvm-exit-on-oom": {
+        "desc": "当TaskManager遇到OutOfMemoryError（OOM）时，是否强制退出JVM进程。启用后，TaskManager会立即退出，让资源框架（如YARN/K8s）重新启动它",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "akka.ssl.enabled": {
+        "desc": "是否为Akka远程通信（JobManager与TaskManager之间）启用SSL加密",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "security.ssl.verify-hostname": {
+        "desc": "是否在SSL握手时验证对等体的主机名。如果为'true'，则主机名必须与证书中的Common Name（CN）或Subject Alternative Name（SAN）匹配",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "mesos.resourcemanager.artifactserver.ssl.enabled": {
+        "desc": "是否为Mesos资源管理器中的工件服务器（Artifact Server）启用SSL",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "mesos.resourcemanager.tasks.cpus": {
+        "desc": "分配给每个Mesos TaskManager的CPU核数。可以是整数或小数",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0.0"
+    },
+    "mesos.resourcemanager.tasks.container.type": {
+        "desc": "Mesos TaskManager使用的容器化类型。'mesos'：使用Mesos默认容器；'docker'：使用Docker容器",
+        "type": "discrete",
+        "range": [
+            "mesos",
+            "docker"
+        ],
+        "dtype": "string",
+        "default_value": "mesos"
+    },
+    "zookeeper.sasl.disable": {
+        "desc": "是否禁用与ZooKeeper通信时的SASL（Simple Authentication and Security Layer）认证。如果设置为'true'，则禁用认证",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.latency.history-size": {
+        "desc": "每个算子（operator）维护的延迟历史记录的数量。较大的值可以存储更多的延迟样本，用于生成更平滑的指标。默认值为128",
+        "type": "continuous",
+        "range": [
+            2,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "state.checkpoints.num-retained": {
+        "desc": "要保留的最大已完成Checkpoint的数量。当超过此数量时，最旧的Checkpoint将被删除。默认值为1",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "yarn.per-job-cluster.include-user-jar": {
+        "desc": "定义在YARN的per-job集群中，用户JAR包在系统类路径中的位置。'FIRST'：放在最前面；'LAST'：放在最后面；'ORDER'：按名称排序；'DISABLED'：不包含",
+        "type": "discrete",
+        "range": [
+            "DISABLED",
+            "FIRST",
+            "LAST",
+            "ORDER"
+        ],
+        "dtype": "string",
+        "default_value": "ORDER"
+    },
+    "env.log.max": {
+        "desc": "每个日志文件的最大数量（在轮转时）。这是环境日志（如`flink.log`）的配置",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "historyserver.archive.fs.refresh-interval": {
+        "desc": "HistoryServer扫描归档目录（`historyserver.archive.fs.dir`）以发现新完成的作业的时间间隔（毫秒）",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "historyserver.web.ssl.enabled": {
+        "desc": "是否为HistoryServer的Web UI端点启用SSL",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "classloader.resolve-order": {
+        "desc": "类加载器在加载类时使用的解析顺序。'child-first'：优先从用户代码JAR中加载类；'parent-first'：优先从Flink系统类路径中加载类",
+        "type": "discrete",
+        "range": [
+            "child-first",
+            "parent-first"
+        ],
+        "dtype": "string",
+        "default_value": "child-first"
+    },
+    "blob.service.cleanup.interval": {
+        "desc": "Blob服务清理过期BLOB文件的间隔时间（秒）。默认值为1小时（3600秒）",
+        "type": "continuous",
+        "range": [
+            360,
+            36000
+        ],
+        "dtype": "int",
+        "default_value": "3600"
+    },
+    "web.history": {
+        "desc": "Web UI历史中保留的已完成作业的最大数量",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "25"
+    },
+    "web.checkpoints.history": {
+        "desc": "Web UI中为每个作业显示的Checkpoint历史记录的最大数量",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "web.backpressure.cleanup-interval": {
+        "desc": "Web UI中背压（Backpressure）监测数据清理任务的时间间隔（毫秒），用于移除不活跃任务的背压数据",
+        "type": "continuous",
+        "range": [
+            60000,
+            6000000
+        ],
+        "dtype": "int",
+        "default_value": "600000"
+    },
+    "web.backpressure.refresh-interval": {
+        "desc": "Web UI刷新背压监测数据的间隔时间（毫秒）。较小的值可以更快地看到背压变化，但会增加采样开销",
+        "type": "continuous",
+        "range": [
+            6000,
+            600000
+        ],
+        "dtype": "int",
+        "default_value": "60000"
+    },
+    "web.backpressure.num-samples": {
+        "desc": "Web UI用于计算背压比率的样本数量。更多的样本可以获得更平滑的背压指标",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "web.backpressure.delay-between-samples": {
+        "desc": "Web UI背压监测中，两个连续样本之间的延迟时间（毫秒）",
+        "type": "continuous",
+        "range": [
+            5,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "jobstore.cache-size": {
+        "desc": "JobStore中作业信息的缓存大小（字节）。用于HistoryServer或JobStore组件",
+        "type": "continuous",
+        "range": [
+            5242880,
+            524288000
+        ],
+        "dtype": "int",
+        "default_value": "52428800 (约50MB)"
+    },
+    "jobstore.expiration-time": {
+        "desc": "作业存储在JobStore中的过期时间（秒）。超过此时间的作业信息将被删除",
+        "type": "continuous",
+        "range": [
+            360,
+            360000
+        ],
+        "dtype": "int",
+        "default_value": "3600 (1小时)"
+    },
+    "jobmanager.execution.attempts-history-size": {
+        "desc": "JobManager为每个任务保留的执行尝试历史记录的最大数量",
+        "type": "continuous",
+        "range": [
+            2,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "16"
+    },
+    "task.cancellation.interval": {
+        "desc": "任务取消过程中，检查任务是否已停止的时间间隔（毫秒）。如果任务在此时间内未停止，将再次触发中断",
+        "type": "continuous",
+        "range": [
+            3000,
+            3000000
+        ],
+        "dtype": "int",
+        "default_value": "30000"
+    },
+    "taskmanager.debug.memory.log": {
+        "desc": "是否定期记录TaskManager的内存使用情况（包括堆内和堆外内存）到日志中，用于调试",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.debug.memory.log-interval": {
+        "desc": "TaskManager内存日志记录的间隔时间（毫秒）。仅在`taskmanager.debug.memory.log`为`true`时生效",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": "5000"
+    },
+    "taskmanager.network.detailed-metrics": {
+        "desc": "是否为网络传输启用详细的指标监控，如每个通道的缓冲区使用情况。这会产生额外的性能开销",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.network.memory.buffers-per-channel": {
+        "desc": "每个传出/传入通道（channel）分配的专用缓冲区数量。用于减少数据竞争",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "taskmanager.network.memory.floating-buffers-per-gate": {
+        "desc": "每个输入门（input gate）分配的浮动缓冲区数量。这些缓冲区用于在多个通道之间共享，以应对数据倾斜",
+        "type": "continuous",
+        "range": [
+            8,
+            800
+        ],
+        "dtype": "int",
+        "default_value": "8"
+    },
+    "akka.fork-join-executor.parallelism-max": {
+        "desc": "Akka fork-join线程池的最大并行度。影响Akka消息处理的并发能力",
+        "type": "continuous",
+        "range": [
+            16,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "akka.jvm-exit-on-fatal-error": {
+        "desc": "当Akka系统遇到致命错误（如ActorSystem终止）时，是否退出JVM进程",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "akka.server-socket-worker-pool.pool-size-max": {
+        "desc": "Akka服务器socket worker线程池的最大大小",
+        "type": "continuous",
+        "range": [
+            2,
+            256
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "rest.client.max-content-length": {
+        "desc": "REST客户端允许的最大响应内容长度（字节）。防止下载过大的响应导致内存溢出",
+        "type": "continuous",
+        "range": [
+            10485760,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "104857600"
+    },
+    "rest.server.max-content-length": {
+        "desc": "REST服务器允许的最大请求内容长度（字节）。防止接收过大的请求导致内存溢出",
+        "type": "continuous",
+        "range": [
+            10485760,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "104857600"
+    },
+    "rest.server.numThreads": {
+        "desc": "REST服务器用于处理请求的工作线程数",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "rest.server.thread-priority": {
+        "desc": "REST服务器工作线程的优先级（1-10，1最低，10最高）",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "blob.offload.minsize": {
+        "desc": "Blob服务将BLOB内容卸载（offload）到磁盘的最小大小（字节）。大于此大小的BLOB将被存储在磁盘上，而不是内存中",
+        "type": "continuous",
+        "range": [
+            131072,
+            2097152
+        ],
+        "dtype": "int",
+        "default_value": "1048576 (1MB)"
+    },
+    "heartbeat.interval": {
+        "desc": "JobManager和TaskManager之间发送心跳的间隔时间（毫秒）。用于检测组件是否存活",
+        "type": "continuous",
+        "range": [
+            1000,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "web.refresh-interval": {
+        "desc": "Web UI自动刷新仪表盘数据的间隔时间（毫秒）",
+        "type": "continuous",
+        "range": [
+            300,
+            6000
+        ],
+        "dtype": "int",
+        "default_value": "3000"
+    },
+    "state.backend.async": {
+        "desc": "是否启用状态后端的异步快照。异步快照可以避免在Checkpoint期间阻塞数据流处理。默认值通常为`true`",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "state.backend.fs.memory-threshold": {
+        "desc": "文件系统状态后端（FsStateBackend）中，状态数据被写入文件的最小大小阈值（KB）。小于此阈值的状态将作为元数据存储在JobManager的内存中",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "20"
+    },
+    "state.backend.local-recovery": {
+        "desc": "是否启用本地恢复（Local Recovery）。启用后，TaskManager会将Checkpoint的副本存储在本地磁盘，以加快故障恢复速度",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.latency.granularity": {
+        "desc": "延迟指标的粒度。'single'：不区分源和子任务；'operator'：区分源，但不区分子任务；'subtask'：同时区分源和子任务",
+        "type": "discrete",
+        "range": [
+            "single",
+            "operator",
+            "subtask"
+        ],
+        "dtype": "string",
+        "default_value": "operator"
+    },
+    "historyserver.web.refresh-interval": {
+        "desc": "HistoryServer Web UI自动刷新的间隔时间（毫秒）",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "security.ssl.rest.authentication-enabled": {
+        "desc": "是否为REST端点启用相互SSL认证（mTLS）。启用后，客户端也需要提供有效的证书",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "mesos.resourcemanager.tasks.container.docker.force-pull-image": {
+        "desc": "在Mesos上使用Docker容器时，是否强制每次都从镜像仓库拉取最新镜像，而不使用本地缓存",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.timer-service.factory": {
+        "desc": "计时器服务（Timer Service）的实现方式。'HEAP'：使用堆内存管理计时器；'ROCKSDB'：使用RocksDB管理计时器，适用于大量计时器的场景",
+        "type": "discrete",
+        "range": [
+            "HEAP",
+            "ROCKSDB"
+        ],
+        "dtype": "string",
+        "default_value": "ROCKSDB"
+    },
+    "yarn.heartbeat.container-request-interval": {
+        "desc": "YARN会话中，Flink向ResourceManager请求容器的间隔时间（毫秒）",
+        "type": "continuous",
+        "range": [
+            50,
+            50000
+        ],
+        "dtype": "int",
+        "default_value": "500"
+    },
+    "metrics.internal.query-service.thread-priority": {
+        "desc": "Flink内部指标查询服务的线程优先级（1-10）。优先级越高，指标服务响应越快，但可能影响主流程",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "metrics.system-resource": {
+        "desc": "是否报告系统资源指标，如CPU、内存、网络等。启用后会定期收集机器级别的指标",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.system-resource-probing-interval": {
+        "desc": "系统资源指标收集的间隔时间（毫秒）。仅在`metrics.system-resource`为`true`时生效",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": "5000"
+    },
+    "state.backend.rocksdb.metrics.actual-delayed-write-rate": {
+        "desc": "是否监控RocksDB当前的实际延迟写入速率。0表示无延迟。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.background-errors": {
+        "desc": "是否监控RocksDB的后台错误计数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.compaction-pending": {
+        "desc": "是否监控RocksDB是否有待处理的Compaction操作。1表示有待处理，0表示没有。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.cur-size-active-mem-table": {
+        "desc": "是否监控RocksDB当前活跃内存表（active memtable）的近似大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.cur-size-all-mem-tables": {
+        "desc": "是否监控RocksDB所有内存表（活跃和不可变）的近似大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-live-data-size": {
+        "desc": "是否监控RocksDB中实时数据的估算大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-num-keys": {
+        "desc": "是否监控RocksDB中键的估算数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-pending-compaction-bytes": {
+        "desc": "是否监控RocksDB中待处理的Compaction需要重写的估算字节数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-table-readers-mem": {
+        "desc": "是否监控RocksDB中用于读取SST表的内存估算大小（不包括块缓存）。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.mem-table-flush-pending": {
+        "desc": "是否监控RocksDB中待处理的内存表刷新（flush）操作数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-deletes-active-mem-table": {
+        "desc": "是否监控RocksDB活跃内存表中的删除条目总数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-deletes-imm-mem-tables": {
+        "desc": "是否监控RocksDB不可变内存表中的删除条目总数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-entries-active-mem-table": {
+        "desc": "是否监控RocksDB活跃内存表中的条目总数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-entries-imm-mem-tables": {
+        "desc": "是否监控RocksDB不可变内存表中的条目总数。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-immutable-mem-table": {
+        "desc": "是否监控RocksDB中不可变内存表的数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-live-versions": {
+        "desc": "是否监控RocksDB中实时版本的SST文件数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-running-compactions": {
+        "desc": "是否监控RocksDB中正在运行的Compaction任务数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-running-flushes": {
+        "desc": "是否监控RocksDB中正在运行的内存表刷新（flush）任务数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-snapshots": {
+        "desc": "是否监控RocksDB中打开的Snapshot数量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.size-all-mem-tables": {
+        "desc": "是否监控RocksDB所有内存表的近似总大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.total-sst-files-size": {
+        "desc": "是否监控RocksDB所有SST文件的总大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.predefined-options": {
+        "desc": "RocksDB的预定义优化配置集合。根据底层存储介质选择合适的配置。'DEFAULT'：默认设置；'SPINNING_DISK_OPTIMIZED'：机械硬盘优化；'FLASH_SSD_OPTIMIZED'：固态硬盘优化",
+        "type": "discrete",
+        "range": [
+            "DEFAULT",
+            "SPINNING_DISK_OPTIMIZED",
+            "SPINNING_DISK_OPTIMIZED_HIGH_MEM",
+            "FLASH_SSD_OPTIMIZED"
+        ],
+        "dtype": "string",
+        "default_value": "DEFAULT"
+    },
+    "state.backend.rocksdb.compaction.level.target-file-size-base": {
+        "desc": "RocksDB Level-1中每个SST文件的目标大小（以MB为单位）。较大的值可以减少文件数量，但可能增加Compaction开销",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "64"
+    },
+    "state.backend.rocksdb.compaction.level.use-dynamic-size": {
+        "desc": "是否使用动态目标大小来控制RocksDB各Level的文件大小。启用后，可以根据实际情况动态调整",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.compaction.style": {
+        "desc": "RocksDB的Compaction策略。'LEVEL'：Leveled Compaction（默认）；'UNIVERSAL'：Universal Compaction，适用于写入密集型负载；'FIFO'：FIFO Compaction，用于临时数据；'NONE'：不进行Compaction",
+        "type": "discrete",
+        "range": [
+            "LEVEL",
+            "UNIVERSAL",
+            "FIFO",
+            "NONE"
+        ],
+        "dtype": "string",
+        "default_value": "LEVEL"
+    },
+    "state.backend.rocksdb.writebuffer.number-to-merge": {
+        "desc": "在将内存表刷新到磁盘之前，可以合并的内存表数量",
+        "type": "continuous",
+        "range": [
+            1,
+            128
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "state.backend.rocksdb.writebuffer.size": {
+        "desc": "单个写缓冲区（write buffer）的大小（以MB为单位）。写缓冲区是RocksDB内存表的内存池",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "64"
+    },
+    "queryable-state.client.network-threads": {
+        "desc": "可查询状态（Queryable State）客户端使用的网络线程数。设置为0表示使用Netty的默认值",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.enable": {
+        "desc": "是否为整个集群启用可查询状态（Queryable State）功能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "queryable-state.proxy.network-threads": {
+        "desc": "可查询状态代理（Queryable State Proxy）使用的网络线程数。设置为0表示使用Netty的默认值",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.proxy.query-threads": {
+        "desc": "可查询状态代理处理查询请求的线程数",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.server.network-threads": {
+        "desc": "可查询状态服务端（Queryable State Server）使用的网络线程数。设置为0表示使用Netty的默认值",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.server.query-threads": {
+        "desc": "可查询状态服务端处理查询请求的线程数",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "metrics.fetcher.update-interval": {
+        "desc": "Web UI使用的指标获取器（Metric Fetcher）的更新间隔（毫秒）。值越小，指标更新越快，但负载越高",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "jobmanager.execution.failover-strategy": {
+        "desc": "作业执行失败时的故障恢复策略。'full'：重启整个作业；'region'：仅重启受影响的Region（更细粒度的恢复）",
+        "type": "discrete",
+        "range": [
+            "full",
+            "region"
+        ],
+        "dtype": "string",
+        "default_value": "region"
+    },
+    "cluster.evenly-spread-out-slots": {
+        "desc": "是否在所有可用的TaskManager上均匀分配Slot。启用后，Flink会尝试将任务分散到更多机器上，以提高容错性",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "yarn.application-attempt-failures-validity-interval": {
+        "desc": "YARN ApplicationMaster尝试失败的有效性时间窗口（毫秒）。在此窗口外的失败不会被计入重启次数",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "yarn.appmaster.vcores": {
+        "desc": "YARN ApplicationMaster（即JobManager）使用的虚拟核心（vcores）数量",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "yarn.heartbeat.interval": {
+        "desc": "Flink YARN会话向ResourceManager发送心跳的间隔时间（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "mesos.resourcemanager.tasks.disk": {
+        "desc": "分配给每个Mesos TaskManager的磁盘空间（MB）",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "state.backend.fs.write-buffer-size": {
+        "desc": "文件系统状态后端在写入Checkpoint数据时使用的写缓冲区大小（字节）",
+        "type": "continuous",
+        "range": [
+            512,
+            131072
+        ],
+        "dtype": "int",
+        "default_value": "4096"
+    },
+    "taskmanager.memory.framework.heap.size": {
+        "desc": "TaskManager框架（Framework）使用的JVM堆内存大小。这部分内存不会分配给任务Slot",
+        "type": "continuous",
+        "range": [
+            12,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "128 mb"
+    },
+    "taskmanager.memory.jvm-overhead.fraction": {
+        "desc": "为JVM开销（如线程栈、编译缓存等）保留的进程总内存比例。默认值为0.1",
+        "type": "continuous",
+        "range": [
+            0.0,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "taskmanager.memory.jvm-overhead.max": {
+        "desc": "TaskManager JVM开销的最大大小。默认值为1 GB",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "1 gb"
+    },
+    "taskmanager.memory.jvm-overhead.min": {
+        "desc": "TaskManager JVM开销的最小大小。默认值为192 MB",
+        "type": "continuous",
+        "range": [
+            19,
+            384
+        ],
+        "dtype": "int",
+        "default_value": "192 mb"
+    },
+    "taskmanager.memory.network.min": {
+        "desc": "TaskManager网络内存的最小大小。默认值为64 MB",
+        "type": "continuous",
+        "range": [
+            6,
+            256
+        ],
+        "dtype": "int",
+        "default_value": "64 mb"
+    },
+    "kubernetes.container.image.pull-policy": {
+        "desc": "Kubernetes容器镜像的拉取策略。'IfNotPresent'：仅当本地不存在时拉取；'Always'：总是拉取；'Never'：从不拉取",
+        "type": "discrete",
+        "range": [
+            "IfNotPresent",
+            "Always",
+            "Never"
+        ],
+        "dtype": "string",
+        "default_value": "IfNotPresent"
+    },
+    "kubernetes.jobmanager.cpu": {
+        "desc": "Kubernetes中JobManager容器的CPU核数请求",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "1.0"
+    },
+    "kubernetes.rest-service.exposed.type": {
+        "desc": "Kubernetes上暴露Flink REST服务的方式。'ClusterIP'：仅在集群内部可访问；'NodePort'：通过节点端口暴露；'LoadBalancer'：通过云提供商的负载均衡器暴露",
+        "type": "discrete",
+        "range": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer",
+            "Headless_ClusterIP"
+        ],
+        "dtype": "string",
+        "default_value": "LoadBalancer"
+    },
+    "state.backend.rocksdb.memory.high-prio-pool-ratio": {
+        "desc": "为高优先级数据（如索引、过滤器、压缩字典块）保留的缓存内存比例。默认值为0.1",
+        "type": "continuous",
+        "range": [
+            0.1,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "state.backend.rocksdb.memory.managed": {
+        "desc": "RocksDB状态后端是否使用Flink托管内存（Managed Memory）。如果为`true`，RocksDB将自动使用Slot的托管内存预算",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "state.backend.rocksdb.metrics.block-cache-capacity": {
+        "desc": "是否监控RocksDB块缓存的容量。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.block-cache-pinned-usage": {
+        "desc": "是否监控RocksDB块缓存中固定（pinned）条目的内存大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.block-cache-usage": {
+        "desc": "是否监控RocksDB块缓存中条目的内存大小。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.column-family-as-variable": {
+        "desc": "是否将列族（Column Family）作为RocksDB指标的一个变量进行暴露。启用后可以按列族区分指标",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.is-write-stopped": {
+        "desc": "是否监控RocksDB是否已停止写入（因Compaction跟不上）。1表示已停止，0表示正常。启用此指标会影响性能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "historyserver.archive.clean-expired-jobs": {
+        "desc": "HistoryServer是否自动清理过期的作业归档。启用后，会删除`historyserver.archive.fs.refresh-interval`中定义的过期作业",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "classloader.fail-on-metaspace-oom-error": {
+        "desc": "当发生元空间（Metaspace）OutOfMemoryError时，是否让类加载器显式失败",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "taskmanager.network.blocking-shuffle.compression.enabled": {
+        "desc": "是否为阻塞式Shuffle的数据启用压缩。压缩可以减少网络和磁盘I/O，但会增加CPU负载",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.attached": {
+        "desc": "是否以附加（attached）模式执行Flink作业。在附加模式下，客户端会等待作业完成后再退出",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.shutdown-on-attached-exit": {
+        "desc": "当以附加模式运行时，如果客户端退出，是否关闭整个Flink集群。仅在`execution.attached`为`true`时生效",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.savepoint.ignore-unclaimed-state": {
+        "desc": "从Savepoint恢复时，是否忽略未被任何算子声明的状态",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.checkpointing.snapshot-compression": {
+        "desc": "是否对Checkpoint快照数据进行压缩。启用后可以减小快照大小，但会增加CPU负载",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.auto-type-registration": {
+        "desc": "是否自动注册用户代码中使用的类型到Kryo序列化器。禁用后可能需要手动注册",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.auto-watermark-interval": {
+        "desc": "自动生成Watermark的间隔时间（毫秒）。仅当源函数未定义Watermark生成策略时生效",
+        "type": "continuous",
+        "range": [
+            20,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "200"
+    },
+    "pipeline.force-avro": {
+        "desc": "是否强制使用Avro序列化器来序列化所有POJO类型",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.force-kryo": {
+        "desc": "是否强制使用Kryo序列化器来序列化所有类型（而不是Avro或Java序列化）",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.generic-types": {
+        "desc": "是否允许使用泛型类型（Generic types）。禁用后，如果遇到未注册的泛型类型会抛出异常",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.max-parallelism": {
+        "desc": "整个管道的默认最大并行度。此值影响KeyedStream的状态分区数量",
+        "type": "continuous",
+        "range": [
+            100,
+            32768
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "pipeline.object-reuse": {
+        "desc": "是否启用对象重用（Object Reuse）优化。启用后，算子会重用对象，减少GC压力，但可能导致不安全的代码",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.operator-chaining": {
+        "desc": "是否启用算子链（Operator Chaining）优化。禁用后，每个算子都会在一个独立的任务中运行",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.time-characteristic": {
+        "desc": "流处理程序的时间特性。'ProcessingTime'：处理时间；'IngestionTime'：摄入时间；'EventTime'：事件时间",
+        "type": "discrete",
+        "range": [
+            "ProcessingTime",
+            "IngestionTime",
+            "EventTime"
+        ],
+        "dtype": "string",
+        "default_value": "EventTime"
+    },
+    "execution.checkpointing.mode": {
+        "desc": "Checkpoint的模式。'EXACTLY_ONCE'：精确一次语义；'AT_LEAST_ONCE'：至少一次语义",
+        "type": "discrete",
+        "range": [
+            "EXACTLY_ONCE",
+            "AT_LEAST_ONCE"
+        ],
+        "dtype": "string",
+        "default_value": "EXACTLY_ONCE"
+    },
+    "execution.checkpointing.prefer-checkpoint-for-recovery": {
+        "desc": "是否优先使用Checkpoint而不是Savepoint进行恢复。如果为`true`，且存在Checkpoint，则优先使用它",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "jobmanager.memory.enable-jvm-direct-memory-limit": {
+        "desc": "是否启用JobManager进程的JVM直接内存限制（-XX:MaxDirectMemorySize）。限制大小由`jobmanager.memory.off-heap.size`决定",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "jobmanager.memory.jvm-overhead.fraction": {
+        "desc": "为JobManager JVM开销（如线程栈、编译缓存等）保留的进程总内存比例。默认值为0.1",
+        "type": "continuous",
+        "range": [
+            0.0,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "jobmanager.memory.off-heap.size": {
+        "desc": "JobManager的非堆内存大小（包括直接内存和本地内存）。默认值为128 MB",
+        "type": "continuous",
+        "range": [
+            12,
+            1280
+        ],
+        "dtype": "int",
+        "default_value": "128 mb"
+    },
+    "jobmanager.retrieve-taskmanager-hostname": {
+        "desc": "JobManager是否尝试从TaskManager检索其主机名，而不是使用RPC连接中的远程地址",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "taskmanager.network.memory.max-buffers-per-channel": {
+        "desc": "每个通道（channel）可以分配的最大缓冲区数量",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "akka.ask.callstack": {
+        "desc": "当Akka ask操作超时时，是否打印调用堆栈信息，以便于调试",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "client.retry-period": {
+        "desc": "客户端在操作失败后重试的间隔时间（秒）",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "execution.checkpointing.unaligned": {
+        "desc": "是否启用非对齐Checkpoint（Unaligned Checkpoint）。启用后，可以加快存在反压时的Checkpoint速度，但会增加I/O负载",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "kubernetes.client.io-pool.size": {
+        "desc": "Kubernetes客户端用于执行阻塞I/O操作（如启动/停止Pod）的线程池大小",
+        "type": "continuous",
+        "range": [
+            4,
+            400
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "mesos.resourcemanager.tasks.network.bandwidth": {
+        "desc": "分配给每个Mesos TaskManager的网络带宽限制（MB/秒）",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "classloader.check-leaked-classloader": {
+        "desc": "是否检查类加载器泄漏。启用后，Flink会尝试检测任务结束后未释放的类加载器",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "high-availability.kubernetes.leader-election.lease-duration": {
+        "desc": "Kubernetes高可用模式下，领导者选举的租约持续时间（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            1500
+        ],
+        "dtype": "int",
+        "default_value": "15"
+    },
+    "high-availability.kubernetes.leader-election.renew-deadline": {
+        "desc": "Kubernetes高可用模式下，领导者更新其租约的最后期限（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            1500
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "high-availability.kubernetes.leader-election.retry-period": {
+        "desc": "Kubernetes高可用模式下，领导者在尝试更新租约之间的重试周期（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "slotmanager.redundant-taskmanager-num": {
+        "desc": "SlotManager维护的冗余TaskManager数量。这些额外的TaskManager可用于快速替换失败的TaskManager",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "taskmanager.network.sort-shuffle.min-buffers": {
+        "desc": "排序Shuffle（Sort Shuffle）所需的最小网络缓冲区数量",
+        "type": "continuous",
+        "range": [
+            64,
+            32768
+        ],
+        "dtype": "int",
+        "default_value": "1024"
+    },
+    "taskmanager.network.sort-shuffle.min-parallelism": {
+        "desc": "触发排序Shuffle的最小并行度。当作业并行度低于此值时，可能使用其他Shuffle实现",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "taskmanager.runtime.large-record-handler": {
+        "desc": "是否启用大记录（Large Record）处理器。用于处理超出网络缓冲区大小的超大记录",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.memory.framework.off-heap.batch-shuffle.size": {
+        "desc": "批处理Shuffle（排序合并Shuffle）用于读取Shuffle数据的内存大小。此内存从`taskmanager.memory.framework.off-heap.size`中分配",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "32 mb"
+    },
+    "execution.checkpointing.unaligned.forced": {
+        "desc": "是否强制对所有Checkpoint使用非对齐模式（Unaligned Checkpoint）。如果启用，则忽略其他条件",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.storage.fs.memory-threshold": {
+        "desc": "文件系统状态存储中，状态数据被写入文件的最小大小阈值（KB）。小于此阈值的状态将作为元数据存储在JobManager内存中",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "20"
+    },
+    "state.storage.fs.write-buffer-size": {
+        "desc": "文件系统状态存储写入Checkpoint数据时使用的写缓冲区大小（字节）",
+        "type": "continuous",
+        "range": [
+            512,
+            262144
+        ],
+        "dtype": "int",
+        "default_value": "4096"
+    },
+    "state.backend.latency-track.history-size": {
+        "desc": "状态后端延迟跟踪（Latency Tracking）维护的历史记录大小",
+        "type": "continuous",
+        "range": [
+            8,
+            16384
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "state.backend.latency-track.keyed-state-enabled": {
+        "desc": "是否启用Keyed State的延迟跟踪",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.latency-track.sample-interval": {
+        "desc": "状态后端延迟跟踪的采样间隔（毫秒）",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "state.backend.latency-track.state-name-as-variable": {
+        "desc": "是否将状态名称作为延迟跟踪指标的一个变量进行暴露",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "cluster.intercept-user-system-exit": {
+        "desc": "是否拦截用户代码中的`System.exit()`调用。'DISABLED'：不拦截；'LOG'：拦截并记录日志；'THROW'：拦截并抛出安全异常",
+        "type": "discrete",
+        "range": [
+            "DISABLED",
+            "LOG",
+            "THROW"
+        ],
+        "dtype": "string",
+        "default_value": "LOG"
+    },
+    "jobmanager.adaptive-scheduler.min-parallelism-increase": {
+        "desc": "自适应调度器（Adaptive Scheduler）中，并行度增加的最小步长",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "rest.flamegraph.cleanup-interval": {
+        "desc": "REST API中火焰图（Flamegraph）数据清理的间隔时间（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "rest.flamegraph.delay-between-samples": {
+        "desc": "火焰图采样之间的延迟时间（毫秒）",
+        "type": "continuous",
+        "range": [
+            5,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "rest.flamegraph.enabled": {
+        "desc": "是否为REST API启用火焰图生成功能",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "rest.flamegraph.num-samples": {
+        "desc": "生成火焰图时采集的样本数量",
+        "type": "continuous",
+        "range": [
+            10,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "rest.flamegraph.refresh-interval": {
+        "desc": "火焰图数据刷新的间隔时间（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "rest.flamegraph.stack-depth": {
+        "desc": "火焰图中显示的最大堆栈深度",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "web.exception-history-size": {
+        "desc": "Web UI中为每个作业显示的异常历史记录的最大数量。默认值为16",
+        "type": "continuous",
+        "range": [
+            2,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "16"
+    },
+    "resourcemanager.start-worker.max-failure-rate": {
+        "desc": "ResourceManager启动Worker（如TaskManager）的最大失败率（失败次数/时间窗口）",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "resourcemanager.start-worker.retry-interval": {
+        "desc": "ResourceManager启动Worker失败后的重试间隔时间（秒）",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": "3"
     }
 }

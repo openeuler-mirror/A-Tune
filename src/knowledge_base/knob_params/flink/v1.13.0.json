@@ -4,14 +4,14 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            600000
         ],
         "dtype": "int",
         "default_value": 10000
     },
     "execution.checkpointing.max-concurrent-checkpoints": {
         "desc": "Sets the maximum number of concurrent checkpoints to control the number of simultaneous checkpoints. Increasing this value improves system concurrency but may cause resource competition; decreasing this value reduces system load but may affect data consistency. This parameter can alleviate potential disk IO bottlenecks during the checkpoint process",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
             10
@@ -24,7 +24,7 @@
         "type": "continuous",
         "range": [
             0,
-            null
+            3600000
         ],
         "dtype": "string",
         "default_value": "0 ms"
@@ -34,47 +34,47 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            3600000
         ],
         "dtype": "int",
         "default_value": 60000
     },
     "jobmanager.memory.jvm-overhead.max": {
         "desc": "Sets the maximum overhead memory for JobManager JVM to ensure sufficient memory for JVM under high load. Increasing this value can alleviate memory bottlenecks and improve system stability. This parameter specifies non-heap memory reserved for JVM overhead, such as thread stack space, compilation cache, etc",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "1 gb"
     },
     "jobmanager.memory.jvm-overhead.min": {
         "desc": "Sets the minimum overhead memory for JobManager JVM to ensure sufficient memory for JVM operation. This parameter reserves non-heap memory overhead for JVM, including thread stack space, compilation cache, etc. Increasing this value can alleviate memory bottlenecks and avoid frequent garbage collection by JVM",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "192 mb"
     },
     "parallelism.default": {
         "desc": "Sets the default parallelism for Flink jobs; if parallelism is not specified, this value is used. Increasing this value can alleviate CPU bottlenecks and improve job execution efficiency. Default value is 1, maximum value is 128",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
-            null,
-            null
+            1,
+            128
         ],
         "dtype": "int",
         "default_value": "1"
     },
     "restart-strategy.fixed-delay.attempts": {
         "desc": "Sets the number of restart attempts for fixed delay restart strategy; used to control the number of restarts when tasks fail, which can alleviate CPU bottlenecks during system failure recovery. Increasing this value improves task recovery capability but may increase resource usage; decreasing this value speeds up failure detection but may cause task loss",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
-            null
+            100
         ],
         "dtype": "int",
         "default_value": 1
@@ -84,38 +84,49 @@
         "type": "continuous",
         "range": [
             0,
-            null
+            3600000
         ],
         "dtype": "int",
-        "default_value": 10000
+        "default_value": 1000
     },
     "restart-strategy": {
         "desc": "Defines the restart strategy when tasks fail to alleviate memory bottlenecks during system failure recovery. Optional values include: 'none' (no restart), 'fixed-delay' (fixed delay restart), 'failure-rate' (failure rate based restart), 'exponential-delay' (exponential delay restart)",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "none",
+            "fixed-delay",
+            "failure-rate",
+            "exponential-delay"
+        ],
         "dtype": "string",
         "default_value": "none"
     },
     "state.backend.incremental": {
         "desc": "This parameter sets whether to enable incremental snapshots, controlling the storage method of state snapshots. Enabling incremental snapshots reduces storage space usage and alleviates disk IO bottlenecks during state management, but may increase recovery time",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "true",
+            "false"
+        ],
         "dtype": "boolean",
         "default_value": "false"
     },
     "state.backend": {
         "desc": "Sets the state backend type; defines how Flink stores state, which can alleviate disk IO bottlenecks during state management. Optional values include 'memory', 'filesystem', and 'rocksdb'",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "hashmap",
+            "rocksdb"
+        ],
         "dtype": "string",
-        "default_value": "memory"
+        "default_value": "hashmap"
     },
     "state.backend.rocksdb.block.cache-size": {
         "desc": "Sets the block cache size for RocksDB in bytes. This parameter controls the number of data blocks cached in memory by RocksDB, thereby improving read performance",
         "type": "continuous",
         "range": [
             0,
-            null
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "8 mb"
@@ -125,7 +136,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            64
         ],
         "dtype": "int",
         "default_value": 4
@@ -134,18 +145,18 @@
         "desc": "Sets the maximum compaction level base size for RocksDB in bytes. This parameter optimizes storage performance and can alleviate disk I/O bottlenecks during state management",
         "type": "continuous",
         "range": [
-            1,
-            null
+            "1 mb",
+            "32 gb"
         ],
         "dtype": "string",
         "default_value": "256 mb"
     },
     "state.backend.rocksdb.thread.num": {
         "desc": "This parameter sets the maximum number of concurrent background flush and compaction jobs for RocksDB (per stateful operator)",
-        "type": "discrete",
+        "type": "continuous",
         "range": [
             1,
-            null
+            64
         ],
         "dtype": "int",
         "default_value": 2
@@ -153,7 +164,10 @@
     "state.backend.rocksdb.use-bloom-filter": {
         "desc": "This parameter sets whether to enable Bloom Filter to optimize RocksDB query performance",
         "type": "discrete",
-        "range": null,
+        "range": [
+            "true",
+            "false"
+        ],
         "dtype": "boolean",
         "default_value": "false"
     },
@@ -162,7 +176,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            "200 mb"
         ],
         "dtype": "string",
         "default_value": "2 mb"
@@ -172,7 +186,7 @@
         "type": "continuous",
         "range": [
             1,
-            null
+            128
         ],
         "dtype": "int",
         "default_value": 2
@@ -186,5 +200,2026 @@
         ],
         "dtype": "int",
         "default_value": 1
+    },
+    "jobmanager.memory.process.size": {
+        "desc": "Total memory size of the JobManager process. Includes JVM heap memory, non-heap memory (direct memory, native memory), JVM metaspace, and JVM overhead. In containerized environments, should be set to the container memory size",
+        "type": "discrete",
+        "range": [
+            5000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "jobmanager.memory.jvm-metaspace.size": {
+        "desc": "JVM metaspace size for the JobManager. Default value is 256 MB",
+        "type": "continuous",
+        "range": [
+            64,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "256 mb"
+    },
+    "taskmanager.memory.process.size": {
+        "desc": "Total memory size of the TaskManager process. Includes total Flink memory, JVM metaspace, and JVM overhead. In containerized environments, should be set to the container memory size",
+        "type": "discrete",
+        "range": [
+            30000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "taskmanager.memory.jvm-metaspace.size": {
+        "desc": "JVM metaspace size for the TaskManager. Default value is 256 MB",
+        "type": "continuous",
+        "range": [
+            64,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": "256 mb"
+    },
+    "taskmanager.memory.network.fraction": {
+        "desc": "Proportion of network memory to total Flink memory. Network memory is non-heap memory reserved for the ShuffleEnvironment (e.g., network buffers). Default value is 0.1",
+        "type": "continuous",
+        "range": [
+            0.1,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "taskmanager.memory.network.max": {
+        "desc": "Maximum network memory size for the TaskManager. Network memory is non-heap memory reserved for the ShuffleEnvironment (e.g., network buffers). Default value is 1 GB",
+        "type": "continuous",
+        "range": [
+            1,
+            16
+        ],
+        "dtype": "int",
+        "default_value": "1 gb"
+    },
+    "taskmanager.network.numberOfBuffers": {
+        "desc": "Number of buffers used by the TaskManager for network transmission. This value determines the amount of direct memory the TaskManager can use for network data exchange. The default value depends on the TaskManager's memory settings",
+        "type": "continuous",
+        "range": [
+            28,
+            44800
+        ],
+        "dtype": "int",
+        "default_value": "2048 (depends on configuration)"
+    },
+    "blob.fetch.backlog": {
+        "desc": "Maximum queue size of pending BLOB fetch requests in the Blob service. BLOB (Binary Large Object) is used to distribute large files (e.g., JAR files) between JobManager and TaskManager",
+        "type": "continuous",
+        "range": [
+            200,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "1000"
+    },
+    "blob.fetch.num-concurrent": {
+        "desc": "Maximum number of concurrent BLOB fetch operations allowed in the Blob service",
+        "type": "continuous",
+        "range": [
+            10,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "taskmanager.network.blocking-shuffle.type": {
+        "desc": "Type of blocking shuffle implementation used by TaskManager for batch jobs. 'file': uses file storage for shuffle data; 'mmap': uses memory-mapped files",
+        "type": "discrete",
+        "range": [
+            "file",
+            "mmap"
+        ],
+        "dtype": "string",
+        "default_value": "file"
+    },
+    "taskmanager.network.request-backoff.initial": {
+        "desc": "Initial backoff time (milliseconds) after a network request failure. When the peer is unavailable, the TaskManager will wait this long before retrying the network request",
+        "type": "continuous",
+        "range": [
+            10,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "taskmanager.network.request-backoff.max": {
+        "desc": "Maximum backoff time (milliseconds) after a network request failure. Retry intervals will increase exponentially until reaching this maximum",
+        "type": "continuous",
+        "range": [
+            1000,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "akka.throughput": {
+        "desc": "Maximum throughput of messages processed by a single Actor in Akka remoting. This value determines the maximum number of messages an Actor can process before yielding control to the thread pool",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "15"
+    },
+    "akka.transport.threshold": {
+        "desc": "Threshold for message transmission in Akka remoting. Used to control whether message compression or batching is enabled",
+        "type": "continuous",
+        "range": [
+            100,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "256"
+    },
+    "fs.overwrite-files": {
+        "desc": "Whether to overwrite an existing file when a filesystem operation (e.g., writing a result file) encounters it. If set to 'true', it will be overwritten; otherwise, an exception will be thrown",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "fs.output.always-create-directory": {
+        "desc": "Whether to always create parent directories for the output path when writing output files. If set to 'true', parent directories will be created even if the output path is a single file",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.exec.mini-batch.enabled": {
+        "desc": "Whether to enable mini-batch optimization. Mini-batching can aggregate multiple accesses to the state backend, significantly improving throughput but increasing latency",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.exec.mini-batch.size": {
+        "desc": "Maximum number of input rows allowed for mini-batch processing. When the accumulated number of rows reaches this threshold or 'mini-batch.allow-latency' is reached, mini-batch processing is triggered. Set to -1 to disable this limit",
+        "type": "continuous",
+        "range": [
+            -1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "-1"
+    },
+    "table.exec.mini-batch.allow-latency": {
+        "desc": "Maximum latency allowed for mini-batch processing (milliseconds). Even if 'micro-batch.size' is not reached, mini-batch processing will be triggered after this time",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "table.optimizer.agg-phase-strategy": {
+        "desc": "Optimization strategy for aggregation operations. 'TWO_PHASE': use two-phase aggregation (local + global); 'ONE_PHASE': use single-phase aggregation; 'AUTO': automatic selection",
+        "type": "discrete",
+        "range": [
+            "TWO_PHASE",
+            "ONE_PHASE",
+            "AUTO"
+        ],
+        "dtype": "string",
+        "default_value": "AUTO"
+    },
+    "table.optimizer.distinct-agg.split.enabled": {
+        "desc": "Whether to enable split optimization for DISTINCT aggregation. Splitting a query containing multiple DISTINCT aggregations into multiple queries can improve performance in some scenarios",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "table.optimizer.distinct-agg.split.bucket-num": {
+        "desc": "Number of buckets to use when splitting DISTINCT aggregation. Each bucket processes a portion of the DISTINCT keys. Larger values increase parallelism but may introduce more overhead",
+        "type": "continuous",
+        "range": [
+            128,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "1024"
+    },
+    "table.optimizer.join-reorder-enabled": {
+        "desc": "Whether to enable join reordering optimization. The optimizer will reorder joins based on statistics to obtain a better execution plan",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.memory.partitioned-index-filters": {
+        "desc": "Whether to use partitioned indexes/filters. Partitioning can split index and filter blocks into smaller sub-blocks and load them into memory only when needed, reducing memory usage",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.memory.write-buffer-ratio": {
+        "desc": "Maximum memory ratio for write buffers, based on the total shared memory managed by RocksDB. The remaining memory is used for block cache. Default value is 0.5",
+        "type": "continuous",
+        "range": [
+            0.2,
+            0.8
+        ],
+        "dtype": "float",
+        "default_value": "0.5"
+    },
+    "state.backend.rocksdb.block.blocksize": {
+        "desc": "Size of SST file blocks in RocksDB (in KB). Larger blocks can improve sequential read performance but reduce point lookup efficiency. Default value is 4KB",
+        "type": "continuous",
+        "range": [
+            2,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "state.backend.rocksdb.block.metadata-blocksize": {
+        "desc": "Size of blocks storing metadata in RocksDB (in KB). Default value is 4KB",
+        "type": "continuous",
+        "range": [
+            2,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "state.backend.rocksdb.bloom-filter.block-based-mode": {
+        "desc": "Whether to enable a specific optimization mode for block-based Bloom Filters. Bloom filters are used to speed up key lookups",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.bloom-filter.bits-per-key": {
+        "desc": "Number of bits allocated per key in the Bloom Filter. Higher values reduce false positive rates but consume more memory. Default value is 10.0",
+        "type": "continuous",
+        "range": [
+            5,
+            100
+        ],
+        "dtype": "float",
+        "default_value": "10.0"
+    },
+    "akka.framesize": {
+        "desc": "Maximum message frame size allowed in Akka remote communication (in bytes). Should be larger than the maximum possible message size, such as large state or configuration. Default is approximately 1MB",
+        "type": "continuous",
+        "range": [
+            1048576,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "10485760 (approx. 10MB)"
+    },
+    "akka.transport.heartbeat.interval": {
+        "desc": "Interval (milliseconds) at which the Akka remote system sends heartbeats to detect whether peer nodes are alive",
+        "type": "continuous",
+        "range": [
+            100,
+            2000
+        ],
+        "dtype": "int",
+        "default_value": "1000"
+    },
+    "akka.log.lifecycle.events": {
+        "desc": "Whether to log lifecycle events of Akka Actors (e.g., start, stop, restart). This is helpful for debugging distributed system issues",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.runtime.hashjoin-bloom-filters": {
+        "desc": "Whether to use Bloom Filters in Hash Join operations. Bloom filters can filter out non-matching join keys in advance, reducing processing load",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.runtime.max-fan": {
+        "desc": "Maximum fan-out number when merging partitions in batch operations. For example, in sort-merge join, this controls the number of source partitions a single partition can merge",
+        "type": "continuous",
+        "range": [
+            16,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "taskmanager.runtime.sort-spilling-threshold": {
+        "desc": "Threshold (ratio of sort memory) at which sorting data begins to be spilled to disk during sort operations. Lower values cause more frequent spilling and less memory usage",
+        "type": "continuous",
+        "range": [
+            0.6,
+            1
+        ],
+        "dtype": "float",
+        "default_value": "0.8"
+    },
+    "security.kerberos.login.use-ticket-cache": {
+        "desc": "Whether to use an existing Kerberos ticket cache for login. If 'true', uses the ticket generated by the `kinit` command; otherwise, uses a keytab file",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "blob.service.ssl.enabled": {
+        "desc": "Whether to enable SSL encryption for the Blob service (used for distributing JAR files, etc.)",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.data.ssl.enabled": {
+        "desc": "Whether to enable SSL encryption for data transfer (data shuffle) between TaskManagers",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.jvm-exit-on-oom": {
+        "desc": "Whether to force the JVM process to exit when the TaskManager encounters an OutOfMemoryError (OOM). When enabled, the TaskManager exits immediately, allowing the resource framework (e.g., YARN/K8s) to restart it",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "akka.ssl.enabled": {
+        "desc": "Whether to enable SSL encryption for Akka remote communication (between JobManager and TaskManager)",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "security.ssl.verify-hostname": {
+        "desc": "Whether to verify the peer's hostname during SSL handshake. If 'true', the hostname must match the Common Name (CN) or Subject Alternative Name (SAN) in the certificate",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "mesos.resourcemanager.artifactserver.ssl.enabled": {
+        "desc": "Whether to enable SSL for the Artifact Server in the Mesos resource manager",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "mesos.resourcemanager.tasks.cpus": {
+        "desc": "Number of CPU cores allocated to each Mesos TaskManager. Can be an integer or decimal",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0.0"
+    },
+    "mesos.resourcemanager.tasks.container.type": {
+        "desc": "Containerization type used by Mesos TaskManager. 'mesos': uses Mesos default container; 'docker': uses Docker container",
+        "type": "discrete",
+        "range": [
+            "mesos",
+            "docker"
+        ],
+        "dtype": "string",
+        "default_value": "mesos"
+    },
+    "zookeeper.sasl.disable": {
+        "desc": "Whether to disable SASL (Simple Authentication and Security Layer) authentication for communication with ZooKeeper. If set to 'true', authentication is disabled",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.latency.history-size": {
+        "desc": "Number of latency history records maintained per operator. Larger values can store more latency samples for generating smoother metrics. Default value is 128",
+        "type": "continuous",
+        "range": [
+            2,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "state.checkpoints.num-retained": {
+        "desc": "Maximum number of completed Checkpoints to retain. When this number is exceeded, the oldest Checkpoint will be deleted. Default value is 1",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "yarn.per-job-cluster.include-user-jar": {
+        "desc": "Defines the position of user JAR files in the system classpath for a YARN per-job cluster. 'FIRST': placed at the front; 'LAST': placed at the end; 'ORDER': sorted by name; 'DISABLED': not included",
+        "type": "discrete",
+        "range": [
+            "DISABLED",
+            "FIRST",
+            "LAST",
+            "ORDER"
+        ],
+        "dtype": "string",
+        "default_value": "ORDER"
+    },
+    "env.log.max": {
+        "desc": "Maximum number of log files (during rotation). This is a configuration for environment logs (e.g., `flink.log`)",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "historyserver.archive.fs.refresh-interval": {
+        "desc": "Interval (milliseconds) at which the HistoryServer scans the archive directory (`historyserver.archive.fs.dir`) to discover newly completed jobs",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "historyserver.web.ssl.enabled": {
+        "desc": "Whether to enable SSL for the HistoryServer's Web UI endpoint",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "classloader.resolve-order": {
+        "desc": "Resolution order used by the classloader when loading classes. 'child-first': loads classes from user code JARs first; 'parent-first': loads classes from the Flink system classpath first",
+        "type": "discrete",
+        "range": [
+            "child-first",
+            "parent-first"
+        ],
+        "dtype": "string",
+        "default_value": "child-first"
+    },
+    "blob.service.cleanup.interval": {
+        "desc": "Interval (seconds) at which the Blob service cleans up expired BLOB files. Default value is 1 hour (3600 seconds)",
+        "type": "continuous",
+        "range": [
+            360,
+            36000
+        ],
+        "dtype": "int",
+        "default_value": "3600"
+    },
+    "web.history": {
+        "desc": "Maximum number of completed jobs retained in the Web UI history",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "25"
+    },
+    "web.checkpoints.history": {
+        "desc": "Maximum number of Checkpoint history records displayed per job in the Web UI",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "web.backpressure.cleanup-interval": {
+        "desc": "Interval (milliseconds) for the backpressure monitoring data cleanup task in the Web UI, used to remove backpressure data for inactive tasks",
+        "type": "continuous",
+        "range": [
+            60000,
+            6000000
+        ],
+        "dtype": "int",
+        "default_value": "600000"
+    },
+    "web.backpressure.refresh-interval": {
+        "desc": "Interval (milliseconds) at which the Web UI refreshes backpressure monitoring data. Smaller values allow faster visibility into backpressure changes but increase sampling overhead",
+        "type": "continuous",
+        "range": [
+            6000,
+            600000
+        ],
+        "dtype": "int",
+        "default_value": "60000"
+    },
+    "web.backpressure.num-samples": {
+        "desc": "Number of samples used by the Web UI to calculate the backpressure ratio. More samples yield smoother backpressure metrics",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "web.backpressure.delay-between-samples": {
+        "desc": "Delay (milliseconds) between two consecutive samples in Web UI backpressure monitoring",
+        "type": "continuous",
+        "range": [
+            5,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "jobstore.cache-size": {
+        "desc": "Cache size (bytes) for job information in the JobStore. Used for HistoryServer or JobStore components",
+        "type": "continuous",
+        "range": [
+            5242880,
+            524288000
+        ],
+        "dtype": "int",
+        "default_value": "52428800 (approx. 50MB)"
+    },
+    "jobstore.expiration-time": {
+        "desc": "Expiration time (seconds) for job storage in the JobStore. Job information older than this will be deleted",
+        "type": "continuous",
+        "range": [
+            360,
+            360000
+        ],
+        "dtype": "int",
+        "default_value": "3600 (1 hour)"
+    },
+    "jobmanager.execution.attempts-history-size": {
+        "desc": "Maximum number of execution attempt history records retained by the JobManager per task",
+        "type": "continuous",
+        "range": [
+            2,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "16"
+    },
+    "task.cancellation.interval": {
+        "desc": "Interval (milliseconds) at which the task cancellation process checks whether the task has stopped. If the task has not stopped within this time, another interrupt will be triggered",
+        "type": "continuous",
+        "range": [
+            3000,
+            3000000
+        ],
+        "dtype": "int",
+        "default_value": "30000"
+    },
+    "taskmanager.debug.memory.log": {
+        "desc": "Whether to periodically log TaskManager memory usage (including on-heap and off-heap memory) for debugging purposes",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.debug.memory.log-interval": {
+        "desc": "Interval (milliseconds) for TaskManager memory logging. Only takes effect when `taskmanager.debug.memory.log` is `true`",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": "5000"
+    },
+    "taskmanager.network.detailed-metrics": {
+        "desc": "Whether to enable detailed metric monitoring for network transmission, such as buffer usage per channel. This introduces additional performance overhead",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.network.memory.buffers-per-channel": {
+        "desc": "Number of dedicated buffers allocated per outgoing/incoming channel. Used to reduce data contention",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "taskmanager.network.memory.floating-buffers-per-gate": {
+        "desc": "Number of floating buffers allocated per input gate. These buffers are shared among multiple channels to handle data skew",
+        "type": "continuous",
+        "range": [
+            8,
+            800
+        ],
+        "dtype": "int",
+        "default_value": "8"
+    },
+    "akka.fork-join-executor.parallelism-max": {
+        "desc": "Maximum parallelism of the Akka fork-join thread pool. Affects the concurrency capability of Akka message processing",
+        "type": "continuous",
+        "range": [
+            16,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "akka.jvm-exit-on-fatal-error": {
+        "desc": "Whether to exit the JVM process when the Akka system encounters a fatal error (e.g., ActorSystem termination)",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "akka.server-socket-worker-pool.pool-size-max": {
+        "desc": "Maximum size of the Akka server socket worker thread pool",
+        "type": "continuous",
+        "range": [
+            2,
+            256
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "rest.client.max-content-length": {
+        "desc": "Maximum response content length (bytes) allowed by the REST client. Prevents memory overflow from downloading excessively large responses",
+        "type": "continuous",
+        "range": [
+            10485760,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "104857600"
+    },
+    "rest.server.max-content-length": {
+        "desc": "Maximum request content length (bytes) allowed by the REST server. Prevents memory overflow from receiving excessively large requests",
+        "type": "continuous",
+        "range": [
+            10485760,
+            1048576000
+        ],
+        "dtype": "int",
+        "default_value": "104857600"
+    },
+    "rest.server.numThreads": {
+        "desc": "Number of worker threads used by the REST server to handle requests",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "rest.server.thread-priority": {
+        "desc": "Priority of REST server worker threads (1-10, 1 lowest, 10 highest)",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "blob.offload.minsize": {
+        "desc": "Minimum size (bytes) for offloading BLOB content to disk by the Blob service. BLOBs larger than this size will be stored on disk rather than in memory",
+        "type": "continuous",
+        "range": [
+            131072,
+            2097152
+        ],
+        "dtype": "int",
+        "default_value": "1048576 (1MB)"
+    },
+    "heartbeat.interval": {
+        "desc": "Interval (milliseconds) at which heartbeats are sent between JobManager and TaskManager to detect whether components are alive",
+        "type": "continuous",
+        "range": [
+            1000,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "web.refresh-interval": {
+        "desc": "Interval (milliseconds) at which the Web UI automatically refreshes dashboard data",
+        "type": "continuous",
+        "range": [
+            300,
+            6000
+        ],
+        "dtype": "int",
+        "default_value": "3000"
+    },
+    "state.backend.async": {
+        "desc": "Whether to enable asynchronous snapshots for the state backend. Asynchronous snapshots avoid blocking data stream processing during Checkpoints. Default value is usually `true`",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "state.backend.fs.memory-threshold": {
+        "desc": "Minimum size threshold (KB) for state data to be written to a file in the filesystem state backend (FsStateBackend). State smaller than this threshold will be stored as metadata in JobManager memory",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "20"
+    },
+    "state.backend.local-recovery": {
+        "desc": "Whether to enable local recovery. When enabled, TaskManager stores a copy of Checkpoints on local disk to speed up failure recovery",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.latency.granularity": {
+        "desc": "Granularity of latency metrics. 'single': does not distinguish between sources and subtasks; 'operator': distinguishes sources but not subtasks; 'subtask': distinguishes both sources and subtasks",
+        "type": "discrete",
+        "range": [
+            "single",
+            "operator",
+            "subtask"
+        ],
+        "dtype": "string",
+        "default_value": "operator"
+    },
+    "historyserver.web.refresh-interval": {
+        "desc": "Interval (milliseconds) at which the HistoryServer Web UI automatically refreshes",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "security.ssl.rest.authentication-enabled": {
+        "desc": "Whether to enable mutual SSL authentication (mTLS) for REST endpoints. When enabled, clients also need to provide a valid certificate",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "mesos.resourcemanager.tasks.container.docker.force-pull-image": {
+        "desc": "When using Docker containers on Mesos, whether to always force pulling the latest image from the registry instead of using the local cache",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.timer-service.factory": {
+        "desc": "Implementation of the Timer Service. 'HEAP': uses heap memory to manage timers; 'ROCKSDB': uses RocksDB to manage timers, suitable for scenarios with a large number of timers",
+        "type": "discrete",
+        "range": [
+            "HEAP",
+            "ROCKSDB"
+        ],
+        "dtype": "string",
+        "default_value": "ROCKSDB"
+    },
+    "yarn.heartbeat.container-request-interval": {
+        "desc": "Interval (milliseconds) at which Flink requests containers from the ResourceManager in a YARN session",
+        "type": "continuous",
+        "range": [
+            50,
+            50000
+        ],
+        "dtype": "int",
+        "default_value": "500"
+    },
+    "metrics.internal.query-service.thread-priority": {
+        "desc": "Thread priority (1-10) for Flink's internal metric query service. Higher priority makes the metric service more responsive but may impact the main flow",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "metrics.system-resource": {
+        "desc": "Whether to report system resource metrics, such as CPU, memory, and network. When enabled, machine-level metrics are collected periodically",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "metrics.system-resource-probing-interval": {
+        "desc": "Interval (milliseconds) for collecting system resource metrics. Only takes effect when `metrics.system-resource` is `true`",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": "5000"
+    },
+    "state.backend.rocksdb.metrics.actual-delayed-write-rate": {
+        "desc": "Whether to monitor RocksDB's current actual delayed write rate. 0 indicates no delay. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.background-errors": {
+        "desc": "Whether to monitor RocksDB's background error count. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.compaction-pending": {
+        "desc": "Whether to monitor if RocksDB has pending Compaction operations. 1 indicates pending, 0 indicates none. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.cur-size-active-mem-table": {
+        "desc": "Whether to monitor the approximate size of RocksDB's current active memtable. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.cur-size-all-mem-tables": {
+        "desc": "Whether to monitor the approximate size of all RocksDB memtables (active and immutable). Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-live-data-size": {
+        "desc": "Whether to monitor the estimated size of live data in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-num-keys": {
+        "desc": "Whether to monitor the estimated number of keys in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-pending-compaction-bytes": {
+        "desc": "Whether to monitor the estimated bytes to be rewritten by pending Compaction in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.estimate-table-readers-mem": {
+        "desc": "Whether to monitor the estimated memory used for reading SST tables in RocksDB (excluding block cache). Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.mem-table-flush-pending": {
+        "desc": "Whether to monitor the number of pending memtable flush operations in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-deletes-active-mem-table": {
+        "desc": "Whether to monitor the total number of delete entries in RocksDB's active memtable. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-deletes-imm-mem-tables": {
+        "desc": "Whether to monitor the total number of delete entries in RocksDB's immutable memtables. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-entries-active-mem-table": {
+        "desc": "Whether to monitor the total number of entries in RocksDB's active memtable. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-entries-imm-mem-tables": {
+        "desc": "Whether to monitor the total number of entries in RocksDB's immutable memtables. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-immutable-mem-table": {
+        "desc": "Whether to monitor the number of immutable memtables in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-live-versions": {
+        "desc": "Whether to monitor the number of live versions of SST files in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-running-compactions": {
+        "desc": "Whether to monitor the number of running Compaction tasks in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-running-flushes": {
+        "desc": "Whether to monitor the number of running memtable flush tasks in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.num-snapshots": {
+        "desc": "Whether to monitor the number of open Snapshots in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.size-all-mem-tables": {
+        "desc": "Whether to monitor the approximate total size of all RocksDB memtables. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.total-sst-files-size": {
+        "desc": "Whether to monitor the total size of all SST files in RocksDB. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.predefined-options": {
+        "desc": "Predefined optimization configuration sets for RocksDB. Choose the appropriate configuration based on the underlying storage medium. 'DEFAULT': default settings; 'SPINNING_DISK_OPTIMIZED': optimization for HDD; 'FLASH_SSD_OPTIMIZED': optimization for SSD",
+        "type": "discrete",
+        "range": [
+            "DEFAULT",
+            "SPINNING_DISK_OPTIMIZED",
+            "SPINNING_DISK_OPTIMIZED_HIGH_MEM",
+            "FLASH_SSD_OPTIMIZED"
+        ],
+        "dtype": "string",
+        "default_value": "DEFAULT"
+    },
+    "state.backend.rocksdb.compaction.level.target-file-size-base": {
+        "desc": "Target size (in MB) for each SST file in RocksDB Level-1. Larger values reduce the number of files but may increase Compaction overhead",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "64"
+    },
+    "state.backend.rocksdb.compaction.level.use-dynamic-size": {
+        "desc": "Whether to use dynamic target sizes to control file sizes across RocksDB levels. When enabled, sizes can be adjusted dynamically based on actual conditions",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.compaction.style": {
+        "desc": "Compaction strategy for RocksDB. 'LEVEL': Leveled Compaction (default); 'UNIVERSAL': Universal Compaction, suitable for write-intensive workloads; 'FIFO': FIFO Compaction, for temporary data; 'NONE': no Compaction",
+        "type": "discrete",
+        "range": [
+            "LEVEL",
+            "UNIVERSAL",
+            "FIFO",
+            "NONE"
+        ],
+        "dtype": "string",
+        "default_value": "LEVEL"
+    },
+    "state.backend.rocksdb.writebuffer.number-to-merge": {
+        "desc": "Number of memtables that can be merged before flushing to disk",
+        "type": "continuous",
+        "range": [
+            1,
+            128
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "state.backend.rocksdb.writebuffer.size": {
+        "desc": "Size of a single write buffer (in MB). Write buffers are memory pools for RocksDB memtables",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "64"
+    },
+    "queryable-state.client.network-threads": {
+        "desc": "Number of network threads used by the Queryable State client. Set to 0 to use Netty's default value",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.enable": {
+        "desc": "Whether to enable the Queryable State feature for the entire cluster",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "queryable-state.proxy.network-threads": {
+        "desc": "Number of network threads used by the Queryable State Proxy. Set to 0 to use Netty's default value",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.proxy.query-threads": {
+        "desc": "Number of threads used by the Queryable State Proxy to handle query requests",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.server.network-threads": {
+        "desc": "Number of network threads used by the Queryable State Server. Set to 0 to use Netty's default value",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "queryable-state.server.query-threads": {
+        "desc": "Number of threads used by the Queryable State Server to handle query requests",
+        "type": "continuous",
+        "range": [
+            0,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "metrics.fetcher.update-interval": {
+        "desc": "Update interval (milliseconds) for the Metric Fetcher used by the Web UI. Smaller values provide faster metric updates but increase load",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "jobmanager.execution.failover-strategy": {
+        "desc": "Failure recovery strategy when job execution fails. 'full': restarts the entire job; 'region': restarts only the affected Region (more fine-grained recovery)",
+        "type": "discrete",
+        "range": [
+            "full",
+            "region"
+        ],
+        "dtype": "string",
+        "default_value": "region"
+    },
+    "cluster.evenly-spread-out-slots": {
+        "desc": "Whether to evenly distribute slots across all available TaskManagers. When enabled, Flink attempts to spread tasks across more machines to improve fault tolerance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "yarn.application-attempt-failures-validity-interval": {
+        "desc": "Validity time window (milliseconds) for YARN ApplicationMaster attempt failures. Failures outside this window are not counted toward restart limits",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": "10000"
+    },
+    "yarn.appmaster.vcores": {
+        "desc": "Number of virtual cores (vcores) used by the YARN ApplicationMaster (i.e., JobManager)",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "yarn.heartbeat.interval": {
+        "desc": "Interval (seconds) at which the Flink YARN session sends heartbeats to the ResourceManager",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "5"
+    },
+    "mesos.resourcemanager.tasks.disk": {
+        "desc": "Disk space (MB) allocated to each Mesos TaskManager",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "state.backend.fs.write-buffer-size": {
+        "desc": "Write buffer size (bytes) used by the filesystem state backend when writing Checkpoint data",
+        "type": "continuous",
+        "range": [
+            512,
+            131072
+        ],
+        "dtype": "int",
+        "default_value": "4096"
+    },
+    "taskmanager.memory.framework.heap.size": {
+        "desc": "JVM heap memory size used by the TaskManager framework. This memory is not allocated to task slots",
+        "type": "continuous",
+        "range": [
+            12,
+            512
+        ],
+        "dtype": "int",
+        "default_value": "128 mb"
+    },
+    "taskmanager.memory.jvm-overhead.fraction": {
+        "desc": "Proportion of total process memory reserved for JVM overhead (e.g., thread stacks, compilation cache). Default value is 0.1",
+        "type": "continuous",
+        "range": [
+            0,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "taskmanager.memory.jvm-overhead.max": {
+        "desc": "Maximum size of TaskManager JVM overhead. Default value is 1 GB",
+        "type": "continuous",
+        "range": [
+            1,
+            10
+        ],
+        "dtype": "int",
+        "default_value": "1 gb"
+    },
+    "taskmanager.memory.jvm-overhead.min": {
+        "desc": "Minimum size of TaskManager JVM overhead. Default value is 192 MB",
+        "type": "continuous",
+        "range": [
+            19,
+            384
+        ],
+        "dtype": "int",
+        "default_value": "192 mb"
+    },
+    "taskmanager.memory.network.min": {
+        "desc": "Minimum network memory size for TaskManager. Default value is 64 MB",
+        "type": "continuous",
+        "range": [
+            6,
+            256
+        ],
+        "dtype": "int",
+        "default_value": "64 mb"
+    },
+    "kubernetes.container.image.pull-policy": {
+        "desc": "Pull policy for Kubernetes container images. 'IfNotPresent': pull only if not present locally; 'Always': always pull; 'Never': never pull",
+        "type": "discrete",
+        "range": [
+            "IfNotPresent",
+            "Always",
+            "Never"
+        ],
+        "dtype": "string",
+        "default_value": "IfNotPresent"
+    },
+    "kubernetes.jobmanager.cpu": {
+        "desc": "CPU core request for the JobManager container in Kubernetes",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": "1.0"
+    },
+    "kubernetes.rest-service.exposed.type": {
+        "desc": "Method for exposing the Flink REST service on Kubernetes. 'ClusterIP': accessible only within the cluster; 'NodePort': exposed via node ports; 'LoadBalancer': exposed via a cloud provider's load balancer",
+        "type": "discrete",
+        "range": [
+            "ClusterIP",
+            "NodePort",
+            "LoadBalancer",
+            "Headless_ClusterIP"
+        ],
+        "dtype": "string",
+        "default_value": "LoadBalancer"
+    },
+    "state.backend.rocksdb.memory.high-prio-pool-ratio": {
+        "desc": "Proportion of cache memory reserved for high-priority data (e.g., indexes, filters, compression dictionary blocks). Default value is 0.1",
+        "type": "continuous",
+        "range": [
+            0.1,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "state.backend.rocksdb.memory.managed": {
+        "desc": "Whether the RocksDB state backend uses Flink managed memory. If `true`, RocksDB automatically uses the Slot's managed memory budget",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "state.backend.rocksdb.metrics.block-cache-capacity": {
+        "desc": "Whether to monitor RocksDB block cache capacity. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.block-cache-pinned-usage": {
+        "desc": "Whether to monitor the memory size of pinned entries in RocksDB block cache. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.block-cache-usage": {
+        "desc": "Whether to monitor the memory size of entries in RocksDB block cache. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.column-family-as-variable": {
+        "desc": "Whether to expose Column Family as a variable in RocksDB metrics. When enabled, metrics can be distinguished by column family",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.rocksdb.metrics.is-write-stopped": {
+        "desc": "Whether to monitor if RocksDB has stopped writes (due to Compaction falling behind). 1 indicates stopped, 0 indicates normal. Enabling this metric impacts performance",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "historyserver.archive.clean-expired-jobs": {
+        "desc": "Whether the HistoryServer automatically cleans up expired job archives. When enabled, expired jobs defined in `historyserver.archive.fs.refresh-interval` will be deleted",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "classloader.fail-on-metaspace-oom-error": {
+        "desc": "Whether to explicitly fail the classloader when a Metaspace OutOfMemoryError occurs",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "taskmanager.network.blocking-shuffle.compression.enabled": {
+        "desc": "Whether to enable compression for blocking shuffle data. Compression reduces network and disk I/O but increases CPU load",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.attached": {
+        "desc": "Whether to execute Flink jobs in attached mode. In attached mode, the client waits for the job to complete before exiting",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.shutdown-on-attached-exit": {
+        "desc": "Whether to shut down the entire Flink cluster if the client exits when running in attached mode. Only takes effect when `execution.attached` is `true`",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.savepoint.ignore-unclaimed-state": {
+        "desc": "Whether to ignore state not claimed by any operator when restoring from a Savepoint",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "execution.checkpointing.snapshot-compression": {
+        "desc": "Whether to compress Checkpoint snapshot data. Enabling this reduces snapshot size but increases CPU load",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.auto-type-registration": {
+        "desc": "Whether to automatically register types used in user code with the Kryo serializer. Disabling may require manual registration",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.auto-watermark-interval": {
+        "desc": "Interval (milliseconds) for automatic Watermark generation. Only takes effect if the source function does not define a Watermark generation strategy",
+        "type": "continuous",
+        "range": [
+            20,
+            20000
+        ],
+        "dtype": "int",
+        "default_value": "200"
+    },
+    "pipeline.force-avro": {
+        "desc": "Whether to force the use of Avro serializer to serialize all POJO types",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.force-kryo": {
+        "desc": "Whether to force the use of Kryo serializer to serialize all types (instead of Avro or Java serialization)",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.generic-types": {
+        "desc": "Whether to allow the use of generic types. When disabled, encountering unregistered generic types will throw an exception",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.max-parallelism": {
+        "desc": "Default maximum parallelism for the entire pipeline. This value affects the number of state partitions for KeyedStreams",
+        "type": "continuous",
+        "range": [
+            100,
+            32768
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "pipeline.object-reuse": {
+        "desc": "Whether to enable Object Reuse optimization. When enabled, operators reuse objects, reducing GC pressure but may cause issues with unsafe code",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "pipeline.operator-chaining": {
+        "desc": "Whether to enable Operator Chaining optimization. When disabled, each operator runs in an independent task",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "pipeline.time-characteristic": {
+        "desc": "Time characteristic for stream processing. 'ProcessingTime': processing time; 'IngestionTime': ingestion time; 'EventTime': event time",
+        "type": "discrete",
+        "range": [
+            "ProcessingTime",
+            "IngestionTime",
+            "EventTime"
+        ],
+        "dtype": "string",
+        "default_value": "EventTime"
+    },
+    "execution.checkpointing.mode": {
+        "desc": "Checkpoint mode. 'EXACTLY_ONCE': exactly-once semantics; 'AT_LEAST_ONCE': at-least-once semantics",
+        "type": "discrete",
+        "range": [
+            "EXACTLY_ONCE",
+            "AT_LEAST_ONCE"
+        ],
+        "dtype": "string",
+        "default_value": "EXACTLY_ONCE"
+    },
+    "execution.checkpointing.prefer-checkpoint-for-recovery": {
+        "desc": "Whether to prefer Checkpoints over Savepoints for recovery. If `true` and a Checkpoint exists, it will be used preferentially",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "jobmanager.memory.enable-jvm-direct-memory-limit": {
+        "desc": "Whether to enable JVM direct memory limit (-XX:MaxDirectMemorySize) for the JobManager process. The limit size is determined by `jobmanager.memory.off-heap.size`",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "jobmanager.memory.jvm-overhead.fraction": {
+        "desc": "Proportion of total process memory reserved for JobManager JVM overhead (e.g., thread stacks, compilation cache). Default value is 0.1",
+        "type": "continuous",
+        "range": [
+            0,
+            0.3
+        ],
+        "dtype": "float",
+        "default_value": "0.1"
+    },
+    "jobmanager.memory.off-heap.size": {
+        "desc": "Off-heap memory size for JobManager (including direct memory and native memory). Default value is 128 MB",
+        "type": "continuous",
+        "range": [
+            12,
+            1280
+        ],
+        "dtype": "int",
+        "default_value": "128 mb"
+    },
+    "jobmanager.retrieve-taskmanager-hostname": {
+        "desc": "Whether the JobManager attempts to retrieve the TaskManager's hostname instead of using the remote address from the RPC connection",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "taskmanager.network.memory.max-buffers-per-channel": {
+        "desc": "Maximum number of buffers that can be allocated per channel",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "akka.ask.callstack": {
+        "desc": "Whether to print call stack information when an Akka ask operation times out, to aid debugging",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "client.retry-period": {
+        "desc": "Interval (seconds) for client retries after an operation failure",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "execution.checkpointing.unaligned": {
+        "desc": "Whether to enable Unaligned Checkpoints. When enabled, Checkpoint speed can be faster under backpressure, but increases I/O load",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "kubernetes.client.io-pool.size": {
+        "desc": "Size of the thread pool used by the Kubernetes client for blocking I/O operations (e.g., starting/stopping Pods)",
+        "type": "continuous",
+        "range": [
+            4,
+            400
+        ],
+        "dtype": "int",
+        "default_value": "4"
+    },
+    "mesos.resourcemanager.tasks.network.bandwidth": {
+        "desc": "Network bandwidth limit (MB/sec) allocated to each Mesos TaskManager",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "classloader.check-leaked-classloader": {
+        "desc": "Whether to check for classloader leaks. When enabled, Flink attempts to detect classloaders that are not released after a task finishes",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "high-availability.kubernetes.leader-election.lease-duration": {
+        "desc": "Lease duration (seconds) for leader election in Kubernetes high-availability mode",
+        "type": "continuous",
+        "range": [
+            1,
+            1500
+        ],
+        "dtype": "int",
+        "default_value": "15"
+    },
+    "high-availability.kubernetes.leader-election.renew-deadline": {
+        "desc": "Renew deadline (seconds) for the leader to renew its lease in Kubernetes high-availability mode",
+        "type": "continuous",
+        "range": [
+            1,
+            1500
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "high-availability.kubernetes.leader-election.retry-period": {
+        "desc": "Retry period (seconds) between the leader's attempts to renew the lease in Kubernetes high-availability mode",
+        "type": "continuous",
+        "range": [
+            1,
+            500
+        ],
+        "dtype": "int",
+        "default_value": "2"
+    },
+    "slotmanager.redundant-taskmanager-num": {
+        "desc": "Number of redundant TaskManagers maintained by the SlotManager. These extra TaskManagers can be used to quickly replace failed TaskManagers",
+        "type": "continuous",
+        "range": [
+            0,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "0"
+    },
+    "taskmanager.network.sort-shuffle.min-buffers": {
+        "desc": "Minimum number of network buffers required for Sort Shuffle",
+        "type": "continuous",
+        "range": [
+            64,
+            32768
+        ],
+        "dtype": "int",
+        "default_value": "1024"
+    },
+    "taskmanager.network.sort-shuffle.min-parallelism": {
+        "desc": "Minimum parallelism to trigger Sort Shuffle. When job parallelism is below this value, other shuffle implementations may be used",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "taskmanager.runtime.large-record-handler": {
+        "desc": "Whether to enable the Large Record handler for processing oversized records that exceed network buffer size",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "taskmanager.memory.framework.off-heap.batch-shuffle.size": {
+        "desc": "Memory size for reading shuffle data in batch shuffle (sort-merge shuffle). This memory is allocated from `taskmanager.memory.framework.off-heap.size`",
+        "type": "continuous",
+        "range": [
+            6,
+            640
+        ],
+        "dtype": "int",
+        "default_value": "32 mb"
+    },
+    "execution.checkpointing.unaligned.forced": {
+        "desc": "Whether to force the use of Unaligned Checkpoints for all Checkpoints. If enabled, other conditions are ignored",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.storage.fs.memory-threshold": {
+        "desc": "Minimum size threshold (KB) for state data to be written to a file in the filesystem state storage. State smaller than this threshold will be stored as metadata in JobManager memory",
+        "type": "continuous",
+        "range": [
+            2,
+            200
+        ],
+        "dtype": "int",
+        "default_value": "20"
+    },
+    "state.storage.fs.write-buffer-size": {
+        "desc": "Write buffer size (bytes) used by the filesystem state storage when writing Checkpoint data",
+        "type": "continuous",
+        "range": [
+            512,
+            262144
+        ],
+        "dtype": "int",
+        "default_value": "4096"
+    },
+    "state.backend.latency-track.history-size": {
+        "desc": "History size maintained by state backend latency tracking",
+        "type": "continuous",
+        "range": [
+            8,
+            16384
+        ],
+        "dtype": "int",
+        "default_value": "128"
+    },
+    "state.backend.latency-track.keyed-state-enabled": {
+        "desc": "Whether to enable latency tracking for Keyed State",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "state.backend.latency-track.sample-interval": {
+        "desc": "Sampling interval (milliseconds) for state backend latency tracking",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "state.backend.latency-track.state-name-as-variable": {
+        "desc": "Whether to expose state name as a variable in latency tracking metrics",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "cluster.intercept-user-system-exit": {
+        "desc": "Whether to intercept `System.exit()` calls in user code. 'DISABLED': no interception; 'LOG': intercept and log; 'THROW': intercept and throw a security exception",
+        "type": "discrete",
+        "range": [
+            "DISABLED",
+            "LOG",
+            "THROW"
+        ],
+        "dtype": "string",
+        "default_value": "LOG"
+    },
+    "jobmanager.adaptive-scheduler.min-parallelism-increase": {
+        "desc": "Minimum step size for increasing parallelism in the Adaptive Scheduler",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "1"
+    },
+    "rest.flamegraph.cleanup-interval": {
+        "desc": "Interval (seconds) for cleaning up Flamegraph data in the REST API",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "rest.flamegraph.delay-between-samples": {
+        "desc": "Delay (milliseconds) between Flamegraph samples",
+        "type": "continuous",
+        "range": [
+            5,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": "50"
+    },
+    "rest.flamegraph.enabled": {
+        "desc": "Whether to enable Flamegraph generation for the REST API",
+        "type": "discrete",
+        "range": [
+            "true",
+            "false"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "rest.flamegraph.num-samples": {
+        "desc": "Number of samples to collect when generating a Flamegraph",
+        "type": "continuous",
+        "range": [
+            10,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "rest.flamegraph.refresh-interval": {
+        "desc": "Interval (seconds) for refreshing Flamegraph data",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "rest.flamegraph.stack-depth": {
+        "desc": "Maximum stack depth displayed in the Flamegraph",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": "100"
+    },
+    "web.exception-history-size": {
+        "desc": "Maximum number of exception history records displayed per job in the Web UI. Default value is 16",
+        "type": "continuous",
+        "range": [
+            2,
+            8192
+        ],
+        "dtype": "int",
+        "default_value": "16"
+    },
+    "resourcemanager.start-worker.max-failure-rate": {
+        "desc": "Maximum failure rate for starting workers (e.g., TaskManager) by the ResourceManager (failures per time window)",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": "10"
+    },
+    "resourcemanager.start-worker.retry-interval": {
+        "desc": "Retry interval (seconds) after a failure to start a worker by the ResourceManager",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": "3"
     }
 }
