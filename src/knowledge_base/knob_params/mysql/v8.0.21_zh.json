@@ -577,7 +577,7 @@
         "default_value": 4
     },
     "max_heap_table_size": {
-        "desc": "This variable sets the maximum size to which user-created MEMORY tables are permitted to grow. It can reduce disk I/O by keeping temporary tables in memory",
+        "desc": "此变量设置用户创建的 MEMORY 表允许增长到的最大大小。它可以通过将临时表保留在内存中来减少磁盘 I/O",
         "type": "continuous",
         "range": [
             16384,
@@ -587,7 +587,7 @@
         "default_value": 16777216
     },
     "thread_cache_size": {
-        "desc": "The number of threads cached to handle new connections. This variable can be increased to improve performance if you have a lot of new connections. It reduces CPU overhead from thread creation/destruction. Ideally set high enough so that most new connections use cached threads, but higher values consume more memory",
+        "desc": "用于处理新连接的缓存线程数。如果有大量新连接，可以增加此值以提高性能。它减少了线程创建/销毁带来的 CPU 开销。理想情况下应设置得足够高，使大多数新连接使用缓存线程，但较高的值会消耗更多内存",
         "type": "continuous",
         "range": [
             0,
@@ -597,7 +597,7 @@
         "default_value": 9
     },
     "tmp_table_size": {
-        "desc": "Defines the maximum size of internal in-memory temporary tables created by the MEMORY storage engine and, as of MySQL 8.0.28, the TempTable storage engine. If the size of a temporary table exceeds this value, it is converted to a disk-based table, which can alleviate memory and disk I/O. Higher values reduce disk usage but increase memory consumption",
+        "desc": "定义 MEMORY 存储引擎和 TempTable 存储引擎创建的内部内存临时表的最大大小。如果临时表大小超过此值，则会转换为基于磁盘的表，这可以减轻内存和磁盘 I/O 压力。较高的值可以减少磁盘使用但会增加内存消耗",
         "type": "continuous",
         "range": [
             1024,
@@ -605,5 +605,661 @@
         ],
         "dtype": "int",
         "default_value": 16777216
+    },
+    "table_open_cache": {
+        "desc": "所有线程的打开表实例数量。增大此值可以减少打开表时的开销，提高并发执行效率，但会增加内存使用。该参数主要用于缓解CPU瓶颈，尤其是在高并发连接场景下",
+        "type": "continuous",
+        "range": [
+            30000,
+            50000
+        ],
+        "dtype": "int",
+        "default_value": 4000
+    },
+    "table_open_cache_instances": {
+        "desc": "表缓存实例数量，通过将表缓存划分为多个独立实例来减少并发访问时的争用。增大该值可以提高高并发环境下的扩展性，有助于缓解CPU瓶颈。建议在连接数较高时适当增加",
+        "type": "continuous",
+        "range": [
+            2,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "sync_binlog": {
+        "desc": "控制每个事务提交后是否将二进制日志同步到磁盘。设置为1时，每次事务提交都执行同步，提供最高的数据安全性但会增加磁盘I/O开销；设置为0时由操作系统决定刷新时机，可以缓解磁盘IO瓶颈但可能丢失数据",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "key_buffer_size": {
+        "desc": "MyISAM存储引擎索引缓存的缓冲区大小（以MB为单位）。增大该值可以提高MyISAM表的索引读取性能，减少磁盘I/O操作。主要影响磁盘IO瓶颈，对于使用MyISAM引擎的环境建议适当调大",
+        "type": "continuous",
+        "range": [
+            8,
+            2048
+        ],
+        "dtype": "int",
+        "default_value": 8
+    },
+    "binlog_cache_size": {
+        "desc": "事务期间用于缓存二进制日志的内存大小（以字节为单位）。增大该值可以减少事务提交时磁盘写入的次数，有助于缓解磁盘IO瓶颈。如果经常使用大事务，建议适当增加此值以避免磁盘临时文件",
+        "type": "continuous",
+        "range": [
+            1,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 32768
+    },
+    "innodb_purge_threads": {
+        "desc": "InnoDB后台purge线程的数量，用于清理不再需要的undo日志和已删除的行。增大该值可以提高清理操作的并行度，有助于缓解CPU瓶颈，在高写入负载下可以提升系统响应速度",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "innodb_page_cleaners": {
+        "desc": "InnoDB页面清理线程的数量，负责将脏页刷新到磁盘。增大该值可以提高脏页刷新的并行效率，有助于缓解磁盘IO瓶颈，特别是在高写入负载和大缓冲池环境中效果明显",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "slave_parallel_type": {
+        "desc": "指定从库上并行复制的类型。DATABASE模式使用基于数据库的并行复制，LOGICAL_CLOCK模式使用基于逻辑时钟的并行复制，后者通常能提供更高的并行度，有助于缓解CPU瓶颈和提升复制吞吐量",
+        "type": "discrete",
+        "range": [
+            "DATABASE",
+            "LOGICAL_CLOCK"
+        ],
+        "dtype": "string",
+        "default_value": "DATABASE"
+    },
+    "slave_parallel_workers": {
+        "desc": "从库上并行复制工作线程的数量。增大该值可以提高复制应用的并行度，加快从库的数据同步速度，有助于缓解CPU瓶颈。建议根据CPU核心数设置，通常设置为4-16之间",
+        "type": "continuous",
+        "range": [
+            0,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "slave_preserve_commit_order": {
+        "desc": "控制从库上是否保留事务的提交顺序。启用时（ON）确保并行复制下事务的提交顺序与主库一致，可以提高数据一致性但可能增加锁等待。该参数主要用于平衡数据一致性和CPU使用",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "lock_wait_timeout": {
+        "desc": "获取元数据锁的超时时间（以秒为单位）。当会话等待锁的时间超过此值时，系统会返回超时错误。增大该值可以避免长时间等待的事务被过早终止，有助于缓解CPU瓶颈，但可能增加锁等待时间",
+        "type": "continuous",
+        "range": [
+            1,
+            31536000
+        ],
+        "dtype": "int",
+        "default_value": 31536000
+    },
+    "long_query_time": {
+        "desc": "慢查询日志的阈值时间（以秒为单位）。执行时间超过此值的查询会被记录到慢查询日志中。增大该值可以减少慢查询日志的记录量，减小该值则有助于识别更多性能问题，主要用于分析磁盘IO和CPU瓶颈",
+        "type": "continuous",
+        "range": [
+            0,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "max_allowed_packet": {
+        "desc": "客户端与服务器之间通信的最大数据包大小（以字节为单位）。增大该值可以支持更大的数据传输（如BLOB字段），但会增加内存使用。主要用于缓解网络传输瓶颈，默认值67108864（64MB）适合大多数场景",
+        "type": "continuous",
+        "range": [
+            1024,
+            1073741824
+        ],
+        "dtype": "int",
+        "default_value": 67108864
+    },
+    "max_connections": {
+        "desc": "MySQL服务器允许的最大并发客户端连接数。增大该值可以支持更多同时连接，但会消耗更多内存和CPU资源。主要用于缓解连接瓶颈，建议根据系统内存和CPU核心数合理设置，通常为500-2000",
+        "type": "continuous",
+        "range": [
+            151,
+            100000
+        ],
+        "dtype": "int",
+        "default_value": 151
+    },
+    "max_join_size": {
+        "desc": "执行不带WHERE条件的联接查询时，允许扫描的最大行数估计值。该参数可以防止执行过于低效的大联接查询，有助于缓解CPU和内存瓶颈。增大该值允许执行更大的联接，但可能影响性能",
+        "type": "continuous",
+        "range": [
+            214748364,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 214748364
+    },
+    "max_length_for_sort_data": {
+        "desc": "排序操作中决定是否使用更高效排序算法的阈值（以字节为单位）。当行数据长度小于此值时，MySQL会使用改进的排序算法，提高排序性能。增大该值可以提升排序效率，有助于缓解CPU瓶颈",
+        "type": "continuous",
+        "range": [
+            4,
+            8388608
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "max_prepared_stmt_count": {
+        "desc": "服务器允许同时存在的预处理语句的最大数量。增大该值可以支持更多预处理语句，减少SQL解析开销，有助于缓解CPU瓶颈。超过此限制时，新的预处理语句会返回错误",
+        "type": "continuous",
+        "range": [
+            0,
+            1048576
+        ],
+        "dtype": "int",
+        "default_value": 16382
+    },
+    "max_sort_length": {
+        "desc": "排序时对于BLOB或TEXT类型字段考虑的最大字节数。只有前N个字节用于排序比较。增大该值可以提高排序精度但会增加内存和CPU开销，减小该值则有助于缓解内存瓶颈",
+        "type": "continuous",
+        "range": [
+            4,
+            8388608
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "max_user_connections": {
+        "desc": "单个用户账户允许的最大并发连接数。设置为0表示不限制。增大该值允许单个用户使用更多连接，但可能影响整体资源分配。主要用于控制资源使用，缓解内存和CPU竞争",
+        "type": "continuous",
+        "range": [
+            0,
+            4294967295
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "min_examined_row_limit": {
+        "desc": "慢查询日志记录的最小检查行数阈值。只有检查行数超过此值的查询才可能被记录。增大该值可以减少慢查询日志的记录量，有助于过滤掉扫描行数较少的查询，主要影响磁盘IO和CPU分析",
+        "type": "continuous",
+        "range": [
+            0,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "back_log": {
+        "desc": "MySQL在暂时停止接受新连接之前，可以积压的连接请求数量。增大该值可以在短时间内处理大量连接请求，有助于缓解连接风暴时的CPU瓶颈。建议在高并发连接场景下适当调大",
+        "type": "continuous",
+        "range": [
+            100,
+            65535
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "group_concat_max_len": {
+        "desc": "GROUP_CONCAT()函数返回结果的最大长度（以字节为单位）。增大该值允许连接更长的字符串，但会增加内存使用。主要用于缓解内存瓶颈，避免结果被截断",
+        "type": "continuous",
+        "range": [
+            4,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "join_buffer_size": {
+        "desc": "执行无法使用索引的联接操作时，每个会话使用的缓冲区大小。增大该值可以提高全表扫描联接的性能，但会增加内存消耗。主要用于缓解磁盘IO瓶颈，适用于复杂联接查询较多的环境",
+        "type": "continuous",
+        "range": [
+            128,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "read_buffer_size": {
+        "desc": "对MyISAM表执行顺序扫描时每个线程使用的缓冲区大小。增大该值可以提高顺序读取性能，但会增加内存使用。主要用于缓解磁盘IO瓶颈，适合大量全表扫描的场景",
+        "type": "continuous",
+        "range": [
+            8192,
+            2147479552
+        ],
+        "dtype": "int",
+        "default_value": 131072
+    },
+    "read_rnd_buffer_size": {
+        "desc": "用于随机读取缓冲区的大小，当排序后按排序顺序读取行时使用。增大该值可以提高ORDER BY操作的性能，但会增加内存开销。主要用于缓解磁盘IO瓶颈，适用于需要排序后读取大量数据的场景",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "sort_buffer_size": {
+        "desc": "每个会话执行排序操作时使用的缓冲区大小。增大该值可以让更多排序在内存中完成，减少磁盘临时文件的使用，有助于缓解磁盘IO瓶颈。对于复杂排序或大结果集排序，建议适当增加",
+        "type": "continuous",
+        "range": [
+            32768,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "table_definition_cache": {
+        "desc": "可以缓存的表定义（.frm文件）的数量。增大该值可以减少打开表时重新读取定义的开销，提高并发性能，有助于缓解CPU瓶颈。建议在表数量较多的环境中适当调大",
+        "type": "continuous",
+        "range": [
+            400,
+            524288
+        ],
+        "dtype": "int",
+        "default_value": 1400
+    },
+    "thread_pool_size": {
+        "desc": "线程池中线程组的数量。增大该值可以提高高并发连接下的处理能力，但可能增加上下文切换开销。主要用于缓解CPU瓶颈，适用于连接数远大于CPU核心数的场景",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "transaction_isolation": {
+        "desc": "事务隔离级别，控制事务之间的可见性和并发行为。READ-UNCOMMITTED提供最高并发但可能有脏读，REPEATABLE-READ是InnoDB默认级别，提供良好的并发与一致性平衡。选择合适的级别可以缓解锁竞争和CPU瓶颈",
+        "type": "discrete",
+        "range": [
+            "READ-UNCOMMITTED",
+            "READ-COMMITTED",
+            "REPEATABLE-READ",
+            "SERIALIZABLE"
+        ],
+        "dtype": "string",
+        "default_value": "REPEATABLE-READ"
+    },
+    "transaction_read_only": {
+        "desc": "设置事务的默认只读模式。启用后可以优化只读事务的性能，减少锁开销，有助于缓解CPU和内存瓶颈。适用于以读操作为主的应用场景",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "binlog_format": {
+        "desc": "二进制日志的记录格式。ROW模式记录每行的变更，最安全但日志量大；STATEMENT模式记录SQL语句，日志量小但可能有不一致性；MIXED模式自动选择。选择合适的格式可以平衡磁盘IO和CPU使用",
+        "type": "discrete",
+        "range": [
+            "MIXED",
+            "STATEMENT",
+            "ROW"
+        ],
+        "dtype": "string",
+        "default_value": "ROW"
+    },
+    "binlog_group_commit_sync_delay": {
+        "desc": "组提交时同步二进制日志的延迟时间（以微秒为单位）。增大该值可以让更多事务一起提交，减少磁盘同步次数，有助于缓解磁盘IO瓶颈。设置为非零值时可以提高吞吐量，但可能增加事务响应时间",
+        "type": "continuous",
+        "range": [
+            0,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_group_commit_sync_no_delay_count": {
+        "desc": "触发二进制日志组提交同步的最小事务数。当等待的事务数达到此值时，即使未达到binlog_group_commit_sync_delay的延迟时间，也会立即执行同步。增大该值可以提高批处理效率，有助于缓解磁盘IO瓶颈",
+        "type": "continuous",
+        "range": [
+            0,
+            100000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_row_image": {
+        "desc": "设置ROW格式二进制日志中记录的行映像类型。full记录完整行，minimal仅记录变更的列，noblob记录除BLOB外的所有列。选择合适的类型可以减少日志量，有助于缓解磁盘IO和网络瓶颈",
+        "type": "discrete",
+        "range": [
+            "full",
+            "minimal",
+            "noblob"
+        ],
+        "dtype": "string",
+        "default_value": "full"
+    },
+    "max_binlog_size": {
+        "desc": "单个二进制日志文件的最大大小（以字节为单位）。当日志文件达到此大小时会轮换到新文件。增大该值可以减少文件轮换频率，但可能增加单个文件的管理开销。主要用于管理磁盘IO和存储空间",
+        "type": "continuous",
+        "range": [
+            4096,
+            1073741824
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "max_binlog_stmt_cache_size": {
+        "desc": "二进制日志语句缓存的最大大小（以字节为单位）。当事务中的语句缓存超过此大小时，会使用磁盘临时文件。增大该值可以减少磁盘临时文件的使用，有助于缓解磁盘IO瓶颈，适合大事务场景",
+        "type": "continuous",
+        "range": [
+            4096,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 18446744073709547520
+    },
+    "transaction_write_set_extraction": {
+        "desc": "用于提取事务写集的哈希算法。MURMUR32使用Murmur32哈希算法，OFF表示禁用。启用后可以提高组复制和并行复制的效率，有助于缓解CPU瓶颈。建议在组复制环境中设置为MURMUR32",
+        "type": "discrete",
+        "range": [
+            "MURMUR32",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_autoextend_increment": {
+        "desc": "InnoDB表空间自动扩展时的增量大小（以MB为单位）。增大该值可以减少表空间扩展的频率，提高批量写入性能，有助于缓解磁盘IO瓶颈。默认值64MB适合大多数场景",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "innodb_autoinc_lock_mode": {
+        "desc": "控制InnoDB自增列生成值时的锁机制。0为传统模式，使用表锁；1为连续模式，使用互斥锁；2为交错模式，允许并发插入。选择合适的模式可以提高并发插入性能，有助于缓解CPU瓶颈",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1",
+            "2"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "innodb_buffer_pool_load_abort": {
+        "desc": "控制是否中止正在进行的缓冲池加载操作。设置为ON时立即中止加载，用于在加载过程影响性能时进行干预。该参数主要用于管理缓冲池预热过程，缓解启动期间的磁盘IO压力",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_deadlock_detect": {
+        "desc": "启用或禁用InnoDB的死锁检测机制。启用时系统会自动检测并回滚死锁事务，禁用后依赖innodb_lock_wait_timeout来避免无限等待。禁用死锁检测可以减少高并发下的CPU开销，有助于缓解CPU瓶颈",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_fill_factor": {
+        "desc": "InnoDB创建或重建索引时每个B-tree页面的填充因子百分比。值越小预留的页内空间越多，可以减少后续分裂，但会占用更多磁盘空间。增大该值可以提高空间利用率，有助于缓解磁盘IO和内存瓶颈",
+        "type": "continuous",
+        "range": [
+            10,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 100
+    },
+    "innodb_flush_log_at_timeout": {
+        "desc": "InnoDB日志刷新的超时时间（以秒为单位）。即使innodb_flush_log_at_trx_commit设置为0或2，日志也会按此间隔定期刷新。增大该值可以减少刷新频率，有助于缓解磁盘IO瓶颈，但可能增加崩溃恢复时的数据丢失风险",
+        "type": "continuous",
+        "range": [
+            1,
+            2700
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "innodb_flush_neighbors": {
+        "desc": "控制InnoDB刷新脏页时是否同时刷新相邻页面。0表示不刷新相邻页，1表示刷新相邻页，2表示刷新同一extent内的相邻页。对于SSD设备建议设置为0，可以减少不必要的写入，有助于缓解磁盘IO瓶颈",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1",
+            "2"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "innodb_flush_sync": {
+        "desc": "控制InnoDB在检查点时是否执行同步刷新。启用时（ON）在检查点期间强制执行同步I/O，可以提高数据安全性但可能影响性能。主要用于平衡数据持久性和磁盘IO瓶颈",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_lru_scan_depth": {
+        "desc": "InnoDB LRU列表的扫描深度，决定了页面清理线程每次扫描的页面数量。增大该值可以提高脏页刷新的效率，但会增加CPU使用。主要用于缓解磁盘IO瓶颈，建议根据写入负载适当调整",
+        "type": "continuous",
+        "range": [
+            100,
+            102400
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "innodb_max_purge_lag_delay": {
+        "desc": "当purge操作滞后时，对INSERT、UPDATE和DELETE操作施加的最大延迟（以微秒为单位）。增大该值可以限制因purge滞后而导致的DML延迟，有助于缓解内存瓶颈，但可能降低整体吞吐量",
+        "type": "continuous",
+        "range": [
+            0,
+            10000000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "innodb_max_undo_log_size": {
+        "desc": "InnoDB undo日志文件的最大大小（以字节为单位）。当undo日志超过此值时，会触发截断操作。增大该值可以减少undo日志的截断频率，有助于缓解磁盘IO瓶颈，但会增加磁盘空间使用",
+        "type": "continuous",
+        "range": [
+            10485760,
+            10737418240
+        ],
+        "dtype": "int",
+        "default_value": 1073741824
+    },
+    "innodb_numa_interleave": {
+        "desc": "控制InnoDB是否使用NUMA交错内存分配策略。启用时可以在多个NUMA节点间均衡分配内存，提高多核系统的内存访问性能。主要用于缓解内存瓶颈，提升大内存服务器的性能",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_online_alter_log_max_size": {
+        "desc": "在线DDL操作期间用于记录并发DML操作的临时日志的最大大小（以字节为单位）。增大该值可以支持更大规模的在线DDL操作，有助于缓解磁盘IO瓶颈，避免DDL操作失败",
+        "type": "continuous",
+        "range": [
+            65536,
+            1342177280
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "innodb_purge_batch_size": {
+        "desc": "purge操作每批次处理的undo日志记录数。增大该值可以提高purge操作的效率，但会增加每次purge的CPU使用。主要用于缓解内存瓶颈，适合高写入负载环境",
+        "type": "continuous",
+        "range": [
+            1,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "innodb_random_read_ahead": {
+        "desc": "控制InnoDB是否启用随机预读机制。启用时可以根据页面访问模式预读取到缓冲池，提高随机读取性能。主要用于缓解磁盘IO瓶颈，适合随机读取模式较多的场景",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_sort_buffer_size": {
+        "desc": "InnoDB在执行索引创建或重建时使用的排序缓冲区大小（以字节为单位）。增大该值可以让更多排序在内存中完成，减少磁盘临时文件的使用，有助于缓解磁盘IO瓶颈",
+        "type": "continuous",
+        "range": [
+            65536,
+            67108864
+        ],
+        "dtype": "int",
+        "default_value": 1048576
+    },
+    "innodb_stats_auto_recalc": {
+        "desc": "控制InnoDB是否在表数据变化超过10%时自动重新计算统计信息。启用时有助于优化器做出更好的执行计划，但会增加CPU开销。主要用于缓解查询性能瓶颈，建议保持启用",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_stats_persistent": {
+        "desc": "控制InnoDB统计信息是否持久化存储到磁盘。启用时统计信息在重启后仍然保留，避免每次启动时重新计算，有助于缓解启动时的CPU瓶颈。建议保持启用",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_stats_persistent_sample_pages": {
+        "desc": "持久化统计信息采集时采样的索引页面数。增大该值可以提高统计信息的准确性，帮助优化器做出更好的执行计划，但会增加统计信息计算时的CPU和磁盘IO开销",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 20
+    },
+    "innodb_undo_log_truncate": {
+        "desc": "控制InnoDB是否自动截断超过最大大小的undo日志文件。启用时可以回收磁盘空间，有助于缓解磁盘IO瓶颈。建议在启用innodb_max_undo_log_size的情况下开启此参数",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_dedicated_server": {
+        "desc": "当MySQL运行在专用服务器上时，自动配置InnoDB参数以适应服务器资源。启用后会自动设置innodb_buffer_pool_size等关键参数，有助于优化CPU和内存使用。建议专用服务器环境启用",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_doublewrite_batch_size": {
+        "desc": "双写缓冲区每批写入的页面数量。增大该值可以提高双写操作的批处理效率，有助于缓解磁盘IO瓶颈。设置为0时使用默认值，建议根据写入负载调整",
+        "type": "continuous",
+        "range": [
+            0,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "innodb_doublewrite_files": {
+        "desc": "双写文件的个数。增加文件数量可以提高双写操作的并发性，有助于缓解磁盘IO瓶颈，尤其是在使用多个磁盘设备的场景下。默认值2适合大多数配置",
+        "type": "continuous",
+        "range": [
+            2,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "innodb_doublewrite_pages": {
+        "desc": "每个双写批次中写入的页面数量。增大该值可以提高双写操作的吞吐量，有助于缓解磁盘IO瓶颈，但会增加内存使用。建议根据innodb_doublewrite_batch_size配合调整",
+        "type": "continuous",
+        "range": [
+            1,
+            512
+        ],
+        "dtype": "int",
+        "default_value": 128
+    },
+    "innodb_fsync_threshold": {
+        "desc": "fsync操作的阈值（以字节为单位），用于控制操作系统层面文件同步的频率。增大该值可以减少fsync调用次数，提高写入性能，有助于缓解磁盘IO瓶颈，但可能增加数据丢失风险",
+        "type": "continuous",
+        "range": [
+            0,
+            65536
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_expire_logs_seconds": {
+        "desc": "二进制日志文件自动过期的秒数。超过此时间的二进制日志会被自动删除，用于管理磁盘空间。增大该值可以保留更长时间的日志用于恢复和复制，但会增加磁盘IO和存储压力",
+        "type": "continuous",
+        "range": [
+            0,
+            4294967295
+        ],
+        "dtype": "int",
+        "default_value": 2592000
+    },
+    "binlog_transaction_compression": {
+        "desc": "启用二进制日志事务压缩。启用后可以显著减少二进制日志的磁盘占用和网络传输量，有助于缓解磁盘IO和网络瓶颈，但会增加CPU使用（压缩和解压缩开销）",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "binlog_transaction_compression_level_zstd": {
+        "desc": "二进制日志使用Zstd算法进行压缩时的压缩级别，范围1-22。级别越高压缩率越好但CPU消耗越大。增大该值可以进一步减少日志大小，但会增加CPU负担。主要用于平衡磁盘IO和CPU瓶颈",
+        "type": "continuous",
+        "range": [
+            1,
+            22
+        ],
+        "dtype": "int",
+        "default_value": 3
     }
 }
