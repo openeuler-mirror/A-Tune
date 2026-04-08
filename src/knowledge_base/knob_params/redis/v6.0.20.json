@@ -328,5 +328,125 @@
             1073741824
         ],
         "default_value": 64
+    },
+    "tcp-backlog": {
+        "desc": "This parameter sets the length of the TCP connection queue that has completed the three-way handshake but has not yet been accepted by the application, i.e., the TCP backlog value. Increasing this value enhances Redis server's ability to handle concurrent connection requests, suitable for high-concurrency scenarios to alleviate network bottlenecks. However, setting it too high may lead to insufficient system resources",
+        "type": "continuous",
+        "range": [
+            1,
+            32767
+        ],
+        "dtype": "int",
+        "default_value": 511
+    },
+    "repl-disable-tcp-nodelay": {
+        "desc": "This parameter controls TCP delay behavior during master-replica replication. When set to 'yes', Redis merges multiple small packets into a larger one for transmission, reducing bandwidth usage but increasing data synchronization latency; when set to 'no', it disables Nagle's algorithm, reducing transmission latency but consuming more bandwidth. Suitable for alleviating network bottlenecks",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "maxclients": {
+        "desc": "This parameter limits the maximum number of simultaneous client connections allowed for a Redis instance. Increasing this value supports more concurrent client connections but consumes more system file descriptor resources; decreasing it limits resource usage and avoids excessive memory consumption. Suitable for alleviating memory and network bottlenecks",
+        "type": "continuous",
+        "range": [
+            1,
+            65536
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "maxmemory-policy": {
+        "desc": "This parameter sets the data eviction policy when Redis reaches the maximum memory limit",
+        "type": "discrete",
+        "range": [
+            "volatile-lru",
+            "allkeys-lru",
+            "volatile-lfu",
+            "allkeys-lfu",
+            "volatile-random",
+            "allkeys-random",
+            "volatile-ttl",
+            "noeviction"
+        ],
+        "dtype": "string",
+        "default_value": "noeviction"
+    },
+    "appendfsync": {
+        "desc": "This parameter sets the synchronization strategy for writing data to disk in AOF persistence mode. 'always': synchronizes to disk immediately after each write operation, offering the highest data safety but the lowest performance; 'everysec': synchronizes once per second, balancing performance and data safety; 'no': lets the operating system decide when to synchronize, offering the highest performance but the greatest risk of data loss. Suitable for alleviating disk I/O bottlenecks",
+        "type": "discrete",
+        "range": [
+            "always",
+            "no",
+            "everysec"
+        ],
+        "dtype": "string",
+        "default_value": "everysec"
+    },
+    "appendonly": {
+        "desc": "This parameter controls whether to enable AOF (Append Only File) persistence. When set to 'yes', Redis records all write operations to the AOF file for data recovery; when set to 'no', AOF persistence is disabled and only RDB persistence is used. Enabling AOF improves data safety but increases disk I/O overhead",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "no-appendfsync-on-rewrite": {
+        "desc": "This parameter controls whether to stop the main process's fsync operations on the AOF file during background I/O operations such as AOF rewrite or RDB saving. When set to 'yes', fsync is not performed during background operations, avoiding blocking caused by disk contention but increasing the risk of data loss (up to 30 seconds of data); when set to 'no', fsync operations are maintained, providing greater data safety but potentially causing blocking. Suitable for high-write-load scenarios",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "hash-max-ziplist-entries": {
+        "desc": "This parameter sets the maximum number of key-value pairs for hash type to use ziplist encoding. When the number of key-value pairs in a hash object is less than or equal to this value, ziplist encoding is used to save memory; beyond this value, it converts to hashtable encoding. Increasing this value allows more hashes to use ziplist to save memory, but an excessively large ziplist may affect read/write performance. Suitable for alleviating memory bottlenecks",
+        "type": "continuous",
+        "range": [
+            32,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": 512
+    },
+    "hash-max-ziplist-value": {
+        "desc": "This parameter sets the maximum byte length of individual fields and values for hash type to use ziplist encoding. When the string lengths of all fields and values in a hash object are less than or equal to this value, ziplist encoding is used to save memory; beyond this value, it converts to hashtable encoding. Increasing this value allows more hashes to use ziplist to save memory but may increase memory fragmentation. Suitable for alleviating memory bottlenecks",
+        "type": "continuous",
+        "range": [
+            32,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "list-max-ziplist-size": {
+        "desc": "This parameter sets the maximum size of each ziplist node in the quicklist encoding for Redis lists. A positive value indicates the maximum number of entries per ziplist; a negative value indicates the logarithm of the maximum byte size per ziplist (-1: 4KB, -2: 8KB, -3: 16KB, -4: 32KB, -5: 64KB). This parameter balances memory usage and performance, suitable for alleviating memory bottlenecks",
+        "type": "discrete",
+        "range": [
+            "-1",
+            "-2",
+            "-3",
+            "-4",
+            "-5"
+        ],
+        "dtype": "string",
+        "default_value": "-2"
+    },
+    "hll-sparse-max-bytes": {
+        "desc": "This parameter sets the maximum bytes for HyperLogLog data structures to use sparse encoding. When the HLL data size is less than or equal to this value, sparse encoding is used to save memory; beyond this value, it converts to dense encoding. Increasing this value allows more HLLs to use sparse encoding to save memory but slightly increases computational overhead. Suitable for alleviating memory bottlenecks",
+        "type": "continuous",
+        "range": [
+            0,
+            15000
+        ],
+        "dtype": "int",
+        "default_value": 3000
     }
 }

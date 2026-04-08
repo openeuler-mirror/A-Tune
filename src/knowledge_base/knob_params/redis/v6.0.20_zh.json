@@ -328,5 +328,125 @@
             1073741824
         ],
         "default_value": 64
+    },
+    "tcp-backlog": {
+        "desc": "该参数用于设置TCP连接中已完成三次握手但尚未被应用程序接受的队列长度，即TCP backlog值。增大该值可以提高Redis服务器处理并发连接请求的能力，适用于高并发场景，可以缓解网络瓶颈。但设置过大会导致系统资源不足",
+        "type": "continuous",
+        "range": [
+            1,
+            32767
+        ],
+        "dtype": "int",
+        "default_value": 511
+    },
+    "repl-disable-tcp-nodelay": {
+        "desc": "该参数用于控制主从复制时的TCP延迟行为。当设置为'yes'时，Redis会将多个小数据包合并为一个大包发送，可以减少带宽占用，但会增加数据同步的延迟；当设置为'no'时，会禁用Nagle算法，减少传输延迟，但会消耗更多带宽。适用于缓解网络瓶颈",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "maxclients": {
+        "desc": "该参数用于限制Redis实例同时允许的最大客户端连接数。增大该值可以支持更多客户端并发连接，但会消耗更多的系统文件描述符资源；减小该值可以限制资源使用，避免过高的内存消耗。适用于缓解内存和网络瓶颈",
+        "type": "continuous",
+        "range": [
+            1,
+            65536
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "maxmemory-policy": {
+        "desc": "该参数用于设置当Redis达到最大内存限制时的数据淘汰策略",
+        "type": "discrete",
+        "range": [
+            "volatile-lru",
+            "allkeys-lru",
+            "volatile-lfu",
+            "allkeys-lfu",
+            "volatile-random",
+            "allkeys-random",
+            "volatile-ttl",
+            "noeviction"
+        ],
+        "dtype": "string",
+        "default_value": "noeviction"
+    },
+    "appendfsync": {
+        "desc": "该参数用于设置AOF持久化模式下，Redis将数据写入磁盘的同步策略。always：每次写操作后都立即同步到磁盘，数据最安全但性能最低；everysec：每秒同步一次，是性能和数据安全性的平衡选择；no：由操作系统决定何时同步，性能最高但数据丢失风险最大。适用于缓解磁盘IO瓶颈",
+        "type": "discrete",
+        "range": [
+            "always",
+            "no",
+            "everysec"
+        ],
+        "dtype": "string",
+        "default_value": "everysec"
+    },
+    "appendonly": {
+        "desc": "该参数用于控制是否启用AOF（Append Only File）持久化功能。设置为'yes'时，Redis会将所有写操作记录到AOF文件中，便于数据恢复；设置为'no'时，不启用AOF持久化，只依赖RDB持久化。启用AOF可以提高数据安全性，但会增加磁盘IO开销",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "no-appendfsync-on-rewrite": {
+        "desc": "该参数用于控制在执行AOF重写或RDB保存等后台I/O操作时，是否停止主进程对AOF文件的fsync操作。设置为'yes'时，后台操作期间不进行fsync，可以避免磁盘竞争造成的阻塞，但会增加数据丢失风险（最多30秒数据）；设置为'no'时，保持fsync操作，数据更安全但可能造成阻塞。适用于高写入负载场景",
+        "type": "discrete",
+        "range": [
+            "yes",
+            "no"
+        ],
+        "dtype": "string",
+        "default_value": "no"
+    },
+    "hash-max-ziplist-entries": {
+        "desc": "该参数用于设置哈希类型使用ziplist编码的最大键值对数量。当哈希对象保存的键值对数量小于等于该值时，使用ziplist编码以节省内存；超过该值后转换为hashtable编码。增大该值可以让更多哈希使用ziplist节省内存，但ziplist过大会影响读写性能。适用于缓解内存瓶颈",
+        "type": "continuous",
+        "range": [
+            32,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": 512
+    },
+    "hash-max-ziplist-value": {
+        "desc": "该参数用于设置哈希类型使用ziplist编码的单个字段和值的最大字节长度。当哈希对象中所有字段和值的字符串长度都小于等于该值时，使用ziplist编码以节省内存；超过该值后转换为hashtable编码。增大该值可以让更多哈希使用ziplist节省内存，但会增加内存碎片。适用于缓解内存瓶颈",
+        "type": "continuous",
+        "range": [
+            32,
+            4096
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "list-max-ziplist-size": {
+        "desc": "该参数用于设置Redis列表中quicklist编码方式下，该参数平衡了内存占用和性能，适用于缓解内存瓶颈",
+        "type": "discrete",
+        "range": [
+            "-1",
+            "-2",
+            "-3",
+            "-4",
+            "-5"
+        ],
+        "dtype": "string",
+        "default_value": "-2"
+    },
+    "hll-sparse-max-bytes": {
+        "desc": "该参数用于设置HyperLogLog数据结构使用稀疏编码（sparse representation）的最大字节数。当HLL数据的大小小于等于该值时，使用稀疏编码以节省内存；超过该值后转换为密集编码（dense representation）。增大该值可以让更多HLL使用稀疏编码节省内存，但会略微增加计算开销。适用于缓解内存瓶颈",
+        "type": "continuous",
+        "range": [
+            0,
+            15000
+        ],
+        "dtype": "int",
+        "default_value": 3000
     }
 }
