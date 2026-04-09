@@ -605,5 +605,661 @@
         ],
         "dtype": "int",
         "default_value": 16777216
+    },
+    "table_open_cache": {
+        "desc": "The number of open table instances for all threads. Increasing this value reduces the overhead of opening tables and improves concurrent execution efficiency, but increases memory usage. This parameter is primarily used to mitigate CPU bottlenecks, especially in high-concurrency connection scenarios",
+        "type": "continuous",
+        "range": [
+            30000,
+            50000
+        ],
+        "dtype": "int",
+        "default_value": 4000
+    },
+    "table_open_cache_instances": {
+        "desc": "The number of table cache instances. Partitioning the table cache into multiple independent instances reduces contention during concurrent access. Increasing this value improves scalability in high-concurrency environments, helping to mitigate CPU bottlenecks. It is recommended to increase this value when the number of connections is high",
+        "type": "continuous",
+        "range": [
+            2,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "sync_binlog": {
+        "desc": "Controls whether the binary log is synchronized to disk after each transaction commit. When set to 1, synchronization occurs after every commit, providing the highest data safety but increasing disk I/O overhead. When set to 0, the operating system decides when to flush, which can alleviate disk I/O bottlenecks but may risk data loss",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "key_buffer_size": {
+        "desc": "The size of the buffer used for MyISAM index caches (in MB). Increasing this value improves index read performance for MyISAM tables and reduces disk I/O operations. It primarily affects disk I/O bottlenecks and should be increased appropriately for environments using the MyISAM engine",
+        "type": "continuous",
+        "range": [
+            8,
+            2048
+        ],
+        "dtype": "int",
+        "default_value": 8
+    },
+    "binlog_cache_size": {
+        "desc": "The size of the memory buffer used to cache binary log entries during a transaction (in bytes). Increasing this value reduces the number of disk writes during transaction commit, helping to alleviate disk I/O bottlenecks. If large transactions are frequent, increasing this value is recommended to avoid using on-disk temporary files",
+        "type": "continuous",
+        "range": [
+            1,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 32768
+    },
+    "innodb_purge_threads": {
+        "desc": "The number of background purge threads used by InnoDB to clean up undo logs and deleted rows. Increasing this value improves the parallelism of purge operations, helping to alleviate CPU bottlenecks, and can improve system responsiveness under high write loads",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "innodb_page_cleaners": {
+        "desc": "The number of page cleaner threads responsible for flushing dirty pages to disk. Increasing this value improves the parallelism of dirty page flushing, helping to alleviate disk I/O bottlenecks, especially in environments with high write loads and large buffer pools",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "slave_parallel_type": {
+        "desc": "Specifies the type of parallel replication used on the replica. DATABASE mode uses database-based parallel replication, while LOGICAL_CLOCK mode uses logical clock-based parallel replication, which typically provides higher parallelism, helps alleviate CPU bottlenecks, and improves replication throughput",
+        "type": "discrete",
+        "range": [
+            "DATABASE",
+            "LOGICAL_CLOCK"
+        ],
+        "dtype": "string",
+        "default_value": "DATABASE"
+    },
+    "slave_parallel_workers": {
+        "desc": "The number of worker threads used for parallel replication on the replica. Increasing this value improves the parallelism of replication apply, accelerating data synchronization on the replica and helping to alleviate CPU bottlenecks. It is recommended to set this value based on CPU core count, typically between 4 and 16",
+        "type": "continuous",
+        "range": [
+            0,
+            1024
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "slave_preserve_commit_order": {
+        "desc": "Controls whether the commit order of transactions is preserved on the replica. When enabled (ON), it ensures that the commit order of parallel replication transactions matches that of the source, improving data consistency but potentially increasing lock waits. This parameter is used to balance data consistency and CPU usage",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "lock_wait_timeout": {
+        "desc": "The timeout period for acquiring metadata locks (in seconds). When a session waits for a lock longer than this value, the system returns a timeout error. Increasing this value prevents long-waiting transactions from being prematurely terminated, helping to alleviate CPU bottlenecks, but may increase lock wait times",
+        "type": "continuous",
+        "range": [
+            1,
+            31536000
+        ],
+        "dtype": "int",
+        "default_value": 31536000
+    },
+    "long_query_time": {
+        "desc": "The threshold time for the slow query log (in seconds). Queries with execution time exceeding this value are logged to the slow query log. Increasing this value reduces the amount of slow query logging, while decreasing it helps identify more performance issues. Primarily used to analyze disk I/O and CPU bottlenecks",
+        "type": "continuous",
+        "range": [
+            0,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "max_allowed_packet": {
+        "desc": "The maximum size of a packet for communication between the client and server (in bytes). Increasing this value supports larger data transfers (e.g., BLOB fields) but increases memory usage. Primarily used to mitigate network transmission bottlenecks; the default of 67108864 (64MB) is suitable for most scenarios",
+        "type": "continuous",
+        "range": [
+            1024,
+            1073741824
+        ],
+        "dtype": "int",
+        "default_value": 67108864
+    },
+    "max_connections": {
+        "desc": "The maximum number of concurrent client connections allowed by the MySQL server. Increasing this value supports more simultaneous connections but consumes more memory and CPU resources. Primarily used to mitigate connection bottlenecks; it is recommended to set this value reasonably based on system memory and CPU core count, typically between 500 and 2000",
+        "type": "continuous",
+        "range": [
+            151,
+            100000
+        ],
+        "dtype": "int",
+        "default_value": 151
+    },
+    "max_join_size": {
+        "desc": "The maximum estimated number of rows that can be scanned for a join query without a WHERE condition. This parameter prevents inefficient large join queries from executing, helping to alleviate CPU and memory bottlenecks. Increasing this value allows larger joins to execute but may impact performance",
+        "type": "continuous",
+        "range": [
+            214748364,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 214748364
+    },
+    "max_length_for_sort_data": {
+        "desc": "The threshold (in bytes) that determines whether to use a more efficient sorting algorithm. When the row data length is less than this value, MySQL uses an improved sorting algorithm to enhance sort performance. Increasing this value improves sorting efficiency, helping to alleviate CPU bottlenecks",
+        "type": "continuous",
+        "range": [
+            4,
+            8388608
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "max_prepared_stmt_count": {
+        "desc": "The maximum number of prepared statements that can exist simultaneously on the server. Increasing this value supports more prepared statements, reducing SQL parsing overhead and helping to alleviate CPU bottlenecks. New prepared statements return an error when this limit is exceeded",
+        "type": "continuous",
+        "range": [
+            0,
+            1048576
+        ],
+        "dtype": "int",
+        "default_value": 16382
+    },
+    "max_sort_length": {
+        "desc": "The maximum number of bytes considered for sorting BLOB or TEXT fields. Only the first N bytes are used for sort comparison. Increasing this value improves sort accuracy but increases memory and CPU overhead, while decreasing it helps alleviate memory bottlenecks",
+        "type": "continuous",
+        "range": [
+            4,
+            8388608
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "max_user_connections": {
+        "desc": "The maximum number of concurrent connections allowed per user account. A value of 0 indicates no limit. Increasing this value allows a single user to use more connections but may impact overall resource allocation. Primarily used to control resource usage and mitigate memory and CPU contention",
+        "type": "continuous",
+        "range": [
+            0,
+            4294967295
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "min_examined_row_limit": {
+        "desc": "The minimum number of examined rows threshold for slow query log recording. Only queries that examine more rows than this value are eligible to be logged. Increasing this value reduces the amount of slow query logging, helping to filter out queries that scan fewer rows. Primarily affects disk I/O and CPU analysis",
+        "type": "continuous",
+        "range": [
+            0,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "back_log": {
+        "desc": "The number of connection requests that can be queued before MySQL temporarily stops accepting new connections. Increasing this value allows handling a large number of connection requests in a short time, helping to alleviate CPU bottlenecks during connection storms. It is recommended to increase this value appropriately in high-concurrency connection scenarios",
+        "type": "continuous",
+        "range": [
+            100,
+            65535
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "group_concat_max_len": {
+        "desc": "The maximum length of the result returned by the GROUP_CONCAT() function (in bytes). Increasing this value allows concatenation of longer strings but increases memory usage. Primarily used to mitigate memory bottlenecks and prevent result truncation",
+        "type": "continuous",
+        "range": [
+            4,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "join_buffer_size": {
+        "desc": "The buffer size used per session for join operations that cannot use indexes. Increasing this value improves the performance of full table scan joins but increases memory consumption. Primarily used to mitigate disk I/O bottlenecks, suitable for environments with many complex join queries",
+        "type": "continuous",
+        "range": [
+            128,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "read_buffer_size": {
+        "desc": "The buffer size used per thread for sequential scans of MyISAM tables. Increasing this value improves sequential read performance but increases memory usage. Primarily used to mitigate disk I/O bottlenecks, suitable for scenarios with many full table scans",
+        "type": "continuous",
+        "range": [
+            8192,
+            2147479552
+        ],
+        "dtype": "int",
+        "default_value": 131072
+    },
+    "read_rnd_buffer_size": {
+        "desc": "The buffer size used for random reads when reading rows in sorted order after sorting. Increasing this value improves ORDER BY operation performance but increases memory overhead. Primarily used to mitigate disk I/O bottlenecks, suitable for scenarios requiring reading large amounts of data after sorting",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "sort_buffer_size": {
+        "desc": "The buffer size used per session for sort operations. Increasing this value allows more sorting to be done in memory, reducing the use of on-disk temporary files, helping to alleviate disk I/O bottlenecks. For complex sorts or large result sets, increasing this value is recommended",
+        "type": "continuous",
+        "range": [
+            32768,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 262144
+    },
+    "table_definition_cache": {
+        "desc": "The number of table definitions (.frm files) that can be cached. Increasing this value reduces the overhead of re-reading table definitions when opening tables, improving concurrent performance and helping to alleviate CPU bottlenecks. It is recommended to increase this value appropriately in environments with many tables",
+        "type": "continuous",
+        "range": [
+            400,
+            524288
+        ],
+        "dtype": "int",
+        "default_value": 1400
+    },
+    "thread_pool_size": {
+        "desc": "The number of thread groups in the thread pool. Increasing this value improves processing capability under high-concurrency connections but may increase context switching overhead. Primarily used to mitigate CPU bottlenecks, suitable for scenarios where the number of connections far exceeds the number of CPU cores",
+        "type": "continuous",
+        "range": [
+            1,
+            64
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "transaction_isolation": {
+        "desc": "The transaction isolation level, which controls visibility and concurrency behavior between transactions. READ-UNCOMMITTED provides the highest concurrency but may allow dirty reads. REPEATABLE-READ is InnoDB's default level, offering a good balance of concurrency and consistency. Choosing the appropriate level can alleviate lock contention and CPU bottlenecks",
+        "type": "discrete",
+        "range": [
+            "READ-UNCOMMITTED",
+            "READ-COMMITTED",
+            "REPEATABLE-READ",
+            "SERIALIZABLE"
+        ],
+        "dtype": "string",
+        "default_value": "REPEATABLE-READ"
+    },
+    "transaction_read_only": {
+        "desc": "Sets the default read-only mode for transactions. Enabling this mode optimizes the performance of read-only transactions, reduces lock overhead, and helps alleviate CPU and memory bottlenecks. Suitable for application scenarios dominated by read operations",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "binlog_format": {
+        "desc": "The recording format for the binary log. ROW mode records changes to each row, which is the safest but generates more log data. STATEMENT mode records SQL statements, which generates less log data but may cause inconsistencies. MIXED mode automatically chooses the appropriate format. Choosing the right format balances disk I/O and CPU usage",
+        "type": "discrete",
+        "range": [
+            "MIXED",
+            "STATEMENT",
+            "ROW"
+        ],
+        "dtype": "string",
+        "default_value": "ROW"
+    },
+    "binlog_group_commit_sync_delay": {
+        "desc": "The delay time (in microseconds) for synchronizing the binary log during group commit. Increasing this value allows more transactions to commit together, reducing the number of disk syncs and helping to alleviate disk I/O bottlenecks. Setting a non-zero value can increase throughput but may increase transaction response time",
+        "type": "continuous",
+        "range": [
+            0,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_group_commit_sync_no_delay_count": {
+        "desc": "The minimum number of transactions to trigger group commit synchronization for the binary log. When the number of waiting transactions reaches this value, synchronization is performed immediately, even if the binlog_group_commit_sync_delay time has not elapsed. Increasing this value improves batching efficiency, helping to alleviate disk I/O bottlenecks",
+        "type": "continuous",
+        "range": [
+            0,
+            100000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_row_image": {
+        "desc": "The type of row image recorded in the binary log when using ROW format. 'full' records the complete row, 'minimal' records only changed columns, and 'noblob' records all columns except BLOB types. Choosing the appropriate type reduces log volume, helping to alleviate disk I/O and network bottlenecks",
+        "type": "discrete",
+        "range": [
+            "full",
+            "minimal",
+            "noblob"
+        ],
+        "dtype": "string",
+        "default_value": "full"
+    },
+    "max_binlog_size": {
+        "desc": "The maximum size of a single binary log file (in bytes). When the log file reaches this size, it rotates to a new file. Increasing this value reduces the frequency of file rotation but may increase management overhead for individual files. Primarily used to manage disk I/O and storage space",
+        "type": "continuous",
+        "range": [
+            4096,
+            1073741824
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "max_binlog_stmt_cache_size": {
+        "desc": "The maximum size of the binary log statement cache (in bytes). When the statement cache for a transaction exceeds this size, on-disk temporary files are used. Increasing this value reduces the use of on-disk temporary files, helping to alleviate disk I/O bottlenecks, suitable for large transaction scenarios",
+        "type": "continuous",
+        "range": [
+            4096,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 18446744073709547520
+    },
+    "transaction_write_set_extraction": {
+        "desc": "The hash algorithm used to extract transaction write sets. MURMUR32 uses the Murmur32 hash algorithm, while OFF disables extraction. Enabling this feature improves the efficiency of group replication and parallel replication, helping to alleviate CPU bottlenecks. It is recommended to set this to MURMUR32 in group replication environments",
+        "type": "discrete",
+        "range": [
+            "MURMUR32",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_autoextend_increment": {
+        "desc": "The increment size for automatic InnoDB tablespace extension (in MB). Increasing this value reduces the frequency of tablespace extensions, improving batch write performance and helping to alleviate disk I/O bottlenecks. The default value of 64 MB is suitable for most scenarios",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "innodb_autoinc_lock_mode": {
+        "desc": "Controls the lock mechanism used when generating values for auto-increment columns in InnoDB. 0 is the traditional mode using table locks; 1 is consecutive mode using mutex locks; 2 is interleaved mode allowing concurrent inserts. Choosing the appropriate mode can improve concurrent insert performance, helping to alleviate CPU bottlenecks",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1",
+            "2"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "innodb_buffer_pool_load_abort": {
+        "desc": "Controls whether an ongoing buffer pool load operation is aborted. When set to ON, the load is immediately aborted, used to intervene when the loading process impacts performance. This parameter is primarily used to manage the buffer pool warm-up process and alleviate disk I/O pressure during startup",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_deadlock_detect": {
+        "desc": "Enables or disables InnoDB's deadlock detection mechanism. When enabled, the system automatically detects and rolls back deadlocked transactions. When disabled, it relies on innodb_lock_wait_timeout to avoid infinite waiting. Disabling deadlock detection reduces CPU overhead under high concurrency, helping to alleviate CPU bottlenecks",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_fill_factor": {
+        "desc": "The fill factor percentage for each B-tree page when InnoDB creates or rebuilds indexes. A smaller value reserves more space within pages, reducing subsequent splits but consuming more disk space. Increasing this value improves space utilization, helping to alleviate disk I/O and memory bottlenecks",
+        "type": "continuous",
+        "range": [
+            10,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 100
+    },
+    "innodb_flush_log_at_timeout": {
+        "desc": "The timeout period for InnoDB log flushing (in seconds). Even when innodb_flush_log_at_trx_commit is set to 0 or 2, logs are flushed periodically at this interval. Increasing this value reduces the frequency of flushes, helping to alleviate disk I/O bottlenecks, but may increase the risk of data loss during crash recovery",
+        "type": "continuous",
+        "range": [
+            1,
+            2700
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "innodb_flush_neighbors": {
+        "desc": "Controls whether adjacent pages are also flushed when InnoDB flushes dirty pages. 0 means do not flush neighbors, 1 means flush neighbors, and 2 means flush neighbors within the same extent. For SSD devices, setting this to 0 is recommended to reduce unnecessary writes, helping to alleviate disk I/O bottlenecks",
+        "type": "discrete",
+        "range": [
+            "0",
+            "1",
+            "2"
+        ],
+        "dtype": "string",
+        "default_value": "1"
+    },
+    "innodb_flush_sync": {
+        "desc": "Controls whether InnoDB performs synchronous flushing during checkpoints. When enabled (ON), it enforces synchronous I/O during checkpoint periods, improving data safety but potentially impacting performance. Primarily used to balance data durability and disk I/O bottlenecks",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_lru_scan_depth": {
+        "desc": "The scan depth of the InnoDB LRU list, which determines the number of pages scanned each time by the page cleaner threads. Increasing this value improves the efficiency of dirty page flushing but increases CPU usage. Primarily used to alleviate disk I/O bottlenecks; it is recommended to adjust this value based on write load",
+        "type": "continuous",
+        "range": [
+            100,
+            102400
+        ],
+        "dtype": "int",
+        "default_value": 1024
+    },
+    "innodb_max_purge_lag_delay": {
+        "desc": "The maximum delay (in microseconds) imposed on INSERT, UPDATE, and DELETE operations when purge lag occurs. Increasing this value limits DML delays caused by purge lag, helping to alleviate memory bottlenecks but may reduce overall throughput",
+        "type": "continuous",
+        "range": [
+            0,
+            10000000
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "innodb_max_undo_log_size": {
+        "desc": "The maximum size of the InnoDB undo log file (in bytes). When the undo log exceeds this value, a truncation operation is triggered. Increasing this value reduces the frequency of undo log truncation, helping to alleviate disk I/O bottlenecks but increases disk space usage",
+        "type": "continuous",
+        "range": [
+            10485760,
+            10737418240
+        ],
+        "dtype": "int",
+        "default_value": 1073741824
+    },
+    "innodb_numa_interleave": {
+        "desc": "Controls whether InnoDB uses a NUMA-interleaved memory allocation policy. When enabled, memory is balanced across multiple NUMA nodes, improving memory access performance on multi-core systems. Primarily used to mitigate memory bottlenecks and enhance performance on large-memory servers",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_online_alter_log_max_size": {
+        "desc": "The maximum size (in bytes) of the temporary log used to record concurrent DML operations during online DDL operations. Increasing this value supports larger online DDL operations, helping to alleviate disk I/O bottlenecks and avoid DDL operation failures",
+        "type": "continuous",
+        "range": [
+            65536,
+            1342177280
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "innodb_purge_batch_size": {
+        "desc": "The number of undo log records processed per batch in purge operations. Increasing this value improves the efficiency of purge operations but increases CPU usage per purge. Primarily used to mitigate memory bottlenecks, suitable for high write load environments",
+        "type": "continuous",
+        "range": [
+            1,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "innodb_random_read_ahead": {
+        "desc": "Controls whether InnoDB enables random read-ahead. When enabled, pages are pre-read into the buffer pool based on page access patterns, improving random read performance. Primarily used to alleviate disk I/O bottlenecks, suitable for scenarios with frequent random read patterns",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_sort_buffer_size": {
+        "desc": "The size of the sort buffer used by InnoDB during index creation or rebuild (in bytes). Increasing this value allows more sorting to be done in memory, reducing the use of on-disk temporary files, helping to alleviate disk I/O bottlenecks",
+        "type": "continuous",
+        "range": [
+            65536,
+            67108864
+        ],
+        "dtype": "int",
+        "default_value": 1048576
+    },
+    "innodb_stats_auto_recalc": {
+        "desc": "Controls whether InnoDB automatically recalculates persistent statistics when table data changes by more than 10%. Enabling this helps the optimizer make better execution plans but increases CPU overhead. Primarily used to alleviate query performance bottlenecks; it is recommended to keep this enabled",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_stats_persistent": {
+        "desc": "Controls whether InnoDB statistics are persisted to disk. When enabled, statistics are retained after restart, avoiding recomputation each time the server starts, helping to alleviate CPU bottlenecks during startup. It is recommended to keep this enabled",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "ON"
+    },
+    "innodb_stats_persistent_sample_pages": {
+        "desc": "The number of index pages sampled when collecting persistent statistics. Increasing this value improves the accuracy of statistics, helping the optimizer make better execution plans, but increases CPU and disk I/O overhead during statistics calculation",
+        "type": "continuous",
+        "range": [
+            1,
+            2147483647
+        ],
+        "dtype": "int",
+        "default_value": 20
+    },
+    "innodb_undo_log_truncate": {
+        "desc": "Controls whether InnoDB automatically truncates undo log files that exceed the maximum size. Enabling this reclaims disk space, helping to alleviate disk I/O bottlenecks. It is recommended to enable this parameter when innodb_max_undo_log_size is also enabled",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_dedicated_server": {
+        "desc": "Automatically configures InnoDB parameters to suit server resources when MySQL is running on a dedicated server. When enabled, key parameters such as innodb_buffer_pool_size are automatically set, helping to optimize CPU and memory usage. It is recommended to enable this in dedicated server environments",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "innodb_doublewrite_batch_size": {
+        "desc": "The number of pages written per batch in the doublewrite buffer. Increasing this value improves the batching efficiency of doublewrite operations, helping to alleviate disk I/O bottlenecks. When set to 0, the default value is used; it is recommended to adjust this based on write load",
+        "type": "continuous",
+        "range": [
+            0,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "innodb_doublewrite_files": {
+        "desc": "The number of doublewrite files. Increasing the number of files improves the concurrency of doublewrite operations, helping to alleviate disk I/O bottlenecks, especially in scenarios using multiple disk devices. The default value of 2 is suitable for most configurations",
+        "type": "continuous",
+        "range": [
+            2,
+            256
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "innodb_doublewrite_pages": {
+        "desc": "The number of pages written per doublewrite batch. Increasing this value improves the throughput of doublewrite operations, helping to alleviate disk I/O bottlenecks but increases memory usage. It is recommended to adjust this in conjunction with innodb_doublewrite_batch_size",
+        "type": "continuous",
+        "range": [
+            1,
+            512
+        ],
+        "dtype": "int",
+        "default_value": 128
+    },
+    "innodb_fsync_threshold": {
+        "desc": "The threshold for fsync operations (in bytes), used to control the frequency of file synchronization at the operating system level. Increasing this value reduces the number of fsync calls, improving write performance and helping to alleviate disk I/O bottlenecks, but may increase the risk of data loss",
+        "type": "continuous",
+        "range": [
+            0,
+            65536
+        ],
+        "dtype": "int",
+        "default_value": 0
+    },
+    "binlog_expire_logs_seconds": {
+        "desc": "The number of seconds after which binary log files automatically expire. Binary logs older than this value are automatically deleted to manage disk space. Increasing this value retains logs for a longer period for recovery and replication, but increases disk I/O and storage pressure",
+        "type": "continuous",
+        "range": [
+            0,
+            4294967295
+        ],
+        "dtype": "int",
+        "default_value": 2592000
+    },
+    "binlog_transaction_compression": {
+        "desc": "Enables binary log transaction compression. When enabled, it significantly reduces the disk usage and network transfer size of the binary log, helping to alleviate disk I/O and network bottlenecks, but increases CPU usage (compression and decompression overhead)",
+        "type": "discrete",
+        "range": [
+            "ON",
+            "OFF"
+        ],
+        "dtype": "string",
+        "default_value": "OFF"
+    },
+    "binlog_transaction_compression_level_zstd": {
+        "desc": "The compression level for binary logs when using the Zstd algorithm, ranging from 1 to 22. Higher levels provide better compression ratios but consume more CPU. Increasing this value further reduces log size but increases CPU load. Primarily used to balance disk I/O and CPU bottlenecks",
+        "type": "continuous",
+        "range": [
+            1,
+            22
+        ],
+        "dtype": "int",
+        "default_value": 3
     }
 }
