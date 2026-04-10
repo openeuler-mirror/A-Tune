@@ -5,7 +5,7 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            1600
         ],
         "default_value": 128
     },
@@ -64,8 +64,8 @@
         "type": "continuous",
         "dtype": "string",
         "range": [
-            null,
-            null
+            "1s",
+            "32s"
         ],
         "default_value": "3s"
     },
@@ -139,23 +139,13 @@
         ],
         "default_value": "false"
     },
-    "spark.sql.adaptive.maxNumPostShufflePartitions": {
-        "desc": "Sets maximum number of partitions after shuffle in Spark SQL adaptive query execution. This parameter helps optimize data distribution after shuffle. Proper adjustment alleviates memory and CPU bottlenecks. Increasing this value improves parallelism; decreasing it reduces number of partitions. Recommended to adjust according to specific job requirements to achieve optimal performance",
-        "type": "continuous",
-        "dtype": "int",
-        "range": [
-            1,
-            null
-        ],
-        "default_value": 500
-    },
     "spark.sql.files.maxPartitionBytes": {
         "desc": "Sets maximum number of bytes to pack into single partition when reading files in Spark SQL. Format same as JVM memory string with size unit suffix ('k', 'm', 'g' or 't') (e.g., 512m, 2g). This configuration only takes effect when using file-based sources (like Parquet, JSON and ORC). Increasing this value reduces number of partitions but may cause memory bottlenecks; decreasing it increases number of partitions, improving parallelism, thus affecting task parallelism and memory usage. Default value of this parameter is 128MB",
         "type": "continuous",
         "dtype": "string",
         "range": [
             1,
-            null
+            "1280m"
         ],
         "default_value": "128m"
     },
@@ -165,9 +155,9 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            10
         ],
-        "default_value": 1000
+        "default_value": 4
     },
     "spark.sql.shuffle.partitions": {
         "desc": "Default number of partitions to use when shuffling data for joins or aggregations. Number of partitions affects parallelism, task scheduling overhead, and data volume processed per task. Note: For structured streaming, this configuration cannot be changed between restarts of query from same checkpoint location",
@@ -175,9 +165,9 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            1000
         ],
-        "default_value": 400
+        "default_value": 200
     },
     "spark.sql.sources.parallelPartitionDiscovery.parallelism": {
         "desc": "This parameter controls parallelism (i.e., number of concurrent tasks) for parallel scanning of partition paths when discovering data source directory partitions. Higher parallelism speeds up metadata discovery for large-scale partition directories, especially when number of partitions is very large (like tens of thousands of partitions). Generally kept consistent with spark.sql.shuffle.partitions parameter",
@@ -185,8 +175,516 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            100000
         ],
         "default_value": 10000
+    },
+    "spark.driver.cores": {
+        "desc": "The number of CPU cores used by the driver process. Increasing this value can improve the driver's task scheduling parallelism, especially when there are a large number of tasks or when collecting large amounts of data. It is recommended to configure this based on the total CPU cores of the driver node. Generally, setting it to 2-4 cores meets most scenarios. If the driver side has heavy computation or data merging operations, this value can be increased appropriately",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.executor.instances": {
+        "desc": "The number of statically allocated executors. It determines how many execution containers the application can obtain in total. Increasing this value improves global parallel computing capability. This parameter only takes effect in static resource allocation mode. If dynamic allocation is enabled, this configuration is ignored. Usually calculated based on total cluster resources (total cores / cores per executor). It is recommended to set the value so that the total number of cores (instances * executor.cores) fully utilizes cluster resources without exceeding them",
+        "type": "continuous",
+        "range": [
+            1,
+            48
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "spark.executor.cores": {
+        "desc": "The number of concurrent tasks (thread pool size) that can be executed in each executor process. Increasing this value improves the parallel processing capability of a single executor. It is generally recommended to set it to 4-8 cores. Too many cores may cause HDFS I/O throughput degradation or increased GC pressure. The total number of concurrent tasks = spark.executor.instances * spark.executor.cores",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": {
+        "desc": "The target size (in KB) of shuffle partitions suggested by Adaptive Query Execution (AQE). When Spark coalesces small partitions or splits skewed partitions, it tries to make each partition close to this size. Decreasing this value creates more partitions, increasing parallelism but also increasing scheduling overhead. Increasing it reduces the number of partitions, decreasing parallelism but reducing shuffle I/O. The default is typically 64MB. This configuration should match data volume and cluster resources to optimize performance",
+        "type": "continuous",
+        "range": [
+            10,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 65536
+    },
+    "spark.broadcast.blockSize": {
+        "desc": "The size (in MB) of each block in TorrentBroadcast. Broadcast variable data is split into blocks of this size for distribution. If blocks are too large, broadcast parallelism decreases, causing slower transfer. If blocks are too small, the management overhead of the BlockManager may increase due to too many blocks",
+        "type": "continuous",
+        "range": [
+            2,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "spark.sql.adaptive.coalescePartitions.initialPartitionNum": {
+        "desc": "The initial number of shuffle partitions before coalescing partitions in Adaptive Query Execution (AQE). Before coalescing partitions, Spark shuffles according to this initial number. If not set, it defaults to the value of spark.sql.shuffle.partitions. Setting a reasonable initial partition number prevents losing too much parallelism during coalescing",
+        "type": "continuous",
+        "range": [
+            100,
+            2000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "spark.sql.adaptive.skewJoin.skewedPartitionFactor": {
+        "desc": "The factor used to determine data-skewed partitions in Adaptive Query Execution (AQE). If a partition's size is greater than (median size of all partitions * this factor) and also greater than the threshold set by 'spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes', the partition is considered skewed and triggers split optimization. Setting this factor too small may cause false positives, while setting it too large may miss real data skew",
+        "type": "continuous",
+        "range": [
+            2,
+            8
+        ],
+        "dtype": "int",
+        "default_value": 5
+    },
+    "spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes": {
+        "desc": "The byte threshold for determining data-skewed partitions in Adaptive Query Execution (AQE). If a partition's size is greater than this threshold and also greater than (median size * spark.sql.adaptive.skewJoin.skewedPartitionFactor), the partition is considered skewed. This value should typically be larger than 'spark.sql.adaptive.advisoryPartitionSizeInBytes', the unit is MB",
+        "type": "continuous",
+        "range": [
+            50,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": 256
+    },
+    "spark.sql.broadcastTimeout": {
+        "desc": "The maximum wait time (in seconds) for broadcast variables in broadcast join operations. If broadcasting is not completed within this time, the task will be terminated. For scenarios requiring broadcasting large datasets or in poor network environments, this value should be increased appropriately to prevent task failures due to broadcast timeout",
+        "type": "continuous",
+        "range": [
+            100,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "spark.sql.sources.parallelPartitionDiscovery.threshold": {
+        "desc": "The threshold for the maximum number of paths for parallel partition discovery. When listing files for partition discovery on the driver side, if the number of detected paths exceeds this value, Spark will attempt to use a distributed job to list the files to avoid overloading the driver. This configuration applies to all file-based sources such as Parquet, JSON, and ORC",
+        "type": "continuous",
+        "range": [
+            8,
+            128
+        ],
+        "dtype": "int",
+        "default_value": 32
+    },
+    "spark.sql.adaptive.enabled": {
+        "desc": "The master switch for enabling Adaptive Query Execution (AQE). When set to true, Spark SQL dynamically adjusts the query plan at runtime based on accurate intermediate statistics, such as coalescing small partitions and optimizing skewed joins, which can significantly improve the performance of complex queries",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.autoBroadcastJoinThreshold": {
+        "desc": "The maximum size (in bytes) of a table that can be broadcast when performing a join operation. When a table's size (including its subpartitions) is less than this value, Spark broadcasts the table to all executor nodes and performs a broadcast hash join, avoiding shuffle operations. Setting this value to -1 completely disables broadcasting. Increasing this value optimizes small-table join large-table scenarios, but excessively large values increase memory pressure on the driver and executors",
+        "type": "discrete",
+        "range": [
+            "0",
+            "10485760",
+            "52428800",
+            "104857600",
+            "209715200",
+            "314572800",
+            "524288000",
+            "1048576000"
+        ],
+        "dtype": "string",
+        "default_value": "10485760"
+    },
+    "spark.memory.storageFraction": {
+        "desc": "The proportion of total Spark memory used for caching data (Storage) in the Unified Memory Manager. The remaining portion is used for execution memory (Execution). This parameter defines the boundary between storage and execution memory. Adjusting this ratio balances the memory required for data caching and computation",
+        "type": "continuous",
+        "range": [
+            0.2,
+            0.8
+        ],
+        "dtype": "float",
+        "default_value": 0.5
+    },
+    "spark.speculation.multiplier": {
+        "desc": "The multiplier factor for determining slow tasks in speculative execution. When a task's runtime exceeds (median runtime of all successful tasks * this multiplier), Spark starts a speculative copy of the task. Decreasing this value makes speculative execution more likely to be triggered, potentially increasing resource consumption. Increasing it reduces speculation triggers but may allow long-tail tasks to slow down the entire job",
+        "type": "continuous",
+        "range": [
+            1.1,
+            1.9
+        ],
+        "dtype": "float",
+        "default_value": 1.5
+    },
+    "spark.speculation.quantile": {
+        "desc": "The proportion of tasks that must be completed to calculate the median task execution time for speculative execution. This means that only after a certain proportion (default 0.75, i.e., 75%) of tasks are completed, the median time is calculated to determine whether the remaining tasks need speculative execution. This value determines when speculative execution is triggered",
+        "type": "continuous",
+        "range": [
+            0.3,
+            0.9
+        ],
+        "dtype": "float",
+        "default_value": 0.75
+    },
+    "spark.sql.adaptive.coalescePartitions.enabled": {
+        "desc": "Whether to enable the partition coalescing feature in Adaptive Query Execution (AQE). When enabled, Spark coalesces multiple small shuffle partitions into larger partitions that meet the target size (specified by spark.sql.adaptive.advisoryPartitionSizeInBytes) after the shuffle stage, avoiding launching too many small tasks and reducing scheduling overhead. This feature only takes effect when spark.sql.adaptive.enabled is true",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.skewJoin.enabled": {
+        "desc": "Whether to enable the skewed join optimization in Adaptive Query Execution (AQE). When enabled, Spark dynamically detects skewed partitions in shuffle joins (such as Sort-Merge Join) at runtime and splits them into multiple sub-partitions (duplicating if necessary) to handle the long-tail task problem caused by data skew. This feature only takes effect when spark.sql.adaptive.enabled is true",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.shuffle.spill.compress": {
+        "desc": "Whether to compress data spilled to disk during the shuffle process. Enabling compression can significantly reduce disk I/O and space usage but increases CPU burden. Since network I/O is typically the bottleneck and the compression ratio is usually high, it is recommended to keep this enabled",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.shuffle.service.fetch.rdd.enabled": {
+        "desc": "Whether to allow using the External Shuffle Service to fetch RDD blocks. Enabling this feature improves the stability of shuffle fetch, especially during executor dynamic allocation or failures, preventing shuffle data loss due to executor exit",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.io.compression.codec": {
+        "desc": "The codec used for compressing internal Spark data such as RDD partitions, shuffle output, and broadcast variables. Options include lz4, lzf, snappy, and zstd. LZ4 and Snappy balance speed and compression ratio and are common choices. ZSTD provides a higher compression ratio but is slightly slower",
+        "type": "discrete",
+        "range": [
+            "lz4",
+            "lzf",
+            "snappy",
+            "zstd"
+        ],
+        "dtype": "string",
+        "default_value": "lz4"
+    },
+    "spark.network.io.preferDirectBufs": {
+        "desc": "Whether to prefer off-heap memory (Direct ByteBuffers) for network I/O in the networking module. Using off-heap memory avoids copying data between the socket buffer and the JVM heap, improving performance. If encountering 'direct memory leak' or OutOfMemoryError errors, try setting this parameter to false to fall back to heap memory",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.optimizeSkewsInRebalancePartitions.enabled": {
+        "desc": "Whether to optimize data skew in RebalancePartitions operations. When enabled, Spark splits skewed partitions into multiple smaller partitions to meet the target size (specified by spark.sql.adaptive.advisoryPartitionSizeInBytes) within AQE, thus solving data skew problems during data writing or reading. Only takes effect when spark.sql.adaptive.enabled is true",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.rebalancePartitionsSmallPartitionFactor": {
+        "desc": "The factor used to determine whether small partitions should be coalesced in RebalancePartitions optimization. If a partition's size is less than (spark.sql.adaptive.advisoryPartitionSizeInBytes * this factor), it is considered a small partition and will be merged during splitting. Increasing this factor merges more small partitions, reducing the total number of partitions",
+        "type": "continuous",
+        "range": [
+            0.1,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 0.2
+    },
+    "spark.shuffle.push.enabled": {
+        "desc": "Whether to enable the push-based shuffle feature. When enabled, mapper tasks push generated shuffle data to external shuffle services so that reducers can fetch data more quickly, improving the stability and performance of large-scale shuffles. This is a relatively new feature",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "spark.shuffle.push.mergersMinThresholdRatio": {
+        "desc": "The minimum ratio used to decide when to start push-based shuffle merging. This parameter defines the threshold proportion of mapper tasks that must have completed. Merging starts only when at least this proportion of mappers have completed data push. This is a floating-point number between 0 and 1",
+        "type": "continuous",
+        "range": [
+            0.01,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 0.05
+    },
+    "spark.shuffle.push.minCompletedPushRatio": {
+        "desc": "The minimum push completion ratio used to determine whether a push-based shuffle is successful. When determining whether a shuffle has successfully completed the push phase, at least this proportion of mappers must have successfully completed data push. This is a floating-point number between 0 and 1",
+        "type": "continuous",
+        "range": [
+            0.01,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 1
+    },
+    "spark.shuffle.io.numConnectionsPerPeer": {
+        "desc": "The maximum number of connections a shuffle client establishes with each remote peer when reading remote block data. Increasing the number of connections can improve network throughput, especially in high-latency network environments, but also increases port usage and memory overhead",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.shuffle.service.index.cache.size": {
+        "desc": "The size limit (in bytes) for caching index file information in the External Shuffle Service. Increasing the cache size can improve shuffle read efficiency and reduce disk I/O, especially when repeatedly reading the same shuffle data",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": 100
+    },
+    "spark.shuffle.accurateBlockThreshold": {
+        "desc": "When a shuffle block size exceeds this threshold (in bytes), Spark accurately tracks the block's size (e.g., for accurate estimation). For blocks smaller than this threshold, estimated values may be used to improve performance. This parameter affects the accuracy of memory management and task scheduling",
+        "type": "continuous",
+        "range": [
+            10485760,
+            10485760000
+        ],
+        "dtype": "int",
+        "default_value": 104857600
+    },
+    "spark.shuffle.registration.timeout": {
+        "desc": "The maximum wait time (in milliseconds) for an executor to register with the External Shuffle Service. If registration exceeds this time, it is considered failed. Increasing this value can prevent registration failures due to network fluctuations",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": 5000
+    },
+    "spark.shuffle.registration.maxAttempts": {
+        "desc": "The maximum number of retries for an executor to register with the External Shuffle Service. If registration fails after this number of attempts, the executor may exit. Increasing this value improves fault tolerance in unstable network environments",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": 3
+    },
+    "spark.io.compression.lz4.blockSize": {
+        "desc": "The size of each compression block (in KB) when using the LZ4 compression codec. Larger blocks can improve compression ratio but may increase memory overhead",
+        "type": "continuous",
+        "range": [
+            2,
+            3200
+        ],
+        "dtype": "int",
+        "default_value": 32
+    },
+    "spark.kryoserializer.buffer.max": {
+        "desc": "The maximum buffer size (in MiB) used by the Kryo serializer. If serializing a large object exceeds the initial buffer size, the buffer grows up to this maximum. If the required buffer exceeds this limit, the task fails. Increasing this value allows serializing very large objects",
+        "type": "continuous",
+        "range": [
+            6,
+            2047
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "spark.cleaner.periodicGC.interval": {
+        "desc": "The interval (in seconds) at which the Spark context cleaner triggers periodic GC. GC is used to clean up expired metadata such as RDDs and shuffle dependencies. If metadata cleanup is not timely and causes driver memory pressure, this interval can be decreased appropriately",
+        "type": "continuous",
+        "range": [
+            1,
+            3000
+        ],
+        "dtype": "int",
+        "default_value": 30
+    },
+    "spark.executor.heartbeatInterval": {
+        "desc": "The interval (in seconds) at which executors send heartbeat messages to the driver. Heartbeats report executor liveness and metrics information (such as task progress). Shorter intervals can detect executor failures faster but increase communication pressure on the driver",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "spark.files.fetchTimeout": {
+        "desc": "The timeout (in seconds) for fetching files (such as added JAR packages or resource files) via HTTP in a distributed environment. If file fetching is not completed within this time, the task fails. For large files or poor network conditions, this value needs to be increased",
+        "type": "continuous",
+        "range": [
+            1,
+            6000
+        ],
+        "dtype": "int",
+        "default_value": 60
+    },
+    "spark.files.maxPartitionBytes": {
+        "desc": "The maximum number of bytes that can be packed into a single partition when reading files (such as Parquet, JSON, ORC). Spark splits and combines files into multiple partitions, trying to keep each partition size not exceeding this value. Increasing this value reduces the number of partitions (i.e., number of tasks), lowering scheduling overhead, but may increase the I/O pressure or memory pressure of individual tasks",
+        "type": "continuous",
+        "range": [
+            13421772,
+            13421772800
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "spark.files.openCostInBytes": {
+        "desc": "Similar to spark.sql.files.openCostInBytes, used to estimate the cost (in bytes) of opening a file when reading files. When multiple small files exist, Spark uses this value to estimate the benefit of merging small files",
+        "type": "continuous",
+        "range": [
+            419430,
+            419430400
+        ],
+        "dtype": "int",
+        "default_value": 4194304
+    },
+    "spark.storage.memoryMapThreshold": {
+        "desc": "The threshold (in MB) for using memory-mapped files instead of Java streams to read files in the storage module. When a file size exceeds this threshold, Spark uses memory-mapped files for reading, which usually improves read efficiency but may consume virtual memory address space",
+        "type": "continuous",
+        "range": [
+            1,
+            200
+        ],
+        "dtype": "int",
+        "default_value": 2048
+    },
+    "spark.rpc.message.maxSize": {
+        "desc": "The maximum allowed size (in MB) of RPC messages in Spark. If very large task results or configuration information need to be passed between the driver and executors, this value may need to be increased; otherwise, messages may be truncated or communication may fail",
+        "type": "continuous",
+        "range": [
+            12,
+            2047
+        ],
+        "dtype": "int",
+        "default_value": 128
+    },
+    "spark.rpc.io.backLog": {
+        "desc": "The receive queue length (Backlog) of the RPC server socket. When a large number of connection requests surge in, if the queue is full, new connections will be rejected. For high-concurrency scenarios, increasing this value can prevent connection rejections",
+        "type": "continuous",
+        "range": [
+            6,
+            6400
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "spark.network.timeout": {
+        "desc": "The default timeout (in seconds) for all network interactions in Spark, such as RPC and shuffle fetch. If a network operation is not completed within this time, it is considered failed. For tasks with frequent GC pauses or high network latency, this value should be increased",
+        "type": "continuous",
+        "range": [
+            60,
+            12000
+        ],
+        "dtype": "int",
+        "default_value": 120
+    },
+    "spark.port.maxRetries": {
+        "desc": "The maximum number of retries for binding a new port when port binding fails (e.g., port already in use). Each retry attempts an incremented port number. Increasing this value improves startup success rates in environments with severe port conflicts",
+        "type": "continuous",
+        "range": [
+            1,
+            1600
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "spark.scheduler.maxRegisteredResourcesWaitingTime": {
+        "desc": "The maximum time (in seconds) the scheduler waits for resource registration (such as executors starting and registering with the driver). If sufficient resources are not successfully registered within this time, the scheduler may start attempting to schedule tasks. For scenarios requiring long startup times (such as large container pulls), this value should be increased",
+        "type": "continuous",
+        "range": [
+            3,
+            3000
+        ],
+        "dtype": "int",
+        "default_value": 30
+    },
+    "spark.scheduler.revive.interval": {
+        "desc": "The minimum interval (in seconds) between resource request (Revive Offers) sends from the TaskScheduler to the cluster manager. Shorter intervals allow tasks to obtain resources faster but increase communication load with the resource manager",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.scheduler.listenerbus.eventqueue.capacity": {
+        "desc": "The capacity of the event queue in the listener bus. Various internal Spark events (such as task start, task end) are placed in this queue for listeners to process. If the queue becomes full, new events may be dropped, potentially causing inaccurate UI or metrics information. For high-load jobs, this value should be increased",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "spark.task.reaper.pollingInterval": {
+        "desc": "The interval (in seconds) at which the Task Reaper polls to check for interrupted or stuck tasks. The Task Reaper monitors and forcibly terminates tasks that cannot terminate themselves for various reasons (such as JVM bugs)",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "spark.sql.adaptive.coalescePartitions.minPartitionSize": {
+        "desc": "The minimum allowed partition size (in MB) after coalescing partitions in Adaptive Query Execution (AQE). Prevents partitions from becoming too small after coalescing, which would impact performance. Only takes effect when spark.sql.adaptive.enabled and spark.sql.adaptive.coalescePartitions.enabled are both true",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.sql.execution.arrow.maxRecordsPerBatch": {
+        "desc": "The maximum number of records per batch when using Apache Arrow for columnar data transfer. Arrow improves data exchange efficiency between Spark SQL and Python tools such as Pandas. Setting a reasonable batch size balances memory usage and serialization overhead",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "spark.sql.shuffledHashJoinFactor": {
+        "desc": "The factor used to determine whether to use Shuffle Hash Join (SHJ). When the partition size of the side being built into a hash table is less than (average partition size of all partitions * this factor), SHJ may be chosen instead of Sort Merge Join. This is a performance tuning parameter for balancing join strategy selection",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": 3
     }
 }
