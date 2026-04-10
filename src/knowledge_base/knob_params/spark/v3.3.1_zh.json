@@ -5,7 +5,7 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            1600
         ],
         "default_value": 128
     },
@@ -64,8 +64,8 @@
         "type": "continuous",
         "dtype": "string",
         "range": [
-            null,
-            null
+            "1s",
+            "32s"
         ],
         "default_value": "3s"
     },
@@ -139,23 +139,13 @@
         ],
         "default_value": "false"
     },
-    "spark.sql.adaptive.maxNumPostShufflePartitions": {
-        "desc": "设置Spark SQL自适应查询执行中，Shuffle后最大分区数。此参数可以帮助优化Shuffle后的数据分布，适当调整可以缓解内存和CPU瓶颈。增大此值可以提高并行度，减小此值可以减少分区数量。建议根据具体的作业需求进行调整，以达到最佳性能",
-        "type": "continuous",
-        "dtype": "int",
-        "range": [
-            1,
-            null
-        ],
-        "default_value": 500
-    },
     "spark.sql.files.maxPartitionBytes": {
         "desc": "设置Spark SQL读取文件时每个分区的最大字节数。格式与 JVM 内存字符串相同，带有大小单位后缀（'k'、'm'、'g'或't'）（例如 512m、2g）。此配置仅在使用基于文件的源（如Parquet、JSON和ORC）时有效。增大此值可以减少分区数量，但可能导致内存瓶颈；减小此值可以增加分区数量，提高并行度，从而影响任务的并行性和内存使用。该参数的默认值为128MB",
         "type": "continuous",
         "dtype": "string",
         "range": [
             1,
-            null
+            "1280m"
         ],
         "default_value": "128m"
     },
@@ -165,9 +155,9 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            10
         ],
-        "default_value": 1000
+        "default_value": 4
     },
     "spark.sql.shuffle.partitions": {
         "desc": "在进行连接或聚合操作时，用于数据混洗的默认分区数。分区数影响并行度、任务调度开销和每个任务处理的数据量。注意：对于结构化流，此配置在从同一检查点位置重新启动查询之间不能更改",
@@ -175,9 +165,9 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            1000
         ],
-        "default_value": 400
+        "default_value": 200
     },
     "spark.sql.sources.parallelPartitionDiscovery.parallelism": {
         "desc": "该参数控制在发现数据源目录分区时，用于并行扫描分区路径的并行度（即并发任务数）。较高的并行度可以加快大规模分区目录的元数据发现速度，尤其是在分区数量非常多（如成千上万个分区）的情况下。一般与spark.sql.shuffle.partitions参数保持一致",
@@ -185,8 +175,516 @@
         "dtype": "int",
         "range": [
             1,
-            null
+            100000
         ],
         "default_value": 10000
+    },
+    "spark.driver.cores": {
+        "desc": "驱动程序（Driver）进程使用的CPU核心数。增加此值可以提高Driver处理任务的并行度，特别是在有大量任务调度或需要收集较多数据时。建议根据Driver节点的CPU总核心数进行配置，通常设置为2到4个核心即可满足大多数场景，若Driver端有大量计算或数据合并操作，可适当增加",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.executor.instances": {
+        "desc": "静态分配的Executor（执行器）数量。它决定了应用程序总共能获得多少个执行容器。增加此值可以提高全局的并行计算能力。该参数仅在静态资源分配模式下生效，若启用了动态分配，则此配置被忽略。通常根据集群总资源（总核心数/每个Executor的核心数）来计算，建议设置值使总核心数（实例数*executor.cores）充分利用集群资源但不超额",
+        "type": "continuous",
+        "range": [
+            1,
+            48
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "spark.executor.cores": {
+        "desc": "每个Executor（执行器）进程中可以并发执行的Task（任务）数量（即线程池大小）。增加此值可以提高单个Executor的并行处理能力。通常建议设置为4到8个核心，过大的核心数可能导致HDFS I/O吞吐量下降或GC压力增大。总并发Task数 = spark.executor.instances * spark.executor.cores",
+        "type": "continuous",
+        "range": [
+            1,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": {
+        "desc": "自适应查询执行（AQE）中建议的Shuffle分区目标大小（单位：KB）。当Spark合并小分区或拆分倾斜分区时，会尽量让每个分区的大小接近此值。调小此值会产生更多分区，提高并行度但增加调度开销；调大此值会减少分区数，降低并行度但减少Shuffle IO次数。默认通常为64MB，该配置值应与数据量和集群资源匹配，以优化性能",
+        "type": "continuous",
+        "range": [
+            10,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 65536
+    },
+    "spark.broadcast.blockSize": {
+        "desc": "TorrentBroadcast（一种广播算法）中每个数据块的大小（单位：MB）。将广播变量数据切分为该大小的块进行分发。如果块太大，会降低广播时的并行度，导致传输变慢；如果块太小，可能会因为产生过多块而增加BlockManager的管理开销",
+        "type": "continuous",
+        "range": [
+            2,
+            32
+        ],
+        "dtype": "int",
+        "default_value": 4
+    },
+    "spark.sql.adaptive.coalescePartitions.initialPartitionNum": {
+        "desc": "自适应查询执行（AQE）进行分区合并操作前的初始Shuffle分区数量。在合并分区之前，Spark会先按照这个初始数量进行Shuffle。如果不设置，默认等于 spark.sql.shuffle.partitions 的值。合理设置初始分区数可以避免在合并过程中丢失过多的并行度",
+        "type": "continuous",
+        "range": [
+            100,
+            2000
+        ],
+        "dtype": "int",
+        "default_value": ""
+    },
+    "spark.sql.adaptive.skewJoin.skewedPartitionFactor": {
+        "desc": "自适应查询执行（AQE）中判定数据倾斜分区的倍数因子。如果一个分区的大小大于（所有分区大小的中位数 * 此因子），并且同时大于 'spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes' 设定的阈值，则该分区会被判定为倾斜分区，从而触发拆分优化。该值设置过小容易误判，设置过大会漏判真正的数据倾斜",
+        "type": "continuous",
+        "range": [
+            2,
+            8
+        ],
+        "dtype": "int",
+        "default_value": 5
+    },
+    "spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes": {
+        "desc": "自适应查询执行（AQE）中判定数据倾斜分区的字节阈值。如果一个分区的大小大于此阈值，并且同时大于 'spark.sql.adaptive.skewJoin.skewedPartitionFactor' 乘以中位数的值，则该分区被视为倾斜分区。该值通常应大于 'spark.sql.adaptive.advisoryPartitionSizeInBytes' 的值，单位是MB",
+        "type": "continuous",
+        "range": [
+            50,
+            5000
+        ],
+        "dtype": "int",
+        "default_value": 256
+    },
+    "spark.sql.broadcastTimeout": {
+        "desc": "广播变量（Broadcast）在广播Join操作中的最大等待时间（单位：秒）。如果在此时间内未能完成广播，任务将被终止。对于需要广播大数据集或网络环境较差的场景，应适当增加此值，防止因广播超时而导致任务失败",
+        "type": "continuous",
+        "range": [
+            100,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 300
+    },
+    "spark.sql.sources.parallelPartitionDiscovery.threshold": {
+        "desc": "并行分区发现的最大路径数阈值。当在Driver端列出文件进行分区发现时，如果检测到的路径数量超过此值，Spark会尝试使用分布式作业来列出文件，以避免Driver端过载。此配置适用于所有基于文件的Source，如Parquet、JSON和ORC",
+        "type": "continuous",
+        "range": [
+            8,
+            128
+        ],
+        "dtype": "int",
+        "default_value": 32
+    },
+    "spark.sql.adaptive.enabled": {
+        "desc": "是否启用自适应查询执行（Adaptive Query Execution，AQE）的总开关。当设置为 true 时，Spark SQL 会在运行时根据中间结果的精确统计信息动态调整查询计划，例如合并小分区、优化倾斜Join（数据倾斜Join）等，能显著提升复杂查询的性能",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.autoBroadcastJoinThreshold": {
+        "desc": "在执行Join操作时，广播表的最大字节数阈值（单位：字节）。当表的大小（包括其子分区）小于此值时，Spark会将该表广播到所有Executor节点，执行Broadcast Hash Join（广播哈希连接），避免Shuffle操作。将此值设置为 -1 可以完全禁用广播功能。增大此值可利用广播优化小表Join大表的场景，但过大会增加Driver和Executor的内存压力",
+        "type": "discrete",
+        "range": [
+            "0",
+            "10485760",
+            "52428800",
+            "104857600",
+            "209715200",
+            "314572800",
+            "524288000",
+            "1048576000"
+        ],
+        "dtype": "string",
+        "default_value": "10485760"
+    },
+    "spark.memory.storageFraction": {
+        "desc": "在统一内存管理（Unified Memory Manager）中，用于缓存数据（Storage）的内存占总Spark内存的比例。剩余部分用于执行内存（Execution）。该参数用于划定存储和执行内存的边界。调整此比例可以平衡数据缓存和计算所需的内存",
+        "type": "continuous",
+        "range": [
+            0.2,
+            0.8
+        ],
+        "dtype": "float",
+        "default_value": 0.5
+    },
+    "spark.speculation.multiplier": {
+        "desc": "推测执行（Speculative Execution）中，慢任务判定系数的乘数因子。当某个Task的运行时间超过（所有成功Task运行时间的中位数 * 此乘数）时，Spark会启动推测副本执行。调小此值会使推测执行更容易被触发，可能会增加资源消耗；调大则会减少推测触发，但可能让长尾任务拖慢整体作业",
+        "type": "continuous",
+        "range": [
+            1.1,
+            1.9
+        ],
+        "dtype": "float",
+        "default_value": 1.5
+    },
+    "spark.speculation.quantile": {
+        "desc": "推测执行（Speculative Execution）中，用于计算Task执行时间中位数时所需完成的Task比例。这意味着只有当一定比例（默认0.75，即75%）的任务完成后，才会计算中位数时间并判断剩余任务是否需要推测执行。该值决定了推测执行触发的时机",
+        "type": "continuous",
+        "range": [
+            0.3,
+            0.9
+        ],
+        "dtype": "float",
+        "default_value": 0.75
+    },
+    "spark.sql.adaptive.coalescePartitions.enabled": {
+        "desc": "是否启用自适应查询执行（AQE）中的分区合并（Coalesce Partitions）功能。当启用后，Spark会在Shuffle阶段结束后，将多个小的Shuffle分区合并为符合目标大小（由 spark.sql.adaptive.advisoryPartitionSizeInBytes 指定）的大分区，以避免启动过多的小任务，减少调度开销。此功能仅在 spark.sql.adaptive.enabled 为 true 时生效",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.skewJoin.enabled": {
+        "desc": "是否启用自适应查询执行（AQE）中的数据倾斜Join优化（Skew Join Optimization）。当启用后，Spark会在运行时动态检测Shuffle Join（如Sort-Merge Join）中的倾斜分区，并将其拆分为多个子分区（必要时进行复制）来处理，从而解决数据倾斜导致的长尾任务问题。此功能仅在 spark.sql.adaptive.enabled 为 true 时生效",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.shuffle.spill.compress": {
+        "desc": "是否压缩Shuffle过程中溢写到磁盘的数据。启用压缩可以显著减少磁盘I/O和空间占用，但会增加CPU负担。由于网络I/O通常是瓶颈，且压缩比通常很高，建议保持开启",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.shuffle.service.fetch.rdd.enabled": {
+        "desc": "是否允许使用外部Shuffle服务（External Shuffle Service）来获取RDD块。启用此功能可以提高Shuffle fetch的稳定性，特别是在Executor动态分配或发生故障时，避免因Executor退出而导致shuffle数据丢失",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.io.compression.codec": {
+        "desc": "用于压缩Spark内部数据（如RDD分区、Shuffle输出、广播变量等）的编解码器。可选值包括 lz4、lzf、snappy、zstd。LZ4和Snappy在速度和压缩率上比较均衡，是常用选择；ZSTD提供更高的压缩率但速度稍慢",
+        "type": "discrete",
+        "range": [
+            "lz4",
+            "lzf",
+            "snappy",
+            "zstd"
+        ],
+        "dtype": "string",
+        "default_value": "lz4"
+    },
+    "spark.network.io.preferDirectBufs": {
+        "desc": "是否在Networking模块中优先使用堆外内存（Direct ByteBuffers）进行网络I/O。使用堆外内存可以避免数据在Socket缓冲区与JVM堆之间的拷贝，提升性能。如果遇到“直接内存泄漏”或OutOfMemoryError错误，可以尝试将此参数设置为 false 以回退到堆内存",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.optimizeSkewsInRebalancePartitions.enabled": {
+        "desc": "是否在RebalancePartitions（重平衡分区）操作中优化数据倾斜。当启用后，Spark会在AQE中将倾斜的分区拆分成多个更小的分区，以适应目标大小（由 spark.sql.adaptive.advisoryPartitionSizeInBytes 指定），从而解决数据写入或读取时的倾斜问题。仅在 spark.sql.adaptive.enabled 为 true 时生效",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "true"
+    },
+    "spark.sql.adaptive.rebalancePartitionsSmallPartitionFactor": {
+        "desc": "在RebalancePartitions（重平衡分区）优化中，用于判定小分区是否应被合并的系数。如果一个分区的大小小于（spark.sql.adaptive.advisoryPartitionSizeInBytes * 此系数），则该分区被视为小分区并在拆分过程中被合并。增大此系数会合并更多的小分区，减少分区总数",
+        "type": "continuous",
+        "range": [
+            0.1,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 0.2
+    },
+    "spark.shuffle.push.enabled": {
+        "desc": "是否启用Shuffle推存（Push-based Shuffle）功能。启用后，Mapper任务将生成的shuffle数据推送到外部Shuffle服务，以便Reducer可以更快地获取数据，提高大规模shuffle的稳定性和性能。这是一个相对较新的特性",
+        "type": "discrete",
+        "range": [
+            "false",
+            "true"
+        ],
+        "dtype": "string",
+        "default_value": "false"
+    },
+    "spark.shuffle.push.mergersMinThresholdRatio": {
+        "desc": "用于决定启动Shuffle推存合并的最小比率。该参数定义了已完成Mapper任务的比例阈值，只有当至少此比例的Mapper完成数据推送后，才会开始进行合并操作。这是一个介于0和1之间的浮点数",
+        "type": "continuous",
+        "range": [
+            0.01,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 0.05
+    },
+    "spark.shuffle.push.minCompletedPushRatio": {
+        "desc": "用于决定Shuffle推存是否成功的最小完成推送比率。在判定一个Shuffle是否成功完成推送阶段时，需要至少此比例的Mapper成功完成了数据推送。这是一个介于0和1之间的浮点数",
+        "type": "continuous",
+        "range": [
+            0.01,
+            1.0
+        ],
+        "dtype": "float",
+        "default_value": 1
+    },
+    "spark.shuffle.io.numConnectionsPerPeer": {
+        "desc": "Shuffle客户端在读取远端Block数据时，与每个远端Peer（对等节点）建立的最大连接数。增加连接数可以提高网络吞吐量，尤其是在高延迟的网络环境中，但也会增加端口占用和内存开销",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.shuffle.service.index.cache.size": {
+        "desc": "外部Shuffle服务（External Shuffle Service）中用于缓存索引文件信息的大小限制（单位：字节）。增加缓存大小可以提高Shuffle读取的效率，减少磁盘I/O，尤其是在重复读取相同shuffle数据时",
+        "type": "continuous",
+        "range": [
+            10,
+            10000
+        ],
+        "dtype": "int",
+        "default_value": 100
+    },
+    "spark.shuffle.accurateBlockThreshold": {
+        "desc": "Shuffle块大小超过此阈值（单位：字节）时，Spark会精确跟踪该块的大小（例如用于精确估算）。对于小于此阈值的块，可能使用估算值以提高性能。此参数影响内存管理和任务调度的精确性",
+        "type": "continuous",
+        "range": [
+            10485760,
+            10485760000
+        ],
+        "dtype": "int",
+        "default_value": 104857600
+    },
+    "spark.shuffle.registration.timeout": {
+        "desc": "Executor向外部Shuffle服务（External Shuffle Service）注册的最大等待时间（单位：毫秒）。如果超过此时间，注册会被视为失败。增加此值可以防止在网络抖动时注册失败",
+        "type": "continuous",
+        "range": [
+            500,
+            500000
+        ],
+        "dtype": "int",
+        "default_value": 5000
+    },
+    "spark.shuffle.registration.maxAttempts": {
+        "desc": "Executor向外部Shuffle服务（External Shuffle Service）注册的最大重试次数。如果达到此次数后仍然失败，Executor可能会退出。增加此值可以提高在网络不稳定情况下的容错性",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": 3
+    },
+    "spark.io.compression.lz4.blockSize": {
+        "desc": "当使用LZ4压缩编解码器时，每个压缩块的大小（单位：KB）。较大的块可以提高压缩率，但可能会增加内存开销",
+        "type": "continuous",
+        "range": [
+            2,
+            3200
+        ],
+        "dtype": "int",
+        "default_value": 32
+    },
+    "spark.kryoserializer.buffer.max": {
+        "desc": "Kryo序列化器使用的缓冲区的最大大小（单位：MiB）。如果序列化一个大对象时超过了缓冲区初始大小，缓冲区会增长到该最大值。如果所需缓冲区超过此限制，任务会失败。增加此值可以允许序列化非常大的对象",
+        "type": "continuous",
+        "range": [
+            6,
+            2047
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "spark.cleaner.periodicGC.interval": {
+        "desc": "Spark上下文清理器（ContextCleaner）触发周期性GC的时间间隔（单位：秒）。GC用于清理已过期的RDD、Shuffle依赖等元数据。如果元数据清理不及时导致Driver内存压力大，可以适当调小此间隔",
+        "type": "continuous",
+        "range": [
+            1,
+            3000
+        ],
+        "dtype": "int",
+        "default_value": 30
+    },
+    "spark.executor.heartbeatInterval": {
+        "desc": "Executor向Driver发送心跳消息的时间间隔（单位：秒）。心跳用于汇报Executor的存活性以及度量信息（如Task进度）。较短的间隔可以更快地检测到Executor故障，但会增加Driver的通信压力",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "spark.files.fetchTimeout": {
+        "desc": "在分布式环境中，通过HTTP获取文件（如添加的JAR包或资源文件）的超时时间（单位：秒）。超过此时间未完成文件获取则任务失败。对于大文件或网络较差的场景，需要增加此值",
+        "type": "continuous",
+        "range": [
+            1,
+            6000
+        ],
+        "dtype": "int",
+        "default_value": 60
+    },
+    "spark.files.maxPartitionBytes": {
+        "desc": "在读取文件（如Parquet、JSON、ORC）时，单个分区能够打包的最大字节数。Spark会将文件切分并组合成多个分区，每个分区的大小尽量不超过此值。增大此值会减少分区数（即任务数），降低调度开销，但可能会增加单个任务的I/O压力或内存压力",
+        "type": "continuous",
+        "range": [
+            13421772,
+            13421772800
+        ],
+        "dtype": "int",
+        "default_value": 134217728
+    },
+    "spark.files.openCostInBytes": {
+        "desc": "与 spark.sql.files.openCostInBytes 类似，用于文件读取时估算打开一个文件的开销（单位：字节）。当多个小文件存在时，Spark会使用此值来估算合并小文件的收益",
+        "type": "continuous",
+        "range": [
+            419430,
+            419430400
+        ],
+        "dtype": "int",
+        "default_value": 4194304
+    },
+    "spark.storage.memoryMapThreshold": {
+        "desc": "存储模块使用内存映射（Memory-Mapped）而非Java流来读取文件的阈值（单位：MB）。当文件大小超过此阈值时，Spark会使用内存映射文件来读取，这通常能提高读取效率，但可能会占用虚拟内存地址空间",
+        "type": "continuous",
+        "range": [
+            1,
+            200
+        ],
+        "dtype": "int",
+        "default_value": 2
+    },
+    "spark.rpc.message.maxSize": {
+        "desc": "Spark中RPC（远程过程调用）消息的最大允许大小（单位：MB）。如果Driver和Executor之间需要传递非常大的任务结果或配置信息，可能需要增大此值，否则消息会被截断或通信失败",
+        "type": "continuous",
+        "range": [
+            12,
+            2047
+        ],
+        "dtype": "int",
+        "default_value": 128
+    },
+    "spark.rpc.io.backLog": {
+        "desc": "RPC服务端Socket的接收队列长度（Backlog）。当瞬间涌入大量连接请求时，如果队列满了，新的连接会被拒绝。对于高并发的场景，增大此值可以防止连接拒绝",
+        "type": "continuous",
+        "range": [
+            6,
+            6400
+        ],
+        "dtype": "int",
+        "default_value": 64
+    },
+    "spark.network.timeout": {
+        "desc": "Spark所有网络交互（如RPC、Shuffle Fetch等）的默认超时时间（单位：秒）。如果某个网络操作在此时间内未完成，会被判定为失败。对于GC频繁导致停顿或网络延迟较高的任务，应增加此值",
+        "type": "continuous",
+        "range": [
+            60,
+            12000
+        ],
+        "dtype": "int",
+        "default_value": 120
+    },
+    "spark.port.maxRetries": {
+        "desc": "当绑定端口失败（如端口被占用）时，Spark尝试绑定新端口的最大重试次数。每次重试会尝试递增的端口号。增加此值可以提高在端口冲突严重环境中的启动成功率",
+        "type": "continuous",
+        "range": [
+            1,
+            1600
+        ],
+        "dtype": "int",
+        "default_value": 16
+    },
+    "spark.scheduler.maxRegisteredResourcesWaitingTime": {
+        "desc": "调度器等待资源注册（如Executor启动并注册到Driver）的最大时间（单位：秒）。如果在此时间内没有足够的资源注册成功，调度器可能开始尝试调度任务。对于需要大量启动时间的场景（如大容器拉起），应增加此值",
+        "type": "continuous",
+        "range": [
+            3,
+            3000
+        ],
+        "dtype": "int",
+        "default_value": 30
+    },
+    "spark.scheduler.revive.interval": {
+        "desc": "任务调度器（TaskScheduler）在发送资源请求（Revive Offers）给集群管理器之间的最小间隔（单位：毫秒）。较短的间隔可以让任务更快地得到资源，但会增加与资源管理器的通信负载",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.scheduler.listenerbus.eventqueue.capacity": {
+        "desc": "监听器总线（ListenerBus）中事件队列的容量。Spark内部的各种事件（如任务开始、结束）会放入此队列供监听器处理。如果队列满了，新的事件会被丢弃，可能导致UI或Metrics信息不准确。对于高负载作业，应增大此值",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "spark.task.reaper.pollingInterval": {
+        "desc": "任务收割器（Task Reaper）轮询检查中断或卡死任务的间隔（单位：秒）。任务收割器用于监控并强制结束那些因为各种原因（如JVM bug）无法自行终止的任务",
+        "type": "continuous",
+        "range": [
+            1,
+            1000
+        ],
+        "dtype": "int",
+        "default_value": 10
+    },
+    "spark.sql.adaptive.coalescePartitions.minPartitionSize": {
+        "desc": "自适应查询执行（AQE）中，合并分区后允许的最小分区大小（单位：MB）。防止分区合并后产生的分区过小，影响性能。只有当 spark.sql.adaptive.enabled 和 spark.sql.adaptive.coalescePartitions.enabled 都为 true 时生效",
+        "type": "continuous",
+        "range": [
+            1,
+            100
+        ],
+        "dtype": "int",
+        "default_value": 1
+    },
+    "spark.sql.execution.arrow.maxRecordsPerBatch": {
+        "desc": "使用Apache Arrow进行列式数据传输时，每个批次的最大记录数。Arrow可以提升Spark SQL与Pandas等Python工具之间的数据交换效率。设置合理的批次大小可以平衡内存使用和序列化开销",
+        "type": "continuous",
+        "range": [
+            1000,
+            1000000
+        ],
+        "dtype": "int",
+        "default_value": 10000
+    },
+    "spark.sql.shuffledHashJoinFactor": {
+        "desc": "用于决定是否采用Shuffle Hash Join（SHJ）的因子。当被构建为哈希表的那一方的分区大小小于（所有分区平均大小 * 此因子）时，可能会选择SHJ而不是Sort Merge Join。这是一个性能调优参数，用于平衡Join策略的选择",
+        "type": "continuous",
+        "range": [
+            1,
+            300
+        ],
+        "dtype": "int",
+        "default_value": 3
     }
 }
