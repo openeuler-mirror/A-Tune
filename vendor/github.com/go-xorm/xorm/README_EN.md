@@ -1,48 +1,46 @@
 # xorm
 
-[中文](https://github.com/go-xorm/xorm/blob/master/README_CN.md)
+[English](https://github.com/go-xorm/xorm/blob/master/README.md)
 
-Xorm is a simple and powerful ORM for Go.
+XORM is a simple and powerful ORM library for the Go language. It simplifies database operations.
 
 [![CircleCI](https://circleci.com/gh/go-xorm/xorm.svg?style=shield)](https://circleci.com/gh/go-xorm/xorm) [![codecov](https://codecov.io/gh/go-xorm/xorm/branch/master/graph/badge.svg)](https://codecov.io/gh/go-xorm/xorm)
-[![](https://goreportcard.com/badge/github.com/go-xorm/xorm)](https://goreportcard.com/report/github.com/go-xorm/xorm) 
+[![](https://goreportcard.com/badge/github.com/go-xorm/xorm)](https://goreportcard.com/report/github.com/go-xorm/xorm)
 [![Join the chat at https://img.shields.io/discord/323460943201959939.svg](https://img.shields.io/discord/323460943201959939.svg)](https://discord.gg/HuR2CF3)
 
 ## Features
 
-* Struct <-> Table Mapping Support
+* Flexible mapping between structs and database tables, with automatic synchronization
 
-* Chainable APIs
+* Transaction support
 
-* Transaction Support
+* Mixed raw SQL and ORM operations
 
-* Both ORM and raw SQL operation Support
+* Chain-style API for simpler calls
 
-* Sync database schema Support
+* Function and struct conditions such as Id, In, Where, Limit, Join, Having, Table, Sql, and Cols
 
-* Query Cache speed up
+* Eager loading of structs
 
-* Database Reverse support, See [Xorm Tool README](https://github.com/go-xorm/cmd/blob/master/README.md)
+* Schema support (Postgres only)
 
-* Simple cascade loading support
+* Caching support
 
-* Optimistic Locking support
+* Automatic generation of XORM structs from the database
 
-* SQL Builder support via [xorm.io/builder](https://xorm.io/builder)
+* Versioning (optimistic locking)
 
-* Automatical Read/Write seperatelly
+* Built-in SQL builder
 
-* Postgres schema support
+* Context cache
 
-* Context Cache support
+## Drivers
 
-## Drivers Support
-
-Drivers for Go's sql package which currently support database/sql includes:
+The following Go database drivers and databases are supported:
 
 * Mysql: [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
 
-* MyMysql: [github.com/ziutek/mymysql/godrv](https://github.com/ziutek/mymysql/tree/master/godrv)
+* MyMysql: [github.com/ziutek/mymysql/godrv](https://github.com/ziutek/mymysql/godrv)
 
 * Postgres: [github.com/lib/pq](https://github.com/lib/pq)
 
@@ -52,27 +50,31 @@ Drivers for Go's sql package which currently support database/sql includes:
 
 * MsSql: [github.com/denisenkom/go-mssqldb](https://github.com/denisenkom/go-mssqldb)
 
-* Oracle: [github.com/mattn/go-oci8](https://github.com/mattn/go-oci8) (experiment)
+* MsSql: [github.com/lunny/godbc](https://github.com/lunny/godbc)
 
-## Installation
+* Oracle: [github.com/mattn/go-oci8](https://github.com/mattn/go-oci8) (experimental support)
+
+## Install
 
 	go get github.com/go-xorm/xorm
 
 ## Documents
 
-* [Manual](http://xorm.io/docs)
+* [Operation Guide](http://xorm.io/docs)
 
-* [GoDoc](http://godoc.org/github.com/go-xorm/xorm)
+* [GoWalker Code Document](http://gowalker.org/github.com/go-xorm/xorm)
 
-## Quick Start
+* [Godoc Code Document](http://godoc.org/github.com/go-xorm/xorm)
 
-* Create Engine
+# Quick Start
+
+* Create an engine. The `driverName` and `dataSourceName` are the same as in the `database/sql` interface.
 
 ```Go
 engine, err := xorm.NewEngine(driverName, dataSourceName)
 ```
 
-* Define a struct and Sync2 table struct to database
+* Define a struct that is synchronized with the table and automatically synchronize the struct to the database.
 
 ```Go
 type User struct {
@@ -88,7 +90,7 @@ type User struct {
 err := engine.Sync2(new(User))
 ```
 
-* Create Engine Group
+* Create an engine group.
 
 ```Go
 dataSourceNameSlice := []string{masterDataSourceName, slave1DataSourceName, slave2DataSourceName}
@@ -102,9 +104,9 @@ slave2Engine, err := xorm.NewEngine(driverName, slave2DataSourceName)
 engineGroup, err := xorm.NewEngineGroup(masterEngine, []*Engine{slave1Engine, slave2Engine})
 ```
 
-Then all place where `engine` you can just use `engineGroup`.
+All `engine` fields can be replaced with `engineGroup`.
 
-* `Query` runs a SQL string, the returned results is `[]map[string][]byte`, `QueryString` returns `[]map[string]string`, `QueryInterface` returns `[]map[string]interface{}`.
+* The original `Query` also supports SQL statement query. The returned result type is `[]map[string][]byte`. `QueryString` returns `[]map[string]string`, and `QueryInterface` returns `[]map[string]interface{}`.
 
 ```Go
 results, err := engine.Query("select * from user")
@@ -117,13 +119,13 @@ results, err := engine.QueryInterface("select * from user")
 results, err := engine.Where("a = 1").QueryInterface()
 ```
 
-* `Exec` runs a SQL string, it returns `affected` and `error`
+* `Exec`: Execute an SQL statement.
 
 ```Go
 affected, err := engine.Exec("update user set age = ? where name = ?", age, name)
 ```
 
-* `Insert` one or multiple records to database
+* `Insert`: Insert one or more records.
 
 ```Go
 affected, err := engine.Insert(&user)
@@ -141,7 +143,7 @@ affected, err := engine.Insert(&user1, &users)
 // INSERT INTO struct2 () values (),(),()
 ```
 
-* `Get` query one record from database
+* `Get`: Query a single record.
 
 ```Go
 has, err := engine.Get(&user)
@@ -168,7 +170,7 @@ has, err := engine.Table(&user).Where("id = ?", id).Cols(cols...).Get(&valuesSli
 // SELECT col1, col2, col3 FROM user WHERE id = ?
 ```
 
-* `Exist` check if one record exist on table
+* `Exist`: Check whether a record exists.
 
 ```Go
 has, err := testEngine.Exist(new(RecordExist))
@@ -192,7 +194,7 @@ has, err = testEngine.Table("record_exist").Where("name = ?", "test1").Exist()
 // SELECT * FROM record_exist WHERE name = ? LIMIT 1
 ```
 
-* `Find` query multiple records from database, also you can use join and extends
+* `Find`: Query multiple records. You can use `Join` and `extends` together.
 
 ```Go
 var users []User
@@ -210,14 +212,14 @@ type UserDetail struct {
 }
 
 var users []UserDetail
-err := engine.Table("user").Select("user.*, detail.*").
+err := engine.Table("user").Select("user.*, detail.*")
     Join("INNER", "detail", "detail.user_id = user.id").
     Where("user.name = ?", name).Limit(10, 0).
     Find(&users)
 // SELECT user.*, detail.* FROM user INNER JOIN detail WHERE user.name = ? limit 10 offset 0
 ```
 
-* `Iterate` and `Rows` query multiple records and record by record handle, there are two methods Iterate and Rows
+* `Iterate` and `Rows`: Traverse the database based on conditions in either `Iterate` or `Rows` mode.
 
 ```Go
 err := engine.Iterate(&User{Name:name}, func(idx int, bean interface{}) error {
@@ -242,7 +244,7 @@ for rows.Next() {
 }
 ```
 
-* `Update` update one or more records, default will update non-empty and non-zero fields except when you use Cols, AllCols and so on.
+* `Update`: Update data. Unless the `Cols` and `AllCols` functions are used, only non-null and non-zero fields are updated by default.
 
 ```Go
 affected, err := engine.ID(1).Update(&user)
@@ -252,7 +254,7 @@ affected, err := engine.Update(&user, &User{Name:name})
 // UPDATE user SET ... Where name = ?
 
 var ids = []int64{1, 2, 3}
-affected, err := engine.In("id", ids).Update(&user)
+affected, err := engine.In(ids).Update(&user)
 // UPDATE user SET ... Where id IN (?, ?, ?)
 
 // force update indicated columns by Cols
@@ -267,7 +269,7 @@ affected, err := engine.ID(1).AllCols().Update(&user)
 // UPDATE user SET name=?,age=?,salt=?,passwd=?,updated=? Where id = ?
 ```
 
-* `Delete` delete one or more records, Delete MUST have condition
+* `Delete`: Deletes records. Note that at least one condition must be met for deletion. Otherwise, an error is reported. To clear the database, use `EmptyTable`.
 
 ```Go
 affected, err := engine.Where(...).Delete(&user)
@@ -277,14 +279,14 @@ affected, err := engine.ID(2).Delete(&user)
 // DELETE FROM user Where id = ?
 ```
 
-* `Count` count records
+* `Count`: Obtain the number of records.
 
 ```Go
 counts, err := engine.Count(&user)
 // SELECT count(*) AS total FROM user
 ```
 
-* `Sum` sum functions
+* `Sum`: summation function.
 
 ```Go
 agesFloat64, err := engine.Sum(&user, "age")
@@ -300,14 +302,14 @@ sumInt64Slice, err := engine.SumsInt(&user, "age", "score")
 // SELECT sum(age), sum(score) FROM user
 ```
 
-* Query conditions builder
+* Condition editor
 
 ```Go
 err := engine.Where(builder.NotIn("a", 1, 2).And(builder.In("b", "c", "d", "e"))).Find(&users)
 // SELECT id, name ... FROM user WHERE a NOT IN (?, ?) AND b IN (?, ?, ?)
 ```
 
-* Multiple operations in one go routine, no transation here but resue session memory
+* Multiple database operations in a single goroutine without using transactions
 
 ```Go
 session := engine.NewSession()
@@ -330,7 +332,7 @@ if _, err := session.Exec("delete from userinfo where username = ?", user2.Usern
 return nil
 ```
 
-* Transation should on one go routine. There is transaction and resue session memory
+* Transactions within a single goroutine
 
 ```Go
 session := engine.NewSession()
@@ -360,7 +362,7 @@ if _, err := session.Exec("delete from userinfo where username = ?", user2.Usern
 return session.Commit()
 ```
 
-* Or you can use `Transaction` to replace above codes.
+* Simplified transaction syntax
 
 ```Go
 res, err := engine.Transaction(func(session *xorm.Session) (interface{}, error) {
@@ -381,7 +383,7 @@ res, err := engine.Transaction(func(session *xorm.Session) (interface{}, error) 
 })
 ```
 
-* Context Cache, if enabled, current query result will be cached on session and be used by next same statement on the same session.
+* Context cache support: When enabled, single-object query results are cached and can be reused by subsequent queries.
 
 ```Go
 	sess := engine.NewSession()
@@ -412,52 +414,30 @@ res, err := engine.Transaction(func(session *xorm.Session) (interface{}, error) 
 
 ## Contributing
 
-If you want to pull request, please see [CONTRIBUTING](https://github.com/go-xorm/xorm/blob/master/CONTRIBUTING.md). And we also provide [Xorm on Google Groups](https://groups.google.com/forum/#!forum/xorm) to discuss.
+If you also want to contribute to xorm, see [CONTRIBUTING](https://github.com/go-xorm/xorm/blob/master/CONTRIBUTING.md). You can also join the QQ group for technical help and discussion.
+Group 1: 280360085 (full)
+Group 2: 795010183
 
 ## Credits
 
 ### Contributors
 
-This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+Thank you to all the contributors.[[Contribute](CONTRIBUTING.md)].
 <a href="graphs/contributors"><img src="https://opencollective.com/xorm/contributors.svg?width=890&button=false" /></a>
 
 ### Backers
 
-Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/xorm#backer)]
+Thank you to all the backers. 🙏 [[Become a Backer](https://opencollective.com/xorm#backer)]
 
 <a href="https://opencollective.com/xorm#backers" target="_blank"><img src="https://opencollective.com/xorm/backers.svg?width=890"></a>
 
 ### Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/xorm#sponsor)]
+Become a sponsor to support xorm. Your logo will be displayed and linked to your website. [[Become a Sponsor](https://opencollective.com/xorm#sponsor)]
 
-## Changelog
+# Cases
 
-* **v0.7.0**
-    * Some bugs fixed
-
-* **v0.6.6**
-    * Some bugs fixed
-
-* **v0.6.5**
-    * Postgres schema support
-    * vgo support
-    * Add FindAndCount
-    * Database special params support via NewEngineWithParams
-    * Some bugs fixed
-
-* **v0.6.4**
-    * Automatical Read/Write seperatelly
-    * Query/QueryString/QueryInterface and action with Where/And
-    * Get support non-struct variables
-    * BufferSize on Iterate
-    * fix some other bugs.
-
-[More changes ...](https://github.com/go-xorm/manual-en-US/tree/master/chapter-16)
-
-## Cases
-
-* [studygolang](http://studygolang.com/) - [github.com/studygolang/studygolang](https://github.com/studygolang/studygolang)
+* [Go](http://studygolang.com/) - [github.com/studygolang/studygolang](https://github.com/studygolang/studygolang)
 
 * [Gitea](http://gitea.io) - [github.com/go-gitea/gitea](http://github.com/go-gitea/gitea)
 
@@ -472,8 +452,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 * [Docker.cn](https://docker.cn/)
 
 * [Xorm Adapter](https://github.com/casbin/xorm-adapter) for [Casbin](https://github.com/casbin/casbin) - [github.com/casbin/xorm-adapter](https://github.com/casbin/xorm-adapter)
-
-* [Gorevel](http://gorevel.cn/) - [github.com/goofcc/gorevel](http://github.com/goofcc/gorevel)
 
 * [Gowalker](http://gowalker.org) - [github.com/Unknwon/gowalker](http://github.com/Unknwon/gowalker)
 
@@ -491,6 +469,31 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 * [go-blog](http://wangcheng.me) - [github.com/easykoo/go-blog](https://github.com/easykoo/go-blog)
 
+## Changelog
+
+* **v0.7.0**
+    * Fixed some bugs.
+
+* **v0.6.6**
+    * Fixed some bugs.
+
+* **v0.6.5**
+    * Introduced `engine.SetSchema` to support schemas. Currently, only Postgres is supported.
+    * Added vgo support.
+    * Added the `FindAndCount` function.
+    * Introduced `NewEngineWithParams` to support special database parameters.
+    * Fixed some bugs.
+
+* **v0.6.4**
+    * Added the capability of automatic read/write splitting.
+    * Added the capability of using Query/QueryString/QueryInterface and Where/And together.
+    * Added support for obtaining non-structural variables via `Get`.
+    * Added `BufferSize` support by `Iterate`.
+    * Fixed some bugs.
+
+[More changelogs...](https://github.com/go-xorm/manual-zh-CN/tree/master/chapter-16)
+
 ## LICENSE
 
-BSD License [http://creativecommons.org/licenses/BSD/](http://creativecommons.org/licenses/BSD/)
+BSD License
+[http://creativecommons.org/licenses/BSD/](http://creativecommons.org/licenses/BSD/)
