@@ -1,6 +1,6 @@
 <img src="misc/A-Tune-logo.png" width="50%" height="50%"/>
 
-[English](./README.md) | 简体中文
+[English](./README_EN.md) | 简体中文
 
 ## A-Tune介绍
 

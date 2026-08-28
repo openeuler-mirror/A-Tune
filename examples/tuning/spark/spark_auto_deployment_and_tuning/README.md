@@ -1,6 +1,8 @@
-## Spark 自动化部署和HiBench基准性能测试
+# Spark 自动化部署和HiBench基准性能测试
 
-### **工作流程**
+[English](./README_EN.md) | 简体中文
+
+## **工作流程**
 
 一、**Spark 自动化部署流程**
 

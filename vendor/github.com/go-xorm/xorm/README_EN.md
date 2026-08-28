@@ -1,6 +1,6 @@
 # xorm
 
-[English](https://github.com/go-xorm/xorm/blob/master/README.md)
+English | [简体中文](./README_CN.md)
 
 XORM is a simple and powerful ORM library for the Go language. It simplifies database operations.
 

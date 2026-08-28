@@ -1,5 +1,7 @@
 # Automated Deployment of Spark and HiBench Performance Benchmarking
 
+English | [简体中文](./README.md)
+
 ## **Workflow**
 
 **I. Automatic deployment of Spark**
