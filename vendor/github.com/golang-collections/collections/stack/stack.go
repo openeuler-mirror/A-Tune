@@ -8,7 +8,7 @@ type (
 	node struct {
 		value interface{}
 		prev *node
-	}
+	}	
 )
 // Create a new stack
 func New() *Stack {
@@ -30,7 +30,7 @@ func (this *Stack) Pop() interface{} {
 	if this.length == 0 {
 		return nil
 	}
-
+	
 	n := this.top
 	this.top = n.prev
 	this.length--
