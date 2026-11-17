@@ -10,7 +10,7 @@
 
 ## 环境准备
 
-- 安装openEuler系统，安装方法参考 《[安装指南](https://docs.openeuler.openatom.cn/zh/docs/24.03_LTS_SP2/server/installation_upgrade/installation/installation_on_servers.html)》。
+- 安装openEuler系统，安装方法参考 《[安装指南](https://docs.openeuler.openatom.cn/zh/docs/24.03_LTS_SP2/server/installation_upgrade/installation/installation_preparations.html)》。
 
 - 安装A-Tune需要使用root权限。
 
@@ -397,7 +397,7 @@ A-Tune安装完成后，需要配置A-Tune服务，然后启动A-Tune服务。
 1. 本文档不对认证证书配置方法作详细说明，如有需要也可以将atuned.cnf和engine.cnf中的rest_tls/engine_tls设成false。
 2. 修改完配置文件后需要重启服务，否则修改不会生效。
 3. 注意使用atune服务时不要同时打开代理。
-4. atuned.cnf 文件中的[system]模块的disk和network项需要修改，修改方法见[A-Tune用户指南2.4.1章节](https://gitee.com/gaoruoshu/A-Tune/blob/master/Documentation/UserGuide/A-Tune%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md)，本文不展开描述。
+4. atuned.cnf 文件中的[system]模块的disk和network项需要修改，修改方法见(#-配置介绍)。
 
 ### 举例
 

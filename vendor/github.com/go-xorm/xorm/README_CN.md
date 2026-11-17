@@ -1,6 +1,6 @@
 # xorm
 
-[English](https://github.com/go-xorm/xorm/blob/master/README.md)
+[English](./README_EN.md) | 简体中文
 
 xorm是一个简单而强大的Go语言ORM库. 通过它可以使数据库操作非常简便。
 

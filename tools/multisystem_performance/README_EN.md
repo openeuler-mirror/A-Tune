@@ -1,5 +1,7 @@
 # OSPP: Multiple-System Performance Verification Tool
 
+English | [简体中文](./README.md)
+
 The multi-system performance verification tool is located in the `tools` directory of A-Tune. It loads system parameters from compared systems and performs performance testing.
 
 ---

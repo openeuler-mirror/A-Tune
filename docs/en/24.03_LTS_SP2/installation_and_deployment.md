@@ -14,7 +14,7 @@ This chapter describes how to install and deploy A-Tune.
 
 ## Environment Preparation
 
-For details about installing an openEuler OS, see the [_openEuler Installation Guide_](https://docs.openeuler.openatom.cn/en/docs/24.03_LTS_SP1/server/installation_upgrade/installation/installation_on_servers.html).
+For details about installing an openEuler OS, see the [_openEuler Installation Guide_](https://docs.openeuler.openatom.cn/en/docs/24.03_LTS_SP2/server/installation_upgrade/installation/installation_on_servers.html).
 
 ## A-Tune Installation
 
@@ -399,7 +399,7 @@ In distributed deployment mode, you need to configure the write the IP address a
 1. This document does not describe how to configure the authentication certificates. You can set **rest_tls** or **engine_tls** in the **atuned.cnf** and **engine.cnf** files to **false** if necessary.
 2. After modifying the configuration file, restart the service. Otherwise, the modification does not take effect.
 3. Do not enable the proxy when using A-Tune.
-4. The **disk** and **network** items of the **\[system]** section in the **atuned.cnf** file need to be modified. For details about how to modify the items, see the [A-Tune User Guide](https://gitee.com/gaoruoshu/A-Tune/blob/master/Documentation/UserGuide/A-Tune%E7%94%A8%E6%88%B7%E6%8C%87%E5%8D%97.md).
+4. The **disk** and **network** items of the **\[system]** section in the **atuned.cnf** file need to be modified. For details about how to modify the items, see (#-overview).
 
 ### Example
 

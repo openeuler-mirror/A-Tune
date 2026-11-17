@@ -1,5 +1,7 @@
 # Bisect-based Performance Analysis Tool
 
+English | [简体中文](./README.md)
+
 This tool automatically analyzes performance differences between two software versions and identifies the key code commits responsible for improvements or regressions. By leveraging a bisection strategy, it efficiently narrows the search space, significantly reducing manual effort.
 
 ## How to Use
