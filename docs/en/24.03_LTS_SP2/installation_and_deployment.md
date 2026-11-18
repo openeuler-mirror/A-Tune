@@ -399,7 +399,7 @@ In distributed deployment mode, you need to configure the write the IP address a
 1. This document does not describe how to configure the authentication certificates. You can set **rest_tls** or **engine_tls** in the **atuned.cnf** and **engine.cnf** files to **false** if necessary.
 2. After modifying the configuration file, restart the service. Otherwise, the modification does not take effect.
 3. Do not enable the proxy when using A-Tune.
-4. The **disk** and **network** items of the **\[system]** section in the **atuned.cnf** file need to be modified. For details about how to modify the items, see (#-overview).
+4. The **disk** and **network** items of the **\[system]** section in the **atuned.cnf** file need to be modified. For details about how to modify the items, see [Overview](#overview).
 
 ### Example
 
