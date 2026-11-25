@@ -71,6 +71,7 @@ A-Tune支持的主要特性、特性成熟度以及使用建议请参见[表1](#
 
 **表 2**  支持的业务类型和应用
 
+<a name="table2819164611311"></a>
 <table class="MsoNormalTable" border="0" cellspacing="0" cellpadding="0" width="1440" style="width:1080.0pt;background:white;border-collapse:collapse">
  <thead>
   <tr>
